@@ -1,0 +1,52 @@
+%% Details of the function:
+% NAME:
+%   save_fig
+% 
+% PURPOSE:
+%   save the current figure to png and fig formats, but not before asking
+%   to save
+%
+% CALLING SEQUENCE:
+%  save_fig(pid,fi,asktopause
+%
+% INPUT:
+%  - pid: figure id number
+%  - fi: file path for figure saving
+%  - asktopause: boolean to either ask to save before saving (gives time to
+%                adjust figure) (default set to true)
+%
+% OUTPUT:
+%  - saved figure files in .png and .fig
+%
+% DEPENDENCIES:
+%  - version_set.m: to track the version of this script
+%
+% NEEDED FILES:
+%  none
+%
+% EXAMPLE:
+%  >> figure(12); 
+%  >> plot(x,y);
+%  >> save_fig(12,[dir 'simpleplot'],true);
+%
+%
+% MODIFICATION HISTORY:
+% Written (v1.0): Samuel LeBlanc, NASA Ames, 2014
+% Modified: 
+%
+% -------------------------------------------------------------------------
+
+%% Function routine
+function save_fig(pid,fi,asktopause)
+version_set('1.0');
+if nargin<3, asktopause=true; end; % set default asktopause behavior
+if asktopause 
+  OK =menu('continue or exit?','Continue','Exit');
+  if OK==2
+      stophere
+      return
+  end
+end
+saveas(pid,[fi '.fig']);
+saveas(pid,[fi '.png']);
+disp(['saving figure at:' fi])

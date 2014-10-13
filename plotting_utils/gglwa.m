@@ -1,0 +1,3 @@
+function gglwa
+
+get_good_looking_wavelength_axis
