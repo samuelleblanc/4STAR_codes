@@ -1,16 +1,47 @@
-%function sasze_radcals_nonlinear_SL
+%% PURPOSE:
+%   Generate the nonlinear analysis from multiple radiance calibrations
+%   taken with different large intgrateiong sphere lamp number and settings
+%
+% CALLING SEQUENCE:
+%   star_radcals_nonlinear
+%
+% INPUT:
+%   none
+% 
+% OUTPUT:
+%  - resp_corr.mat save file with data from nonlinear analysis
+%  - plots of welldepth vs. radiance or counts
+%
+% DEPENDENCIES:
+%  - startup.m
+%  - save_fig.m
+%  - version_set.m : for version control of this file
+%  - load_calrad.m : for loading radiance calibration files
+%  - meannonan.m : for calculating mean value without nans
+%  - makepoly_nresp.m : to build a polynomial of the response function
+%  - recolor.m : to recolor the lines
+%
+% NEEDED FILES:
+%  - radiance calibration files
+%
+% EXAMPLE:
+%  
+%
+% MODIFICATION HISTORY:
+% Written: Samuel LeBlanc, NASA Ames, date unknown, 2014
+%          - ported from sasze_radcals_nonlinear_SL.m
+%
+% -------------------------------------------------------------------------
+
+%% Start of function
+function star_radcals_nonlinear
+version_set('1.0');
+startup;
 clear
 close all
-%infile = getfullname_('SASZe*radcals.*.mat','radcals','Select "All Lamp" radcals file.');
-%cals = load(infile);
-
-% previous kept from Connor's work
-% next line calls new routine related to 4STAR - specific to a single test
-% case
 
 asktopause=false;
 [cals pname date corstr] = load_calrad();
-filesep='\';
 
 %[pname, fname, ext] = fileparts(infile); pname = [pname, filesep];
 fields = fieldnames(cals);
@@ -64,16 +95,9 @@ end
 %
 % make new analysis based on the nonlin structure
 pols=makepoly_nresp(nonlin);
-if asktopause 
-  OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      return
-  end
-end
-saveas(6,[pname,filesep,date, 'welldepth_nresp_polyfit' corstr '.fig']);
-saveas(6,[pname,filesep,date, 'welldepth_nresp_polyfit' corstr '.png']);
+save_fig(6,[pname,filesep,date, 'welldepth_nresp_polyfit' corstr],asktopause);
 
-% plot the normalized responsitivity and non-normalized responsitivity for
+%% plot the normalized responsitivity and non-normalized responsitivity for
 % a single wavelength
 disp('plotting at single wavelength vis');
 nm_ = 555;
@@ -90,14 +114,7 @@ xlabel('well depth')
 ylabel('normalized responsivity')
 title(['normalized responsivity vs well depth for vis pixel ',num2str(nm_)])
 grid on;
-if asktopause 
-  OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      return
-  end
-end
-saveas(1,[pname,filesep,date, 'welldepth_nresp_vis_',num2str(nm_),corstr,'.fig']);
-saveas(1,[pname,filesep,date, 'welldepth_nresp_vis_',num2str(nm_),corstr,'.png']);
+save_fig(1,[pname,filesep,date, 'welldepth_nresp_vis_',num2str(nm_),corstr],asktopause);
 
 %
 figure(5); plot(nonlin.Lamps_1.vis.wells(:,nm_), nonlin.Lamps_1.vis.resp(:,nm_),'o-',...
@@ -111,16 +128,7 @@ xlabel('Well Depth')
 ylabel('Responsivity (counts/(Wm^-2sr^-1nm^-1)')
 title(['Responsivity vs well depth for vis pixel ',num2str(nm_)])
 grid on;
-if asktopause
-  OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      return
-  end
-end
-
-saveas(5,[pname,filesep,date, 'welldepth_resp_vis_',num2str(nm_),corstr,'.fig']);
-saveas(5,[pname,filesep,date, 'welldepth_resp_vis_',num2str(nm_),corstr,'.png']);
-
+save_fig(5,[pname,filesep,date, 'welldepth_resp_vis_',num2str(nm_),corstr],asktopause);
 
 %% now to do the same for nir spectrometer
 % plot the normalized responsitivity and non-normalized responsitivity for
@@ -140,14 +148,7 @@ xlabel('well depth')
 ylabel('normalized responsivity')
 title(['normalized responsivity vs well depth for nir pixel ',num2str(nm_)])
 grid on;
-if asktopause
-  OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      return
-  end
-end
-saveas(2,[pname,filesep,date, 'welldepth_nresp_nir_',num2str(nm_),corstr,'.fig']);
-saveas(2,[pname,filesep,date, 'welldepth_nresp_nir_',num2str(nm_),corstr,'.png']);
+save_fig(2,[pname,filesep,date, 'welldepth_nresp_nir_',num2str(nm_),corstr],asktopause);
 
 %
 figure(7); plot(nonlin.Lamps_1.nir.wells(:,nm_), nonlin.Lamps_1.nir.resp(:,nm_),'o-',...
@@ -161,15 +162,7 @@ xlabel('Well Depth')
 ylabel('Responsivity (counts/(Wm^-2sr^-1nm^-1)')
 title(['Responsivity vs well depth for nir pixel ',num2str(nm_)])
 grid on;
-if asktopause
-  OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      return
-  end
-end
-
-saveas(7,[pname,filesep,date, 'welldepth_resp_nir_',num2str(nm_),corstr,'.fig']);
-saveas(7,[pname,filesep,date, 'welldepth_resp_nir_',num2str(nm_),corstr,'.png']);
+save_fig(7,[pname,filesep,date, 'welldepth_resp_nir_',num2str(nm_),corstr],asktopause);
 
 
 %% new figures
@@ -254,19 +247,11 @@ for LL = fliplr(Lamps)
         xlabel('well depth')
         ylabel('sensitivity')
         title(['Relative sensitivity to well-depth for ',spc, ' with ',lamp_str],'interp','none');   
-        if asktopause
-          OK =menu('continue or exit?','Continue','Exit')
-          if OK==2
-            break
-          end
-        end
         
         if strcmp(spc,'vis')   
-          saveas(10,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr,'.fig']);
-          saveas(10,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr,'.png']); 
+            save_fig(10,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr],asktopause);
         else
-          saveas(11,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr,'.fig']);
-          saveas(11,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr,'.png']); 
+            save_fig(11,[pname,filesep,date, 'welldepth_sensitivity.',lamp_str,'_',spc,corstr],asktopause);
         end
      end
 
@@ -399,12 +384,7 @@ title('NIR spectrometer combined relationship with well depth');
 xlabel('Well depth');
 ylabel('Normalized response');
 
-OK =menu('continue or exit?','Continue','Exit')
-  if OK==2
-      break
-  end
-saveas(12,[pname,filesep,date, 'welldepth_response_combine',corstr,'.fig']);
-saveas(12,[pname,filesep,date, 'welldepth_response_combine',corstr,'.png']); 
+save_fig(12,[pname,filesep,date, 'welldepth_response_combine',corstr],asktopause);
 
 if length(corstr) <= 1  
     disp(['Saving nonlinear analysis data to: ' pname '\' date '_resp_corr.mat'])
