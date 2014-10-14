@@ -27,8 +27,7 @@
 %  
 %
 % MODIFICATION HISTORY:
-% Written: Samuel LeBlanc, on Hercules C130, lat: 70 lon: -148, September
-% 15th, 2014
+% Written: Samuel LeBlanc, on Hercules C130, lat: 70 lon: -148, September 15th, 2014
 %
 % -------------------------------------------------------------------------
 
