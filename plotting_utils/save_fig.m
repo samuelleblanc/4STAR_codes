@@ -32,18 +32,21 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, 2014
-% Modified: 
+% Modified (v1.1): by Samuel LeBlanc, NASA Ames, October 14th, 2014
+%                  - changed the stophere to eval('dbstop');
 %
 % -------------------------------------------------------------------------
 
 %% Function routine
 function save_fig(pid,fi,asktopause)
-version_set('1.0');
+version_set('1.1');
 if nargin<3, asktopause=true; end; % set default asktopause behavior
 if asktopause 
   OK =menu('continue or exit?','Continue','Exit');
   if OK==2
-      stophere
+      s=dbstack;
+      eval(['dbstop in ' s(2).name ' at ' num2str(s(2).line+1)])
+      %stophere %evalin('caller','dbstop if 1==1'); %stophere
       return
   end
 end

@@ -51,19 +51,31 @@ if evalin('caller','exist(''program_version'');') && evalin('base','exist(''prog
   program_version=catstruct(pvb,pvc); % if there is overlap, use the caller program_version, but issue warning
 elseif evalin('caller','exist(''program_version'');'); % check if the program_version exists in the caller workspace
   program_version=evalin('caller','program_version'); % load program_version from caller workspace
-elseif evalin('base','exist(''program_version'');'); % check if the program_version exists in the base workspace
+elseif evalin('base','exist(''program_version'');'); % check if the program_version exists in the base workspace and if the caller of this program is the main program
   program_version=evalin('base','program_version'); % get the program_version
 end;
 
 
-program_version.(currentmfile)=['Version: ' v_in ...
-                                ' - Date last modified: ' mfile.date ...
-                                ' - Ran by: ' getUserName()];
+program_version.(currentmfile)=[{'Version: ' v_in} ...
+                                {'Date last modified: ' mfile.date}...
+                                {'Ran by: ' getUserName()}];
                             
-clear pppp currentmfile pppp2 mfile
+
 assignin('caller','program_version',program_version);
 assignin('base','program_version',program_version);
+if length(pppp) > 2;
+    evalin('caller','assignin(''caller'',''program_version'',program_version)');
+    if length(pppp) > 3;
+      evalin('caller','evalin(''caller'',''assignin(''''caller'''',''''program_version'''',program_version)'')');
+      if length(pppp) > 4;
+          evalin('caller','evalin(''caller'',''evalin(''''caller'''',''''assignin(''''''''caller'''''''',''''''''program_version'''''''',program_version)'''')'')');
+      end;
+    end;
+end;
+
+clear pppp currentmfile pppp2 mfile
 return
+
 
 %% function that returns the user name
 function name = getUserName ()
