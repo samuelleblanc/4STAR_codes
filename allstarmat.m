@@ -17,7 +17,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % Yohei, 2011/10/24, 2012/04/11, 2012/06/27, 2013/02/13
 % CJF: 2012/10/05
 % CJF: 2013/12/05: edited lines 145 and following to strip empty records
-
+% SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
+version_set('1.0');
 %********************
 % control input
 %********************
@@ -156,9 +157,9 @@ for ii=1:length(contents);
     end
         
     if ii==1 && append==0;
-        save(savematfile, contents{ii},'-mat', '-v7');
+        save(savematfile, contents{ii},'-mat', '-v7','program_version');
     else
-        save(savematfile, contents{ii},'-mat', '-v7', '-append');
+        save(savematfile, contents{ii},'-mat', '-v7', '-append','program_version');
     end;
 end;
 
