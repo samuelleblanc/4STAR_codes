@@ -1,15 +1,56 @@
-function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-% [visresp, nirresp, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
+%% Details of the program:
+% NAME:
+%   starskyresp
+% 
+% PURPOSE:
+%  returns the 4STAR responsivity [cts/ms / W/(m^2.sr.um)] for the time (t) of the
+%  measurement. t must be in the Matlab time format. Leave blank and now is
+%  assumed. New calibration files should be linked to this code, and all
+%  other 4STAR codes should obtain the responsivity functions from this code. See also
+%  starwavelengths.m and starLangley.m.  
+%
+% CALLING SEQUENCE:
+%   [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t)
+%
+% INPUT:
+%  t: time (in matlab format) of the measurements, to choose the correct
+%     response function, when omitted takes the current time
+% 
+% OUTPUT:
+%  visresp: response function for the vis spectrometer
+%  nirresp: response function for the nir spectrometer
+%  visnote: notes indicating which response function file used for vis
+%  nirnote: notes indicating which response function file used for nir
+%  vislstr: visfilename for response function
+%  nirlstr: nirfilename for response function
+%  visaerosolcols: returns wavelength index to which the aeronet channels match in vis  
+%  niraerosolcols: returns wavelength index to which the aeronet channels match in nir
+%  visresperr: response uncertainty for vis spectrometer
+%  nirresperr: response uncertainty for nir spectrometer 
+%
+% DEPENDENCIES:
+%  - version_set.m (for version control of the script)
+%
+% NEEDED FILES:
+%  - VIS and NIR sky barrell response functions created from HISS
+%
+% EXAMPLE:
+%
+%
+% MODIFICATION HISTORY:
+% Written (v1.0): Yohei Shinozuka, 2012/05/28, 2012/05/31 (ported over from starc0)
+% Modified (v1.1): Samuel LeBlanc, NASA Ames, October 14th, 2014
+%                  - update to include calibrations from post SEAC4RS and
+%                    pre-ARISE
+%                  - updated to include links to response functions of
+%                    ARISE calibrations
+%                  - added version control of this m-script
+%
+% -------------------------------------------------------------------------
 
-% returns the 4STAR responsivity [cts/ms / W/(m^2.sr.um)] for the time (t) of the
-% measurement. t must be in the Matlab time format. Leave blank and now is
-% assumed. New calibration files should be linked to this code, and all
-% other 4STAR codes should obtain the c0 from this code. See also
-% starwavelengths.m and starLangley.m.  
-% Yohei, 2012/05/28, 2012/05/31.
-% Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
-version_set('1.0');
-%%[visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+%% start of function
+function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
+version_set('1.1');
 
 % control the input
 if nargin==0;
@@ -17,18 +58,35 @@ if nargin==0;
 end;
 
 % select a source file
-if isnumeric(t); % time of the measurement is given; return the C0 of the time.
+if isnumeric(t); % time of the measurement is given; return the response of the time.
     if t>=datenum([2012 7 3 0 0 0])&& t< datenum([2013 1 16 0 0 0]) ; % new VIS spectrometer since July 3, 2012       
         daystr='20120920'; % temporary calibration, over m_aero over 1.2 - 1.8.
         %         filesuffix='refined_Langley_on_G1_screened_2x_with_gas_absorption_ignored';
         %         filesuffix='refined_Langley_on_G1_second_flight_screened_2x_with_gas_absorption_ignored';
         filesuffix='from_20120920_006_VIS_park_with_201112131052Hiss-corrected';
     elseif t >= datenum([2013 1 16 0 0 0])
-        % 20130506_VIS_SKY_Resp_with_20130605124300HISS.dat
+        % response linked to 20130506_VIS_SKY_Resp_with_20130605124300HISS.dat
         daystr = '20130506';
-        filesuffix = 'with_20130605124300HISS';
-    end;    
-else % special collections
+        filesuffix = 'with_20130605124300HISS';    elseif t>= datenum([2013 8 1 0 0 0]) && t < datenum([2013 9 20 0 0 0]);
+        % updated by SL to use May 2013 radiance calibration from the
+        % sphere with 9 lamps - For SEAC4RS data
+        daystr = '20130507';
+        filesuffix = 'from_20130507_008_VIS_park_with_20130605124300HISS';
+    elseif t>= datenum([2013 9 1 0 0 0]) && t < datenum([2014 5 20 0 0 0]);
+        daystr = '20131121';
+        filesuffix = 'from_20131121_010_VIS_park_with_20130605124300HISS';
+    elseif t>= datenum([2014 5 21 0 0 0]) && t < datenum([2014 7 15 0 0 0]);
+        % for using calibration from first lab sphere cal
+        % with SEAC4RS fiber (not the long one going on ARISE)
+        daystr = '20140624'; % date of cal
+        filesuffix = 'from_20140624_016_VIS_park_with_20140606091700HISS';
+    elseif t >= datenum([2014 7 16 0 0 0]);
+        % for using calibration from second lab sphere cal
+        % with long fiber for the ARISE field campaign
+        daystr = '20140716';
+        filesuffix = 'from_20140716_008_VIS_park_with_20140606091700HISS';
+    end;  
+else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
     if isequal(t, 'MLO201205') || isequal(t, 'MLO2012May')
         daystr={'20120525' '20120526' '20120528' '20120531' '20120601' '20120602' '20120603'};
@@ -36,7 +94,7 @@ else % special collections
     end;
 end;
 
-% read the file and return c0 values and notes
+% read the file and return response values and notes
 if ~exist('visresp')
     if ~exist('filesuffix');
         error('Update starc0.m');
