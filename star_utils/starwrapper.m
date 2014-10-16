@@ -70,7 +70,7 @@ if (~isempty(varargin))
     if mod(nargin,2); % varargin not paired 
         varargin={s2,varargin{:}};
     end;
-    for c=1:length(varargin)-1
+    for c=1:2:length(varargin)-1
        switch varargin{c}
           case {'verbose'}
             c=c+1;
@@ -175,8 +175,8 @@ end;
 %% include wavelengths in um and flip NIR raw data
 if verbose; disp('add related variables, count rate and combine structures'), end;
 [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
-[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t)); % C0
-[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t));% this is for calling modified c0 file
+[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),verbose); % C0
+[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),verbose);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
 [visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
 if ~isempty(strfind(lower(datatype),'vis'));
@@ -206,7 +206,7 @@ if size(s.raw,2)<1000
 else
     sat_val = 65535;
 end
-disp('...calculating saturated points');
+if verbose; disp('...calculating saturated points'); end;
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
@@ -255,7 +255,7 @@ if applynonlinearcorr
     if nargin>=2+nnarg;
        s2.rawcorr=r_raw;
     end;
-    disp('finished running nonlinear correction')
+    if verbose; disp('finished running nonlinear correction'), end;
 else
     s.rawcorr=s.raw;
     if nargin>=2+nnarg;

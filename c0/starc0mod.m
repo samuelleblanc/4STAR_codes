@@ -11,10 +11,11 @@
 %   modLangley.m.
 %
 % CALLING SEQUENCE:
-%  [visc0mod, nirc0mod, visnote, nirnote, vislstr, nirlstr, viswvcols, nirwvcols, visc0moderr, nirc0moderr]=starc0mod(t)
+%  [visc0mod, nirc0mod, visnote, nirnote, vislstr, nirlstr, viswvcols, nirwvcols, visc0moderr, nirc0moderr]=starc0mod(t,verbose)
 %
 % INPUT:
-%  - t: t must be in the Matlab time format. 
+%  t: t must be in the Matlab time format. 
+%  verbose: optional, to set if the function outputs text to the command line
 % 
 % OUTPUT:
 %  - visc0mod: array of TOA Langley, including water vapor regions
@@ -40,18 +41,21 @@
 % Written: Michal Segal-Rozenhaimer, NASA Ames, July 21st, 2014
 % Modified (v1.0): Samuel LeBlanc, NASA Ames, October 13th, 2014
 %           - added version_set for version control
+% Modified (v1.1): Samuel LeBlanc, NASA Ames, October, 15th, 2014
+%           - added the verbose keyword
 %
 % -------------------------------------------------------------------------
 %% function routine
-function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t)
-version_set('1.0');
+function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
+version_set('1.1');
 
 % control the input
 if nargin==0;
     t=now;
 end;
+if ~exist('verbose','var'); verbose=true; end;
 
-disp('...in starc0mod')
+if verbose; disp('...in starc0mod'), end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.

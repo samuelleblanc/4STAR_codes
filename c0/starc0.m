@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
@@ -9,7 +9,13 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
 % Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
-version_set('1.0');
+% Samuel, v1.1, 2014/10/15, added verbose keyword
+version_set('1.1');
+if ~exist('verbose','var')
+    verbose=true;
+end;
+
+if verbose; disp('In starc0'), end;
 % control the input
 if nargin==0;
     t=now;
