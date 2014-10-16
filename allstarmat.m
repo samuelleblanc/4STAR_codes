@@ -159,7 +159,7 @@ for ii=1:length(contents);
     if ii==1 && append==0;
         save(savematfile, contents{ii},'-mat', '-v7','program_version');
     else
-        save(savematfile, contents{ii},'-mat', '-v7', '-append','program_version');
+        save(savematfile, contents{ii},'-mat', '-append','program_version');
     end;
 end;
 
