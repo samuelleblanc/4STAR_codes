@@ -64,10 +64,11 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         %         filesuffix='refined_Langley_on_G1_screened_2x_with_gas_absorption_ignored';
         %         filesuffix='refined_Langley_on_G1_second_flight_screened_2x_with_gas_absorption_ignored';
         filesuffix='from_20120920_006_VIS_park_with_201112131052Hiss-corrected';
-    elseif t >= datenum([2013 1 16 0 0 0])
+    elseif t >= datenum([2013 1 16 0 0 0]) && t < datenum([2013 8 1 0 0 0]);
         % response linked to 20130506_VIS_SKY_Resp_with_20130605124300HISS.dat
         daystr = '20130506';
-        filesuffix = 'with_20130605124300HISS';    elseif t>= datenum([2013 8 1 0 0 0]) && t < datenum([2013 9 20 0 0 0]);
+        filesuffix = 'with_20130605124300HISS';    
+    elseif t>= datenum([2013 8 1 0 0 0]) && t < datenum([2013 9 20 0 0 0]);
         % updated by SL to use May 2013 radiance calibration from the
         % sphere with 9 lamps - For SEAC4RS data
         daystr = '20130507';
@@ -97,7 +98,7 @@ end;
 % read the file and return response values and notes
 if ~exist('visresp')
     if ~exist('filesuffix');
-        error('Update starc0.m');
+        error('Update starskyresp.m');
     elseif isstr(filesuffix);
         daystr={daystr};
         filesuffix={filesuffix};

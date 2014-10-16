@@ -45,10 +45,10 @@ function hiss_star_cals = Radiance_cals_4STAR
 version_set('1.0');
 
 %date='20131121'
-date='20130506'
+%date='20130506'
 %date='20140624'
-%date='20140716'
-docorrection=false;
+date='20140716'
+docorrection=true; %false;
 
 %% Legacy codes
 % nir = rd_spc_TCAP_v2([pname,'20120920_003_NIR_park.dat']);
@@ -458,7 +458,8 @@ else
     corstr='';
 end
 
-save([pname filesep date '_rad_cal' corstr])
-disp(['saved to ' pname filesep date '_rad_cal' corstr '.mat'])
+fname=[pname filesep date '_rad_cal' corstr];
+save(fname)
+disp(['saved to ' fname '.mat'])
 disp('Now stopping program')
 return
