@@ -23,7 +23,11 @@ function [rate, dark, darkstd, note]=starrate(s, bounds)
 % SL: 2014/10/08: applied the rate calculation on rawcorr instead of raw, 
 %                 to use linearly corrected data
 % SL: v1.0, 2014/10/13: added version control to this m-script via version_set
-version_set('1.0');
+% SL: v1.1, 2014/10/17: - added statements to use darks that have been interpolated from the
+%                       darks at other integration times if none are available, 
+%                       - added check on darks if they are too large,
+%                         VIS @ 574 nm > 1000, NIR @ 1283.7 nm > 2000
+version_set('1.1');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -60,6 +64,18 @@ for uu=1:length(tintu); % for each integration time
         dark(rowsu,:)=repmat(nanmean(dark(rowsu,:),1),size(rowsu));
         darkstd(rowsu,:)=repmat(nanstd(dark(rowsu,:),1),size(rowsu));
         note='over entire duration.';
+        % check if the darks are too large
+        if length(s.w)==512; % it is the nir spectrometer
+           if any(dark(rowsu,200) > 2000); 
+               dark(rowsu(dark(rowsu,200)>2000),:)=NaN; 
+               note=[note ' Dark too high, therefore ignored.'];
+           end;
+         else % for the VIS spectrometer
+           if any(dark(rowsu,500) > 1000); 
+               dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+               note=[note ' Dark too high, therefore ignored.'];
+           end;
+        end;
     else
         if isstr(bounds) & (isequal(lower(bounds), 'bookends') | isequal(lower(bounds), 'bookend') | isequal(lower(bounds), 'sandwich'));
             diffstr=diff(s.Str(rowsu));
@@ -96,11 +112,26 @@ for uu=1:length(tintu); % for each integration time
         if ~isempty(index);
             [dark0sum,snsum]=sumvec(dark(rowsu,:),index);
             [darkstd(rowsu,:),snstd]=stdvec(dark(rowsu,:),index);
-            dark(rowsu,:)=dark0sum./snsum;
+            dark(rowsu,:)=dark0sum./snsum;            
             note=['Darks averaged ' note];
+            % check if the darks are too large
+            if length(s.w)==512; % it is the nir spectrometer
+              if any(dark(rowsu,200) > 2000); 
+                  dark(rowsu(dark(rowsu,200)>2000),:)=NaN; 
+                  note=[note ' Dark too high, therefore ignored.'];
+              end;
+            else % for the VIS spectrometer
+              if any(dark(rowsu,500) > 1000); 
+                  dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+                  note=[note ' Dark too high, therefore ignored.'];
+              end;
+            end;
+
         end;
     end;
 end;
+
+%% check if there are missing darks
 if any(any(isnan(dark)));
     [ngtint,ngi]=unique(s.Tint(any(isnan(dark),2)==1));
     warning(['Dark not measured for ' num2str(sum(any(isnan(dark),2))) ' data points.']);
@@ -108,8 +139,34 @@ if any(any(isnan(dark)));
     for nn=1:length(ngtint);
         warning([num2str(ngtint(nn)) ' (e.g., ' datestr(s.t(ngi(nn)), 31) ', row #' num2str(ngi(nn)) ')']);
     end;
+    if any(any(isfinite(dark))); % checking to see if there are any darks to use
+        warning('.. Using darks interpolated/extrapolated from other integration times');
+        inotemptydark=any(isfinite(dark'));
+        for iw=1:length(s.w); % loop through eacj wavelength
+          % calculate dark rate for non empty darks
+          darkrate(:,iw)=dark(inotemptydark,iw)./s.Tint(inotemptydark); 
+          % interpolate the dark rate to all the available times
+          darkrate_filled(:,iw)=interp1(s.t(inotemptydark),darkrate(:,iw),s.t,'linear','extrap');
+          % repopulate the empty darks with the new interpolated/extrapolated dark_rate*Tint
+          dark(~inotemptydark,iw)=darkrate_filled(~inotemptydark,iw).*s.Tint(~inotemptydark);
+        end;
+        clear darkrate darkrate_filled inotemptydark
+        note=[note, '.. darks for Tint:' num2str(ngtint(nn)) ' were interpolated/extrapolated from darks of other integration times'];
+    end;
 end;
 
+%% check darks for any problems
+if length(s.w)==512; % it is the nir spectrometer
+    if any(dark(:,200) > 2000);
+        warning('NIR darks too large, please double check');
+    end;
+else % for the VIS spectrometer
+    if any(dark(:,500) > 1000);
+        warning('VIS darks too large, please double check');
+    end;
+end;
+
+%% final calculations of rate
 % determine adjustment factor (for read-out time or something, TO BE UPDATED).
 adj=1; 
 
