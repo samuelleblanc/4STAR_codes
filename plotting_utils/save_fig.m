@@ -48,7 +48,10 @@ if asktopause
       eval(['dbstop in ' s(2).name ' at ' num2str(s(2).line+1)])
       %stophere %evalin('caller','dbstop if 1==1'); %stophere
       return
-  end
+  else;
+      s=dbstack;
+      eval(['dbclear in ' s(2).name ' at ' num2str(s(2).line+1)])
+  end;
 end
 saveas(pid,[fi '.fig']);
 saveas(pid,[fi '.png']);
