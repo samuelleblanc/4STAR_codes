@@ -6,9 +6,11 @@
 %  Create the calibration for the small sphere
 %
 % CALLING SEQUENCE:
-%   d=small_sphere_cal(varargin)
+%   d=small_sphere_cal(daystr, dir, varargin)
 %
 % INPUT:
+%  daystr: input day of calibration in form of a string (yyyymmdd), optional
+%  dir: input of directory to se as base, optional
 %  varargin:
 % 
 % OUTPUT:
@@ -26,6 +28,7 @@
 %  - starwrapper.m
 %  - version_set.m
 %  - load_sphere_transfer.m : for choosing and loading the correct sphere transfer cal
+%  - small_sphere_select.m : for selecting the right files for each day
 %
 % NEEDED FILES:
 %  - small sphere park files 
@@ -47,22 +50,33 @@
 %           - building of new response functions and saving of those files 
 %           in conjunction with load_sphere_transfer
 %           - set flag for use of background data
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, Octoer, 17th, 2014
+%           - added call to small_sphere_select, which selects which files
+%           to use for every day of calibration, and the range of data
+%           within that file via flt
+%           - added variables to be used on command line call of daystr and
+%           dir.
 %
 % -------------------------------------------------------------------------
 
 %% start of function
-function d=small_sphere_cal(varargin)
+function d=small_sphere_cal(daystr, dir, varargin)
 startup;
 version_set('1.1')
 
+if ~exist('daystr','var');
+  daystr='20140804'; % set the default
+end;
 % setting the standard variables
-dir='C:\Users\sleblan2\Research\4STAR\cal\';
+if ~exist('dir','var'); dir='C:\Users\sleblan2\Research\4STAR\cal\'; end;
 l=filesep;
 
 %********************
 %% regulate input and read source
 %********************
-[sourcefile, contents0, savematfile]=startupbusiness('park', 'ask',['.' filesep 'tempmatdata.mat'],varargin{:});
+
+[fnames,flt,fnamesbak,fltbak,isbackground]=small_sphere_select(daystr,dir);
+[sourcefile, contents0, savematfile]=startupbusiness('park', fnames,['.' filesep 'tempmatdata.mat'],varargin{:});
 load(sourcefile,contents0{:},'program_version');
 
 %% add variables and make adjustments common among all data types. Also
@@ -71,19 +85,18 @@ load(sourcefile,contents0{:},'program_version');
     for i=1:length(s.t); s.rad(i,:)=s.rate(i,:)./s.skyresp; end;
 
 %% build the mean and standard dev radiance values
-rad=nanmean(s.rad(s.sat_time==0 & s.raw(:,500)>2000,:));
-rad_std=nanstd(s.rad(s.sat_time==0 & s.raw(:,500)>2000,:));
+rad=nanmean(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
+rad_std=nanstd(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 nm=s.w*1000.0;
 
 %% build the mean and standard dev rate values
-rate=nanmean(s.rate);
-rate_std=nanstd(s.rate);
+rate=nanmean(s.rate(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
+rate_std=nanstd(s.rate(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 
 %% Check if there is a background file
-isbackground=menu('Is there a background radiation file?','Yes','No');
-if isbackground == 1; 
+if isbackground
     disp('There is a background file')
-    [sourcefile, contents0, savematfile]=startupbusiness('park','ask',['.' filesep 'tempmatdata.mat'], varargin{:});
+    [sourcefile, contents0, savematfile]=startupbusiness('park',fnamesbak,['.' filesep 'tempmatdata.mat'], varargin{:});
     s2=load(sourcefile,contents0{:});
 
     % add variables and make adjustments common among all data types. Also
@@ -92,18 +105,16 @@ if isbackground == 1;
     for i=1:length(sbak.t); sbak.rad(i,:)=sbak.rate(i,:)./sbak.skyresp; end;
 
     % build the mean and standard dev radiance values
-    rad_back=nanmean(sbak.rad(sbak.sat_time==0,:));
-    rad_back_std=nanstd(sbak.rad(sbak.sat_time==0,:));
+    rad_back=nanmean(sbak.rad(fltbak(sbak.sat_time(fltbak)==0),:));
+    rad_back_std=nanstd(sbak.rad(fltbak(sbak.sat_time(fltbak)==0),:));
     
     % build the mean and standard dev radiance values
-    rate_back=nanmean(sbak.rate(sbak.sat_time==0,:));
-    rate_back_std=nanstd(sbak.rate(sbak.sat_time==0,:));
+    rate_back=nanmean(sbak.rate(fltbak(sbak.sat_time(fltbak)==0),:));
+    rate_back_std=nanstd(sbak.rate(fltbak(sbak.sat_time(fltbak)==0),:));
     
     % remove the background radiation to the calibrated radiance
     rad=rad-rad_back;
     rate=rate-rate_back;
-else; 
-    isbackground=0; 
 end;
 
 %% plot the resulting radiances
@@ -141,8 +152,8 @@ d.nm=nm;
 d.isbackground=isbackground;
 
 %% output important information
-visTint=unique(s.visTint)
-nirTint=unique(s.nirTint)
+visTint=unique(s.visTint(flt))
+nirTint=unique(s.nirTint(flt))
 [nul ind1]=min(abs(s.w-0.5));
 [nul ind2]=min(abs(s.w-1.2));
 disp(['visrate=' num2str(rate(ind1))])
@@ -150,14 +161,14 @@ disp(['nirrate=' num2str(rate(ind2))])
 disp(['visratestd=' num2str(rate_std(ind1))])
 disp(['nirratestd=' num2str(rate_std(ind2))])
 for i=1:length(visTint)
-  visraw=nanmean(s.raw(s.visTint==visTint(i) & s.sat_time==0 & s.Str==2,ind1));
+  visraw=nanmean(s.raw(flt(s.visTint(flt)==visTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind1));
   disp(['visraw:' num2str(visraw) ' at visTint:' num2str(visTint(i))])
 end;
 for i=1:length(nirTint)
-  nirraw=nanmean(s.raw(s.nirTint==nirTint(i) & s.sat_time==0 & s.Str==2,ind2));
+  nirraw=nanmean(s.raw(flt(s.nirTint(flt)==nirTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind2));
   disp(['nirraw:' num2str(nirraw) ' at nirTint:' num2str(nirTint(i))])
 end;
-disp(['num=' num2str(length(s.raw(:,ind1)))])
+disp(['num=' num2str(length(s.raw(flt,ind1)))])
 
 %% write new response function?
 writenew=menu('Do you want to write a new response function?','Yes','No');
