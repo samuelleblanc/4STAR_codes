@@ -177,13 +177,13 @@ if writenew==1;
     % build the response function
     resp=rate./tra.rad;
     resperr=rate_std./tra.rad;
-    vis.resp=resp(513:end);        nir.resp=resp(1:512);
-    vis.resperr=resperr(513:end);  nir.resperr=resperr(1:512);
-    vis.nm=nm(513:end);            nir.nm=nm(1:512);
-    vis.rate=rate(513:end);        nir.rate=rate(1:512);
-    vis.rad=rad(513:end);          nir.rad=rad(1:512);
-    vis.fname=s.filename{2};       nir.fname=s.filename{1};
-    vis.time=s.t;                  nir.time=s.t;
+    vis.resp=resp(1:1044);        nir.resp=resp(1045:end);
+    vis.resperr=resperr(1:1044);  nir.resperr=resperr(1045:end);
+    vis.nm=nm(1:1044);            nir.nm=nm(1045:end);
+    vis.rate=rate(1:1044);        nir.rate=rate(1045:end);
+    vis.rad=rad(1:1044);          nir.rad=rad(1045:end);
+    vis.fname=s.filename{2};      nir.fname=s.filename{1};
+    vis.time=s.t;                 nir.time=s.t;
     
     [vis.fresp,nir.fresp]=write_SkyResp_files_2(vis,nir,tra,dir);
     disp('Response function file written');

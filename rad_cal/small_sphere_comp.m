@@ -92,7 +92,7 @@ xlabel('Wavelength (nm)');
 ylabel('Ratio of Sphere Radiances');
 title(['Change in sphere radiances compared to: ' dates(ref,:)]);
 fi=[dir 'Comp_rad_sphere'];
-ylim([0.9,1.1]);
+ylim([0.8,1.15]);
 xlim([300 1700]);
 grid on;
 
@@ -106,14 +106,14 @@ set(13,'Position',[20 30 1200 800]);
 ax1=subplot(2,1,1);
 plot(d.(fields{ref}).nm,d.(fields{ref}).rad);
 hold all;
-for i=ref:num
+for i=ref+1:num
   plot(d.(fields{i}).nm,d.(fields{i}).rad);  
 end
 hold off;
 xlabel('Wavelength (nm)');
 ylabel('Radiances (Wm^{-2}sr^{-1}\mum^{-1})');
 title('Small integrating Sphere radiance');
-legend(dates(ref:end,:));
+legend(dates(ref:end,:),'location','west');
 ylim([0,150]);
 xlim([300 1700]);
 
@@ -121,15 +121,15 @@ xlim([300 1700]);
 ax2=subplot(2,1,2);
 plot(d.(fields{ref}).nm,d.(fields{ref}).rad./spref);
 hold all;
-for i=ref:num
+for i=ref+1:num
   plot(d.(fields{i}).nm,d.(fields{i}).rad./spref);  
 end
 hold off;
 xlabel('Wavelength (nm)');
 ylabel('Ratio of Sphere Radiances');
 title(['Change in sphere radiances compared to: ' dates(ref,:)]);
-fi=[dir 'Comp_rad_sphere'];
-ylim([0.9,1.1]);
+fi=[dir 'Comp_rad_sphere-subset'];
+ylim([0.8,1.15]);
 xlim([300 1700]);
 grid on;
 
