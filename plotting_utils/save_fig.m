@@ -7,7 +7,7 @@
 %   to save
 %
 % CALLING SEQUENCE:
-%  save_fig(pid,fi,asktopause
+%  save_fig(pid,fi,asktopause)
 %
 % INPUT:
 %  - pid: figure id number
