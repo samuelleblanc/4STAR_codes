@@ -53,8 +53,10 @@ load(sourcefile,contents0{:},'program_version');
 % [mat_dir, fname, ext] = fileparts(savematfile);
 % star_light_fname = [mat_dir,filesep,datestr(star.t(1),'yyyymmdd'),'starsun_LIGHT.mat'];
 if ~exist(savematfile,'file')
+    s.program_version=program_version;
     save(savematfile, '-struct', 's', '-mat','program_version');
 else
+    s.program_version=program_version;
     save(savematfile, '-struct', 's', '-mat', '-append','program_version');
 end
 contents=[contents; fieldnames(s)];
