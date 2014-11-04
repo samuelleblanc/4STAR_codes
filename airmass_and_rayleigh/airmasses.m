@@ -7,7 +7,6 @@ function [m_ray, m_aero, m_H2O, m_O3, m_NO2]=airmasses(sza, alt, h)
 % plot_re4_COAST_Oct2011.m. 
 % h is altitude of ozone layer in km. plot_re4_COAST_Oct2011.m uses 21.
 % Yohei, 2012/05/18, after John Livingston's plot_re4_COAST_Oct2011.m.
-% MS edit test
 
 % control input
 if numel(alt)==1;
