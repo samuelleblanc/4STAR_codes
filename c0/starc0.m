@@ -11,6 +11,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
 % Samuel, v1.1, 2014/10/15, added verbose keyword
 % Yohei, 2014/11/12, test on Github
+% Sam change on sam branch
 version_set('1.1');
 if ~exist('verbose','var')
     verbose=true;
@@ -224,3 +225,4 @@ end;
 % visnotec0='VIS C0 turned off';
 % nirnotec0='NIR C0 turned off';
 
+% test 2
