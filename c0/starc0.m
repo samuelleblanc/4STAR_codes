@@ -11,11 +11,18 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
 % Samuel, v1.1, 2014/10/15, added verbose keyword
 % Yohei, 2014/11/12, test on Github
+<<<<<<< HEAD
 % Connor, test of out of sync
+=======
+
+% testing of joint editing
+>>>>>>> origin/master
 version_set('1.1');
 if ~exist('verbose','var')
     verbose=true;
 end;
+
+%Sam editing
 
 if verbose; disp('In starc0'), end;
 % control the input
