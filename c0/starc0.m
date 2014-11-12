@@ -13,6 +13,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Yohei, 2014/11/12, test on Github
 % Sam test master
 % Michal test pull
+% Michal test pull2
 version_set('1.1');
 if ~exist('verbose','var')
     verbose=true;
