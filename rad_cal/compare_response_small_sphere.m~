@@ -44,7 +44,7 @@
 %% Start of function
 function compare_response_small_sphere
 startup_plotting
-version_set('1.2');
+version_set('1.1');
 
 % setting the standard variables
 dir='C:\Users\sleblan2\Research\4STAR\cal\';

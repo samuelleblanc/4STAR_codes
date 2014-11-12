@@ -38,7 +38,7 @@
 
 %% Start of function
 function compare_response
-startup_plotting
+startup
 version_set('1.1');
 
 % setting the standard variables
