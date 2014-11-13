@@ -1,4 +1,9 @@
 function [flags,flag_info,t] = cnvt_ng2flags(ng,t)
+%% Program to convert ng (no good) flags to flag format
+% created by CJF
+% Modification history:
+% SL (v1.0): 2014-11-12: added versioning, and ng=3 for tracking errors
+version_set('v1.0')
 % [flags,flag_info,t] = cnvt_flags2ng(ng)
 %%
 % daystr = datestr(t(1),'yyyymmdd');
@@ -22,9 +27,10 @@ function [flags,flag_info,t] = cnvt_ng2flags(ng,t)
 % 
 %  t = [min(ng(:,1)):(1./(24*60)):max(ng(:,2))];
 % tt = unique([t;ng(:,1);ng(:,2)]);
+if ~empty(ng)
 tags = unique(ng(:,3));
-flag_tags = [1  ,2 ,10,90,100,200,300];
-flag_names = {'unknown','before_or_after_flight','unspecified_clouds','cirrus','inst_trouble' ,'inst_tests' ,'frost'}
+flag_tags = [1  ,2 ,3,10,90,100,200,300];
+flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus','inst_trouble' ,'inst_tests' ,'frost'}
 if ~exist('t','var')
     t = [min(ng(:,1)):(1./(24*60)):max(ng(:,2))];
 end
@@ -41,6 +47,10 @@ for N = 1:size(ng,1)
     t_ = t>=ng(N,1) & t<=ng(N,2);
     flags.(flag_info.flag_names{tag_ii})(t_) = true;
 end
+else
+    flags = [];
+    flag_info = [];
+end;
 % agricultural smoke [datenum('18:57:45') datenum('18:58:25')] is masked by
 % the STD-based screening. A limitation of the automation.
 

@@ -18,8 +18,7 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % CJF: 2012/10/05
 % CJF: 2013/12/05: edited lines 145 and following to strip empty records
 % SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
-% SL (v1.1): added comment
-version_set('1.1');
+version_set('1.0');
 %********************
 % control input
 %********************

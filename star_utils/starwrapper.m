@@ -52,6 +52,9 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v1.0, 2014-10-10: set verison control of this script, with version_set
 % SL: v1.1, 2014-11-12: changed switches to toggles in a toggle structure
 %                       - added gassubstract toggle
+%                       - added booleanflagging toggle
+%                       - added flagging toggle
+
 version_set('1.1');
 %********************
 %% prepare for processing
@@ -66,8 +69,10 @@ toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;
 toggle.gassubtract = false;
-toggle.booleanflagging = 0;
-toggle.flagging = 1; % mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle.booleanflagging = true;
+toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle.doflagging = false; % for running any Yohei style flagging
+toggle.dostarflag = true; 
 
 %% check if the switches are set in the call to starwrapper
 if (~isempty(varargin))
@@ -133,7 +138,7 @@ end;
 s2.note={};
 
 %% get data type
-if verbose; disp('get data types'), end;
+if toggle.verbose; disp('get data types'), end;
 [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
 if nargin>=2+nnarg
     [daystr2, filen2, datatype2]=starfilenames2daystr(s2.filename, 1);
@@ -252,9 +257,9 @@ end;
 if toggle.applynonlinearcorr 
     if toggle.verbose; disp('Applying nonlinear correction'), end;
     %if ~exist('vis_sun'), stophere; end;
-    s_raw=correct_nonlinear(s.raw, verbose);
+    s_raw=correct_nonlinear(s.raw, toggle.verbose);
     if nargin>=2+nnarg;
-       r_raw=correct_nonlinear(s2.raw, verbose);
+       r_raw=correct_nonlinear(s2.raw, toggle.verbose);
     end;
     s.rawcorr=s_raw;
     if nargin>=2+nnarg;
@@ -439,6 +444,7 @@ end
 %********************
 %% screen data
 %********************
+if toggle.doflagging;
 m_aero_max=15;
 if toggle.booleanflagging; % new flagging system
     boolean=toggle.booleanflagging;
@@ -551,7 +557,7 @@ else; % the old flagging system
     end;
     s.note=[autoscrnote(1:end-2) '. ' s.note];
 end;
-
+end; % toggle.doflagging
 %compute s.rawrelstd for auto cloud screening
 % if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
 %     ti=9/86400;
@@ -741,21 +747,28 @@ end;
     %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
     %s.flagallcols
     %************************************************************
-%     [s.flags]=starflag(daystr,toggle.flagging,s);
+    if toggle.dostarflag;
+        if toggle.verbose; disp('Starting the starflag'), end;
+        [s.flags]=starflag(daystr,toggle.flagging,s);
+    end;
     %************************************************************
     
 %% apply flags to the calculated tau_aero_noscreening
     s.tau_aero=s.tau_aero_noscreening;
-%    s.tau_aero(~s.flags.aerosol_init_auto,:)=NaN;
-% tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
+    if toggle.dostarflag && toggle.flagging==1;
+       s.tau_aero(~s.flags.aerosol_init_auto,:)=NaN;
+    end;
+ % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
 % 2014/07/18.
     % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
     % apply flags to the calculated tau_aero_noscreening
-    if toggle.booleanflagging;
+    if toggle.doflagging;
+      if toggle.booleanflagging;
         s.tau_aero(any(s.flagallcols,3),:)=NaN;
         s.tau_aero(any(s.flag,3))=NaN;
-    else
+      else
         s.tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
+      end;
     end;
     % The end of "The lines below used to be around here. But recent
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."

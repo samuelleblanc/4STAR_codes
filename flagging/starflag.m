@@ -1,19 +1,49 @@
 function [flags] = starflag(daystr,Mode,s)
-% generates flags for 4STAR direct sun data
+%% Function to generate flags for 4STAR data
+% uses different modes:
 % Mode = 1 "Automatic" aerosol (except strong events) versus clouds;
 % starflag is called in starsun.m file and starsun.mat will contain the
 % INITIAL (i.e. "automatic") flags (i.e. vis_sun.flag and
 % vis_sun.flagallcols); It also produces YYYYMMDD_starflag_auto_createdYYYYMMDD_HHMM.mat
-
+%
 % Mode = 2 "in-depth" flagging of aerosol (e.g. smoke or dust) and
 % clouds (e.g. low clouds or cirrus); starflag.m is called as stand-alone
 %(i.e. outside of starsun.m) and produces YYYYMMDD_starflag_man_createdYYYYMMDD_HHMM_by_Op.mat
-%and starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
-%and starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m etc...
+% and starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
+% and starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m 
+% and starflags_YYYYMMDD_marks_cirrus_created_YYYYMMDD_vy_Op.m, etc...
+%
+% Mode = 3 "Loading" a previous starflag file, with precedence of manual
+% vs. auto flagging. should be called whenever the flag file is already
+% there, if not, then asks user if they want to do manual or automatic
+
+% Modification history:
 % SL, v1.0, 20141013, added my name to the list of flaggers and added version control of this m script wiht version_set
-version_set('1.0');
+% SL, v1.1, 2014-11-12, added Mode 3 for loading previous flag files, with
+%                       inclusion of starinfo flags, considerable rebuilding
+version_set('1.1');
 
-
+if (Mode==3);
+    files = ls([starpaths,daystr,'_starflag_man_*'])
+    if ~isempty(files);
+        flagfile=files(end,:);
+        disp('loading file:' [starpaths flagfile])
+        load([starpaths flagfile]);
+    else;
+        files = ls([starpaths,daystr,'_starflag_auto_*'])
+        if ~isempty(files);
+            flagfile=files(end,:);
+            disp('loading file:' [starpaths flagfile])
+            load([starpaths flagfile]);
+        else;
+            flagfile=uigetfile('*starflag*.mat','Select correct starflag file')
+        end;
+    end;
+    
+    if isequal(flagfile,0)
+        Mode = menu('No file selected, which mode do you want to operate?','Automatic','Manual');
+    end;
+end;
 %define operator for manual screening mode (mode=2)
 if (Mode==2)
     op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer','Meloe Kacenelenbogen','Samuel LeBlanc');
@@ -37,32 +67,33 @@ end
 %Define ouput file names for both modes
 switch Mode
     case 1
-        outputfile=[starpaths,filesep,daystr,'_starflag_auto_created',datestr(now,'yyyymmdd_hhMM'),'.mat'];%This has to be starsun.mat
+        flagfile = [daystr,'_starflag_auto_created',datestr(now,'yyyymmdd_hhMM'),'.mat'];
+        outputfile=[starpaths,filesep,ofile];%This has to be starsun.mat
+        disp(['Starflag mode 1 to output to:' outputfile])
     case 2
-        outputfile=[starpaths,filesep,daystr,'_starflag_man_created',datestr(now,'yyyymmdd_hhMM'), 'by_',op_name_str,'.mat'];
+        flagfile = [daystr,'_starflag_man_created',datestr(now,'yyyymmdd_hhMM'), 'by_',op_name_str,'.mat'];
+        outputfile=[starpaths,filesep,flagfile];
+        disp(['Starflag mode 2 to output to:' outputfile])
 end
 
-switch Mode
-    case 1
-        if ~isempty(s)
-            t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
-            viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;tau_aero_noscreening=s.tau_aero_noscreening;
-            c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;rawrelstd=s.rawrelstd;Md=s.Md;
-            Str=s.Str;raw=s.raw;dark=s.dark;darkstd=s.darkstd;
-        else
-            error('input 4STAR data file is empty');
-        end
-    case 2
-        % Now load any fields from starsun.mat that you want to use to generate
-        % automated flags or plot in visi_screen.
-        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...'])
-        slsun(daystr,'t','w', 'Lon', 'Lat', 'Alt', 'Pst', 'Tst', ...
-            'aerosolcols','viscols','nircols', ...
-            'rateaero',  'tau_aero_noscreening',...
-            'c0', 'm_aero','QdVlr','QdVtb','QdVtot',...
-            'ng','rawrelstd','Md','Str','raw','dark','darkstd','flags');
+if ~isempty(s)
+    t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
+    viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;tau_aero_noscreening=s.tau_aero_noscreening;
+    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;rawrelstd=s.rawrelstd;Md=s.Md;
+    Str=s.Str;raw=s.raw;dark=s.dark;darkstd=s.darkstd;
+    
+else
+    % Now load any fields from starsun.mat that you want to use to generate
+    % automated flags or plot in visi_screen.
+    disp(['Loading data from ',daystr,'starsun.mat.  Please wait...'])
+    slsun(daystr,'t','w', 'Lon', 'Lat', 'Alt', 'Pst', 'Tst', ...
+        'aerosolcols','viscols','nircols', ...
+        'rateaero',  'tau_aero_noscreening',...
+        'c0', 'm_aero','QdVlr','QdVtb','QdVtot',...
+        'ng','rawrelstd','Md','Str','raw','dark','darkstd','flags');
 end
 
+s.note{end+1} = ['Flagging with starflag with output at:' flagfile]
 % t = s.t;
 % slsun(daystr, 't'); %Get time from the starsun file because we need it to convert the
 % ng structure in the initial starinfo file into logical flags of length(t)
@@ -189,7 +220,7 @@ if (Mode==2)
             clear('flags')
             source='ask';
             [sourcefile, ext, daystr,filen]=starsource(source, 'sun');
-%             load(sourcefile{1}); THIS IS TO READ MK's FILE
+            %             load(sourcefile{1}); THIS IS TO READ MK's FILE
             flags=load(sourcefile{1});%THIS IS TO READ MICHAL's FILE
             t=flags.time.t;
             reset_flags=false;
@@ -289,6 +320,7 @@ end
 %Write output file:
 %Mode 1: YYYYMMDD_auto_starflag_createdYYYYMMDD_HHMM.mat
 %Mode 2: YYYYMMDD_man_starflag_createdYYYYMMDD_HHMM_by_Op.mat
+flags.flagfile = flagfile; % make it so that we save the flagfile name.
 if ~exist(outputfile,'file')
     save(outputfile,'flags');
     if (Mode==2)
@@ -296,36 +328,45 @@ if ~exist(outputfile,'file')
     end
 end
 
-Mark_subset_file=false;
-if ((Mode==2) && (Mark_subset_file))
-    %Write subset output files:
-    %starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
-    %starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m etc...
-    %similar to s.ng in starinfo but with new fields to identify flags and flag_tags
-    
-    % This will generate a smaller subset with only "not good" conditions
-    [flag_aod, flag_names_aod, flag_tag_aod] = cnvt_flags2ng(t, flags,~good);
-    
-    if ~isempty(flag_aod)
-        aod_str = write_starflags_marks_file(flag_aod,flag_names_aod,flag_tag_aod,daystr,'not_aerosol', op_name_str);
-    else
-        disp('no clouds or bad aod selected');
-    end
-    
-    % This will generate a subset identifying smoke events
-    [flag_aod_smoke, flag_names_smoke, flag_tag_smoke] = cnvt_flags2ng(t, flags,flags.smoke);
-    if ~isempty(flag_aod_smoke)
-        smoke_str = write_starflags_marks_file(flag_aod_smoke,flag_names_smoke,flag_tag_smoke,daystr,'smoke', op_name_str);
-    else
-        disp('no smoke selected');
-    end
-    
-    % This will generate a subset identifying smoke events
-    [flag_aod_dust, flag_names_dust, flag_tag_dust] = cnvt_flags2ng(t, flags,flags.dust);
-    if ~isempty(flag_aod_dust)
-        dust_str = write_starflags_marks_file(flag_aod_dust,flag_names_dust,flag_tag_dust,daystr,'dust', op_name_str);
-    else
-        disp('no dust selected');
+if (Mode==2);
+    answer = menu('Write mask file, similar to startinfo?','Yes','No');
+    if answer == 2; Mark_subset_file=false; else; Mark_subset_file=true; end;
+    if (Mark_subset_file)
+        %Write subset output files:
+        %starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
+        %starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m etc...
+        %similar to s.ng in starinfo but with new fields to identify flags and flag_tags
+        
+        % This will generate a smaller subset with only "not good" conditions
+        [flag_aod, flag_names_aod, flag_tag_aod] = cnvt_flags2ng(t, flags,~good);
+        if ~isempty(flag_aod)
+            aod_str = write_starflags_marks_file(flag_aod,flag_names_aod,flag_tag_aod,daystr,'not_aerosol', op_name_str);
+        else
+            disp('no clouds or bad aod selected');
+        end
+        
+        % This will generate a subset identifying smoke events
+        [flag_aod_smoke, flag_names_smoke, flag_tag_smoke] = cnvt_flags2ng(t, flags,flags.smoke);
+        if ~isempty(flag_aod_smoke)
+            smoke_str = write_starflags_marks_file(flag_aod_smoke,flag_names_smoke,flag_tag_smoke,daystr,'smoke', op_name_str);
+        else
+            disp('no smoke selected');
+        end
+        
+        % This will generate a subset identifying smoke events
+        [flag_aod_dust, flag_names_dust, flag_tag_dust] = cnvt_flags2ng(t, flags,flags.dust);
+        if ~isempty(flag_aod_dust)
+            dust_str = write_starflags_marks_file(flag_aod_dust,flag_names_dust,flag_tag_dust,daystr,'dust', op_name_str);
+        else
+            disp('no dust selected');
+        end
+        
+        [flag_cirrus, flag_names_cirus, flag_tag_cirrus] = cnvt_flags2ng(t, flags,flags.cirrus);
+        if ~isempty(flag_cirrus)
+            cirrus_str = write_starflags_marks_file(flag_cirrus,flag_names_cirrus,flag_tag_cirrus,daystr,'cirrus', op_name_str);
+        else
+            disp('no cirrus selected');
+        end
     end
 end
 return
