@@ -50,19 +50,24 @@ function	s=starwrapper(s, s2, varargin)
 % SL: 2014-10-06: added logic to use switches even when there is only one
 %                 input structure
 % SL: v1.0, 2014-10-10: set verison control of this script, with version_set
-version_set('1.0');
+% SL: v1.1, 2014-11-12: changed switches to toggles in a toggle structure
+%                       - added gassubstract toggle
+version_set('1.1');
 %********************
 %% prepare for processing
 %********************
 
 %% set default switches
-verbose=true;
-saveadditionalvariables=true;
-savefigure=false;
-computeerror=true;
-inspectresults=false;
-applynonlinearcorr=true;
-applytempcorr=false;
+toggle.verbose=true;
+toggle.saveadditionalvariables=true;
+toggle.savefigure=false;
+toggle.computeerror=true;
+toggle.inspectresults=false;
+toggle.applynonlinearcorr=true;
+toggle.applytempcorr=false;
+toggle.gassubtract = false;
+toggle.booleanflagging = 0;
+toggle.flagging = 1; % mode=1 for automatic, mode=2 for in-depth 'manual'
 
 %% check if the switches are set in the call to starwrapper
 if (~isempty(varargin))
@@ -74,31 +79,31 @@ if (~isempty(varargin))
        switch varargin{c}
           case {'verbose'}
             c=c+1;
-            verbose=varargin{c};
+            toggle.verbose=varargin{c};
             disp(['verbose set to ' num2str(verbose)])
           case {'saveadditionalvariables'}
             c=c+1;
-            saveadditionalvariables=varargin{c};
+            toggle.saveadditionalvariables=varargin{c};
             disp(['saveadditionalvariables set to ' num2str(saveadditionalvariables)])
           case {'savefigure'}
             c=c+1;
-            savefigure=varargin{c};
+            toggle.savefigure=varargin{c};
             disp(['savefigure set to ' num2str(savefigure)])
           case {'computeerror'}
             c=c+1;
-            computeerror=varargin{c};
+            toggle.computeerror=varargin{c};
             disp(['computeerror set to ' num2str(computeerror)])
           case {'inspectresults'}
             c=c+1;
-            inspectresults=varargin{c}; 
+            toggle.inspectresults=varargin{c}; 
             disp(['inspectresults set to ' num2str(inspectresults)])
           case {'applynonlinearcorr'}
             c=c+1;
-            applynonlinearcorr=varargin{c};
+            toggle.applynonlinearcorr=varargin{c};
             disp(['applynonlinearcorr set to ' num2str(applynonlinearcorr)])
           case {'applytempcorr'}
             c=c+1;
-            applytempcorr=varargin{c};
+            toggle.applytempcorr=varargin{c};
             disp(['applytempcorr set to ' num2str(applytempcorr)])
         % (continued)
            otherwise         
@@ -109,7 +114,7 @@ if (~isempty(varargin))
      end % for
 else; nnarg=0; end; % if
 
-if verbose;  disp('In Starwrapper'), end;
+if toggle.verbose;  disp('In Starwrapper'), end;
 
 % start taking notes
 if ~isfield(s, 'note');
@@ -137,7 +142,7 @@ end;
 %********************
 %% get additional info specific to this data set
 %********************
-if verbose; disp('get additional info specific to file'), end;
+if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
@@ -173,10 +178,10 @@ end;
 %% add related variables, derive count rate and combine structures
 %********************
 %% include wavelengths in um and flip NIR raw data
-if verbose; disp('add related variables, count rate and combine structures'), end;
+if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
 [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
-[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),verbose); % C0
-[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),verbose);% this is for calling modified c0 file
+[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose); % C0
+[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
 [visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
 if ~isempty(strfind(lower(datatype),'vis'));
@@ -206,7 +211,7 @@ if size(s.raw,2)<1000
 else
     sat_val = 65535;
 end
-if verbose; disp('...calculating saturated points'); end;
+if toggle.verbose; disp('...calculating saturated points'); end;
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
@@ -244,8 +249,8 @@ if nargin>=2+nnarg
 end;
 
 %% run nonlinear correction on raw counts
-if applynonlinearcorr 
-    if verbose; disp('Applying nonlinear correction'), end;
+if toggle.applynonlinearcorr 
+    if toggle.verbose; disp('Applying nonlinear correction'), end;
     %if ~exist('vis_sun'), stophere; end;
     s_raw=correct_nonlinear(s.raw, verbose);
     if nargin>=2+nnarg;
@@ -255,7 +260,7 @@ if applynonlinearcorr
     if nargin>=2+nnarg;
        s2.rawcorr=r_raw;
     end;
-    if verbose; disp('finished running nonlinear correction'), end;
+    if toggle.verbose; disp('finished running nonlinear correction'), end;
 else
     s.rawcorr=s.raw;
     if nargin>=2+nnarg;
@@ -264,7 +269,7 @@ else
 end;
 
 %% subtract dark and divide by integration time
-if verbose; disp('substract darks and divide by integration time'), end;
+if toggle.verbose; disp('substract darks and divide by integration time'), end;
 [s.rate, s.dark, s.darkstd, note]=starrate(s);
 
 s.note(end+1,1)={note};
@@ -274,7 +279,7 @@ if nargin>=2+nnarg
 end;
 %sum_isnan=sum(isnan(s.rate(1,:)))
 % combine two structures
-if verbose; disp('out of starrate, combining two structures'), end;
+if toggle.verbose; disp('out of starrate, combining two structures'), end;
 drawnow;
 pp=numel(s.t);
 qq=size(s.raw,2);
@@ -317,7 +322,7 @@ if nargin>=2+nnarg
         error('Two structures must be for separate spectrometers.');
     end;
     % discard the s2 variables for which s has duplicates
-    if verbose, disp('discarding duplicate structures'), end;
+    if toggle.verbose, disp('discarding duplicate structures'), end;
     fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
         fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
     fnok=[]; % Yohei, 2012/11/27
@@ -412,7 +417,7 @@ end;
 %********************
 %% adjust the count rate
 %********************
-if verbose; disp('adjusting the count rate'), end;
+if toggle.verbose; disp('adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
 [forj_corr, detail] = get_forj_corr(s.t(1));
@@ -423,7 +428,7 @@ AZunique = unique(AZ_deg);
 s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
 
 %% apply temp correction to rate structs
-if applytempcorr
+if toggle.applytempcorr
  corr=startemperaturecorrection(daystr, s.t);
  s.rate  = s.rate.*repmat(corr,1,qq);
 end
@@ -432,143 +437,144 @@ end
 % TO BE DEVELOPED.
 
 %********************
-% screen data
+%% screen data
 %********************
-% boolean=1;
-% m_aero_max=15;
-% if boolean; % new flagging system
-%
-%     warning('Boolean flagging is under development. Please report any bug to Yohei.');
-%
-%     % prepare for flagging
-%     if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
-%         % compute STD for auto cloud screening
-%         ti=9/86400;
-%         if strmatch('vis', lower(datatype(1:3)));
-%             cc=408;
-%         elseif strmatch('nir', lower(datatype(1:3)));
-%             cc=169;
-%         else;
-%             cc=[408 169+1044];
-%         end;
-%         s.rawstd=NaN(pp, numel(cc));
-%         s.rawmean=NaN(pp, numel(cc));
-%         for i=1:pp;
-%             rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-%             if numel(rows)>0;
-%                 s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-%                 s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-%             end;
-%         end;
-%         s.rawrelstd=s.rawstd./s.rawmean;
-%     end;
-%
-%     % flag all columns (see below for flagging specific columns)
-%     nflagallcolsitems=7;
-%     s.flagallcolsitems=repmat({''},nflagallcolsitems,1);
-%     s.flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
-%     s.flagallcols(s.Str~=1,:,1)=true; s.flagallcolsitems(1)={'darks or sky scans'};
-%     if strmatch('sun', lower(datatype(end-2:end)));
-%         s.flagallcols(s.Md~=1,:,2)=true; s.flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
-%         s.flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; s.flagallcolsitems(3)={'high standard deviation'};
-%     end;
-%     s.flagallcols(s.m_aero>m_aero_max,:,4)=true; s.flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
-%     for i=1:size(s.ng,1);
-%         ng=incl(s.t,s.ng(i,1:2));
-%         if isempty(ng);
-%         elseif s.ng(i,3)<10;
-%             s.flagallcols(ng,:,5)=true; s.flagallcolsitems(5)={'unknown or others (manual flag)'};
-%         elseif s.ng(i,3)<100;
-%             s.flagallcols(ng,:,6)=true; s.flagallcolsitems(6)={'clouds (manual flag)'};
-%         elseif s.ng(i,3)<1000;
-%             s.flagallcols(ng,:,7)=true; s.flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
-%         end;
-%     end;
-%     if size(s.flagallcols,3)~=nflagallcolsitems;
-%         error('Update starwrapper.m.');
-%     end;
-%
-%     % flag specific columns
-%     nflagitems=1;
-%     s.flagitems=repmat({},nflagitems,1);
-%     s.flag=false(pp,qq,nflagitems); % flags applied to each column separately
-%     s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; s.flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
-%     if size(s.flag,3)~=nflagitems;
-%         error('Update starwrapper.m.');
-%     end;
-%
-% else; % the old flagging system
-%     % execute manual flags to screen out data for clouds and other unfavorable conditions
-%     s.flag=zeros(size(s.rate));
-%     for i=1:size(s.ng,1);
-%         ng=incl(s.t,s.ng(i,1:2));
-%         s.flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
-%     end;
-%
-%     % auto screening
-%     % cjf: We may need to consider a different screen for the AOD at the beginning
-%     % and ending of the sky scans.
-%     % YS: agreed. And different screens mean they should be applied in starsun
-%     % and starsky, not in starwrapper.
-%     autoscrnote='Auto-screening was applied for ';
-%     s.flag(s.Str~=1,:)=s.flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
-%     autoscrnote=[autoscrnote 'darks or sky scans, '];
-%     s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
-%     autoscrnote=[autoscrnote '<=1 signal-to-noise ratio or non-positive c0, ']; % YS 2012/10/09
-%     s.flag(s.m_aero>m_aero_max,:)=s.flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
-%     autoscrnote=[autoscrnote 'aerosol airmass higher than ' num2str(m_aero_max) ', ']; % YS 2012/10/09
-%     if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
-%         % non-tracking mode - is this redundant with the Str-based screening?
-%         s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
-%         autoscrnote=[autoscrnote 'non-tracking modes, '];
-%         % STD-based cloud screening
-%         ti=9/86400;
-%         if strmatch('vis', lower(datatype(1:3)));
-%             cc=408;
-%         elseif strmatch('nir', lower(datatype(1:3)));
-%             cc=169;
-%         else;
-%             cc=[408 169+1044];
-%         end;
-%         s.rawstd=NaN(pp, numel(cc));
-%         s.rawmean=NaN(pp, numel(cc));
-%         for i=1:pp;
-%             rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 s.Str>0
-%             if numel(rows)>0;
-%                 s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-%                 s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-%             end;
-%         end;
-%         s.rawrelstd=s.rawstd./s.rawmean;
-%         s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
-%         autoscrnote=[autoscrnote 'STD higher than ' num2str(s.sd_aero_crit) ' at columns #' num2str(cc) ', '];
-%     end;
-%     s.note=[autoscrnote(1:end-2) '. ' s.note];
-% end;
+m_aero_max=15;
+if toggle.booleanflagging; % new flagging system
+    boolean=toggle.booleanflagging;
+    %warning('Boolean flagging is under development. Please report any bug to Yohei.');
+    if toggle.verbose; disp('in the boolean flagging system'), end;
+    % prepare for flagging
+    if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+        if toggle.verbose; disp('In the boolean flagging area'), end;
+        % compute STD for auto cloud screening
+        ti=9/86400;
+        if strmatch('vis', lower(datatype(1:3)));
+            cc=408;
+        elseif strmatch('nir', lower(datatype(1:3)));
+            cc=169;
+        else;
+            cc=[408 169+1044];
+        end;
+        s.rawstd=NaN(pp, numel(cc));
+        s.rawmean=NaN(pp, numel(cc));
+        for i=1:pp;
+            rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
+            if numel(rows)>0;
+                s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+            end;
+        end;
+        s.rawrelstd=s.rawstd./s.rawmean;
+    end;
 
-%compute s.rawrelstd for auto cloud screening
-if strmatch('vis', lower(datatype(1:3)));
-    cc=408;
-elseif strmatch('nir', lower(datatype(1:3)));
-    cc=169;
-else;
-    cc=[408 169+1044];
-end;
-%gasmode=1;
-if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
-    ti=9/86400;
-
-    s.rawstd=NaN(pp, numel(cc));
-    s.rawmean=NaN(pp, numel(cc));
-    for i=1:pp;
-        rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-        if numel(rows)>0;
-            s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-            s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+    % flag all columns (see below for flagging specific columns)
+    nflagallcolsitems=7;
+    s.flagallcolsitems=repmat({''},nflagallcolsitems,1);
+    s.flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
+    s.flagallcols(s.Str~=1,:,1)=true; s.flagallcolsitems(1)={'darks or sky scans'};
+    if strmatch('sun', lower(datatype(end-2:end)));
+        s.flagallcols(s.Md~=1,:,2)=true; s.flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
+        s.flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; s.flagallcolsitems(3)={'high standard deviation'};
+    end;
+    s.flagallcols(s.m_aero>m_aero_max,:,4)=true; s.flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
+    for i=1:size(s.ng,1);
+        ng=incl(s.t,s.ng(i,1:2));
+        if isempty(ng);
+        elseif s.ng(i,3)<10;
+            s.flagallcols(ng,:,5)=true; s.flagallcolsitems(5)={'unknown or others (manual flag)'};
+        elseif s.ng(i,3)<100;
+            s.flagallcols(ng,:,6)=true; s.flagallcolsitems(6)={'clouds (manual flag)'};
+        elseif s.ng(i,3)<1000;
+            s.flagallcols(ng,:,7)=true; s.flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
         end;
     end;
-    s.rawrelstd=s.rawstd./s.rawmean;
-% end;
+    if size(s.flagallcols,3)~=nflagallcolsitems;
+        error('Update starwrapper.m.');
+    end;
+
+    % flag specific columns
+    nflagitems=1;
+    s.flagitems=repmat({},nflagitems,1);
+    s.flag=false(pp,qq,nflagitems); % flags applied to each column separately
+    s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; s.flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
+    if size(s.flag,3)~=nflagitems;
+        error('Update starwrapper.m.');
+    end;
+
+else; % the old flagging system
+    % execute manual flags to screen out data for clouds and other unfavorable conditions
+    if toggle.verbose; disp('in the old flagging system'), end;
+    s.flag=zeros(size(s.rate));
+    for i=1:size(s.ng,1);
+        ng=incl(s.t,s.ng(i,1:2));
+        s.flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
+    end;
+
+    % auto screening
+    % cjf: We may need to consider a different screen for the AOD at the beginning
+    % and ending of the sky scans.
+    % YS: agreed. And different screens mean they should be applied in starsun
+    % and starsky, not in starwrapper.
+    autoscrnote='Auto-screening was applied for ';
+    s.flag(s.Str~=1,:)=s.flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
+    autoscrnote=[autoscrnote 'darks or sky scans, '];
+    s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
+    autoscrnote=[autoscrnote '<=1 signal-to-noise ratio or non-positive c0, ']; % YS 2012/10/09
+    s.flag(s.m_aero>m_aero_max,:)=s.flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
+    autoscrnote=[autoscrnote 'aerosol airmass higher than ' num2str(m_aero_max) ', ']; % YS 2012/10/09
+    if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+        % non-tracking mode - is this redundant with the Str-based screening?
+        s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
+        autoscrnote=[autoscrnote 'non-tracking modes, '];
+        % STD-based cloud screening
+        ti=9/86400;
+        if strmatch('vis', lower(datatype(1:3)));
+            cc=408;
+        elseif strmatch('nir', lower(datatype(1:3)));
+            cc=169;
+        else;
+            cc=[408 169+1044];
+        end;
+        s.rawstd=NaN(pp, numel(cc));
+        s.rawmean=NaN(pp, numel(cc));
+        for i=1:pp;
+            rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 s.Str>0
+            if numel(rows)>0;
+                s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+            end;
+        end;
+        s.rawrelstd=s.rawstd./s.rawmean;
+        s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
+        autoscrnote=[autoscrnote 'STD higher than ' num2str(s.sd_aero_crit) ' at columns #' num2str(cc) ', '];
+    end;
+    s.note=[autoscrnote(1:end-2) '. ' s.note];
+end;
+
+%compute s.rawrelstd for auto cloud screening
+% if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+%     ti=9/86400;
+%     if strmatch('vis', lower(datatype(1:3)));
+%         cc=408;
+%     elseif strmatch('nir', lower(datatype(1:3)));
+%         cc=169;
+%     else;
+%         cc=[408 169+1044];
+%     end;
+% %gasmode=1;
+% 
+%     s.rawstd=NaN(pp, numel(cc));
+%     s.rawmean=NaN(pp, numel(cc));
+%     for i=1:pp;
+%         rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
+%         if numel(rows)>0;
+%             s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+%             s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+%         end;
+%     end;
+%     s.rawrelstd=s.rawstd./s.rawmean;
+%  %end;
 
 % (remaining items from the AATS code)
 % filter #2 discard measurement cycles with bad tracking
@@ -647,17 +653,18 @@ if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
           %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
           % water vapor retrieval (940fit+c0 method)
           %-----------------------------------------
-          if verbose; disp('water vapor retrieval start'), end;
-         % [s] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+          if toggle.verbose; disp('water vapor retrieval start'), end;
+          [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
           % subtract water vapor from tau_aero
-          if verbose; disp('water vapor retrieval end'), end;
+          if toggle.verbose; disp('water vapor retrieval end'), end;
           % gases subtractions and o3/no2 conc [in DU] from fit
           %-----------------------------------------------------
-          if verbose; disp('gases subtractions start'), end;
-          %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
-          if verbose; disp('gases subtractions end'), end;
-          %s.tau_aero=s.tau_aero_wvsubtract;
-        
+          if toggle.gassubtract
+            if toggle.verbose; disp('gases subtractions start'), end;
+            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
+            if toggle.verbose; disp('gases subtractions end'), end;
+            %s.tau_aero=s.tau_aero_wvsubtract;
+          end;
     %elseif gasmode==2 && ~isempty(strfind(lower(datatype),'sun'))
         % use retrieved O3/NO2 to subtract
         % reconstruct filtered data using PCA
@@ -701,7 +708,7 @@ if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
     % % % s=rmfield(s, 'rate'); YS 2012/10/09
     
     % estimate uncertainties in tau aero - largely inherited from AATS14_MakeAOD_MLO_2011.m
-    if computeerror;
+    if toggle.computeerror;
         s.m_err=0.0003.*(s.m_ray/2).^2.2; % expression for dm/m is from Reagan report
         s.m_err(s.m_ray<=2)=0.0003; % negligible for TCAP July, but this needs to be revisited. The AATS code offers two options: this (0.03%) and 1%.
         s.tau_aero_err1=abs(tau.*repmat(s.m_err,1,qq)); % YS 2012/10/09 abs avoids imaginary part and hence reduces the size of tau_aero_err (for which tau_aero is NaN as long as rate<=darkstd is screened out.).
@@ -729,19 +736,32 @@ if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
             s.tau_aero_errhi=(s.tau_aero_err1.^2+s.tau_aero_err2hi.^2+s.tau_aero_err3.^2+s.tau_aero_err4.^2+s.tau_aero_err5.^2+s.tau_aero_err6.^2+s.tau_aero_err7.^2+s.tau_aero_err8.^2+s.tau_aero_err9.^2+s.tau_aero_err10.^2+s.tau_aero_err11.^2).^0.5; % combined uncertianty
         end;
     end;
-    
+
     %flags bad_aod, unspecified_clouds and before_and_after_flight
     %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
     %s.flagallcols
     %************************************************************
-%     [s.flags]=starflag(daystr,1,s);
+%     [s.flags]=starflag(daystr,toggle.flagging,s);
     %************************************************************
     
 %% apply flags to the calculated tau_aero_noscreening
     s.tau_aero=s.tau_aero_noscreening;
-%     s.tau_aero(~s.flags.aerosol_init_auto,:)=NaN;
+%    s.tau_aero(~s.flags.aerosol_init_auto,:)=NaN;
 % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
 % 2014/07/18.
+    % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
+    % apply flags to the calculated tau_aero_noscreening
+    if toggle.booleanflagging;
+        s.tau_aero(any(s.flagallcols,3),:)=NaN;
+        s.tau_aero(any(s.flag,3))=NaN;
+    else
+        s.tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
+    end;
+    % The end of "The lines below used to be around here. But recent
+    % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
+
+
+
 
     % fit a polynomial curve to the non-strongly-absorbing wavelengths
     [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
@@ -750,7 +770,7 @@ if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
     % derive optical depths and gas mixing ratios
     % Michal's code TO BE PLUGGED IN HERE.
     
-end; % End of sun-specific processing
+% end; % End of sun-specific processing
 
     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
         s.skyrad = s.rate./repmat(s.skyresp,pp,1);
@@ -762,7 +782,7 @@ end; % End of sun-specific processing
 %********************
 %% remove some of the results for a lighter file
 %********************
-if ~saveadditionalvariables;
+if ~toggle.saveadditionalvariables;
     s=rmfield(s, {'darkstd' 'rate' 'forjunc' 'rate_noFORJcorr' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray'});
 end;
 
@@ -972,4 +992,5 @@ if inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))) ; %||
     end;    
 end % done with plotting sun results
     
+s.toggle = toggle
 return

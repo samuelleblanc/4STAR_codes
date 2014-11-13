@@ -48,5 +48,8 @@ s=starwrapper(vis_sun, nir_sun);
 %********************
 % save
 %********************
-save(savematfile, '-struct', 's', '-mat','program_version'); 
+if exist('program_version','var');
+   s.program_version = program_version;
+end;
+save(savematfile, '-struct', 's', '-mat'); 
 contents=[contents; fieldnames(s)];

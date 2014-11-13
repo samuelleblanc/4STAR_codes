@@ -10,7 +10,7 @@ function [flags] = starflag(daystr,Mode,s)
 %(i.e. outside of starsun.m) and produces YYYYMMDD_starflag_man_createdYYYYMMDD_HHMM_by_Op.mat
 %and starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
 %and starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m etc...
-% SL, v1.0, 20141013, addedmy name to the list of flaggers and added version control of this m script wiht version_set
+% SL, v1.0, 20141013, added my name to the list of flaggers and added version control of this m script wiht version_set
 version_set('1.0');
 
 
@@ -29,6 +29,8 @@ if (Mode==2)
             op_name_str = 'MS';
         case 5
             op_name_str = 'MK';
+        case 6
+            op_name_str = 'SL';
     end
 end
 
