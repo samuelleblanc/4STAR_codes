@@ -38,10 +38,6 @@
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer, NASA Ames, Aug 7th, 2014
-% MS: 2014-11-14: corrected bug of using m_aero_avg/m_H2O_avg instead of
-% m_aero/m_H2O, and performed calculations over slant path with
-% post-division of airmass factor
-% MS: 2014-11-17: replaced all _avg values with original ones
 %
 % -------------------------------------------------------------------------
 %% function routine
@@ -50,7 +46,7 @@ function [cwv] = cwvcorecalc(starsun,modc0,model_atmosphere)
 %----------------------------------------------------------------------
  showfigure = 0;
  Loschmidt=2.686763e19;                   % molec/cm3*atm
- cwvoptfit = true;
+ cwvoptfit = false;
  
 %----------------------------------------------------------------------
 %% lamp calibration
@@ -75,18 +71,16 @@ wnir = starsun.w(1045:end);
 %
 %% apply modified calib to rate
 
-calibmodc0   = repmat(modc0',length(starsun.t),1);
+calibmodc0   = repmat(modc0',length(starsun.tavg),1);
 
-sundist      = repmat(starsun.f(1),length(starsun.UTHh),length(starsun.w));
+sundist      = repmat(starsun.f(1),length(starsun.UTavg),length(starsun.w));
 
-% calculate rate using modc0
-% spc_modc0old    = starsun.spc_avg./calibmodc0./sundist;
-spc_modc0       = starsun.rate./calibmodc0./sundist;
+% rate using modc0
+spc_modc0    = starsun.spc_avg./calibmodc0./sundist;
 %
 
-% slant transmittance corrected for Rayleigh
-modc0Tw=spc_modc0.*exp((starsun.tau_ray).*repmat(starsun.m_ray,1,length(starsun.w)));
 % tau_OD modc0
+modc0Tw=spc_modc0.*exp((starsun.tau_ray_avg).*repmat(starsun.m_ray_avg,1,length(starsun.w)));
 tau_ODmodc0 = -log(modc0Tw)./repmat(starsun.m_aero,1,length(starsun.w));
 tau_ODmodc0slant = -log(modc0Tw);
 %
@@ -116,17 +110,17 @@ for wrange=[1];
 % calculate linear baseline for only the water vapor band region
 % calculate polynomial baseline
 order2=1;  % order of baseline polynomial fit
-poly3=zeros(length(starsun.w(wln)),length(starsun.UTHh));  % calculated polynomial
-poly3_c=zeros(length(starsun.UTHh),(order2)+1);            % polynomial coefficients
+poly3=zeros(length(starsun.w(wln)),length(starsun.UTavg));  % calculated polynomial
+poly3_c=zeros(length(starsun.UTavg),(order2)+1);            % polynomial coefficients
 order_in2=1;
 thresh_in2=0.01;
 % deduce baseline
-for i=1:length(starsun.UTHh)
+for i=1:length(starsun.UTavg)
 % function (fn) can be: 'sh','ah','stq','atq'
 % for gui use (visualization) write:
 % [poly2_,poly2_c_,iter,order,thresh,fn]=backcor(wvis(wln_ind),starsun.tau_aero(goodTime(i),wln_ind));
 % spectrum calculated by modc0 calibration (vertical OD)
-        [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(starsun.w(wln),tau_ODmodc0slant(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
+        [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(starsun.w(wln),tau_ODmodc0(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
         poly3(:,i)=poly3_;        % calculated polynomials
         poly3_c(i,:)=poly3_c_';   % polynomial coefficients
 
@@ -134,26 +128,24 @@ for i=1:length(starsun.UTHh)
 %                 figure(1111)
 %                 plot(starsun.w(wln),tau_ODmodc0(i,wln),'.b','markersize',8);hold on;
 %                 plot(starsun.w(wln),poly3_,'-r','linewidth',2);hold off;
-%                 legend('AOD','AOD baseline');title(num2str(starsun.UTHh(i)));
+%                 legend('AOD','AOD baseline');title(num2str(starsun.UTavg(i)));
 %                 pause(0.01);
 
 end
  
  % assign spectrum, baseline and subtracted spectrum
- tau_aero=real(poly3);  % this is slant path aerosol OD
+ tau_aero=real(poly3);
 
- baseline = (tau_aero)';% this is slant
- spectrum = tau_ODmodc0slant(:,wln);
- spectrum_sub = spectrum-baseline;%
+ baseline = (tau_aero)';    % this is vertical
+ spectrum = tau_ODmodc0(:,wln);
+ spectrum_sub = spectrum-baseline;% this is vertical
 %% end of baseline subtraction 
 
  
  % these transmittances are used for AATS method CWV derivation
- %      Tw=spc_modc0(:,wln).*exp(tau_aero'.*(repmat(starsun.m_aero,1,length(starsun.w(wln))))+...
- %     (starsun.tau_ray(:,wln)).*repmat(starsun.m_ray,1,length(starsun.w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
- % tau_aero is slant path here
- Tw=spc_modc0(:,wln).*exp(tau_aero'+...
-    (starsun.tau_ray(:,wln)).*repmat(starsun.m_ray,1,length(starsun.w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
+     Tw=spc_modc0(:,wln).*exp(tau_aero'.*(repmat(starsun.m_aero_avg,1,length(starsun.w(wln))))+...
+    (starsun.tau_ray_avg(:,wln)).*repmat(starsun.m_ray_avg,1,length(starsun.w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
+ 
  
  %
  % upload a and b parameters (from LBLRTM - new spec FWHM)
@@ -184,8 +176,8 @@ end
  if model_atmosphere==1
       H2O_conv=1244.12; %converts cm-atm in pr cm or g/cm2.  the conversion factor has units of [cm^3/g]. 
       
-      U1=(1./repmat(starsun.m_H2O,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(starsun.UTHh)))))'.*...
-         (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(starsun.UTHh))))'); 
+      U1=(1./repmat(starsun.m_H2O_avg,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(starsun.UTavg)))))'.*...
+         (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(starsun.UTavg))))'); 
       Ufinal  = U1/H2O_conv;
       avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
  elseif model_atmosphere==3 % TCAP winter
@@ -204,13 +196,13 @@ end
       bfit_H2O=[alt0.cs_sort(:,2) alt1000.cs_sort(:,2) alt2000.cs_sort(:,2) alt3000.cs_sort(:,2) alt4000.cs_sort(:,2) alt5000.cs_sort(:,2) alt6000.cs_sort(:,2) alt7000.cs_sort(:,2)];
       cfit_H2O=ones(length(xs.wavelen),length(zkm_LBLRTM_calcs));
 
-      for j=1:length(starsun.UTHh)
-          kk=find(starsun.Alt(j)/1000>=zkm_LBLRTM_calcs);
-          if starsun.Alt(j)/1000<0 kk=1; end  %handles alts slightly less than zero
+      for j=1:length(starsun.UTavg)
+          kk=find(starsun.Altavg(j)/1000>=zkm_LBLRTM_calcs);
+          if starsun.Altavg(j)/1000<0 kk=1; end  %handles alts slightly less than zero
           kz=kk(end);
-          CWV1=(-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))')./starsun.m_H2O(j);
-          CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./starsun.m_H2O(j);
-          CWVint_atmcm = CWV1 + (starsun.Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
+          CWV1=(-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))')./starsun.m_H2O_avg(j);
+          CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./starsun.m_H2O_avg(j);
+          CWVint_atmcm = CWV1 + (starsun.Altavg(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
           Ucalc(j,:)=CWVint_atmcm;      
       end
       %Uold=U;
@@ -218,10 +210,10 @@ end
 
       H2O_conv=1244.12; %converts cm-atm in pr cm or g/cm2.  the conversion factor has units of [cm^3/g]. 
       Ufinal  = U/H2O_conv;
-    %   U1=(1./repmat(starsun.m_H2O_avg((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTHh((goodTime)))))))'.*...
-    %       (log(Tw(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTHh((goodTime))))))');
-    %  U1_lamp=(1./repmat(starsun.m_H2O_avg((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTHh((goodTime)))))))'.*...
-    %      (log(Tw_lamp(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTHh((goodTime))))))');
+    %   U1=(1./repmat(starsun.m_H2O_avg((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTavg((goodTime)))))))'.*...
+    %       (log(Tw(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTavg((goodTime))))))');
+    %  U1_lamp=(1./repmat(starsun.m_H2O_avg((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTavg((goodTime)))))))'.*...
+    %      (log(Tw_lamp(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTavg((goodTime))))))');
      % average U1 over wavelength
      avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm; last:26:52
     %  avg_U1 = avg_U1_;
@@ -264,32 +256,21 @@ end
                 alt10000.cs_sort(1:1556,2) alt11000.cs_sort(1:1556,2) alt12000.cs_sort(1:1556,2) alt13000.cs_sort(1:1556,2) alt14000.cs_sort(1:1556,2)];
       
       
-      Ucalc    = NaN(length(starsun.UTHh),length(wln));
-      colTw    = NaN(length(starsun.UTHh),length(starsun.w));
-      %tau_h2oa = NaN(length(starsun.UTHh),length(starsun.w));
+      Ucalc    = NaN(length(starsun.UTavg),length(wln));
+      colTw    = NaN(length(starsun.UTavg),length(starsun.w));
+      %tau_h2oa = NaN(length(starsun.UTavg),length(starsun.w));
       
-      for j=1:length(starsun.UTHh)
-          if ~isNaN(starsun.Alt(j))
-              kk=find(starsun.Alt(j)/1000>=zkm_LBLRTM_calcs);
-              if starsun.Alt(j)/1000<=0 kk=1; end            %handles alts slightly less than zero
+      for j=1:length(starsun.UTavg)
+          if ~isNaN(starsun.Altavg(j))
+              kk=find(starsun.Altavg(j)/1000>=zkm_LBLRTM_calcs);
+              if starsun.Altavg(j)/1000<=0 kk=1; end            %handles alts slightly less than zero
               kz=kk(end);
-              CWV1=((-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))'))./starsun.m_H2O(j);
-              CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./starsun.m_H2O(j);
-              CWVint_atmcm = CWV1 + (starsun.Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
+              CWV1=(-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))')./starsun.m_H2O_avg(j);
+              CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./starsun.m_H2O_avg(j);
+              CWVint_atmcm = CWV1 + (starsun.Altavg(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
               Ucalc(j,:)    =CWVint_atmcm; 
               colTw(j,:)    =exp(- afit_allH2O(:,kz).*(nanmean(CWVint_atmcm(26:52))).^bfit_allH2O(:,kz));
               %tau_h2oa(j,:) = real(-log(colTw(j,:)));
-              
-              % test Tw figure;
-%               figure(666)
-%               plot(wvis(wln),-log(Tw(j,:)),'.b');hold on;
-%               plot(wvis(wln),CWV1/H2O_conv, '-b');hold on;
-%               plot(wvis(wln),CWV2/H2O_conv,'--g');hold off;
-%               legend('CWVod','CWVkz1','CWVkz2');
-%               title([datestr(starsun.t(j),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Alt(j)) 'm' 'kz1 = ' num2str(kz) ' kz2 = ' num2str(kz+1)]);
-
-              %%% end test figure
-              
           else
               Ucalc(j,:)   =zeros(1,length(wln)); 
               colTw(j,:)   =zeros(1,length(starsun.w));
@@ -299,19 +280,17 @@ end
       end
       %Uold=U;
       U=Ucalc;
-      
-     
 
       H2O_conv=1244.12; %converts cm-atm into pr cm or g/cm2.  the conversion factor has units of [atm*cm^3/g]. 
       Ufinal  = U/H2O_conv;
-     %   U1=(1./repmat(starsun.m_H2O((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTHh((goodTime)))))))'.*...
-     %       (log(Tw(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTHh((goodTime))))))');
+     %   U1=(1./repmat(starsun.m_H2O_avg((goodTime))',1,length(cwv_ind1))).*(((1./(-repmat(H2Oa((cwv_ind1))',1,length(starsun.UTavg((goodTime)))))))'.*...
+     %       (log(Tw(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.UTavg((goodTime))))))');
     
      % average U1 over wavelength
      avg_U1 = abs(real(nanmean(Ufinal(:,ind),2)));%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
      std_U1 = abs(real((nanstd(Ufinal(:,ind),[],2)))); 
    
-     starsun.Alt(starsun.Alt<0)=0;
+     starsun.Altavg(starsun.Altavg<0)=0;
  end
  % assign method 1 variables to save:
  cwv.(lab1)    = avg_U1;
@@ -330,24 +309,24 @@ end
      figure (2);plot(wvis(wln),Ufinal);      axis([0.92 0.98 0 (max(avg_U1))]);legend('cwv by Modified Langley');
      
      % plot avg_cwv
-     figure (3);plot(starsun.UTHh,avg_U1,'ob','markerfacecolor','b','markersize',10);xlabel('UT','fontsize',12,'fontweight','bold');ylabel('CWV [g/cm2]','fontsize',12,'fontweight','bold');
-     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.UTHh) max(starsun.UTHh) 0 max(avg_U1)]);
+     figure (3);plot(starsun.UTavg,avg_U1,'ob','markerfacecolor','b','markersize',10);xlabel('UT','fontsize',12,'fontweight','bold');ylabel('CWV [g/cm2]','fontsize',12,'fontweight','bold');
+     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.UTavg) max(starsun.UTavg) 0 max(avg_U1)]);
 
      % with Lat/Lon
-     figure(4);scatter3(starsun.Lat(avg_U1<=3&avg_U1>=0),starsun.Lon(avg_U1<=3&avg_U1>=0),avg_U1(avg_U1<=3&avg_U1>=0),10,avg_U1(avg_U1<=3&avg_U1>=0),'filled');xlabel('Latitude','fontsize',12,'fontweight','bold');ylabel('Longitude','fontsize',12,'fontweight','bold');
-     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.Lat) max(starsun.Lat) min(starsun.Lon) max(starsun.Lon) 0 3]);
+     figure(4);scatter3(starsun.Latavg(avg_U1<=3&avg_U1>=0),starsun.Lonavg(avg_U1<=3&avg_U1>=0),avg_U1(avg_U1<=3&avg_U1>=0),10,avg_U1(avg_U1<=3&avg_U1>=0),'filled');xlabel('Latitude','fontsize',12,'fontweight','bold');ylabel('Longitude','fontsize',12,'fontweight','bold');
+     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.Latavg) max(starsun.Latavg) min(starsun.Lonavg) max(starsun.Lonavg) 0 3]);
      cb=colorbar; set(cb,'fontsize',12,'fontweight','bold');title('CWV [g/cm^{2}]','fontsize',12','fontweight','bold');
      % with Lat/Alt-bound by low CWV values
-     figure(5);scatter3(starsun.Lat(avg_U1<=0.5&avg_U1>=0),starsun.Altavg(avg_U1<=0.5&avg_U1>=0),avg_U1(avg_U1<=0.5&avg_U1>=0),10,avg_U1(avg_U1<=0.5&avg_U1>=0),'filled');
+     figure(5);scatter3(starsun.Latavg(avg_U1<=0.5&avg_U1>=0),starsun.Altavg(avg_U1<=0.5&avg_U1>=0),avg_U1(avg_U1<=0.5&avg_U1>=0),10,avg_U1(avg_U1<=0.5&avg_U1>=0),'filled');
      xlabel('Latitude','fontsize',12,'fontweight','bold');ylabel('Altitude [m]','fontsize',12,'fontweight','bold');
-     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.Lat) max(starsun.Lat) min(starsun.Alt) max(starsun.Alt) 0 1]);
+     set(gca,'fontsize',12,'fontweight','bold');axis([min(starsun.Latavg) max(starsun.Latavg) min(starsun.Altavg) max(starsun.Altavg) 0 1]);
      cb=colorbar; set(cb,'fontsize',12,'fontweight','bold');title('CWV [g/cm^{2}]','fontsize',12','fontweight','bold');
 
      % plot average 0.92-0.96 (1:52)
-     %  figure;errorbar(starsun.UTHh((goodTime)),mean(Ufinal(:,26:52),2),std(Ufinal(:,26:52),[],2),'d','color',[0 0.8 0.2],'MarkerSize',6);hold on;
-     %         plot(starsun.UTHh((goodTime)),starsun.Altavg((goodTime))/1000,'-','color',[0.5 0.5 0.5],'LineWidth',2);
+     %  figure;errorbar(starsun.UTavg((goodTime)),mean(Ufinal(:,26:52),2),std(Ufinal(:,26:52),[],2),'d','color',[0 0.8 0.2],'MarkerSize',6);hold on;
+     %         plot(starsun.UTavg((goodTime)),starsun.Altavg((goodTime))/1000,'-','color',[0.5 0.5 0.5],'LineWidth',2);
      figure(44);
-     [AX,H1,H2] = plotyy(starsun.UTHh,avg_U1,starsun.UTHh,starsun.Alt);
+     [AX,H1,H2] = plotyy(starsun.UTavg,avg_U1,starsun.UTavg,starsun.Altavg);
      set(get(AX(1),'Ylabel'),'String','Columnar Water vapor [g cm^{-2}]','FontSize',16,'color',[0 0.8 0.2]) 
      set(get(AX(2),'Ylabel'),'String','Altitude [meters]','FontSize',16,'color',[0.5 0.5 0.5]) 
      set(H1,'LineStyle','d','MarkerFaceColor',[0 0.8 0.2],'MarkerSize',6)
@@ -368,9 +347,9 @@ wv_residual = [];
 
 for i = 1:length(starsun.t)
  % choose right altitude coef
-        if ~isNaN(starsun.Alt(i))
-              kk=find(starsun.Alt(i)/1000>=zkm_LBLRTM_calcs);
-              if starsun.Alt(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
+        if ~isNaN(starsun.Altavg(i))
+              kk=find(starsun.Altavg(i)/1000>=zkm_LBLRTM_calcs);
+              if starsun.Altavg(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
               kz=kk(end);
               
         else 
@@ -389,7 +368,7 @@ for i = 1:length(starsun.t)
            x0 = [5000 0.75 0.8 -2];
        end
         %if lampcalib==1
-            y = real((spectrum(i,:)));%this is total OD (divided by airmass)
+            y = (spectrum(i,:));%this is total OD (divided by airmass)
 %        else
 %             y = (spectrum(i,:));%waterOD(i,:);
 %        end
@@ -436,17 +415,17 @@ for i = 1:length(starsun.t)
            if wrange==3
             [U_,fval,exitflag,output]  = fmincon('H2OO2resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR3);
            elseif wrange==4
-            ylarge = logical(y>=4);
+            ylarge = logical(y>=2);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('H2OCH4resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR4);
             end
            elseif wrange==5
-            ylarge = logical(y>=4);
+            ylarge = logical(y>=2);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('H2OCH4CO2O4resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR5);
             end
            else
-            ylarge = logical(y>=4);
+            ylarge = logical(y>=2);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('H2Oresi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             end
@@ -477,7 +456,7 @@ for i = 1:length(starsun.t)
                     swv_opt = [swv_opt; real(U_)];
                     wv_residual = [wv_residual;real(fval)];
                 end
-                cwv_opt_ = (real(U_(1))/H2O_conv)/starsun.m_H2O(i); 
+                cwv_opt_ = (real(U_(1))/H2O_conv);%/starsun.m_H2O_avg(i); 
                 cwv_opt_round = round(cwv_opt_*100)/100;
                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
                % plot fitted figure
@@ -502,22 +481,23 @@ for i = 1:length(starsun.t)
                % assign fitted spectrum to subtract
                %tau_aero_fitsubtract(i,wln) = ysub;
                % wvODfit(i,wln) = real(yopt) + baseline(i,:)'; %(add subtracted baseline to retrieved fit)
-%                          figure(4444);
-%                          plot(starsun.w(wln),y,'-b');hold on;
-%                          plot(starsun.w(wln),yopt,'--r');hold on;
-%                          plot(starsun.w(wln),ysub,'-c');hold on;
-%                          plot(starsun.w(wln),y'-ysub,'-k');hold off;
-%                          xlabel('wavelength','fontsize',12);ylabel('total slant water vapor OD','fontsize',12);
-%                          legend('measured','calculated (fit)','spectrum to subtract','subtracted spectrum');
-%                          title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Alt(i)) 'm' ' CWV= ' num2str(cwv_opt_round)]);
-%                          ymax = yopt + 0.2;
-%                          if max(ymax)<0 
-%                              ymaxax=1; 
-%                          else
-%                              ymaxax=max(ymax);
-%                          end;
-%                          axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 ymaxax]);
-%                          pause(0.0001);
+%                        figure(444);
+%                        plot(starsun.w(wln),y,'-b');hold on;
+%                        plot(starsun.w(wln),yopt,'--r');hold on;
+%                        plot(starsun.w(wln),ysub,'-c');hold on;
+%                        plot(starsun.w(wln),y'-ysub,'-k');hold off;
+%                        xlabel('wavelength','fontsize',12);ylabel('total slant water vapor OD','fontsize',12);
+%                        legend('measured','calculated (fit)','spectrum to subtract','subtracted spectrum');
+%                        title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Altavg(i)) 'm' ' CWV= ' num2str(cwv_opt_round)]);
+%                        ymax = yopt + 0.2;
+%                        if max(ymax)<0 
+%                            ymaxax=1; 
+%                        else
+%                            ymaxax=max(ymax);
+%                        end;
+%                        axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 ymaxax]);
+%                        pause(0.0001);
+
                
             end
        else
@@ -537,12 +517,12 @@ for i = 1:length(starsun.t)
        end
 
 end % end of loop over all data points for wv retrieval
-   cwv_opt = (swv_opt(:,1)/H2O_conv)./starsun.m_H2O;% retrieval is made on slant./starsun.m_H2O;  %conversion from slant path to vertical
+   cwv_opt = (swv_opt(:,1)/H2O_conv);% retrieval is made on vertical./starsun.m_H2O_avg;  %conversion from slant path to vertical
    if wrange==4
-       cwv.(lab3) = swv_opt(:,2)./starsun.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
+       cwv.(lab3) = swv_opt(:,2)./starsun.m_ray_avg; % this is [atm x cm]     !! check if needs to be divided with airmass
    elseif wrange==5
-       cwv.(lab3) = swv_opt(:,2)./starsun.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
-       cwv.(lab4) = swv_opt(:,3)./starsun.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
+       cwv.(lab3) = swv_opt(:,2)./starsun.m_ray_avg; % this is [atm x cm]     !! check if needs to be divided with airmass
+       cwv.(lab4) = swv_opt(:,3)./starsun.m_ray_avg; % this is [atm x cm]     !! check if needs to be divided with airmass
    end
     
     % save in each wavelength range retrieval
