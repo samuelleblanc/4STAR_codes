@@ -1,4 +1,10 @@
 function [ng, flag_name, flag_tag] = cnvt_flags2ng(time, flags,good)
+%% Program to convert flags to ng (no good) format
+% created by CJF
+% Modification history:
+% SL (v1.0): 2014-11-12: added versioning, and ng=3 for tracking errors
+version_set('v1.0')
+
 if ~exist('good','var')
     good = true(size(time));
 end
@@ -17,6 +23,8 @@ for fld = 1:length(flag_name)
             flag_tag(fld) = 1;
         case 'before_or_after_flight'
             flag_tag(fld) = 2;
+        case 'tracking_errors'
+            flag_tag(fld) = 3;
         case 'unspecified_clouds'
             flag_tag(fld) = 10;
         case 'cirrus'

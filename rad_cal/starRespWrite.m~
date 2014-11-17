@@ -23,7 +23,7 @@
 %
 % DEPENDENCIES:
 %  - save_fig.m (for saving the plots)
-%  - startup_plotting.m (for making good looking plots)
+%  - startup.m (for making good looking plots)
 %  - startupbusiness.m
 %  - starwrapper.m
 %  - version_set.m
@@ -39,15 +39,14 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, October 15th, 2014
-% Modified (v1.1): By Samuel LeBlanc, NASA Ames, 2014-11-12
-%          - changed startup to startup_plotting
+% Modified: By Samuel LeBlanc test
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [fnamevis fnamenir]=starRespWrite()
-startup_plotting;
-version_set('1.1')
+startup;
+version_set('1.0')
 
 %% setting the standard variables
 pname=uigetdir(starpaths,'Find folder for calibration files');

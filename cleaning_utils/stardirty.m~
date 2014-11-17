@@ -15,7 +15,7 @@
 %  Plots of dirty and clean window differences
 %
 % DEPENDENCIES:
-%  - startup_plotting.m (setup for nice figure plotting, can be safely omitted)
+%  - startup.m (setup for nice figure plotting, can be safely omitted)
 %  - allstarmat.m and the required dependencies
 %  - starwrapper.m and required dependencies (updated to handle a single
 %  structure, with command toggles)
@@ -150,7 +150,7 @@ sclean.stdev=nanstd(sclean.rate(sclean.fl,:));
   
   
 %% Now plot the appropriate spectra
-startup_plotting
+startup
 figure(1);
 ax1=subplot(2,1,1);
 plot(sdirty.w,sdirty.mean,'r',sclean.w,sclean.mean,'b')

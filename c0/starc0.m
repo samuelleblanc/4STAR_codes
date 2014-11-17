@@ -14,10 +14,13 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Sam test master
 % Michal test pull
 % Michal test pull2
+=======
+
 version_set('1.1');
 if ~exist('verbose','var')
     verbose=true;
 end;
+
 
 if verbose; disp('In starc0'), end;
 % control the input
@@ -25,7 +28,7 @@ if nargin==0;
     t=now;
 end;
 
-% select a source file
+% select a source file % second comment
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2013 6 18 0 0 0]); % fiber swapped in the evening of June 17, 2013 at Dryden.
         if now>=datenum([2014 9 1 0 0 0]);

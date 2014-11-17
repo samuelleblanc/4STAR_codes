@@ -44,3 +44,6 @@ Temporary Items
 
 # Matlab temporary files
 *.asv
+
+# vi temporary files
+*.*~

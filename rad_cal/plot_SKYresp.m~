@@ -19,7 +19,7 @@
 %    corresponding variation to each other
 %
 % DEPENDENCIES:
-%  - startup_plotting.m
+%  - startup.m
 %  - save_fig.m
 %  - version_set.m : for version control of this file
 %
@@ -31,14 +31,13 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, date unknown, 2014
-% Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
-%                 - changed startup to startup_plotting
+%
 % -------------------------------------------------------------------------
 
 %% Start of function
 function resp=plot_SKYresp(cal,vis,nir,date,pname)
-startup_plotting;
-version_set('1.1');
+startup;
+version_set('1.0');
 disp('Plotting the various SKY response functions');
 
 figure(3);
