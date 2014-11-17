@@ -54,8 +54,10 @@ function	s=starwrapper(s, s2, varargin)
 %                       - added gassubstract toggle
 %                       - added booleanflagging toggle
 %                       - added flagging toggle
+% MS: 2014/11/14: corrected bug in cwvcorecalc
+% MS: 2014/11/17: commented spec_aveg_cwv out
 
-version_set('1.1');
+version_set('1.2');
 %********************
 %% prepare for processing
 %********************
@@ -649,8 +651,8 @@ end; % toggle.doflagging
         %************************************************************
         
         % calculate CWV from 940 nm band and subtract other regions
-        tavg=3;
-        [s] = spec_aveg_cwv(s,tavg);
+        % tavg=3;
+        % [s] = spec_aveg_cwv(s,tavg);
         
         %[s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrievecwv(s,cross_sections);%original version
 %         if verbose; disp('calculating water vapor amount and subtracting'), end;
