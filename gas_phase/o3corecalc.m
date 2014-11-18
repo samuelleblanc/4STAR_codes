@@ -1,10 +1,10 @@
-function [O3conc H2Oconc O4conc O3resi o3OD] = o3corecalc(starsun,o3coef,o4coef,h2ocoef,wln,tau_ODslant)
+function [O3conc H2Oconc O4conc O3resi o3OD] = o3corecalc(starsun,o3coef,o4coef,h2ocoef,wln,tau_OD)
 % retrieve o3 and derive fitted spectrum for subtraction
 %-------------------------------------------------------
 % MS, July, 24, 2014
 %-------------------------------------------------------
 ODfit = zeros(length(starsun.t),length(starsun.w));
-tau_aero_subtract = tau_ODslant;
+tau_o3o4h2o_subtract = tau_OD;
 % subtract baseline
 % order2=1;  % order of baseline polynomial fit
 % poly3=zeros(length(starsun.w(wln)),length(starsun.UTavg));  % calculated polynomial
@@ -47,7 +47,7 @@ o3_DU = [];
 for i = 1:length(starsun.t)
            
     x0 = [0.3 1 0.5 0.75 0.8 -2 -0.1]; % this is initial guess;o3-300h2o-5000;o4-10000
-    y = (tau_ODslant(i,wln));
+    y = (tau_OD(i,wln));
     meas = [starsun.w(wln)' y'];
     PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000];
        % Set Options
@@ -63,7 +63,7 @@ for i = 1:length(starsun.t)
        % check spectrum validity for conversion
        ypos = logical(y>=0);
        if ~isNaN(y(1)) && isreal(y) && sum(ypos)>length(wln)-15 && sum(isinf(y))==0
-            ylarge = logical(y>=2);
+            ylarge=logical(y>=7);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('O3resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             end
@@ -78,8 +78,8 @@ for i = 1:length(starsun.t)
   
              sc = [sc; real(U_)];
              sc_residual = [sc_residual;real(fval)];
-                o3_conc_ = (real(U_(1)));%/starsun.m_O3_avg(i); 
-                o3_round = round(o3_conc_*100)/100;% this is vertical (tau_aero is vertical) in atmxcm
+                o3_conc_ = (real(U_(1)));%/starsun.m_O3(i); 
+                o3_round = round(o3_conc_*100)/100;% this is vertical (tau_aero is slant) in atmxcm
                 o3_DU_    = (o3_conc_*1000);%/starsun.m_O3(i); 
                 o3_DU_round = round(o3_DU_);
                 o3_DU = [o3_DU;o3_DU_];
@@ -97,7 +97,7 @@ for i = 1:length(starsun.t)
                % assign fitted spectrum
                 ODfit(i,wln) = yopt;
                 % save spectrum to subtract
-                tau_aero_subtract(i,wln) = -log(exp(-(o3coef(wln).*real(U_(1)))).*exp(-(o4coef(wln).*real(U_(2)))).*exp(-(h2ocoef(wln).*real(U_(3)))));
+                tau_o3o4h2o_subtract(i,wln) = -log(exp(-(o3coef(wln).*real(U_(1)))).*exp(-(o4coef(wln).*real(U_(2)))).*exp(-(h2ocoef(wln).*real(U_(3)))));
 %                       figure(444);
 %                       plot(starsun.w(wln),y,'-b');hold on;
 %                       plot(starsun.w(wln),yopt,'--r');hold on;
@@ -124,7 +124,7 @@ for i = 1:length(starsun.t)
                U_ = [NaN NaN NaN NaN NaN NaN NaN];
                sc = [sc; U_];
                sc_residual = [sc_residual;NaN];
-                o3_DU = [o3_DU;NaN];
+               o3_DU = [o3_DU;NaN];
            
        end
        

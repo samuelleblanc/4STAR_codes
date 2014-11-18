@@ -1,11 +1,12 @@
-function [CH4conc CO2conc CO2resi co2OD] = co2corecalc(starsun,ch4coef,co2coef,wln,tau_ODslant)
+function [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc(starsun,ch4coef,co2coef,wln,tau_OD)
 % retrieve using 1.555-1.630 region (CH4 and CO2)
 %------------------------------------------------
 % MS, Mar 11, 2014
 % MS, July 25, 2014
+% MS, 2014-11-17, refined struct names, added output variable
 %------------------------------------------------
 ODfit = zeros(length(starsun.t),length(starsun.w));
-tau_aero_subtract = tau_ODslant;
+tau_co2ch4_subtract = tau_OD;
 %------------------------------------------------
 
 sc=[];
@@ -14,7 +15,7 @@ sc_residual = [];
 for i = 1:length(starsun.t)
            
     x0 = [500 500 0.75 0.8 -2]; 
-    y = (tau_ODslant(i,wln));
+    y = (tau_OD(i,wln));
     meas = [starsun.w(wln)' y'];
     PAR  = [ch4coef(wln) co2coef(wln)];
        % Set Options
@@ -42,7 +43,7 @@ for i = 1:length(starsun.t)
   
                 sc = [sc; real(U_)];
                 sc_residual = [sc_residual;real(fval)];
-                co2_conc_ = (real(U_(2)));%/starsun.m_H2O_avg(i); 
+                co2_conc_ = (real(U_(2)));%/starsun.m_H2O(i); 
                 co2_round = round(co2_conc_*100)/100;
                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
                % plot fitted figure
@@ -56,7 +57,7 @@ for i = 1:length(starsun.t)
                % assign fitted spectrum
                 ODfit(i,wln) = yopt;
                 % save spectrum to subtract
-                tau_aero_subtract(i,wln) = -log(exp(-(ch4coef(wln).*real(U_(1)))).*exp(-(co2coef(wln).*real(U_(2)))));
+                tau_co2ch4_subtract(i,wln) = -log(exp(-(ch4coef(wln).*real(U_(1)))).*exp(-(co2coef(wln).*real(U_(2)))));
 %                       figure(444);
 %                       plot(starsun.w(wln),y,'-b');hold on;
 %                       plot(starsun.w(wln),yopt,'--r');hold on;

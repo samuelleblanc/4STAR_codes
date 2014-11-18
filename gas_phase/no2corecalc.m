@@ -1,10 +1,10 @@
-function [NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc(starsun,no2coef,o4coef,o3coef,wln,tau_ODslant)
+function [NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc(starsun,no2coef,o4coef,o3coef,wln,tau_OD)
 % retrieve o3 and derive fitted spectrum for subtraction
 %-------------------------------------------------------
 % MS: July, 26, 2014: NO2 fit (400-500 nm region)
 %-------------------------------------------------------
 ODfit = zeros(length(starsun.t),length(starsun.w));
-tau_aero_subtract = tau_ODslant;
+tau_no2_subtract = tau_OD;
 %------------------------------------------------
 
 sc=[];
@@ -14,7 +14,7 @@ no2_DU = [];
 for i = 1:length(starsun.t)
            
     x0 = [0.3 1 0.3 0.05 -0.1 0.5]; % this is initial guess (-2 for 6th element -0.1 for 7th element)
-    y = (tau_ODslant(i,wln));
+    y = (tau_OD(i,wln));
     meas = [starsun.w(wln)' y'];
     PAR  = [no2coef(wln)/1000 o4coef(wln)*10000 o3coef(wln)];
        % Set Options
@@ -30,7 +30,7 @@ for i = 1:length(starsun.t)
        % check spectrum validity for conversion
        ypos = logical(y>=0);
        if ~isNaN(y(1)) && isreal(y) && sum(ypos)>length(wln)-15 && sum(isinf(y))==0
-            ylarge = logical(y>=2);
+            ylarge = logical(y>=5);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('NO2resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             end
@@ -58,7 +58,7 @@ for i = 1:length(starsun.t)
                    yno2subtract   =  -log(exp(-((no2coef(wln)/1000).*real(U_(1)))));
                    yo4subtract   =  -log(exp(-(o4coef(wln).*10000*real(U_(2)))));
                    yo3subtract  =  -log(exp(-(o3coef(wln).*real(U_(3)))));
-                   tau_aero_subtract(i,wln) = y'-yno2subtractall;
+                   tau_no2_subtract(i,wln) = y'-yno2subtractall;
                
                % assign fitted spectrum to subtract
                 ODfit(i,wln) = yno2subtractall;
