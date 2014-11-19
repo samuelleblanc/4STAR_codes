@@ -4,11 +4,12 @@
 %
 % 
 % Michal 2013/02/20
+% MS: 2014/11/18, changed ,rate_noFORJcorr field to rate
 
 %********************
 % set parameters
 %********************
-daystr='20130711';
+daystr='20130712';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -21,10 +22,10 @@ if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
 else
     %source=[daystr 'starsun.mat'];
-    source=[daystr 'starsun4modL.mat'];
+    source=[daystr 'starsunLangley.mat'];
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_aero','tau_O3','tau_NO2','tau_O4','tau_ray','rate_noFORJcorr');
+load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_aero','tau_O3','tau_NO2','tau_O4','tau_ray','rate');
 starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 s1=s(strmatch('langley',s));
@@ -96,7 +97,7 @@ am = [min(m_H2O(ok)) max(m_H2O(ok))];
 %am = [3.2 12];      % July-11
 %
 tau_NO2 = repmat(tau_NO2,pp,1);
-[c0_mod,residual]=modLangley(am,iwln,wvis(iwln),rate_noFORJcorr(ok,iwln),watvap_tau_aero(ok,:),...
+[c0_mod,residual]=modLangley(am,iwln,wvis(iwln),rate(ok,iwln),watvap_tau_aero(ok,:),...
                               tau_ray(ok,iwln),tau_O4(ok,iwln),tau_O3(ok,iwln),tau_NO2(ok,iwln),m_aero(ok),m_ray(ok),m_O3(ok),m_NO2(ok),m_H2O(ok),H2Oa(iwln),H2Ob(iwln),stdev_mult);
                           
                          
@@ -126,15 +127,19 @@ elseif strcmp(daystr,'20130214')
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');
-    c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_constrained_airmass_screened_2x.dat');
+    %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_constrained_airmass_screened_2x.dat');
+    c0file = '20130708_VIS_C0_refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718.dat';
     c0=importdata(fullfile(starpaths, c0file));
     c0vis = c0.data(:,3);
     c0mod = c0vis;
     c0mod(iwln) = c0_mod;
     % filesuffix='modified_Langley_on_G1_secondL_flight_screened_2x_withOMIozone';
-    %filesuffix='modified_Langley_MLOscreened_2x';
-    filesuffix='modified_Langley_MLOscreened_constrained_airmass_2x';
+    % filesuffix='modified_Langley_MLOscreened_2x';
+    % filesuffix='modified_Langley_MLOscreened_constrained_airmass_2x';
     % filesuffix='modified_Langley_on_G1_secondL_flight_6km_3c_screened_2x_withOMIozone';
+    filesuffix='modified_Langley_at_MLO_screened_2.0x';
+    % this is for the averaged file
+    % filesuffix='modified_Langley_at_MLO_screened_2.0x_averagethru20130712_20140718';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 end
 

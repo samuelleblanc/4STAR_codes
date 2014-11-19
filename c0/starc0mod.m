@@ -63,8 +63,9 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         if now>=datenum([2014 7 18 0 0 0]);
             daystr='20130708';
             %filesuffix='modified_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140721';
-            filesuffix='modified_Langley_at_MLO_screened_2.0x_updated20140721';
+            %filesuffix='modified_Langley_at_MLO_screened_2.0x_updated20140721';
             %filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            filesuffix='modified_Langley_at_MLO_screened_2.0std_averagethru20130711';
             model_atmosphere=2;% SEAC4RS (mid-lat summer)
         elseif now>=datenum([2013 7 14 0 0 0]);
             daystr='20130708';
