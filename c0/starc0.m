@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
@@ -8,38 +8,39 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % importdata.m. To save new c0 data, use starsavec0.m.    
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
-% Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
-% Samuel, v1.1, 2014/10/15, added verbose keyword
-% Yohei, 2014/11/12, test on Github
-% Sam test master
-% Michal test pull
-% Michal test pull2
-%=======
 
-version_set('1.1');
-if ~exist('verbose','var')
-    verbose=true;
-end;
-
-
-if verbose; disp('In starc0'), end;
 % control the input
 if nargin==0;
     t=now;
 end;
 
-% select a source file % second comment
+% select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2013 6 18 0 0 0]); % fiber swapped in the evening of June 17, 2013 at Dryden.
+    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
             daystr='20140830';
-            filesuffix='refined_Langley_on_C130_screened_3.0x';
+            filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
-        elseif now>=datenum([2014 7 18 0 0 0]);
+        end;
+        %     elseif t>=datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS and post-SEAC4RS latter days
+        %             daystr='20130708';
+        %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+        %     elseif t>=datenum([2013 6 18 0 0 0]) & t<datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS early days
+        %             daystr='20130708';
+        %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled2p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+    elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
+        if now>=datenum([2014 10 17]);
             daystr='20130708';
-            %filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
-            filesuffix = 'refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
+            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
+            % use for separate starsun files to obtaine modified Langley
+            %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+        elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
+            daystr='20130708';
+            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+        elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
+            daystr='20130708';
+            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2013 7 14 0 0 0]);
