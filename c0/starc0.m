@@ -14,7 +14,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % Sam test master
 % Michal test pull
 % Michal test pull2
-=======
+%=======
 
 version_set('1.1');
 if ~exist('verbose','var')
@@ -38,7 +38,8 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2014 7 18 0 0 0]);
             daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            %filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            filesuffix = 'refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2013 7 14 0 0 0]);
