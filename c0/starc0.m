@@ -8,6 +8,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % importdata.m. To save new c0 data, use starsavec0.m.    
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
+% MS, 2014-11-19, added ARISE cal-flight Langley to list
+% MS, changed line 21 from 8 1 000 to 7 1 000 to account for pre-ARISE cal
 
 % control the input
 if nargin==0;
@@ -16,10 +18,12 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+    if t>=datenum([2014 7 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
-            daystr='20140830';
-            filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            daystr='20141002';
+            %daystr='20140830';
+            %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;

@@ -16,11 +16,13 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 %           under 'sleblan2'
 % Modified (v1.0): by Samuel LeBlanc, Oct-10, 2014
 %          - added version control of this script via the version_set.m script
+% MS, 2014-11-19, changed michal username to msegalro
+%                 changed folder paths
 version_set('1.0');
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
-if ~isempty(strfind(lower(userpath),'michal')); % a problem: userpath does not work on Michal's machine 
+if ~isempty(strfind(lower(userpath),'msegalro')); %
     matfolder='C:\MatlabCodes\data\';
-    figurefolder='C:\MatlabCodes\4STAR\Figures\';
+    figurefolder='C:\MatlabCodes\figs\';
     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
     author='Michal';
 elseif ~isempty(strfind(lower(userpath),'meloe')); 
