@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
@@ -8,8 +8,20 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % importdata.m. To save new c0 data, use starsavec0.m.    
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
+% Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
+% Samuel, v1.1, 2014/10/15, added verbose keyword
+% Michal, v1.2, 2014/11/17, combined version from NAS
 % MS, 2014-11-19, added ARISE cal-flight Langley to list
 % MS, changed line 21 from 8 1 000 to 7 1 000 to account for pre-ARISE cal
+
+
+
+version_set('1.2');
+if ~exist('verbose','var')
+    verbose=true;
+end;
+
+if verbose; disp('In starc0'), end;
 
 % control the input
 if nargin==0;
