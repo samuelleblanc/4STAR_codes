@@ -56,8 +56,11 @@ function	s=starwrapper(s, s2, varargin)
 %                       - added flagging toggle
 % MS: 2014/11/14: corrected bug in cwvcorecalc
 % MS: 2014/11/17: commented spec_aveg_cwv out
+% SL: v1.3, 2014-11-24: added check to ensure that no sun-specific
+%                       processing occurs when in FOV. 
+%                       - changed the default values of the toggles.
 
-version_set('1.2');
+version_set('1.3');
 %********************
 %% prepare for processing
 %********************
@@ -66,15 +69,15 @@ version_set('1.2');
 toggle.verbose=true;
 toggle.saveadditionalvariables=true;
 toggle.savefigure=false;
-toggle.computeerror=true;
+toggle.computeerror=false;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;
 toggle.gassubtract = false;
-toggle.booleanflagging = true;
+toggle.booleanflagging = false;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = false; % for running any Yohei style flagging
-toggle.dostarflag = true; 
+toggle.dostarflag = false; 
 
 %% check if the switches are set in the call to starwrapper
 if (~isempty(varargin))
@@ -594,7 +597,7 @@ end; % toggle.doflagging
 % mode of gas retrieval proc
 % gasmode=menu('Select gas retrieval mode:','1: CWV only','2: PCA, hyperspectral');
 
-% if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));
+ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));
     % || ~isempty(strfind(lower(datatype),'sky')); % not for FOV, ZEN, PARK data
     
     %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
@@ -785,7 +788,7 @@ end; % toggle.doflagging
     % derive optical depths and gas mixing ratios
     % Michal's code TO BE PLUGGED IN HERE.
     
-% end; % End of sun-specific processing
+ end; % End of sun-specific processing
 
     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
         s.skyrad = s.rate./repmat(s.skyresp,pp,1);
@@ -806,7 +809,7 @@ end;
 %********************
 % plots very tightly related to the processes above only. For other figures, use other codes.
 % data screening
-if inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))) ; %|| ~isempty(strmatch('sky', lower(datatype(end-2:end))))); % don't inspect FOV, ZEN, PARK data
+if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))) ; %|| ~isempty(strmatch('sky', lower(datatype(end-2:end))))); % don't inspect FOV, ZEN, PARK data
     panel_preference=1;
     if panel_preference==2;
         yylist={'s.tau_aero_noscreening' 'ang' 's.rawrelstd' 'track_err' 's.Alt/1000'};

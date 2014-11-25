@@ -135,14 +135,14 @@ linkaxes(sb,'x');
 % figure; plot(ins.nm, ins.spectra(ins.Str==1,:),'-',ins.nm, ins.spectra(ins.Str==0,:),'k-')
 
 %%
-ins.spectra=ins.raw; !!!
-ins.time=ins.t; !!!
+ins.spectra=ins.raw; %!!!
+ins.time=ins.t; %!!!
 if ~isempty(findstr(ins.filename{:}, 'VIS'))
     ins.is_vis=1;
 else
     ins.is_vis=0;
 end;
-!!!
+%!!!
 if sum(ins.Str==0)==0
     darks = min(ins.spectra);
 else 
@@ -226,7 +226,7 @@ xlabel('Angle [degrees]');
 ylabel('Relative signal');
 colorbar
 ylim([.85,1.02]);
-xlim([-1,1]);
+xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
 

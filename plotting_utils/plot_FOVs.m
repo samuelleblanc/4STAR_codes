@@ -20,6 +20,7 @@
 %  - scat_ang_degs.m
 %  - FOV_scan.m
 %  - starpaths.m
+%  - version_set.m
 %
 % NEEDED FILES:
 %  - saved yyyymmddstar.mat files
@@ -29,12 +30,13 @@
 %
 % MODIFICATION HISTORY:
 % Written: Samuel LeBlanc, NASA Ames, August 15th, 2014, Happy Acadian Day!
-%
+% Modified v1.0: by Samuel LeBlanc, NASA Ames, 2014-11-24,
+%           -added version control
 % -------------------------------------------------------------------------
 
 %% Start of function
 function plot_FOVs(filein)
-
+version_set('1.0')
 %% setup and load the files
 if nargin<1 || isempty(filein)
     [filename, sourcefolder]=uigetfile('*star.mat','Pick the star.mat files');
