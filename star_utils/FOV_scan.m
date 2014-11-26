@@ -19,6 +19,7 @@
 %  - starwavelengths.m
 %  - scat_ang_degs.m
 %  - version_set.m
+%  - convert_star_to_rd_spc
 %
 % NEEDED FILES:
 %  none
@@ -34,13 +35,15 @@
 %           - added comments
 % Modified (v1.0): by Samuel LeBlanc, October, 13th, 2014, NASA Ames
 %           - added version_set for m script version control
+% Modified (v1.1): by Samuel LeBlanc, November 25th, 2014, NASA Ames
+%           - modified the call to the scat_and_degs - it was erronous.
 %
 % -------------------------------------------------------------------------
 
 %% Start of code
 
 function ins = FOV_scan(ins)
-version_set('1.0');
+version_set('1.1');
 
 %% legacy code
 % 
@@ -165,12 +168,15 @@ if ins.is_vis
 else
    good_pix = (ins.rangeCCD>100)&(rem([1:length(ins.nm)],50)==0);
 end
-%%
-ins.SA = scat_ang_degs(90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), ins.AZ_deg,...
-   90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), mean(ins.AZ_deg).*ones(size(ins.AZ_deg)));
-
-   sza = 90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg));
-   saz = mean(abs(ins.AZ_deg)).*ones(size(ins.AZ_deg));
+%%   
+%scat_ang_degs(sza, saz, za, az) 
+sza = 90-mean(abs(ins.El_deg(tracking))).*ones(size(ins.AZ_deg));
+saz = mean(abs(ins.AZ_deg(tracking))).*ones(size(ins.AZ_deg));
+ins.SA = scat_ang_degs(sza,saz,90.0-ins.El_deg,ins.AZ_deg)
+   
+ % Old code  
+ %  ins.SA = scat_ang_degs(90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), ins.AZ_deg,...
+ %  90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), mean(ins.AZ_deg).*ones(size(ins.AZ_deg)));
 
 if ins.Vscan
    ins.midAng = mean(ins.El_deg);
