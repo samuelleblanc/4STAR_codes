@@ -37,6 +37,8 @@
 %           - added version_set for m script version control
 % Modified (v1.1): by Samuel LeBlanc, November 25th, 2014, NASA Ames
 %           - modified the call to the scat_and_degs - it was erronous.
+%           - the scattering angle calculation is now based on epheremis
+%           calculated sun position with the offset from 4STAR.
 %
 % -------------------------------------------------------------------------
 
@@ -78,16 +80,19 @@ ins=convert_star_to_rd_spc(ins);
 
 %%
 tracking = (abs(ins.QdVlr./ins.QdVtot)<0.02) & (abs(ins.QdVtb./ins.QdVtot)<0.02) & (ins.QdVtot>.5)&(ins.Str==1) & (ins.Str>0);
+ic = find(tracking);
+icenter = ic(ceil(end/2));
 rec = [1:length(tracking)]';
 if any(tracking)
-scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
+    scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
+   % scan(icenter) = true;
 else
     scan = true(size(tracking));
     scan([1:3 end-2:end]) = false;
 end
 %%
-figure; 
-sb(1) = subplot(2,1,1);
+figure('position',[80,80,1400,500]); 
+sb(1) = subplot(2,2,1);
 plot([1:length(ins.QdVlr)], [ins.QdVlr./ins.QdVtot, ins.QdVtb./ins.QdVtot], '+',...
     rec(scan), ins.QdVlr(scan)./ins.QdVtot(scan),'ro',...
     rec(~tracking&~scan), ins.QdVlr(~tracking&~scan)./ins.QdVtot(~tracking&~scan),'k-x',...
@@ -95,7 +100,7 @@ plot([1:length(ins.QdVlr)], [ins.QdVlr./ins.QdVtot, ins.QdVtb./ins.QdVtot], '+',
 legend('LR/Tot','TB/Tot');
 % title(ins.fname,'interp','none')
 title(ins.filename{:},'interp','none')
-sb(2) = subplot(2,1,2);
+sb(2) = subplot(2,2,3);
 plot([1:length(ins.QdVlr)],[ins.AZ_deg-mean(ins.AZ_deg(tracking)), ins.El_deg-mean(ins.El_deg(tracking))], '-o');
 legend('Az deg','El deg');
 linkaxes(sb,'x');
@@ -121,8 +126,8 @@ P_LR_a = polyfit(Az_range, ins.QdVlr(Az_fit_range)./ins.QdVtot(Az_fit_range),1);
 P_TB_a = polyfit(Az_range, ins.QdVtb(Az_fit_range)./ins.QdVtot(Az_fit_range),1);
 
 %%
-figure; 
-sb(1) = subplot(2,1,1);
+%figure; 
+sb(3) = subplot(2,2,2);
 plot(rec(tracking), [ins.QdVlr(tracking)./ins.QdVtot(tracking), ins.QdVtb(tracking)./ins.QdVtot(tracking)], 'o',...
     rec(scan), ins.QdVlr(scan)./ins.QdVtot(scan)./P_LR(1),'.r-',...
     rec(scan), ins.QdVtb(scan)./ins.QdVtot(scan)./P_TB(1),'.m-',...
@@ -130,7 +135,7 @@ plot(rec(tracking), [ins.QdVlr(tracking)./ins.QdVtot(tracking), ins.QdVtb(tracki
     rec(ins.Str==0), ins.QdVlr(ins.Str==0)./ins.QdVtot(ins.Str==0),'k.');
 lg = legend('LR/Tot','TB/Tot', 'LR / P_LR','TB / P_TB'); set(lg,'interp','none')
 title(ins.fname,'interp','none')
-sb(2) = subplot(2,1,2);
+sb(4) = subplot(2,2,4);
 plot([1:length(ins.QdVlr)],[ins.AZ_deg-mean(ins.AZ_deg), ins.El_deg-mean(ins.El_deg)], '-o');
 legend('Az deg','El deg');
 linkaxes(sb,'x');
@@ -170,22 +175,29 @@ else
 end
 %%   
 %scat_ang_degs(sza, saz, za, az) 
-sza = 90-mean(abs(ins.El_deg(tracking))).*ones(size(ins.AZ_deg));
-saz = mean(abs(ins.AZ_deg(tracking))).*ones(size(ins.AZ_deg));
-ins.SA = scat_ang_degs(sza,saz,90.0-ins.El_deg,ins.AZ_deg)
+%sza = 90-interp1(abs(ins.El_deg(icenter)).*ones(size(ins.AZ_deg));
+%sza = interp1(ins.t(tracking),90-abs(ins.El_deg(tracking)),ins.t,'linear','extrap')
+dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
+sza = (90-abs(ins.sunel)) + dza
+%saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));
+%saz = interp1(ins.t(tracking),abs(ins.AZ_deg(tracking)),ins.t,'linear','extrap')
+daz = ins.Az_deg(icenter) - ins.sunaz(icenter)
+saz = ins.sunaz + daz
+
+ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg)
    
  % Old code  
  %  ins.SA = scat_ang_degs(90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), ins.AZ_deg,...
  %  90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), mean(ins.AZ_deg).*ones(size(ins.AZ_deg)));
 
 if ins.Vscan
-   ins.midAng = mean(ins.El_deg);
-   ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
+   ins.midAng = ins.El_deg(icenter) %mean(ins.El_deg);
+   %ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
    ins.SA(ins.El_deg<ins.midAng) = -1.*ins.SA(ins.El_deg<ins.midAng);
    title_str = ['Vertical FOV'];
 else
-   ins.midAng = mean(ins.AZ_deg);
-   ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
+   ins.midAng = ins.AZ_deg(icenter) %mean(ins.AZ_deg);
+   %ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
    ins.SA(ins.AZ_deg<ins.midAng) = -1.*ins.SA(ins.AZ_deg<ins.midAng);
    title_str = ['Horizontal FOV'];
 end
@@ -220,18 +232,20 @@ end
 xlim([-1.5,1.5]);
 ax(1) = gca;
 
+%% normalize by each value at the center point
+ins.CCD_norm_zero = ins.CCD_norm./repmat(ins.CCD_norm(icenter,:),size(ins.t))
 
 %%
 
 fig2 = figure; 
-lines = plot(ins.SA(scan), ins.CCD_norm(scan,good_pix), '-');grid('on');
+lines = plot(ins.SA(scan), ins.CCD_norm_zero(scan,good_pix), '-');grid('on');
 % lines = plot(ins.SA(light_ii(ii)),ins.CCD_norm(light_ii(ii),good_pix), '-');grid('on');
 recolor(lines, ins.nm(good_pix));
 title({title_str;ins.fname},'interp','none');
 xlabel('Angle [degrees]');
 ylabel('Relative signal');
 colorbar
-ylim([.85,1.02]);
+ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
@@ -271,14 +285,15 @@ saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']);
 
 %%
 %ins.SA(3:end-2), ins.CCD_norm(3:end-2,good_pix)
-midSA = ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
-for ix = length(ins.nm):-1:1
-    P{ix} = polyfit(ins.SA(midSA),ins.CCD_norm(midSA,ix),1);
-    midv = polyval(P{ix},0);
-    ins.CCD_renorm(:,ix) = ins.CCD_norm(:,ix)./midv;
-    ins.CCD_fit(:,ix) = polyval(P{ix},ins.SA(midSA));
-end
-    %%
+midSA = icenter %ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
+%for ix = length(ins.nm):-1:1
+%    P{ix} = polyfit(ins.SA(midSA),ins.CCD_norm(midSA,ix),1);
+%    midv = polyval(P{ix},0);
+%    ins.CCD_renorm(:,ix) = ins.CCD_norm(:,ix)./midv;
+%    ins.CCD_fit(:,ix) = polyval(P{ix},ins.SA(midSA));
+%end
+ins.CCD_renorm = ins.CCD_norm_zero;
+%%
 fig4 = figure;
 imagesc(ins.SA(light_ii(ii)), ins.nm, ins.CCD_renorm(light_ii(ii),:)'); axis('xy');
 title([ins.fname ' normalized to 0 deg'], 'interp','none');

@@ -18,6 +18,7 @@
 % DEPENDENCIES:
 %  - starwavelengths.m -> to get the wavelength arrays
 %  - starpaths.m 
+%  - version_set.m
 %
 % NEEDED FILES:
 %  none
@@ -27,17 +28,19 @@
 %
 % MODIFICATION HISTORY:
 % Written: Samuel LeBlanc, NASA Ames, August 15th, 2014 - Happy Acadian Day!
-%
+% Modified (v1.0): by Samuel LeBlanc, NASA Ames, November 25th, 2014
+%          - added version control via version_set
+%          - changed the pname result
 % -------------------------------------------------------------------------
 
 %% Start of code
 function ins=convert_star_to_rd_spc(ins);
-
+version_set('1.0');
 ins.spectra=ins.raw;
 
 % get the pname and fname values from the filenames
 [ins.pname ins.fname]=fileparts(ins.filename{1});
-if ins.pname(1) ~ filesep
+if exist(ins.pname) ~= 7
     % set pname to default directory in starpaths
     ins.pname=starpaths;
 end
