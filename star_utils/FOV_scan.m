@@ -39,13 +39,15 @@
 %           - modified the call to the scat_and_degs - it was erronous.
 %           - the scattering angle calculation is now based on epheremis
 %           calculated sun position with the offset from 4STAR.
+% Modified (v1.2): by Samuel LeBlanc, December 5th, 2014, NASA Ames
+%           - slight modifications to plotting of the line FOV.
 %
 % -------------------------------------------------------------------------
 
 %% Start of code
 
 function ins = FOV_scan(ins)
-version_set('1.1');
+version_set('1.2');
 
 %% legacy code
 % 
@@ -244,11 +246,14 @@ recolor(lines, ins.nm(good_pix));
 title({title_str;ins.fname},'interp','none');
 xlabel('Angle [degrees]');
 ylabel('Relative signal');
-colorbar
+c = colorbar
+ylabel(c,'Wavelength [nm]')
 ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
+saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
+saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
 
 %%
 % ./(ones(size(ins.time))*ins.rangeCCD);
