@@ -252,8 +252,9 @@ ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
+save_fig(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV']);
+%saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
+%saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
 
 %%
 % ./(ones(size(ins.time))*ins.rangeCCD);
