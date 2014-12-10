@@ -1,4 +1,4 @@
-function [savematfile, contents]=starsky(varargin)
+function [savematfile, contents]=starzen(varargin)
 version_set('1.0');
 
 % starsun(source, savematfile)
@@ -54,10 +54,10 @@ load(sourcefile,contents0{:},'program_version');
 % star_light_fname = [mat_dir,filesep,datestr(star.t(1),'yyyymmdd'),'starsun_LIGHT.mat'];
 if ~exist(savematfile,'file')
     s.program_version=program_version;
-    save(savematfile, '-struct', 's', '-mat','program_version');
+    save(savematfile, '-struct', 's', '-mat');
 else
     s.program_version=program_version;
-    save(savematfile, '-struct', 's', '-mat', '-append','program_version');
+    save(savematfile, '-struct', 's', '-mat', '-append');
 end
 contents=[contents; fieldnames(s)];
 
