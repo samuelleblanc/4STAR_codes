@@ -2,11 +2,14 @@
 % computation is done in Langley.m, and saving in starsavec0.m.
 %
 % Yohei, 2012/01/23, 2013/02/19
+% Michal, 2015-01-07, added version_set (v 1.0) for version control of this
+% script
+version_set('1.0');
 
 %********************
 % set parameters
 %********************
-daystr='20130706';
+daystr='20141002';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -17,6 +20,8 @@ savefigure=0;
 %********************
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
+elseif isequal(daystr, '20141002')
+    source='20141002starsun_wupdatedForj.mat';
 else
     source=[daystr 'starsun.mat'];
 end;
@@ -153,8 +158,10 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     c0unc=NaN(size(w)); % put NaN for uncertainty - to be updated later
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
-    filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
-    additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
+    % filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
+    % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
+    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+    % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
 elseif isequal(k, 'addunc'); % add unc to an existing c0 file
