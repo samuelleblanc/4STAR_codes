@@ -4,7 +4,9 @@
 % Yohei, 2012/01/23, 2013/02/19
 % Michal, 2015-01-07, added version_set (v 1.0) for version control of this
 % script
-version_set('1.0');
+% Michal, 2015-01-07, added an option to plot Langley with Azdeg
+%                     changed version to 1.1
+version_set('1.1');
 
 %********************
 % set parameters
@@ -26,7 +28,10 @@ else
     source=[daystr 'starsun.mat'];
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero');
+load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon');
+AZ_deg_   = AZstep/(-50);
+AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
+
 starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 s1=s(strmatch('langley',s));
@@ -48,6 +53,45 @@ for k=1:numel(stdev_mult);
     title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
         starsas(['star' daystr 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+
+% plot 500 nm count rate with Az_deg
+for k=1;
+    figure;
+    h2=scatter(Lon(ok), Lat(ok),6,AZ_deg(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('AZdeg');
+    xlabel('Longitude','FontSize',14);
+    ylabel('Latitude','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[-163:0.5:-159]); set(gca,'XTickLabel',[-163:0.5:-159]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+% plot Lat/Lon with Az_deg
+for k=1;
+    figure;
+    h1=scatter(m_aero(ok), rateaero(ok,cols(4)),6,AZ_deg(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('AZdeg');
+    xlabel('aerosol Airmass','FontSize',14);
+    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    y = rateaero(ok,cols(4));
+    ylim([min(y(:)) max([max(y(:)) data0])]);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 
