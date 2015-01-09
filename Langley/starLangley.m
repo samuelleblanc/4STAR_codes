@@ -5,6 +5,7 @@
 % Michal, 2015-01-07, added version_set (v 1.0) for version control of this
 % script
 % Michal, 2015-01-07, added an option to plot Langley with Azdeg
+%                     added an option to plot Langley with Tst
 %                     changed version to 1.1
 version_set('1.1');
 
@@ -28,7 +29,7 @@ else
     source=[daystr 'starsun.mat'];
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon');
+load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
@@ -56,7 +57,7 @@ for k=1:numel(stdev_mult);
     end;
 end;
 
-% plot 500 nm count rate with Az_deg
+% plot Lat/Lon with Az_deg
 for k=1;
     figure;
     h2=scatter(Lon(ok), Lat(ok),6,AZ_deg(ok),'filled');
@@ -71,10 +72,28 @@ for k=1;
     grid on;
     title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
-        starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+        starsas(['star' daystr 'latlonvaz' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
-% plot Lat/Lon with Az_deg
+% plot 500 nm count rate with Tst
+for k=1;
+    figure;
+    h2=scatter(m_aero(ok), rateaero(ok,cols(4)),6,Tst(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('Tst');
+    xlabel('aerosol Airmass','FontSize',14);
+    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+% plot 500 nm count rate with Az_deg
 for k=1;
     figure;
     h1=scatter(m_aero(ok), rateaero(ok,cols(4)),6,AZ_deg(ok),'filled');
@@ -245,9 +264,9 @@ elseif ~isfinite(k); % save after averaging
             spec='NIR';
         end;
         filesuffix=[originalfilesuffix '_averagedwith20130214'];
-        a=importdata(fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']));
-        b=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
-        if kk==1;
+        a=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
+        if kk==1;fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']));
+        b=importdata(
             w=(a.data(:,2)'+b.data(:,2)')/2;            
             c0new=(a.data(:,3)'+b.data(:,3)')/2;
             c0unc=(a.data(:,4)'+b.data(:,4)')/2;
