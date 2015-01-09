@@ -37,17 +37,20 @@
 %          - ported over from old code, included reference to specific
 %          files
 %          - added version control of this file
+% Modified (v1.1): by Samuel LeBlanc, NASA Ames Jan 8th, 2015
+%          - update with new calibration date.
 %
 % -------------------------------------------------------------------------
 
 %% Start of function
 function hiss_star_cals = Radiance_cals_4STAR
-version_set('1.0');
+version_set('1.1');
 
 %date='20131121'
 %date='20130506'
 %date='20140624'
-date='20140716'
+%date='20140716'
+date='20141024'
 docorrection=true; %false;
 
 %% Legacy codes
@@ -228,6 +231,25 @@ for ll = lamps
       end
       pp='park';
       date='20140716';
+    elseif date=='20141024' | date=='20141025'
+      switch ll
+        case 12
+            fnum = '005';
+        case 9
+            fnum = '009';
+        case 6
+            fnum = '010';
+        case 3
+            fnum = '011';
+        case 2
+            fnum = '012';
+        case 1
+            fnum = '013';
+        case 0
+            fnum = '014';
+      end
+      pp='park';
+      date='20141024';
     else
         disp('problem! date not recongnised')
     end    

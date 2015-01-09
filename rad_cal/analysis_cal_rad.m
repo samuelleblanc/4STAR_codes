@@ -148,10 +148,18 @@ disp(vis.fname)
 disp(nir.fname)
 
 % Select the proper variables for amount of lamps
-ll=1; %select the lamps-9
-iint_vis=3;
-iint_nir=3;
-switch ll
+if date == '20141024';
+    ll = 3; % select the lamps-3
+    iint_vis = 7; % 32 ms int time
+    iint_nir = 7; % 400 ms int time
+    lampstr = 'Lamps_3';
+    fnum = '011';
+    st = '013';
+else
+    ll=1; %select the lamps-9
+    iint_vis=3;
+    iint_nir=3;
+    switch ll
         case 12
             if date =='20131120', fnum = '009'; else fnum='006'; end;
             lampstr='Lamps_12';
@@ -173,12 +181,13 @@ switch ll
         case 0
             if date =='20131120', fnum = '015'; else fnum='004'; end;
             lampstr='Lamps_0';
-end
+    end
     
-if date == '20131120' 
-    st='014' ;
-else 
-    st='003';
+    if date == '20131120'
+        st='014' ;
+    else
+        st='003';
+    end
 end
 print_vis.fname=strrep(print_vis.fname,st,fnum)
 print_nir.fname=strrep(print_nir.fname,st,fnum)

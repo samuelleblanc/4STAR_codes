@@ -34,24 +34,27 @@
 % Written: Samuel LeBlanc, NASA Ames, August 1st, 2014
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                  - change startup to startup_plotting
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2015-01-08
+%                  - added post ARISE rad cals
 % -------------------------------------------------------------------------
 
 %% Start of function
 function compare_response
 startup_plotting
-version_set('1.1');
+version_set('1.2');
 
 % setting the standard variables
 dir='C:\Users\sleblan2\Research\4STAR\cal\';
 l='\';
 
-dates=['20130506';'20131120';'20140624';'20140716'];
+dates=['20130506';'20131120';'20140624';'20140716';'20141024'];
 
 %% Load files
 d1=load([dir dates(1,:) l '20130507' '_rad_cal_corr.mat'],'cal','vis','nir');
 d2=load([dir dates(2,:) l '20131121' '_rad_cal_corr.mat'],'cal');
 d3=load([dir dates(3,:) l dates(3,:) '_rad_cal_corr.mat'],'cal');
 d4=load([dir dates(4,:) l dates(4,:) '_rad_cal_corr.mat'],'cal');
+d5=load([dir dates(5,:) l dates(5,:) '_rad_cal_corr.mat'],'cal');
 
 %% Plotting of response functions per lamps
 fields = fieldnames(d1.cal);
@@ -71,7 +74,8 @@ for LL=Lamps
    plot(d1.vis.nm, d1.cal.(lamp_str).vis.mean_resp, ...
         d1.vis.nm, d2.cal.(lamp_str).vis.mean_resp, ...
         d1.vis.nm, d3.cal.(lamp_str).vis.mean_resp, ...
-        d1.vis.nm, d4.cal.(lamp_str).vis.mean_resp,'-');
+        d1.vis.nm, d4.cal.(lamp_str).vis.mean_resp, ...
+        d1.vis.nm, d5.cal.(lamp_str).vis.mean_resp, '-');
    title(['VIS response for ' lamp_str]);
    xlabel('Wavelength [nm]');
    ylabel('Response [Cnts/(W m^{-2} \mum^{-1} sr^{-1})^{-1}]');
@@ -84,7 +88,8 @@ for LL=Lamps
    plot(d1.nir.nm, d1.cal.(lamp_str).nir.mean_resp, ...
         d1.nir.nm, d2.cal.(lamp_str).nir.mean_resp, ...
         d1.nir.nm, d3.cal.(lamp_str).nir.mean_resp, ...
-        d1.nir.nm, d4.cal.(lamp_str).nir.mean_resp,'-');
+        d1.nir.nm, d4.cal.(lamp_str).nir.mean_resp, ...
+        d1.nir.nm, d5.cal.(lamp_str).nir.mean_resp, '-');
    title(['NIR response for ' lamp_str]);
    xlabel('Wavelength [nm]');
    ylabel('Response [Cnts/(W m^{-2} \mum^{-1} sr^{-1})^{-1}]');
@@ -94,11 +99,12 @@ for LL=Lamps
    
    %vis resp differences
    ax3=subplot(2,2,3);
-   ref_resp=d3.cal.(lamp_str).vis.mean_resp;
+   ref_resp=d4.cal.(lamp_str).vis.mean_resp;
    plot(d1.vis.nm, (d1.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100., ...
         d1.vis.nm, (d2.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100., ...
         d1.vis.nm, (d3.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100., ...
-        d1.vis.nm, (d4.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100.,'-');
+        d1.vis.nm, (d4.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100., ...
+        d1.vis.nm, (d5.cal.(lamp_str).vis.mean_resp-ref_resp)./ref_resp.*100., '-');
    title(['VIS response change for ' lamp_str]);
    xlabel('Wavelength [nm]');
    ylabel('Response Change [%]');
@@ -107,11 +113,12 @@ for LL=Lamps
    
    %nir resp
    ax4=subplot(2,2,4);
-   ref_resp=d3.cal.(lamp_str).nir.mean_resp;
+   ref_resp=d4.cal.(lamp_str).nir.mean_resp;
    plot(d1.nir.nm, (d1.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100., ...
         d1.nir.nm, (d2.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100., ...
         d1.nir.nm, (d3.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100., ...
-        d1.nir.nm, (d4.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100.,'-');
+        d1.nir.nm, (d4.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100., ...
+        d1.nir.nm, (d5.cal.(lamp_str).nir.mean_resp-ref_resp)./ref_resp.*100., '-');
    title(['NIR response change for ' lamp_str]);
    xlabel('Wavelength [nm]');
    ylabel('Response Change [%]');
