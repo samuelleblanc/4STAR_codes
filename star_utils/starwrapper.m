@@ -60,6 +60,7 @@ function	s=starwrapper(s, s2, varargin)
 %                       processing occurs when in FOV. 
 %                       - changed the default values of the toggles.
 % MS: v1.4, 2015-01-09: added toggle field lampcalib to chose between c0/lampc0 calib
+% SL: v1.4, 2015-01-09: fixed bug in toggle checking
 
 version_set('1.4');
 %********************
@@ -81,7 +82,7 @@ toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
 toggle.lampcalib  = true; 
 
-%% check if the switches are set in the call to starwrapper
+%% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
     nnarg=2;
     if mod(nargin,2); % varargin not paired 
@@ -92,31 +93,31 @@ if (~isempty(varargin))
           case {'verbose'}
             c=c+1;
             toggle.verbose=varargin{c};
-            disp(['verbose set to ' num2str(verbose)])
+            disp(['verbose set to ' num2str(toggle.verbose)])
           case {'saveadditionalvariables'}
             c=c+1;
             toggle.saveadditionalvariables=varargin{c};
-            disp(['saveadditionalvariables set to ' num2str(saveadditionalvariables)])
+            disp(['saveadditionalvariables set to ' num2str(toggle.saveadditionalvariables)])
           case {'savefigure'}
             c=c+1;
             toggle.savefigure=varargin{c};
-            disp(['savefigure set to ' num2str(savefigure)])
+            disp(['savefigure set to ' num2str(toggle.savefigure)])
           case {'computeerror'}
             c=c+1;
             toggle.computeerror=varargin{c};
-            disp(['computeerror set to ' num2str(computeerror)])
+            disp(['computeerror set to ' num2str(toggle.computeerror)])
           case {'inspectresults'}
             c=c+1;
             toggle.inspectresults=varargin{c}; 
-            disp(['inspectresults set to ' num2str(inspectresults)])
+            disp(['inspectresults set to ' num2str(toggle.inspectresults)])
           case {'applynonlinearcorr'}
             c=c+1;
             toggle.applynonlinearcorr=varargin{c};
-            disp(['applynonlinearcorr set to ' num2str(applynonlinearcorr)])
+            disp(['applynonlinearcorr set to ' num2str(toggle.applynonlinearcorr)])
           case {'applytempcorr'}
             c=c+1;
             toggle.applytempcorr=varargin{c};
-            disp(['applytempcorr set to ' num2str(applytempcorr)])
+            disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
         % (continued)
            otherwise         
                error(['Invalid optional argument, ', ...

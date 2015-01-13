@@ -32,13 +32,14 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, October 17th, 2014
-% Modified: 
+% Modified (v1.1): Samuel LeBlanc, NASA Ames, January 9th, 2015
+%                  - bug fix for no default flight date with background
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [fnames,flt,fnamesbak,fltbak,isbackground]=small_sphere_select(daystr,dir)
-version_set('1.0');
+version_set('1.1');
 
 if ~exist('dir','var'); 
     dir=uigetfolder('','Select folder where calibrations are stored');
@@ -93,13 +94,26 @@ switch daystr
         fnamesbak={[dir filesep daystr filesep 'background' filesep daystr '_005_VIS_park.dat'];...
                    [dir filesep daystr filesep 'background' filesep daystr '_005_NIR_park.dat']};
         fltbak=[1:20];
+    case '20141024'
+        fnames={[dir filesep daystr filesep 'small_sphere' filesep daystr '_016_VIS_park.dat'];...
+                [dir filesep daystr filesep 'small_sphere' filesep daystr '_016_NIR_park.dat']};
+        flt=[[17:48],[76:84],[93:101]];
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_014_VIS_park.dat'];...
+                   [dir filesep daystr filesep 'Lamps_0' filesep daystr '_014_NIR_park.dat']};
+        fltbak=[[6:13],[21:26]];
     otherwise
         warning('daystr not found in small_sphere_select, please manually select:');
         fnames=getfullname_('*.dat','Select calibration files');
-        flt=[1:200];
+        flt=[-999];
         isbackground=menu('Is there a background radiation file?','Yes','No');
         if isbackground == 1; 
             fnamesbak=getfullname_('*.dat','Select background files');
-        else; isbackground=0; end;
+            fltbak=[1:10];
+        else; 
+            isbackground=0; 
+            fnamesbak = '';
+            fltbak = [];
+        end;
 end;
 end

@@ -87,6 +87,9 @@ load(sourcefile,contents0{:},'program_version');
     for i=1:length(s.t); s.rad(i,:)=s.rate(i,:)./s.skyresp; end;
 
 %% build the mean and standard dev radiance values
+if flt(1) == -999;
+    flt = [1:length(s.t)];
+end;
 rad=nanmean(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 rad_std=nanstd(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 nm=s.w*1000.0;
