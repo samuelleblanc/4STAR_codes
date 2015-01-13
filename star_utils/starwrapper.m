@@ -59,8 +59,9 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v1.3, 2014-11-24: added check to ensure that no sun-specific
 %                       processing occurs when in FOV. 
 %                       - changed the default values of the toggles.
+% MS: v1.4, 2015-01-09: added toggle field lampcalib to chose between c0/lampc0 calib
 
-version_set('1.3');
+version_set('1.4');
 %********************
 %% prepare for processing
 %********************
@@ -78,6 +79,7 @@ toggle.booleanflagging = false;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
+toggle.lampcalib  = true; 
 
 %% check if the switches are set in the call to starwrapper
 if (~isempty(varargin))
@@ -122,7 +124,8 @@ if (~isempty(varargin))
               nnarg=0;
         end % switch
      end % for
-else; nnarg=0; end; % if
+else nnarg=0; 
+end; % if
 
 if toggle.verbose;  disp('In Starwrapper'), end;
 
@@ -190,7 +193,11 @@ end;
 %% include wavelengths in um and flip NIR raw data
 if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
 [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
-[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose); % C0
+if ~toggle.lampcalib % choose Langley c0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose);     % C0
+else                 % choose lamp adjusted c0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(nanmean(s.t),toggle.verbose); % C0 adjusted with lamp values
+end
 [visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
 [visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
