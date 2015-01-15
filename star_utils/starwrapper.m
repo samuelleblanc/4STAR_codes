@@ -80,7 +80,8 @@ toggle.booleanflagging = false;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
-toggle.lampcalib  = true; 
+toggle.lampcalib  = false; 
+toggle.runwatervapor = true;
 
 %% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
@@ -672,17 +673,19 @@ end; % toggle.doflagging
           %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
           % water vapor retrieval (940fit+c0 method)
           %-----------------------------------------
-          if toggle.verbose; disp('water vapor retrieval start'), end;
-          [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
-          % subtract water vapor from tau_aero
-          if toggle.verbose; disp('water vapor retrieval end'), end;
-          % gases subtractions and o3/no2 conc [in DU] from fit
-          %-----------------------------------------------------
-          if toggle.gassubtract
-            if toggle.verbose; disp('gases subtractions start'), end;
-            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
-            if toggle.verbose; disp('gases subtractions end'), end;
-            %s.tau_aero=s.tau_aero_wvsubtract;
+          if toggle.runwatervapor;
+              if toggle.verbose; disp('water vapor retrieval start'), end;
+              [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+              % subtract water vapor from tau_aero
+              if toggle.verbose; disp('water vapor retrieval end'), end;
+              % gases subtractions and o3/no2 conc [in DU] from fit
+              %-----------------------------------------------------
+              if toggle.gassubtract
+                  if toggle.verbose; disp('gases subtractions start'), end;
+                  [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
+                  if toggle.verbose; disp('gases subtractions end'), end;
+                  %s.tau_aero=s.tau_aero_wvsubtract;
+              end;
           end;
     %elseif gasmode==2 && ~isempty(strfind(lower(datatype),'sun'))
         % use retrieved O3/NO2 to subtract
