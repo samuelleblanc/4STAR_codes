@@ -20,7 +20,7 @@ end;
 if staysingle
     daystr=unique(daystr,'rows');
     if size(daystr,1)~=1; % if multiple dates are mixed, empty the daystr
-        daystr=daystr[1];
+        daystr=daystr(1,:);
         disp('multiple days are combined, returning first day string')
     end;
     filen=char(unique(filen));
