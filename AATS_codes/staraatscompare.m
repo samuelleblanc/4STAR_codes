@@ -1,6 +1,7 @@
 function [vis_sun, nir_sun, aats]=staraatscompare(daystr, noonrow)
 
 corstr='_corr';
+corstr='';
 
 stardir=['C:\Users\Samuel\Research\4STAR\roof\' daystr '\'];
 stardir=['C:\Users\sleblan2\Research\4STAR\roof\' daystr ''];
@@ -17,8 +18,12 @@ end;
 aatsdir='C:\Users\Samuel\Research\AATS\data\ames\';
 aatsdir='C:\Users\sleblan2\Research\AATS\data\ames\';
 load(fullfile(aatsdir, [daystr 'aats.mat'])); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
-if ~exist('aats') || ~isfield(aats,'t')
-    aats.t=UT'/24+datenum(year,month,day);
+if ~exist('aats')
+        aats.t=UT'/24+datenum(year,month,day);
+else
+    if ~isfield('aats','t');
+        aats.t=UT'/24+datenum(year,month,day);
+    end;
 end;
 % if floor(t(end))-floor(t(1))==1; % the 4STAR ran into the next day
 %     nextdaystr=datestr(datenum(str2num(daystr(1:4)),str2num(daystr(5:6)),str2num(daystr(7:8)))+1,30);

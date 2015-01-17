@@ -4,7 +4,7 @@ close all
 asktopause=true;
 
 corstr='_corr';
-
+corstr='';
 %dateprocstr='20140416';
 %dateprocstr='20140428';
 %dateprocstr='20140502';
