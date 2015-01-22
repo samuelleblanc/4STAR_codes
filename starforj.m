@@ -17,8 +17,6 @@ function [savematfile, contents]=starsun(varargin)
 %   [savematfile, contents]=starforj(...) returns the path for the resulting mat-file and its contents.
 % 
 % Yohei, 2013/02/07, after starsun.m.
-% Samuel,v1.0,2014/10/13, added vetsion control of this m script with version_set
-version_set('1.0');
 
 %********************
 % regulate input and read source
