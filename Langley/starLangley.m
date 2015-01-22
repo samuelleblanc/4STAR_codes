@@ -7,6 +7,8 @@
 % Michal, 2015-01-07, added an option to plot Langley with Azdeg
 %                     added an option to plot Langley with Tst
 %                     changed version to 1.1
+% Michal, 2015-01-20, added an option for further data range screening for
+%                     Langley (Line 45)
 version_set('1.1');
 
 %********************
@@ -24,12 +26,13 @@ savefigure=0;
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
 elseif isequal(daystr, '20141002')
-    source='20141002starsun_wupdatedForj.mat';
+    source='20141002starsun.mat';% this was using most accurate c0 wFORJ
+    %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
 else
     source=[daystr 'starsun.mat'];
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst');
+load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
@@ -38,6 +41,14 @@ s=importdata(starinfofile);
 s1=s(strmatch('langley',s));
 eval(s1{:});
 ok=incl(t,langley);
+% perform different QA filtering
+if isequal(daystr, '20141002')
+    figure; plot(m_aero(ok),tau_aero(ok,407),'.b');
+    xlabel('airmass');ylabel('500 nm AOD');
+    figure; plot(Lat(ok),tau_aero(ok,407),'.b');
+    xlabel('Latitude');ylabel('500 nm AOD');
+    ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
+end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
@@ -223,7 +234,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
-    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+    % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
@@ -265,8 +277,7 @@ elseif ~isfinite(k); % save after averaging
         end;
         filesuffix=[originalfilesuffix '_averagedwith20130214'];
         a=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
-        if kk==1;fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']));
-        b=importdata(
+        if kk==1;fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']);
             w=(a.data(:,2)'+b.data(:,2)')/2;            
             c0new=(a.data(:,3)'+b.data(:,3)')/2;
             c0unc=(a.data(:,4)'+b.data(:,4)')/2;
