@@ -154,8 +154,8 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            %a=importdata(fullfile(starpaths,visfilename));
-            a=load(fullfile(starpaths,visfilename));
+            a=importdata(fullfile(starpaths,visfilename));
+            %a=load(fullfile(starpaths,visfilename));
             sprintf('%s',size(a,1)) ;
             sprintf('%f',size(a,2)) ;
             sprintf('%s',visfilename);
@@ -180,7 +180,8 @@ if ~exist('visc0')
         vislstr(i)={visfilename};
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
-            a=load(fullfile(starpaths,nirfilename));
+            %a=load(fullfile(starpaths,nirfilename));
+            a=importdata(fullfile(starpaths,nirfilename));
             nirc0mod(i,:)=a(:,3);%.data(:,strcmp(lower(a.colheaders), 'c0'))';
 %             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
 %                 nirc0moderr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';

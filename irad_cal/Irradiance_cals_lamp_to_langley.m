@@ -37,15 +37,17 @@
 % Written: Michal Segal-Rozenhaimer (MSR), NASA Ames,Aug-26, 2014
 % MS, 2014-11-19, added last calibration date and FEL numbers
 %                 adjusted to general path names
+% MS, 2015-01-09, accept Langley region of 700 nm
+%                 accept Lamp region below 500 nm
 % -------------------------------------------------------------------------
 %% function routine
 function Langs_and_lamps = Irradiance_cals_lamp_to_langley(varargin)
 
 % calibration dates and files:
-% 2013-11-22: 002.dat   %lamp925
-% 2014-06-24: 023.dat   %lamp926
-% 2014-07-16: 012.dat   %lamp926
-% 2014-10-24: 018.dat   %lamp926
+% 2013-11-22: vis/nir_park_002.dat   %lamp925
+% 2014-06-24: vis/nir_park_023.dat   %lamp926
+% 2014-07-16: vis/nir_park_012.dat   %lamp926
+% 2014-10-24: vis/nir_park_018.dat   %lamp926 % make sure to chose 6000ms
 
 startup_plotting;
 [matfolder, figurefolder, askforsourcefolder, author]=starpaths;
@@ -210,10 +212,11 @@ nir.scaleaeroidx = MODTRANcalc.aeroind(1045:1556); % 206 wavelengths
 % select wavelengths regions to exclude
 nm_340 = interp1(vis.nm,[1:length(vis.nm)],340.0, 'nearest');
 nm_400 = interp1(vis.nm,[1:length(vis.nm)],400.0, 'nearest');
+nm_564 = interp1(vis.nm,[1:length(vis.nm)],564.0, 'nearest');
 nm_620 = interp1(vis.nm,[1:length(vis.nm)],620.6, 'nearest');
 nm_635 = interp1(vis.nm,[1:length(vis.nm)],635.0, 'nearest');
 nm_685 = interp1(vis.nm,[1:length(vis.nm)],684.8, 'nearest');
-nm_694 = interp1(vis.nm,[1:length(vis.nm)],694.9, 'nearest');
+nm_696 = interp1(vis.nm,[1:length(vis.nm)],696.9, 'nearest');
 nm_750 = interp1(vis.nm,[1:length(vis.nm)],750.1, 'nearest');
 nm_780 = interp1(vis.nm,[1:length(vis.nm)],780.6, 'nearest');
 nm_741 = interp1(vis.nm,[1:length(vis.nm)],741.5, 'nearest');
@@ -226,7 +229,7 @@ co2wln  = find(nir.nm<=nir.nm(nm_1630)&nir.nm>=nir.nm(nm_1555));
 vis.scaleaeroidx(1:nm_400)      = 0;
 vis.scaleaeroidx(565)           = 0; %626.2 nm
 vis.scaleaeroidx(572)           = 0; %631.7 nm
-vis.scaleaeroidx(nm_685:nm_741) = 0; %631.7 nm
+vis.scaleaeroidx(nm_685:nm_741) = 0; %631.7 nm%325 wavelengths
 % vis.scaleaeroidx(nm_620:nm_635) = 0;
 % vis.scaleaeroidx_expand = vis.scaleaeroidx;
 % vis.scaleaeroidx_expand(nm_340:nm_400) = 1;
@@ -238,8 +241,8 @@ vis.scaleaeroidx(nm_685:nm_741) = 0; %631.7 nm
 [nir.lang_resp_norm nir.lang_resp_mu nir.lang_resp_rng] = featureNormalizeRange(Langs_and_lamps.nir.lang_resp);
 %
 % % normalize lamp response
-[vis.lamp_resp_norm vis.lamp_resp_mu vis.lamp_resp_rng] = featureNormalizeRange(Langs_and_lamps.vis.FELstar_resp);
-[nir.lamp_resp_norm nir.lamp_resp_mu nir.lamp_resp_rng] = featureNormalizeRange(Langs_and_lamps.nir.FELstar_resp);
+[vis.lamp_resp_norm vis.lamp_resp_mu vis.lamp_resp_rng] = featureNormalizeRange(Langs_and_lamps.vis.FELstar_resp');
+[nir.lamp_resp_norm nir.lamp_resp_mu nir.lamp_resp_rng] = featureNormalizeRange(Langs_and_lamps.nir.FELstar_resp');
 % % %
 
 % vis
@@ -271,13 +274,22 @@ vis.scaledLamp2LangMod    = (Langs_and_lamps.vis.FELstar_resp*vis.SratioAvgMod) 
 nir.scaledLamp2LangMod    = (Langs_and_lamps.nir.FELstar_resp*nir.SratioAvgMod)   .*kur.nirInterp';   % in rate units
 
 % combine lamp and Langley into one array
+% create lamp combined index
 % don't include lamp 620-635 range:
-vis.scaleaeroidx(nm_620:nm_635) = 0;
+% don't include lamp 685-741 range:
+% vis.scalelampidx = ones(length(vis.scaleaeroidx),1);%(nm_620:nm_635) = 0;% 314 wavelengths
+% nir.scalelampidx = ones(length(nir.scaleaeroidx),1);
+% vis.scaleaeroidx(nm_620:nm_635) = 0;
+% vis.scaleaeroidx(nm_696:nm_741) = 0;
+% apply lamp values in non-aerosol regions
 vis.LangLampCombMod = visc0;
 vis.LangLampCombMod(vis.scaleaeroidx==0) = vis.scaledLamp2LangMod(vis.scaleaeroidx==0);
 nir.LangLampCombMod = nirc0;
 nir.LangLampCombMod(nir.scaleaeroidx==0) = nir.scaledLamp2LangMod(nir.scaleaeroidx==0);
-
+% override with Langley values:
+vis.LangLampCombMod(nm_564:nm_620) = visc0(nm_564:nm_620);
+vis.LangLampCombMod(nm_620:nm_635) = visc0(nm_620:nm_635);
+vis.LangLampCombMod(nm_696:nm_741) = visc0(nm_696:nm_741);
 % save combined langley with scaled lamp at CO2 region
 nir.LangLampCombMod(co2wln) = nir.scaledLamp2LangMod(co2wln);
 

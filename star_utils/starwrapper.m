@@ -59,8 +59,10 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v1.3, 2014-11-24: added check to ensure that no sun-specific
 %                       processing occurs when in FOV. 
 %                       - changed the default values of the toggles.
+% MS: v1.4, 2015-01-09: added toggle field lampcalib to chose between c0/lampc0 calib
+% SL: v1.4, 2015-01-09: fixed bug in toggle checking
 
-version_set('1.3');
+version_set('1.4');
 %********************
 %% prepare for processing
 %********************
@@ -78,8 +80,10 @@ toggle.booleanflagging = false;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
+toggle.lampcalib  = false; 
+toggle.runwatervapor = true;
 
-%% check if the switches are set in the call to starwrapper
+%% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
     nnarg=2;
     if mod(nargin,2); % varargin not paired 
@@ -90,31 +94,31 @@ if (~isempty(varargin))
           case {'verbose'}
             c=c+1;
             toggle.verbose=varargin{c};
-            disp(['verbose set to ' num2str(verbose)])
+            disp(['verbose set to ' num2str(toggle.verbose)])
           case {'saveadditionalvariables'}
             c=c+1;
             toggle.saveadditionalvariables=varargin{c};
-            disp(['saveadditionalvariables set to ' num2str(saveadditionalvariables)])
+            disp(['saveadditionalvariables set to ' num2str(toggle.saveadditionalvariables)])
           case {'savefigure'}
             c=c+1;
             toggle.savefigure=varargin{c};
-            disp(['savefigure set to ' num2str(savefigure)])
+            disp(['savefigure set to ' num2str(toggle.savefigure)])
           case {'computeerror'}
             c=c+1;
             toggle.computeerror=varargin{c};
-            disp(['computeerror set to ' num2str(computeerror)])
+            disp(['computeerror set to ' num2str(toggle.computeerror)])
           case {'inspectresults'}
             c=c+1;
             toggle.inspectresults=varargin{c}; 
-            disp(['inspectresults set to ' num2str(inspectresults)])
+            disp(['inspectresults set to ' num2str(toggle.inspectresults)])
           case {'applynonlinearcorr'}
             c=c+1;
             toggle.applynonlinearcorr=varargin{c};
-            disp(['applynonlinearcorr set to ' num2str(applynonlinearcorr)])
+            disp(['applynonlinearcorr set to ' num2str(toggle.applynonlinearcorr)])
           case {'applytempcorr'}
             c=c+1;
             toggle.applytempcorr=varargin{c};
-            disp(['applytempcorr set to ' num2str(applytempcorr)])
+            disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
         % (continued)
            otherwise         
                error(['Invalid optional argument, ', ...
@@ -122,7 +126,8 @@ if (~isempty(varargin))
               nnarg=0;
         end % switch
      end % for
-else; nnarg=0; end; % if
+else nnarg=0; 
+end; % if
 
 if toggle.verbose;  disp('In Starwrapper'), end;
 
@@ -190,7 +195,11 @@ end;
 %% include wavelengths in um and flip NIR raw data
 if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
 [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
-[visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose); % C0
+if ~toggle.lampcalib % choose Langley c0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose);     % C0
+else                 % choose lamp adjusted c0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(nanmean(s.t),toggle.verbose); % C0 adjusted with lamp values
+end
 [visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
 [visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
@@ -664,17 +673,19 @@ end; % toggle.doflagging
           %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
           % water vapor retrieval (940fit+c0 method)
           %-----------------------------------------
-          if toggle.verbose; disp('water vapor retrieval start'), end;
-          [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
-          % subtract water vapor from tau_aero
-          if toggle.verbose; disp('water vapor retrieval end'), end;
-          % gases subtractions and o3/no2 conc [in DU] from fit
-          %-----------------------------------------------------
-          if toggle.gassubtract
-            if toggle.verbose; disp('gases subtractions start'), end;
-            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
-            if toggle.verbose; disp('gases subtractions end'), end;
-            %s.tau_aero=s.tau_aero_wvsubtract;
+          if toggle.runwatervapor;
+              if toggle.verbose; disp('water vapor retrieval start'), end;
+              [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+              % subtract water vapor from tau_aero
+              if toggle.verbose; disp('water vapor retrieval end'), end;
+              % gases subtractions and o3/no2 conc [in DU] from fit
+              %-----------------------------------------------------
+              if toggle.gassubtract
+                  if toggle.verbose; disp('gases subtractions start'), end;
+                  [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
+                  if toggle.verbose; disp('gases subtractions end'), end;
+                  %s.tau_aero=s.tau_aero_wvsubtract;
+              end;
           end;
     %elseif gasmode==2 && ~isempty(strfind(lower(datatype),'sun'))
         % use retrieved O3/NO2 to subtract

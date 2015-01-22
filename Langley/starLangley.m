@@ -2,11 +2,17 @@
 % computation is done in Langley.m, and saving in starsavec0.m.
 %
 % Yohei, 2012/01/23, 2013/02/19
+% Michal, 2015-01-07, added version_set (v 1.0) for version control of this
+% script
+% Michal, 2015-01-07, added an option to plot Langley with Azdeg
+%                     added an option to plot Langley with Tst
+%                     changed version to 1.1
+version_set('1.1');
 
 %********************
 % set parameters
 %********************
-daystr='20130706';
+daystr='20141002';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -17,11 +23,16 @@ savefigure=0;
 %********************
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
+elseif isequal(daystr, '20141002')
+    source='20141002starsun_wupdatedForj.mat';
 else
     source=[daystr 'starsun.mat'];
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero');
+load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst');
+AZ_deg_   = AZstep/(-50);
+AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
+
 starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 s1=s(strmatch('langley',s));
@@ -43,6 +54,63 @@ for k=1:numel(stdev_mult);
     title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
         starsas(['star' daystr 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+
+% plot Lat/Lon with Az_deg
+for k=1;
+    figure;
+    h2=scatter(Lon(ok), Lat(ok),6,AZ_deg(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('AZdeg');
+    xlabel('Longitude','FontSize',14);
+    ylabel('Latitude','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[-163:0.5:-159]); set(gca,'XTickLabel',[-163:0.5:-159]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'latlonvaz' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+% plot 500 nm count rate with Tst
+for k=1;
+    figure;
+    h2=scatter(m_aero(ok), rateaero(ok,cols(4)),6,Tst(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('Tst');
+    xlabel('aerosol Airmass','FontSize',14);
+    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+    end;
+end;
+% plot 500 nm count rate with Az_deg
+for k=1;
+    figure;
+    h1=scatter(m_aero(ok), rateaero(ok,cols(4)),6,AZ_deg(ok),'filled');
+    colorbar;
+    ch=colorbarlabeled('AZdeg');
+    xlabel('aerosol Airmass','FontSize',14);
+    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    set(gca,'FontSize',14);
+    set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+    starttstr=datestr(langley(1), 31);
+    stoptstr=datestr(langley(2), 13);
+    y = rateaero(ok,cols(4));
+    ylim([min(y(:)) max([max(y(:)) data0])]);
+    grid on;
+    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    if savefigure;
+        starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 
@@ -153,8 +221,10 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     c0unc=NaN(size(w)); % put NaN for uncertainty - to be updated later
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
-    filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
-    additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
+    % filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
+    % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
+    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+    % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
 elseif isequal(k, 'addunc'); % add unc to an existing c0 file
@@ -194,9 +264,9 @@ elseif ~isfinite(k); % save after averaging
             spec='NIR';
         end;
         filesuffix=[originalfilesuffix '_averagedwith20130214'];
-        a=importdata(fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']));
-        b=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
-        if kk==1;
+        a=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
+        if kk==1;fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']));
+        b=importdata(
             w=(a.data(:,2)'+b.data(:,2)')/2;            
             c0new=(a.data(:,3)'+b.data(:,3)')/2;
             c0unc=(a.data(:,4)'+b.data(:,4)')/2;
