@@ -212,6 +212,8 @@ nir.scaleaeroidx = MODTRANcalc.aeroind(1045:1556); % 206 wavelengths
 % select wavelengths regions to exclude
 nm_340 = interp1(vis.nm,[1:length(vis.nm)],340.0, 'nearest');
 nm_400 = interp1(vis.nm,[1:length(vis.nm)],400.0, 'nearest');
+nm_490 = interp1(vis.nm,[1:length(vis.nm)],489.6, 'nearest');
+nm_500 = interp1(vis.nm,[1:length(vis.nm)],500.0, 'nearest');
 nm_564 = interp1(vis.nm,[1:length(vis.nm)],564.0, 'nearest');
 nm_620 = interp1(vis.nm,[1:length(vis.nm)],620.6, 'nearest');
 nm_635 = interp1(vis.nm,[1:length(vis.nm)],635.0, 'nearest');
@@ -287,6 +289,7 @@ vis.LangLampCombMod(vis.scaleaeroidx==0) = vis.scaledLamp2LangMod(vis.scaleaeroi
 nir.LangLampCombMod = nirc0;
 nir.LangLampCombMod(nir.scaleaeroidx==0) = nir.scaledLamp2LangMod(nir.scaleaeroidx==0);
 % override with Langley values:
+vis.LangLampCombMod(nm_490:nm_685) = visc0(nm_490:nm_685);
 vis.LangLampCombMod(nm_564:nm_620) = visc0(nm_564:nm_620);
 vis.LangLampCombMod(nm_620:nm_635) = visc0(nm_620:nm_635);
 vis.LangLampCombMod(nm_696:nm_741) = visc0(nm_696:nm_741);

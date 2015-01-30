@@ -54,7 +54,7 @@ star.RH=star.RH+100.0;
 star.h2o=magnus(star.RH,star.Tst+273.15);%rh2nd(star.RH,star.Tst+273.15,star.Pst);
 
 %standard
-std=importdata([dir '..\afglss.dat']);
+std=importdata([dir 'afglss.dat']);
 std.z=std.data(:,1).*1000.;
 std.p=std.data(:,2);
 std.t=std.data(:,3)-273.15;
