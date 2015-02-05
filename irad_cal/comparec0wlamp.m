@@ -36,12 +36,34 @@ ax(2)=subplot(212);plot(hh,ad.tau_aero(:,nm_380) - sd.tau_aero(:,nm_380),'.k');
 xlabel('time [hr]','fontsize',12);
 ylabel('AOD (380 nm) lampadjc0-c0','fontsize',12);
 linkaxes(ax,'x');
+legend('c0','lampadjc0');
 % spectral
-hh19 = interp1(hh,[1:length(hh)],23, 'nearest');
+hh19 = interp1(hh,[1:length(hh)],19, 'nearest');
 figure;plot(sd.w,sd.tau_aero(hh19,:),'-b',ad.w,ad.tau_aero(hh19,:),'-g');
 xlabel('wavelength','fontsize',12);
 ylabel('AOD','fontsize',12);
-axis([0.35 1.7 0 0.15]);
+axis([0.30 1.7 0 0.15]);
+legend('c0','lampadjc0');
+% spectral movie
+ figure;set(gcf, 'Color','white');
+        axis tight manual
+        ax = gca;
+        ax.NextPlot = 'replaceChildren';
+        % set(gca, 'nextplot','replacechildren', 'Visible','off');
+        loops = length(hh);
+        for j = 1:loops
+                    plot(sd.w,sd.tau_aero(j,:),'-b',ad.w,ad.tau_aero(j,:),'-g');
+                    xlabel('wavelength','fontsize',12);
+                    ylabel('AOD','fontsize',12);
+                    axis([0.30 1.7 0 0.15]);
+                    legend('c0','lampadjc0');
+                    % add times
+                    str = datestr(sd.t(j), 'dd mmm yyyy'); % Show in the format
+                    set(gca,'fontsize',12);
+                    title(str);
+                    drawnow
+                    pause(0.01);
+         end
 
 % correlation with no2
 load('20130925cross_sections_uv_vis_swir_Tech5wlnFWHM.mat');

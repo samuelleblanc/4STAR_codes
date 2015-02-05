@@ -30,6 +30,8 @@ elseif isequal(daystr, '20141002')
     %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
 else
     source=[daystr 'starsun.mat'];
+    % source='20140917starsunLangley.mat';% this is the original file made
+    % in field
 end;
 file=fullfile(starpaths, source);
 load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero');
@@ -48,6 +50,8 @@ if isequal(daystr, '20141002')
     figure; plot(Lat(ok),tau_aero(ok,407),'.b');
     xlabel('Latitude');ylabel('500 nm AOD');
     ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
+elseif isequal(daystr, '20140917')
+    ok = ok(m_aero(ok)>=4);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
@@ -161,6 +165,9 @@ elseif isequal(daystr, '20120722'); % TCAP July 2012
     c7.data=[c7v.data;c7n.data];
     unc=sqrt((1.6/100).^2+(c7.data(:,3)./c22.data(:,3)-1).^2); % 1.6% FORJ impact and the deviation of the July 7 cal from the July 22.
     c0unc=c0new.*unc';
+elseif isequal(daystr, '20141002'); % ARISE Oct 2014
+    unc=1.5/100; % 1.5% this if for the range of min-max values due to changing aerosol in the scene.
+    c0unc=c0new.*unc';
 end;
 
 %********************
@@ -228,6 +235,7 @@ end;
 % save new c0
 %********************
 k=1; % select one of the multiple screening criteria (stdev_mult), or NaN (see below).
+c0unc = real(c0unc(k,:));
 if isnumeric(k) && k>=1; % save results from the screening/regression above
     c0unc=NaN(size(w)); % put NaN for uncertainty - to be updated later
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
@@ -235,7 +243,9 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
-    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened';
+    % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened';
+    % filesuffix='refined_Langley
+    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
