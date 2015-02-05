@@ -61,8 +61,10 @@ function	s=starwrapper(s, s2, varargin)
 %                       - changed the default values of the toggles.
 % MS: v1.4, 2015-01-09: added toggle field lampcalib to chose between c0/lampc0 calib
 % SL: v1.4, 2015-01-09: fixed bug in toggle checking
+% SL: v1.5, 2015-02-05: added starinfo2 file which is a function file, for
+%                       use with pleaides cluster
 
-version_set('1.4');
+version_set('1.5');
 %********************
 %% prepare for processing
 %********************
@@ -81,7 +83,7 @@ toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth '
 toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
 toggle.lampcalib  = false; 
-toggle.runwatervapor = true;
+toggle.runwatervapor = false;
 
 %% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
@@ -161,10 +163,13 @@ if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
-infofile=fullfile(starpaths, ['starinfo' daystr '.m']);
+infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
+infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
-if exist(infofile)==2;
+if exist(infofile2)==2;
+    eval(infofile2);
+elseif exist(infofile)==2;
     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
 else; % copy an existing old starinfo file and run it
     while dayspast<maxdayspast;
