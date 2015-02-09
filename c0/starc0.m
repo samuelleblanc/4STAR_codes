@@ -37,7 +37,8 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %daystr='20140830';
             %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
             %filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
-            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
@@ -143,6 +144,7 @@ if ~exist('visc0')
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
             a=importdata(fullfile(starpaths,visfilename));
+            %a=load(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -165,6 +167,7 @@ if ~exist('visc0')
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
             a=importdata(fullfile(starpaths,nirfilename));
+            %a=load(fullfile(starpaths,nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
