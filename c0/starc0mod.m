@@ -43,11 +43,14 @@
 %           - added version_set for version control
 % Modified (v1.1): Samuel LeBlanc, NASA Ames, October, 15th, 2014
 %           - added the verbose keyword
+% Modified (v1.2): Samuel LeBlanc, NASA Ames, Febuary, 5th, 2015
+%           - added if command for selecting the correct run of either
+%           importdata or load depending on matlab version  
 %
 % -------------------------------------------------------------------------
 %% function routine
 function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
-version_set('1.1');
+version_set('1.2');
 
 % control the input
 if nargin==0;
@@ -56,6 +59,13 @@ end;
 if ~exist('verbose','var'); verbose=true; end;
 
 if verbose; disp('...in starc0mod'), end;
+
+% get the version of matlab
+vv = version('-release')
+newmatlab = false; 
+if str2num(vv(1:4)) >= 2012;
+    newmatlab = true;
+end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
@@ -154,12 +164,17 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            a=importdata(fullfile(starpaths,visfilename));
-            %a=load(fullfile(starpaths,visfilename));
+            if newmatlab;
+                a=load(fullfile(starpaths,visfilename));
+                visc0mod(i,:)=a(:,3);
+            else;
+                a=importdata(fullfile(starpaths,visfilename));
+                visc0mod(i,:)=a(:,3).data(:,strcmp(lower(a.colheaders), 'c0'))';
+            end;
             sprintf('%s',size(a,1)) ;
             sprintf('%f',size(a,2)) ;
             sprintf('%s',visfilename);
-            visc0mod(i,:)=a(:,3);%.data(:,strcmp(lower(a.colheaders), 'c0'))';
+            %.data(:,strcmp(lower(a.colheaders), 'c0'))';
 %             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
 %                 visc0moderr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
 %             elseif sum(strcmp(lower(a.colheaders), 'c0errlo'))>0 & sum(strcmp(lower(a.colheaders), 'c0errhi'))>0;
@@ -180,9 +195,13 @@ if ~exist('visc0')
         vislstr(i)={visfilename};
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
-            %a=load(fullfile(starpaths,nirfilename));
-            a=importdata(fullfile(starpaths,nirfilename));
-            nirc0mod(i,:)=a(:,3);%.data(:,strcmp(lower(a.colheaders), 'c0'))';
+            if newmatlab;
+                a=load(fullfile(starpaths,nirfilename));
+                nirc0mod(i,:)=a(:,3);
+            else;
+                a=importdata(fullfile(starpaths,nirfilename));
+                nirc0mod(i,:)=a(:,3).data(:,strcmp(lower(a.colheaders), 'c0'))';
+            end;
 %             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
 %                 nirc0moderr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
 %             elseif sum(strcmp(lower(a.colheaders), 'c0errlo'))>0 & sum(strcmp(lower(a.colheaders), 'c0errhi'))>0;

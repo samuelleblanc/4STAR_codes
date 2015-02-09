@@ -32,13 +32,14 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2014 7 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
-        if now>=datenum([2014 9 1 0 0 0]);
+        if now>=datenum([2014 8 1 0 0 0]);
             daystr='20141002';
             %daystr='20140830';
             %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
             %filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
             %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
             filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc'; % for in flight langley modified to remove aod variations, default for ARISE cal
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
@@ -143,6 +144,7 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
+            disp(fullfile(starpaths,visfilename))
             a=importdata(fullfile(starpaths,visfilename));
             %a=load(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
