@@ -63,8 +63,11 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v1.4, 2015-01-09: fixed bug in toggle checking
 % SL: v1.5, 2015-02-05: added starinfo2 file which is a function file, for
 %                       use with pleaides cluster
+% SL: v1.6, 2015-02-13: can now put in a toggle structure as an argument,
+%                       combines this toggle structure to the defaults, with preference over the
+%                       input
 
-version_set('1.5');
+version_set('1.6');
 %********************
 %% prepare for processing
 %********************
@@ -88,47 +91,54 @@ toggle.runwatervapor = true;
 
 %% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
-    nnarg=2;
-    if mod(nargin,2); % varargin not paired
-        varargin={s2,varargin{:}};
-    end;
-    for c=1:2:length(varargin)-1
-        switch varargin{c}
-            case {'verbose'}
-                c=c+1;
-                toggle.verbose=varargin{c};
-                disp(['verbose set to ' num2str(toggle.verbose)])
-            case {'saveadditionalvariables'}
-                c=c+1;
-                toggle.saveadditionalvariables=varargin{c};
-                disp(['saveadditionalvariables set to ' num2str(toggle.saveadditionalvariables)])
-            case {'savefigure'}
-                c=c+1;
-                toggle.savefigure=varargin{c};
-                disp(['savefigure set to ' num2str(toggle.savefigure)])
-            case {'computeerror'}
-                c=c+1;
-                toggle.computeerror=varargin{c};
-                disp(['computeerror set to ' num2str(toggle.computeerror)])
-            case {'inspectresults'}
-                c=c+1;
-                toggle.inspectresults=varargin{c};
-                disp(['inspectresults set to ' num2str(toggle.inspectresults)])
-            case {'applynonlinearcorr'}
-                c=c+1;
-                toggle.applynonlinearcorr=varargin{c};
-                disp(['applynonlinearcorr set to ' num2str(toggle.applynonlinearcorr)])
-            case {'applytempcorr'}
-                c=c+1;
-                toggle.applytempcorr=varargin{c};
-                disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
-                % (continued)
-            otherwise
-                error(['Invalid optional argument, ', ...
-                    varargin{c}]);
-                nnarg=0;
-        end % switch
-    end % for
+    if nargin==3;
+        nnarg=1;
+        if isa(varargin{1},'struct'); % check if its a toggle structure
+            toggle = catstruct(toggle,varargin{1}); %concatenate the toggles, but with preference over the input toggle
+        end;
+    else;
+        nnarg=2;
+        if mod(nargin,2); % varargin not paired
+            varargin={s2,varargin{:}};
+        end;
+        for c=1:2:length(varargin)-1
+            switch varargin{c}
+                case {'verbose'}
+                    c=c+1;
+                    toggle.verbose=varargin{c};
+                    disp(['verbose set to ' num2str(toggle.verbose)])
+                case {'saveadditionalvariables'}
+                    c=c+1;
+                    toggle.saveadditionalvariables=varargin{c};
+                    disp(['saveadditionalvariables set to ' num2str(toggle.saveadditionalvariables)])
+                case {'savefigure'}
+                    c=c+1;
+                    toggle.savefigure=varargin{c};
+                    disp(['savefigure set to ' num2str(toggle.savefigure)])
+                case {'computeerror'}
+                    c=c+1;
+                    toggle.computeerror=varargin{c};
+                    disp(['computeerror set to ' num2str(toggle.computeerror)])
+                case {'inspectresults'}
+                    c=c+1;
+                    toggle.inspectresults=varargin{c};
+                    disp(['inspectresults set to ' num2str(toggle.inspectresults)])
+                case {'applynonlinearcorr'}
+                    c=c+1;
+                    toggle.applynonlinearcorr=varargin{c};
+                    disp(['applynonlinearcorr set to ' num2str(toggle.applynonlinearcorr)])
+                case {'applytempcorr'}
+                    c=c+1;
+                    toggle.applytempcorr=varargin{c};
+                    disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
+                    % (continued)
+                otherwise
+                    error(['Invalid optional argument, ', ...
+                        varargin{c}]);
+                    nnarg=0;
+            end % switch
+        end % for
+    end; % nargin==1
 else nnarg=0;
 end; % if
 
