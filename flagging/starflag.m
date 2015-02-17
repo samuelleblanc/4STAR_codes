@@ -21,19 +21,22 @@ function [flags] = starflag(daystr,Mode,s)
 % SL, v1.0, 20141013, added my name to the list of flaggers and added version control of this m script wiht version_set
 % SL, v1.1, 2014-11-12, added Mode 3 for loading previous flag files, with
 %                       inclusion of starinfo flags, considerable rebuilding
+% MS, 2015-02-17,corrected a bug in line 74; definition of outputfile
+%                corrected bug in lines 31,37 (disp function)
+%
 version_set('1.1');
 
 if (Mode==3);
-    files = ls([starpaths,daystr,'_starflag_man_*'])
+    files = ls([starpaths,daystr,'_starflag_man_*']);
     if ~isempty(files);
         flagfile=files(end,:);
-        disp('loading file:' [starpaths flagfile])
+        disp(['loading file:' starpaths flagfile])
         load([starpaths flagfile]);
     else;
-        files = ls([starpaths,daystr,'_starflag_auto_*'])
+        files = ls([starpaths,daystr,'_starflag_auto_*']);
         if ~isempty(files);
             flagfile=files(end,:);
-            disp('loading file:' [starpaths flagfile])
+            disp(['loading file:' starpaths flagfile])
             load([starpaths flagfile]);
         else;
             flagfile=uigetfile('*starflag*.mat','Select correct starflag file')
