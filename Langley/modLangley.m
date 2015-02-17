@@ -9,18 +9,24 @@ function [c0_mod,RSD]=modLangley(am,iwln,wvis,data,tau_aero,tau_ray,tau_O4,tau_O
 % iwln is array of wvl used for modified Langley
 %------------------------------------------------------------
 % Michal Feb 20 2013
+% Modification, Michal Segal, NASA Ames, Feb-09-2015, added
+% another airmass option, to choose from index and not range ('mH2Oidx')
 
 
 flag_write_results='no'; %'yes'
 flag_restrict_altitude='no';
-flag_screen_method='mH2O';%'mH2O^b';%'mH2O'; %'mH2O^b';%
+flag_screen_method='mH2Oidx';%'mH2O^b';%'mH2O';'mH2Oidx'
 
 % restrict airmass range
-min_m_H2O=am(1);                % to decide check min values of m_H2O
+min_m_H2O=am(1);                    % to decide check min values of m_H2O
 % if am(1)<3
 %     min_m_H2O = 3;
 % end
-max_m_H2O=am(2);                % to decide check max values of m_H2O
+if strcmp(flag_screen_method,'mH2Oidx')
+    max_m_H2O=am(end);              % to decide check max values of m_H2O
+else
+    max_m_H2O=am(2);                % to decide check max values of m_H2O
+end
 % if am(2)>12
 %     max_m_H2O = 12;
 % end
@@ -62,6 +68,8 @@ for ichan=1:length(channels)
     i=find(m_H2O<=max_m_H2O & m_H2O>=min_m_H2O);
  elseif strcmp(flag_screen_method,'mH2O^b')
     i=find(x<=max_x & x>=min_x);
+ elseif strcmp(flag_screen_method,'mH2Oidx')
+    i=1:length(m_H2O);
  end
  
   x=x(i);
@@ -80,7 +88,7 @@ for ichan=1:length(channels)
   %Altitude restriction for airborne Langley (in km)
    alt_use=alt(i);  % in [meters]
    %UT_use=UT(i)
-  i=find(alt_use>=6000);
+  i=find(alt_use>=5000);
   x=x(i);
   y=y(i); 
  end
@@ -93,28 +101,28 @@ for ichan=1:length(channels)
 %     y_fit=b(1)+b(2)*x;
 %     a=y'-y_fit;
 
-%     figure(100)
-%     subplot(2,1,1)
-%     plot(x,y','g+',x,y_fit);
-% %     title(sprintf('%2i.%2i.%2i %8.3f µm',day,month,year,lambda(ichan)),'fontsize',12);
-%     title(sprintf('%8.3f µm',lambda(ichan)),'fontsize',12);
-%     xlabel('m_{H2O}^b','FontSize',14)
-%     ylabel('ln V*','FontSize',14)
-%     set(gca,'FontSize',14)
-%     grid on
-%     xlimval=get(gca,'xlim');
-%     ylimval=get(gca,'ylim');
-%     mH2Ocalc=exp(log(xlimval)/b_H2O(10));
-%     htmin=text(xlimval(1),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
-%     set(htmin,'fontsize',14,'color','r')
-%     htmax=text(xlimval(2)-0.055*(xlimval(2)-xlimval(1)),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
-%     set(htmax,'fontsize',14,'color','r')
-%     subplot(2,1,2);
-%     plot(x,a,'g+');
-%     grid on
-%     xlabel('m_{H2O}^b','FontSize',14)
-%     ylabel('Residuals','FontSize',14)
-%     set(gca,'FontSize',14)
+%      figure(100)
+%      subplot(2,1,1)
+%      plot(x,y','g+',x,y_fit);
+%  %     title(sprintf('%2i.%2i.%2i %8.3f µm',day,month,year,lambda(ichan)),'fontsize',12);
+%      title(sprintf('%8.3f µm',lambda(ichan)),'fontsize',12);
+%      xlabel('m_{H2O}^b','FontSize',14)
+%      ylabel('ln V*','FontSize',14)
+%      set(gca,'FontSize',14)
+%      grid on
+%      xlimval=get(gca,'xlim');
+%      ylimval=get(gca,'ylim');
+%      mH2Ocalc=exp(log(xlimval)/b_H2O(10));
+%      htmin=text(xlimval(1),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
+%      set(htmin,'fontsize',14,'color','r')
+%      htmax=text(xlimval(2)-0.055*(xlimval(2)-xlimval(1)),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
+%      set(htmax,'fontsize',14,'color','r')
+%      subplot(2,1,2);
+%      plot(x,a,'g+');
+%      grid on
+%      xlabel('m_{H2O}^b','FontSize',14)
+%      ylabel('Residuals','FontSize',14)
+%      set(gca,'FontSize',14)
 %   
 %     pause(0.01)
 
@@ -131,38 +139,38 @@ for ichan=1:length(channels)
  U_modlang(ichan)=(-p(1)/a_H2O(channels(ichan)))^(1/b_H2O(channels(ichan)))/1244;
  RSD(ichan)=std(a);
 
-%  mH2Ocalc=exp(log(3)/b_H2O(ichan));    % parameter to use in plot
-% %  
-%      figure(101)
-%      subplot(2,1,1)
-%      plot(x,y,'.',x,y_fit);
-%      title(sprintf('%8.3f µm   std:%3.1f   V0:%7.4f  RSD:%7.4f',wvis(ichan),stdev_mult,c0_mod(ichan),RSD(ichan)),'FontSize',12);
-%      grid on;
-%      xlabel('m_{H2O}^b','FontSize',14);
-%      ylabel('ln V*','FontSize',14);
-%      set(gca,'FontSize',14);
-%      % axis([min_x max_x min(y) max(y)]);
-%      axis([3 11 0 5]);
-%      xlimval=get(gca,'xlim');
-%      ylimval=get(gca,'ylim');
-%     mH2Ocalc=exp(log(xlimval)/b_H2O(ichan));
-%     mH2Ocalc(2)=exp(log(x(1))/b_H2O(ichan));
-%     mH2Ocalc(1)=exp(log(x(end))/b_H2O(ichan));
-%     htmin=text(xlimval(1),ylimval(1)+0.5*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
-%     %htmin=text(xlimval(1),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
-%     set(htmin,'fontsize',14,'color','r')
-%     htmax=text(xlimval(2)-0.1*(xlimval(2)-xlimval(1)),ylimval(1)+0.5*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
-%     %htmax=text(xlimval(2)-0.055*(xlimval(2)-xlimval(1)),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
-%    set(htmax,'fontsize',14,'color','r')
-%      subplot(2,1,2);
-%      plot(x,a,'b.');
-%      grid on
-%      xlabel('m_{H2O}^b','FontSize',14)
-%      ylabel('Residuals','FontSize',14)
-%      set(gca,'FontSize',14);
-%      % axis([min_x max_x min(a) max(a)]);
-%      axis([3 11 -0.01 0.01]);
-%      pause(0.001)
+%   mH2Ocalc=exp(log(3)/b_H2O(ichan));    % parameter to use in plot
+%   
+%        figure(101)
+%        subplot(2,1,1)
+%        plot(x,y,'.',x,y_fit);
+%        title(sprintf('%8.3f µm   std:%3.1f   V0:%7.4f  RSD:%7.4f',wvis(ichan),stdev_mult,c0_mod(ichan),RSD(ichan)),'FontSize',12);
+%        grid on;
+%        xlabel('m_{H2O}^b','FontSize',14);
+%        ylabel('ln V*','FontSize',14);
+%        set(gca,'FontSize',14);
+%        % axis([min_x max_x min(y) max(y)]);
+%        axis([3 11 0 5]);
+%        xlimval=get(gca,'xlim');
+%        ylimval=get(gca,'ylim');
+%        mH2Ocalc=exp(log(xlimval)/b_H2O(ichan));
+%  %      mH2Ocalc(2)=exp(log(x(1))/b_H2O(ichan));
+%  %      mH2Ocalc(1)=exp(log(x(end))/b_H2O(ichan));
+%        htmin=text(xlimval(1),ylimval(1)+0.5*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
+%        %htmin=text(xlimval(1),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(1)));
+%        set(htmin,'fontsize',14,'color','r')
+%  %     htmax=text(xlimval(2)-0.1*(xlimval(2)-xlimval(1)),ylimval(1)+0.5*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
+%        htmax=text(xlimval(2)-0.055*(xlimval(2)-xlimval(1)),ylimval(1)+0.03*(ylimval(2)-ylimval(1)),sprintf('%4.2f',mH2Ocalc(2))); 
+%        set(htmax,'fontsize',14,'color','r')
+%        subplot(2,1,2);
+%        plot(x,a,'b.');
+%        grid on
+%        xlabel('m_{H2O}^b','FontSize',14)
+%        ylabel('Residuals','FontSize',14)
+%        set(gca,'FontSize',14);
+%        % axis([min_x max_x min(a) max(a)]);
+%        axis([3 11 -0.01 0.01]);
+%        pause(0.001)
 end
 
 if strcmp(flag_write_results,'yes')

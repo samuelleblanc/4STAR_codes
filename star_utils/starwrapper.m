@@ -77,13 +77,13 @@ toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;
-toggle.gassubtract = true;
+toggle.gassubtract = false;
 toggle.booleanflagging = false;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = false; % for running any Yohei style flagging
 toggle.dostarflag = false; 
 toggle.lampcalib  = false; 
-toggle.runwatervapor = true;
+toggle.runwatervapor = false;
 
 %% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))

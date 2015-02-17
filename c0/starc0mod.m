@@ -46,11 +46,14 @@
 % Modified (v1.2): Samuel LeBlanc, NASA Ames, Febuary, 5th, 2015
 %           - added if command for selecting the correct run of either
 %           importdata or load depending on matlab version  
+% Modified, Michal Segal, NASA Ames, February, 9th, 2015
+%           - added ARISE c0 option in dates choice
+%           - changed to version 1.3
 %
 % -------------------------------------------------------------------------
 %% function routine
 function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
-version_set('1.2');
+version_set('1.3');
 
 % control the input
 if nargin==0;
@@ -69,7 +72,13 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2013 6 18 0 0 0]); % fiber swapped in the evening of June 17, 2013 at Dryden.
+    if t>=datenum([2014 7 1 0 0 0]); % ARISE;
+        if now>=datenum([2014 8 1 0 0 0]);
+            daystr='20141002';
+            filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            model_atmosphere=3;% ARISE (first archive MidLat winter coefficients)
+        end;
+    elseif t>=datenum([2013 6 18 0 0 0]); % fiber swapped in the evening of June 17, 2013 at Dryden.
         if now>=datenum([2014 7 18 0 0 0]);
             daystr='20130708';
             %filesuffix='modified_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140721';

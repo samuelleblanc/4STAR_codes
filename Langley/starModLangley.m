@@ -5,11 +5,13 @@
 % 
 % Michal 2013/02/20
 % MS: 2014/11/18, changed ,rate_noFORJcorr field to rate
-
+% MS: 2015/02/09, added airmass constrain for ARISE and save section
+%                 added some additional tweaks for 20141002 dataset
 %********************
 % set parameters
 %********************
-daystr='20130712';
+daystr='20141002';
+%daystr='20130712';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -21,8 +23,8 @@ savefigure=0;
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
 else
-    %source=[daystr 'starsun.mat'];
-    source=[daystr 'starsunLangley.mat'];
+    source=[daystr 'starsun.mat'];
+    %source=[daystr 'starsunLangley.mat'];
 end;
 file=fullfile(starpaths, source);
 load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_aero','tau_O3','tau_NO2','tau_O4','tau_ray','rate');
@@ -35,10 +37,10 @@ ok=incl(t,langley);
 % load water vapor coef
 % load H2O a and b parameters
 % watvapcoef =load('C:\MatlabCodes\data\cross_sections_uv_vis_swir_all.mat');  % 3.4km MidLatSummer
-watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat');    % 3.4km Tropical MLO
-%watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');    % 6.85km MidLatWinter for 20130214
-% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');    % 6.0km MidLatWinter for 20130212
-% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat'); % 6.0km-3coef. MidLatwinter
+% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat');         % 3.4km Tropical MLO
+% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');     % 6.85km MidLatWinter for 20130214
+ watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');         % 6.0km MidLatWinter for 20130212
+% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat');   % 6.0km-3coef. MidLatwinter
 
  
  % interpolate H2O parameters to whole wln grid
@@ -61,10 +63,27 @@ watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_
     %  ax(2)=subplot(2,1,2);plot(wvis,H2Ob,'-r');legend('H2O b parameter');
     %  linkaxes(ax,'x');
 %
+
+% adjust airmass range for ARISE
+if strcmp(daystr,'20141002')
+    ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
+    am = m_H2O(ok);
+else
+    am = [min(m_H2O(ok)) max(m_H2O(ok))];
+    % adjust values for MLO 2013
+    %am = [3.2 11.7];    % July-08
+    %am = [3.2 11.8];    % July-09
+    %am = [3.2 7.2];     % July-10
+    %am = [3.2 12];      % July-11
+%
+end
+
 % estimate tau_aero for water vapor region by using baseline fit
 qq = length(wvis);
 pp = length(t);
-iwln = find(wvis<=0.9945&wvis>=0.8823);
+iwln  = find(wvis<=0.9945&wvis>=0.8823);
+iwln2 = find(wvis<=0.9945&wvis>=0.9000);
+iwln_900nm = interp1(wvis,[1:length(wvis)],0.9,'nearest');
 order=1;                            % order of baseline polynomial fit
 poly=zeros(length(wvis(iwln)),pp);  % calculated polynomial
 polycoef=zeros(pp,(order)+1);       % polynomial coefficients
@@ -89,13 +108,6 @@ end
 watvap_tau_aero=(real(poly))';
 
 % run modified Langley
-am = [min(m_H2O(ok)) max(m_H2O(ok))];
-% adjust values for MLO 2013
-%am = [3.2 11.7];     % July-08
-%am = [3.2 11.8];    % July-09
-%am = [3.2 7.2];     % July-10
-%am = [3.2 12];      % July-11
-%
 tau_NO2 = repmat(tau_NO2,pp,1);
 [c0_mod,residual]=modLangley(am,iwln,wvis(iwln),rate(ok,iwln),watvap_tau_aero(ok,:),...
                               tau_ray(ok,iwln),tau_O4(ok,iwln),tau_O3(ok,iwln),tau_NO2(ok,iwln),m_aero(ok),m_ray(ok),m_O3(ok),m_NO2(ok),m_H2O(ok),H2Oa(iwln),H2Ob(iwln),stdev_mult);
@@ -125,6 +137,17 @@ elseif strcmp(daystr,'20130214')
     filesuffix='modified_Langley_on_G1_secondL_flight_6_85km_screened_2x_withOMIozone';
     % filesuffix='modified_Langley_on_G1_secondL_flight_6km_3c_screened_2x_withOMIozone';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
+elseif strcmp(daystr,'20141002')  
+    c0=importdata(fullfile(starpaths, '20141002_VIS_C0_refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc.dat'));
+    c0vis = c0.data(:,3);
+    c0mod = c0vis;
+    c0mod(iwln2) = c0_mod(24:end);% applying only the region from 900 nm to end
+    % test figure;
+    figure;
+    plot(wln,c0vis,'-b');hold on;plot(wln,c0mod,'--c');legend('c0','modc0');
+    axis([0.8 1 0 200]);
+    filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+    visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_constrained_airmass_screened_2x.dat');
@@ -145,7 +168,12 @@ end
 
 %nirfilename=fullfile(starpaths, [daystr '_NIR_C0_' filesuffix '.dat']);!
 %should we run modified for NIR as well?
-additionalnotes='Modified Langley processed for 0.8823-0.9945 micron region';
-starsavec0(visfilename, source, additionalnotes,wln , c0mod', c0unc);
+if strcmp(daystr,'20141002')  
+    additionalnotes='Modified Langley processed for 0.9000-0.9945 micron region';
+    starsavec0(visfilename, source, additionalnotes,wln , c0mod', c0unc);
+else
+    additionalnotes='Modified Langley processed for 0.8823-0.9945 micron region';
+    starsavec0(visfilename, source, additionalnotes,wln , c0mod', c0unc);
+end
 %starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new(k,nircols), c0unc(:,nircols));
 %

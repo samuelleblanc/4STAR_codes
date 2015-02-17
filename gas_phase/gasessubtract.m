@@ -214,6 +214,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %% subtract/retrieve NO2/O3/O4 region
    wln = wln_vis7;
    NO2conc = []; NO2resi=[];
+   %!!! need to perform pca on OD spectra before NO2 retrieval as in former
+   %algorithm
    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(starsun,no2coef,o4coef,o3coef,wln,tau_OD);%tau_OD
    % no2OD is the spectrum portion to subtract
    gas.no2  = NO2conc;%in [DU]

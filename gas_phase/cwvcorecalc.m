@@ -203,7 +203,7 @@ end
          (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(starsun.t))))'); 
       Ufinal  = U1/H2O_conv;
       avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
- elseif model_atmosphere==3 % TCAP winter
+ elseif model_atmosphere==3 % TCAP winter/ARISE
      % load altitude dependent coef.
      alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
      alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter1000m.mat'));
@@ -239,6 +239,7 @@ end
     %      (log(Tw_lamp(:,Tw_wln)))).^((1./(repmat(H2Ob((cwv_ind1))',1,length(starsun.t((goodTime))))))');
      % average U1 over wavelength
      avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm; last:26:52
+     std_U1 = abs(real((nanstd(Ufinal(:,ind),[],2)))); 
     %  avg_U1 = avg_U1_;
     %  avg_U1((isnan(avg_U1_)==1))=0;
     %  avg_U1 = real(avg_U1);
