@@ -27,7 +27,9 @@ function [rate, dark, darkstd, note]=starrate(s, bounds)
 %                       darks at other integration times if none are available, 
 %                       - added check on darks if they are too large,
 %                         VIS @ 574 nm > 1000, NIR @ 1283.7 nm > 2000
-version_set('1.1');
+% SL: v1.2, 2015/02/13: - added check in dark interpolation to skip if there is a
+%                         dark count for a specific wavelength that is zero to skip
+version_set('1.2');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -142,11 +144,14 @@ if any(any(isnan(dark)));
     if any(any(isfinite(dark))); % checking to see if there are any darks to use
         warning('.. Using darks interpolated/extrapolated from other integration times');
         inotemptydark=any(isfinite(dark'));
-        for iw=1:length(s.w); % loop through eacj wavelength
+        for iw=1:length(s.w); % loop through each wavelength
           % calculate dark rate for non empty darks
-          darkrate(:,iw)=dark(inotemptydark,iw)./s.Tint(inotemptydark); 
+          darkrate(:,iw)=dark(inotemptydark,iw)./s.Tint(inotemptydark);
+          if any(~darkrate(:,iw)); continue, end; % make sure that the darkrate is not just zeros
+          % double check for non-unique values
+          [darkrate_unique,iunique,inonunique] = unique(darkrate(:,iw));
           % interpolate the dark rate to all the available times
-          darkrate_filled(:,iw)=interp1(s.t(inotemptydark),darkrate(:,iw),s.t,'linear','extrap');
+          darkrate_filled(:,iw)=interp1(s.t(inotemptydark(iunique)),darkrate_unique,s.t,'linear','extrap');
           % repopulate the empty darks with the new interpolated/extrapolated dark_rate*Tint
           dark(~inotemptydark,iw)=darkrate_filled(~inotemptydark,iw).*s.Tint(~inotemptydark);
         end;
