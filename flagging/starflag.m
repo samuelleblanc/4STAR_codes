@@ -68,7 +68,7 @@ end
 switch Mode
     case 1
         flagfile = [daystr,'_starflag_auto_created',datestr(now,'yyyymmdd_hhMM'),'.mat'];
-        outputfile=[starpaths,filesep,ofile];%This has to be starsun.mat
+        outputfile=[starpaths,filesep,flagfile];%This has to be starsun.mat
         disp(['Starflag mode 1 to output to:' outputfile])
     case 2
         flagfile = [daystr,'_starflag_man_created',datestr(now,'yyyymmdd_hhMM'), 'by_',op_name_str,'.mat'];
