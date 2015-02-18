@@ -784,6 +784,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %************************************************************
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
+        if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         [s.flags]=starflag(daystr,toggle.flagging,s);
     end;
     %************************************************************
