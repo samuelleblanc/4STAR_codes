@@ -49,6 +49,8 @@
 % Modified, Michal Segal, NASA Ames, February, 9th, 2015
 %           - added ARISE c0 option in dates choice
 %           - changed to version 1.3
+% Modified, Michal Segal, February, 18, 2015
+%           - fixed bug related to newmatlab
 %
 % -------------------------------------------------------------------------
 %% function routine
@@ -178,7 +180,7 @@ if ~exist('visc0')
                 visc0mod(i,:)=a(:,3);
             else;
                 a=importdata(fullfile(starpaths,visfilename));
-                visc0mod(i,:)=a(:,3).data(:,strcmp(lower(a.colheaders), 'c0'))';
+                visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             end;
             sprintf('%s',size(a,1)) ;
             sprintf('%f',size(a,2)) ;
@@ -209,7 +211,7 @@ if ~exist('visc0')
                 nirc0mod(i,:)=a(:,3);
             else;
                 a=importdata(fullfile(starpaths,nirfilename));
-                nirc0mod(i,:)=a(:,3).data(:,strcmp(lower(a.colheaders), 'c0'))';
+                nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             end;
 %             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
 %                 nirc0moderr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
