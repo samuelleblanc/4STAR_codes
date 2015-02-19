@@ -66,8 +66,9 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v1.6, 2015-02-13: can now put in a toggle structure as an argument,
 %                       combines this toggle structure to the defaults, with preference over the
 %                       input
+% MS: v1.7, 2015-02-19: added total optical depth fields for gas utils
 
-version_set('1.6');
+version_set('1.7');
 %********************
 %% prepare for processing
 %********************
@@ -81,14 +82,11 @@ toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;
 toggle.gassubtract = false;
-toggle.booleanflagging = false;
+toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
-toggle.doflagging = false; % for running any Yohei style flagging
-toggle.dostarflag = false; 
+toggle.doflagging = true; % for running any Yohei style flagging
+toggle.dostarflag = true; 
 toggle.lampcalib  = false; 
-toggle.runwatervapor = false;
-toggle.dostarflag = false;
-toggle.lampcalib  = false;
 toggle.runwatervapor = true;
 
 
@@ -670,6 +668,12 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
     s.tau_aero=s.tau_aero_noscreening;
     
+    % total optical depth (Rayleigh subtracted) needed for gas processing
+    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray));
+    s.tau_tot_slant    = real(-log(s.rateaero./repmat(s.c0,pp,1)));
+    s.tau_tot_vertical = real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+    
+    
     % apply screening here
     %flags bad_aod, unspecified_clouds and before_and_after_flight
     %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
@@ -701,7 +705,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         %-----------------------------------------------------
         if toggle.gassubtract
             if toggle.verbose; disp('gases subtractions start'), end;
-            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s,model_atmosphere);
+            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
         end;
@@ -832,7 +836,7 @@ end;
 %% remove some of the results for a lighter file
 %********************
 if ~toggle.saveadditionalvariables;
-    s=rmfield(s, {'darkstd' 'rate' 'forjunc' 'rate_noFORJcorr' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray'});
+    s=rmfield(s, {'darkstd' 'rate' 'forjunc' 'rate_noFORJcorr' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' 'rate_tot' 'tau_tot_slant' 'tau_tot_vertical'});
 end;
 
 %********************
