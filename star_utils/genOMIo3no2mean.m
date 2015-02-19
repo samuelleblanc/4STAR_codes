@@ -35,6 +35,7 @@
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer (MS), NASA Ames,Feb-06-2015
+% MS, Feb-18-2015, created readOMI subroutines
 % -------------------------------------------------------------------------
 %% function routine
 function [o3out no2out] = genOMIo3no2mean(domainbounds)
@@ -55,44 +56,9 @@ minLon = domainbounds(2);
 maxLat = domainbounds(3);
 maxLon = domainbounds(4);
 % read o3 data
-o3Time=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/Time'));
-o3Lat=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/Latitude'));
-o3Lon=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/Longitude'));
-o3col=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/ColumnAmountO3'));
-o3cldP=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/CloudPressure'));
-o3cldF=double(hdf5read(o3infile,'/HDFEOS/GRIDS/OMI Column Amount O3/Data Fields/RadiativeCloudFraction'));
-o3.time=o3Time(:,:,1); 
-nanind = o3.time < 0;
-o3.lon =o3Lon(:,:,1);  o3.lon( nanind)=NaN;
-o3.lat =-o3Lat(:,:,1); o3.lat( nanind)=NaN;
-o3.o3col =o3col(:,:,1);o3.o3col(nanind)=NaN;
-o3.cldP  =o3cldP(:,:,1);o3.cldP(nanind)=NaN;
-o3.cldF  =o3cldF(:,:,1);o3.cldF(nanind)=NaN;
-
+o3  = readOMIo3grid(o3infile);
 % read no2 data
-
-no2Time=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Time'));
-no2Lat=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Latitude'));
-no2Lon=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Longitude'));
-no2CloudF=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudFraction'));
-no2CloudFStd=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudFractionStd'));
-no2col=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2'));
-no2colStd=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Std'));
-no2colTrop=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Trop'));
-no2colTropStd=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2TropStd'));
-no2colStrat=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Strat'));
-no2colStratStd=double(hdf5read(no2infile,'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2StratStd'));
-no2.time=no2Time(:,:,1);
-nanind2 = no2.time < 0;
-no2.lon=no2Lon(:,:,1);              no2.lon( nanind2)=NaN;
-no2.lat=no2Lat(:,:,1);              no2.lat( nanind2)=NaN;
-no2.cldF = no2CloudF(:,:,1);        no2.cldF( nanind2)=NaN;
-no2.no2col=no2col(:,:,1);           no2.no2col( nanind2)=NaN;
-no2.no2colTrop=no2colTrop(:,:,1);   no2.no2colTrop( nanind2)=NaN;
-no2.no2colStrat=no2colStrat(:,:,1); no2.no2colStrat( nanind2)=NaN;
-
-  % close current file
-    hdfml('closeall');
+no2 = readOMIno2grid(no2infile);
 
 % perform data mean
 o3_goodidx = o3.lat > minLat    &...
@@ -127,6 +93,7 @@ no2.no2colStratmean = nanmean(no2.no2colStrat(no2_goodidx));
 no2.no2colStratstd  = nanstd(no2.no2colStrat(no2_goodidx));
 
 % save out parameters
+% correct for too low values
 if o3.o3colmean < 250
     o3out  = o3.o3colmean + o3.o3colstd;
 else
