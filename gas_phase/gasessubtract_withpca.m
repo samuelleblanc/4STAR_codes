@@ -20,6 +20,7 @@
 %  - tau_sub: subtracted tau_aero spectrum
 %  - gas: gases struct that includes all retrieved values
 %  - gas.O3conc and gas.NO2conc are in DU and are retrieved products
+%  - note that currently NO2 is not optimized as well!
 %  - other quantities in gas struct are still subject to further check
 %
 % DEPENDENCIES:
@@ -40,21 +41,16 @@
 %                 switched tau_OD_wvsubtract to be an input variable from cwvcorecalc: starsun.cwv.tau_OD_wvsubtract;  
 %                 optimized gases subtraction from total OD spectra
 % 2015-02-18 MSR: added pca filter before no2 retrieval
-% 2015-02-19 MSR: replaced tau_OD with new starwrapper tau_tot fields
-%                 added version set for better tracking of changes
-%                 changed loadCrossSections into local function
 % -------------------------------------------------------------------------
 %% function routine
 
 function [tau_sub gas] = gasessubtract(s)
 %----------------------------------------------------------------------
- version_set('1.0');
  showfigure = 0;
- 
+ Loschmidt=2.686763e19;                   % molec/cm3*atm
  colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
- 
-%% load cross-sections
-   loadCrossSections;
+ % load cross-sections
+ loadCrossSections;
 %----------------------------------------------------------------------
 %% set wavelength ranges for best fit calc
 
@@ -87,8 +83,6 @@ wnir = s.w(1045:end);
  nm_0675 = interp1(wvis,[1:length(wvis)],0.6823,  'nearest');%0.675
  
  % no2 (with o3 and o4)
- nm_0300 = interp1(wvis,[1:length(wvis)],0.330,  'nearest');
- nm_0900 = interp1(wvis,[1:length(wvis)],0.900,  'nearest');
  nm_0400 = interp1(wvis,[1:length(wvis)],0.430,  'nearest');
  nm_0500 = interp1(wvis,[1:length(wvis)],0.490,  'nearest');
  
@@ -108,14 +102,12 @@ wnir = s.w(1045:end);
  pp    = length(s.t);
  qq    = length(s.w);
  
-%  sundist   = repmat(s.f(1),length(s.t),length(s.w));
-%  calibc0   = repmat(s.c0,length(s.t),1);
-%  spc       = s.rate./calibc0./sundist;
-%  Tslant    = spc.*exp((s.tau_ray).*repmat(s.m_ray,1,length(s.w)));
-%  tau_ODslant = -log(Tslant);
-%  tau_OD      = tau_ODslant./repmat(s.m_aero,1,qq);
- 
- tau_OD = s.tau_tot_vertical;% need to also check tau_tot_slant;
+ sundist   = repmat(s.f(1),length(s.t),length(s.w));
+ calibc0   = repmat(s.c0,length(s.t),1);
+ spc       = s.rate./calibc0./sundist;
+ Tslant    = spc.*exp((s.tau_ray).*repmat(s.m_ray,1,length(s.w)));
+ tau_ODslant = -log(Tslant);
+ tau_OD      = tau_ODslant./repmat(s.m_aero,1,qq);
  
  %rateall    = real(starsun.rate./repmat(starsun.f,1,qq)./tr(starsun.m_ray, starsun.tau_ray)); % rate adjusted for the Rayleigh component
  %tau_OD     = real(-log(rateall./repmat(starsun.c0,pp,1)));%./repmat(starsun.m_aero,1,qq));   % total slant optical depth (Rayeigh subtracted)
@@ -138,7 +130,7 @@ wnir = s.w(1045:end);
 %-------------------------------------
 % assign wv subtracted array (from cwvcorecalc.m routine) to OD
 % 1 is only wv subtracted (no O3 region)-input from cwvcorecalc routine
-  tau_OD_fitsubtract1 = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
+  tau_OD_fitsubtract1 = s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq);  %m_aero and m_H2O are the same
 %----------------------------------------------------------------------
 %% subtract/retrieve CO2
     wln = wln_nir3;
@@ -148,7 +140,7 @@ wnir = s.w(1045:end);
    gas.band1600resi= CO2resi;
    co2amount = CO2conc*co2coef';    % this is wavelength dependent slant OD
    ch4amount = CH4conc*ch4coef';    % this is wavelength dependent slant OD
-   tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - real(co2amount) - real(ch4amount);   % this is wv, co2 and ch4 subtraction
+   tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - co2amount - ch4amount;   % this is wv, co2 and ch4 subtraction
 %  tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - tau_co2ch4_subtract;
 %     figure;
 %     plot(starsun.w,tau_OD(end-500,:),'-b');hold on;
@@ -205,7 +197,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    h2ocoefVIS = zeros(qq,1); h2ocoefVIS(wln_vis6) = h2ocoef(wln_vis6);
    h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';
    %tau_OD_fitsubtract = tau_ODslant - o3amount - o4amount -h2oamount;
-   tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - real(o3amount) - real(o4amount) -real(h2oamount);% subtraction of remaining gases in o3 region
+   tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - o3amount - o4amount -h2oamount;% subtraction of remaining gases in o3 region
 %    figure;
 %    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
 %    plot(starsun.w,tau_ODslant(end-500,:)-o3amount(end-500,:),'--r');xlabel('wavelength');ylabel('OD');
@@ -224,37 +216,25 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    wln = wln_vis7;
    NO2conc = []; NO2resi=[];
    
-%    % perform pca (full spectrum)
-%    [s.pcadata s.pcavisdata s.pcanirdata s.pcvis s.pcnir s.eigvis s.eignir s.pcanote] =starPCAshort(s);
-%    
-%    % reconstruct spectra for no2 retrieval
-%    rate_pca      = s.pcadata(:,1:1044)./repmat(s.f(1),pp,length(wvis));
-%    tau_pca       = -log(rate_pca./repmat(s.c0(1:length(wvis)),pp,1));
-%    tau_pca_mRay  = tau_pca - s.tau_ray(:,1:length(wvis)).*repmat(s.m_ray,1,length(wvis));
-%    tau4no2       = tau_pca_mRay./repmat(s.m_aero,1,length(wvis));
-%    
+   % perform pca (full spectrum)
+   [s.pcadata s.pcavisdata s.pcanirdata s.pcvis s.pcnir s.eigvis s.eignir s.pcanote] =starPCAshort(s);
+   
+   % reconstruct spectra for no2 retrieval
+   rate_pca      = s.pcadata(:,1:1044)./repmat(s.f(1),pp,length(wvis));
+   tau_pca       = -log(rate_pca./repmat(s.c0(1:length(wvis)),pp,1));
+   tau_pca_mRay  = tau_pca - s.tau_ray(:,1:length(wvis)).*repmat(s.m_ray,1,length(wvis));
+   tau4no2       = tau_pca_mRay./repmat(s.m_aero,1,length(wvis));
+   
    % compare pca/no-pca
 %    figure;
 %    plot(wvis,tau_OD (10000,1:1044),'-b'); hold on;
 %    plot(wvis,tau4no2(10000,1:1044),'--r');hold on;
 %    legend('tau','taupca');
    
-
-   % perform pca on no2 wln range
-   wln4pca = find(wvis<=wvis(nm_0900)&wvis>=wvis(nm_0300)); 
-   % find no2 range within wln4pca
-   nm_0400pca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
-   nm_0500pca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.490,  'nearest');
-   
-   [s] =starPCA(s,wln4pca,0);
-   
    % perform fit on pca spectra
-    pcastr = strcat('pca_',num2str(round(1000*s.w(wln4pca(1)))),'_',num2str(round(1000*s.w(wln4pca(end)))));
-%    
-%    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcadata);
-%    no2dat = [NO2conc NO2resi];
-%    save('no2dat_pca_430_490OD.dat','-ASCII','no2dat');
-%    tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+   [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau4no2);
+   no2dat = [NO2conc NO2resi];
+   save('no2dat_pca_all.dat','-ASCII','no2dat');
    % perform fit on original spectra
    %[NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau_OD);
    
@@ -265,8 +245,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    ccoefno2pca=[];
    RRno2pca=[];
    for k=1:pp;
-        %coefno2pca=basisno2\tau_pca_mRay(k,(wln))';
-        coefno2pca=basisno2\s.(pcastr).pcadata(k,nm_0400pca:nm_0500pca)';
+        coefno2pca=basisno2\tau_pca_mRay(k,(wln))';
         reconno2pca=basisno2*coefno2pca;
         RRno2pca=[RRno2pca reconno2pca];
         ccoefno2pca=[ccoefno2pca coefno2pca];
@@ -281,9 +260,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    no2vcdpca_smooth = real(no2VCDsmoothpca);
    
    % calculate error
-   % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
-   no2Err   = (s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);      % in atm cm
-   MSEno2DU = real((1000*(1/length(wln))*sum(no2Err.^2))');                                               % convert from atm cm to DU
+   no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
+   MSEno2DU = real((1000*(1/length(wln))*sum(no2Err.^2))');                           % convert from atm cm to DU
    RMSEno2  = real(sqrt(real(MSEno2DU)));
    
    figure;subplot(211);plot(tplot,no2VCDpca,'.r');hold on;
@@ -296,36 +274,33 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
           xlabel('time');ylabel('no2 RMSE [DU]');
           
    % prepare to plot spectrum OD and no2 cross section
-   %no2spectrum_pca     = tau_pca_mRay(:,(wln))-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
-   no2spectrum_pca     = s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
+   no2spectrum_pca     = tau_pca_mRay(:,(wln))-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
    no2fit_pca          = ccoefno2pca(1,:)'*basisno2(:,1)';
-   %no2residual_pca     = tau_pca_mRay(:,(wln))-RRno2pca';
-   no2residual_pca     = s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)-RRno2pca';
+   no2residual_pca     = tau_pca_mRay(:,(wln))-RRno2pca';
    
-%    % 8. plot fitted and "measured" no2 spectrum
-%      for i=1:10:length(s.t)
-%          figure(888);
-%          plot(wvis((wln)),no2spectrum_pca(i,:),'-k','linewidth',2);hold on;
-%          plot(wvis((wln)),no2fit_pca(i,:),'-r','linewidth',2);hold on;
-%          plot(wvis((wln)),no2residual_pca(i,:),':k','linewidth',2);hold off;
-%          xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcdpca_smooth(i)),' RMSE = ',num2str(RMSEno2(i))),...
-%                 'fontsize',14,'fontweight','bold');
-%          ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted NO_{2} spectrum','residual');
-%          set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
-%          pause(0.001);
-%      end
+   % 8. plot fitted and "measured" no2 spectrum
+     for i=1:10:length(s.t)
+         figure(888);
+         plot(wvis((wln)),no2spectrum_pca(i,:),'-k','linewidth',2);hold on;
+         plot(wvis((wln)),no2fit_pca(i,:),'-r','linewidth',2);hold on;
+         plot(wvis((wln)),no2residual_pca(i,:),':k','linewidth',2);hold off;
+         xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcdpca(i)),' RMSE = ',num2str(RMSEno2(i))),...
+                'fontsize',14,'fontweight','bold');
+         ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted NO_{2} spectrum','residual');
+         set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
+         pause(0.001);
+     end
 
    % no2OD is the spectrum portion to subtract
-   gas.no2  = no2vcdpca_smooth;%NO2conc;%in [DU]
-   gas.no2resi= RMSEno2;%sqrt(NO2resi);
-   %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
-   %no2amount = (NO2conc)*no2coef';
-   no2amount = (no2vcdpca_smooth/1000)*no2coef';
+   gas.no2  = NO2conc;%in [DU]
+   gas.no2resi= sqrt(NO2resi);
+   gas.no2OD  = no2OD;% this is to be subtracted from total OD;
+   no2amount = (NO2conc)*no2coef';
    %no2amount = (1.86e-4)*repmat(no2coef',pp,1);  % constant value
-   tau_OD_fitsubtract5 = tau_OD_fitsubtract4 - real(no2amount);
+   tau_OD_fitsubtract5 = tau_OD_fitsubtract4 - no2amount;
    tau_sub = tau_OD_fitsubtract5;%tau_OD_fitsubtract4;
    %tau_sub(:,1:nm_0490) = starsun.tau_a_avg(:,1:nm_0490);
-   %tau_sub(:,1:nm_0470) = s.tau_aero(:,1:nm_0470);
+   tau_sub(:,1:nm_0470) = s.tau_aero(:,1:nm_0470);
 %    figure;
 %    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
 %    plot(starsun.w,tau_ODslant(end-500,:)-no2amount(end-500,:),'--y');xlabel('wavelength');ylabel('OD');
@@ -338,17 +313,14 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 % comment out to increase speed
 % for k=1:500:length(starsun.t)
 %    figure(1111);
-%    plot(s.w,tau_OD(k,:),'-b','linewidth',2);hold on;
-%    plot(s.w,tau_ODslant_fitsubtract1(k,:),'--r','linewidth',2);hold on;%wv
-%    plot(s.w,tau_ODslant_fitsubtract2(k,:),'--g','linewidth',2);hold on;%co2+ch4
-%    plot(s.w,tau_ODslant_fitsubtract3(k,:),'--c','linewidth',2);hold on;%o2
-%    plot(s.w,real(tau_OD_fitsubtract4(k,:)),'--y','linewidth',2);hold on;%o3+o4+h2o
-%    plot(s.w,real(tau_OD_fitsubtract5(k,:)),'--m','linewidth',2);hold
-%    on;%no2
-%    plot(s.w,tau_sub(k,:),'--m','linewidth',2);hold on;%no2
+%    plot(starsun.w,tau_ODslant(k,:),'-b','linewidth',2);hold on;
+%    plot(starsun.w,tau_ODslant_fitsubtract1(k,:),'--r','linewidth',2);hold on;%wv
+%    plot(starsun.w,tau_ODslant_fitsubtract2(k,:),'--g','linewidth',2);hold on;%co2+ch4
+%    plot(starsun.w,tau_ODslant_fitsubtract3(k,:),'--c','linewidth',2);hold on;%o2
+%    plot(starsun.w,tau_ODslant_fitsubtract4(k,:),'--y','linewidth',2);hold on;%o3+o4+h2o
+%    plot(starsun.w,tau_sub(k,:),'--m','linewidth',2);hold on;%no2
 %    plot([wvis wnir],starsun.tau_a_avg(k,:),':k','linewidth',2);hold off;
 %    xlabel('wavelength');ylabel('OD');legend('total OD','wv (940 nm) subtraction','co2+ch4 subtraction','o2 subtraction','o3+o4+h2o subtraction','no2 subtraction','tau-aero');
-%    legend('total OD','o3 (+o4+h2o) subtraction','no2 subtraction');
 %    xlabel('wavelength','fontsize',12);ylabel('OD','fontsize',12);
 %                        title([datestr(starsun.t(k),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Altavg(k)) 'm']);
 %                        ymax = yopt + 0.2;
