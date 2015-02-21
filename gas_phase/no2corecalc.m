@@ -1,7 +1,7 @@
 function [NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc(starsun,no2coef,o4coef,o3coef,wln,tau_OD)
-% retrieve o3 and derive fitted spectrum for subtraction
+% retrieve no2 and derive fitted spectrum for subtraction
 %-------------------------------------------------------
-% MS: July, 26, 2014: NO2 fit (400-500 nm region)
+% MS: July, 26, 2014: NO2 fit (430-490 nm region)
 %-------------------------------------------------------
 ODfit = zeros(length(starsun.t),length(starsun.w));
 tau_no2_subtract = tau_OD;
@@ -14,7 +14,11 @@ no2_DU = [];
 for i = 1:length(starsun.t)
            
     x0 = [0.3 1 0.3 0.05 -0.1 0.5]; % this is initial guess (-2 for 6th element -0.1 for 7th element)
-    y = (tau_OD(i,wln));
+    if size(tau_OD,2)<1556
+        y = (tau_OD(i,:));
+    else
+        y = (tau_OD(i,wln));
+    end
     meas = [starsun.w(wln)' y'];
     PAR  = [no2coef(wln)/1000 o4coef(wln)*10000 o3coef(wln)];
        % Set Options
@@ -46,7 +50,7 @@ for i = 1:length(starsun.t)
              sc_residual = [sc_residual;real(fval)];
                 no2_conc_ = (real(U_(1)));%/starsun.m_O3_avg(i); % this is already DU
                 %no2_round = round(no2_conc_*100)/100;% this is slant in atmxcm
-                no2_DU_    = (no2_conc_);%/starsun.m_NO2(i); %no2_DU_round = round(no2_DU_);
+                no2_DU_    = (no2_conc_)/starsun.m_NO2(i); %no2_DU_round = round(no2_DU_);
                 no2_DU = [no2_DU;no2_DU_];
                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
                % plot fitted figure
@@ -58,27 +62,32 @@ for i = 1:length(starsun.t)
                    yno2subtract   =  -log(exp(-((no2coef(wln)/1000).*real(U_(1)))));
                    yo4subtract   =  -log(exp(-(o4coef(wln).*10000*real(U_(2)))));
                    yo3subtract  =  -log(exp(-(o3coef(wln).*real(U_(3)))));
-                   tau_no2_subtract(i,wln) = y'-yno2subtractall;
+                   
+                   if size(tau_OD,2)<1556
+                       tau_no2_subtract(i,:)   = y'-yno2subtractall;
+                   else
+                       tau_no2_subtract(i,wln) = y'-yno2subtractall;
+                   end
                
                % assign fitted spectrum to subtract
                 ODfit(i,wln) = yno2subtractall;
                 % save spectrum to subtract
                 %tau_aero_subtract(i,wln) = -log(exp(-(no2coef(wln).*real(U_(1)))).*exp(-(o4coef(wln).*real(U_(2)))).*exp(-(o3coef(wln).*real(U_(3)))));
                 if ~isNaN(U_(1))
-%                         figure(444);
-%                         plot(starsun.w(wln),y,'-b');hold on;
-%                         %plot(starsun.w(wln),-log(Tmodel),'--c');hold on;
-%                         plot(starsun.w(wln),yopt,'--r');hold on;
-%                         plot(starsun.w(wln),yno2subtract,'--g');hold on;
-%                         plot(starsun.w(wln),yo4subtract,'--c');hold on;
-%                         plot(starsun.w(wln),yo3subtract,'--m');hold on;
-%                         plot(starsun.w(wln),y'-yno2subtractall,':k');hold off;
-%                        xlabel('wavelength','fontsize',12);ylabel('total OD','fontsize',12);
-%                        legend('measured','calculated (fit)','no2 spectrum to subtract','o4 spectrum to subtract','o3 spectrum to subtract','subtracted spectrum');
-%                        title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Altavg(i)) 'm' ' NO2= ' num2str(no2_DU_) '[DU]']);
-%                        ymax = yopt + 0.2;
-%                        axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 max(ymax)]);
-%                        pause(0.0001);
+%                          figure(444);
+%                          plot(starsun.w(wln),y,'-b');hold on;
+%                          %plot(starsun.w(wln),-log(Tmodel),'--c');hold on;
+%                          plot(starsun.w(wln),yopt,'--r');hold on;
+%                          plot(starsun.w(wln),yno2subtract,'--g');hold on;
+%                          plot(starsun.w(wln),yo4subtract,'--c');hold on;
+%                          plot(starsun.w(wln),yo3subtract,'--m');hold on;
+%                          plot(starsun.w(wln),y'-yno2subtractall,':k');hold off;
+%                         xlabel('wavelength','fontsize',12);ylabel('total OD','fontsize',12);
+%                         legend('measured','calculated (fit)','no2 spectrum to subtract','o4 spectrum to subtract','o3 spectrum to subtract','subtracted spectrum');
+%                         title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Alt(i)) 'm' ' NO2= ' num2str(no2_DU_) '[DU]']);
+%                         ymax = yopt + 0.2;
+%                         axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 max(ymax)]);
+%                         pause(0.0001);
                 end
                 % subtract fitted spectrum from slant
                 % tau_aero_subtract(i,wln) = tau_ODslant(i,wln) - ODfit(i,wln);
@@ -89,7 +98,12 @@ for i = 1:length(starsun.t)
                sc = [sc; U_];
                sc_residual = [sc_residual;NaN];
                no2_DU = [no2_DU;NaN];
-               tau_aero_subtract(i,wln) = NaN(1,length(wln));
+               
+               if size(tau_OD,2)<1556
+                    tau_aero_subtract(i,:) = NaN(1,length(wln));
+               else
+                    tau_aero_subtract(i,wln) = NaN(1,length(wln));
+               end
        end
        
 end
