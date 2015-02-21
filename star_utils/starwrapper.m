@@ -81,7 +81,7 @@ toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;
-toggle.gassubtract = false;
+toggle.gassubtract = true;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = true; % for running any Yohei style flagging
@@ -670,8 +670,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
     s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray));
-    s.tau_tot_slant    = real(-log(s.rateaero./repmat(s.c0,pp,1)));
-    s.tau_tot_vertical = real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+    s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
+    s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
     
     
     % apply screening here
@@ -788,7 +788,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %************************************************************
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
-        if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
+        %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         [s.flags]=starflag(daystr,toggle.flagging,s);
     end;
     %************************************************************
