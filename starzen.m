@@ -3,7 +3,7 @@ version_set('1.1');
 
 toggle.verbose = true;
 toggle.subsetting_Tint = true;
-toggle.pca_filter = true;
+toggle.pca_filter = false;
 toggle.applytempcorr = false;
 toggle.doflagging = false;
 
