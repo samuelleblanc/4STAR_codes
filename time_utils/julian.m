@@ -1,4 +1,4 @@
-function JD=Julian(day,month,year,UT);
+function JD=julian(day,month,year,UT)
 % This function calculates the Julian Date JD. Only valid after
 %  15th Oct. 1582 (Duffet chap. 4). 
 % Inputs (day, month,year,UT) maybe vectors.
@@ -11,7 +11,7 @@ function JD=Julian(day,month,year,UT);
   B = 2 - A + fix(A/4);
   C = fix(365.25*year);
   D = fix(30.6001*(month+1));
- JD= B + C + D + day + 1720994.5  + UT/24;
+  JD= B + C + D + day + 1720994.5  + UT/24;
 
 
 

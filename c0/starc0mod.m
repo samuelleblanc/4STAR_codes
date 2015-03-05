@@ -176,8 +176,10 @@ if ~exist('visc0')
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
             if newmatlab;
-                a=load(fullfile(starpaths,visfilename));
-                visc0mod(i,:)=a(:,3);
+%                 a=load(fullfile(starpaths,visfilename));
+%                 visc0mod(i,:)=a(:,3);% test
+                a=importdata(fullfile(starpaths,visfilename));
+                visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             else;
                 a=importdata(fullfile(starpaths,visfilename));
                 visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
@@ -207,8 +209,10 @@ if ~exist('visc0')
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
             if newmatlab;
-                a=load(fullfile(starpaths,nirfilename));
-                nirc0mod(i,:)=a(:,3);
+%                 a=load(fullfile(starpaths,nirfilename));
+%                 nirc0mod(i,:)=a(:,3);
+                a=importdata(fullfile(starpaths,nirfilename));
+                nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             else;
                 a=importdata(fullfile(starpaths,nirfilename));
                 nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
