@@ -12,7 +12,7 @@
 % OUTPUT:
 %  - plots of nonlinear analysis
 %  - plots of response function fo every lamp number and settings
-%  - response function in ascii format
+%  - response function in ascii format of selected times
 %
 % DEPENDENCIES:
 %  - startup_plotting.m
@@ -31,6 +31,9 @@
 % Written (v1.0): Samuel LeBlanc, NASA Ames, date unknown, 2014
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                  - modidifed startup to startup_plotting
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2015-03-16
+%                  - changed the specific response funciton to write out
+%                  - added some comments
 %
 % -------------------------------------------------------------------------
 
@@ -85,6 +88,7 @@ rad_vis=[cal.Lamps_12.vis.rad;...
                 cal.Lamps_2.vis.rad;...
                 cal.Lamps_1.vis.rad];
 
+%% plotting out the results
 figure(1);
 %colormap jet(1044);
 k=semilogx(rad_vis(:,1),vis_resp_lamps(:,1),'-');
@@ -133,7 +137,7 @@ ylabel(h,'Wavelength [nm]');
 ff=[pname '\' date '_resp_per_lamp_nir'];
 save_fig(2,ff,true);
 
-
+%% building the response files
 disp('Now prepare for building the response function')
 
 % for 6-lamp cal (to compare with previous cals
@@ -149,12 +153,19 @@ disp(nir.fname)
 
 % Select the proper variables for amount of lamps
 if date == '20141024';
-    ll = 3; % select the lamps-3
-    iint_vis = 7; % 32 ms int time
-    iint_nir = 7; % 400 ms int time
-    lampstr = 'Lamps_3';
-    fnum = '011';
+    ll = 9; % select the lamps-9
+    iint_vis = 4; % 12 ms int time
+    iint_nir = 4; % 150 ms int time
+    lampstr = 'Lamps_9';
+    fnum = '009';
     st = '013';
+elseif date == '20140716';
+    ll = 9; % select the lamps-9
+    iint_vis = 4; % 12 ms int time
+    iint_nir = 4; % 150 ms int time
+    lampstr = 'Lamps_9';
+    fnum = '004';
+    st = '008';
 else
     ll=1; %select the lamps-9
     iint_vis=3;
