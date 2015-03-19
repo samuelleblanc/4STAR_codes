@@ -1045,5 +1045,5 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     end;
 end % done with plotting sun results
 
-s.toggle = toggle
+s.toggle = toggle;
 return

@@ -150,8 +150,9 @@ if any(any(isnan(dark)));
           if any(~darkrate(:,iw)); continue, end; % make sure that the darkrate is not just zeros
           % double check for non-unique values
           [darkrate_unique,iunique,inonunique] = unique(darkrate(:,iw));
+          [t_withdark_unique, i_withdark_unique] = unique(s.t(inotemptydark(iunique)));
           % interpolate the dark rate to all the available times
-          darkrate_filled(:,iw)=interp1(s.t(inotemptydark(iunique)),darkrate_unique,s.t,'linear','extrap');
+          darkrate_filled(:,iw)=interp1(t_withdark_unique,darkrate_unique(i_withdark_unique),s.t,'linear','extrap');
           % repopulate the empty darks with the new interpolated/extrapolated dark_rate*Tint
           dark(~inotemptydark,iw)=darkrate_filled(~inotemptydark,iw).*s.Tint(~inotemptydark);
         end;
