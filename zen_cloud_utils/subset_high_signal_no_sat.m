@@ -35,12 +35,13 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, February 13th, 2015
-% Modified:
+% Modified (v1.1): by Samuel LeBlanc, NASA Ames, March 19th, 2015
+%                  - fixed bug below
 %
 % -------------------------------------------------------------------------
 
 function s = subset_high_signal_no_sat(s)
-version_set('v1.0')
+version_set('v1.1')
 
 if s.toggle.verbose; disp('Subsetting the zenith radiances samples for the highest non-saturated signal'), end;
 
@@ -58,8 +59,8 @@ for i=1:length(iset);
     s.sat_set_vis(i) = any(s.sat_vis(u));
     s.sat_set_nir(i) = any(s.sat_nir(u));
     if all(s.sat_vis(u)) || all(s.sat_vis(u));
-        s.rads(i,:) = s.rad(u(0),:)*NaN;
-        s.t_rad(i) = s.t(u(0));
+        s.rads(i,:) = s.rad(u(1),:)*NaN;
+        s.t_rad(i) = s.t(u(1));
         continue;
     end;
     [s.visTint_rad(i), iv] = max(s.visTint(u(~s.sat_vis(u))));
