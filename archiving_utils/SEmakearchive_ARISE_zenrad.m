@@ -125,9 +125,9 @@ form.Latitude = '%3.7f';
 form.Longitude = '%4.7f';
 
 %% prepare list of details for each flight
-dslist={'20140830' '20140901' '20140902' '20140904' '20140905' '20140906' '20140907' '20140909' '20140910' '2010911' '20140913' '20140915' '20140916' '20140917' '20140918' '20140919' '20140921' '20140924' '20141002' '20141004' } ; %put one day string
+dslist={'20140830' '20140901' '20140902' '20140904' '20140905' '20140906' '20140907' '20140909' '20140910' '20140911' '20140913' '20140915' '20140916' '20140917' '20140918' '20140919' '20140921' '20140924' '20141002' '20141004' } ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          1          1          1          1          1          1          1          1          0         1          1          1          1          0          0          1          1          1          0  ] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          1          0          0          0          0          1          1          0          0          0          1  ] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -193,12 +193,15 @@ for i=idx_file_proc
         ii = nn-iradstart+1;
         % filter for bad data but keep nans
         iflt = find(rads(:,save_iwvls(ii)) > 0 | isnan(rads(:,save_iwvls(ii))));
-        data.(names{nn}) = interp1(tutc_rad(iflt),rads(iflt,save_iwvls(ii)),UTC);
+        % make sure to only have unique values
+        [tutc_unique,itutc_unique] = unique(tutc_rad(iflt));
+        data.(names{nn}) = interp1(tutc_unique,rads(iflt(itutc_unique),save_iwvls(ii)),UTC);
     end;
     %special case for maximum radiances
     mrad = max(rads(:,goodwvls),[],2);
     iflt = find(mrad > 0 | isnan(mrad));
-    data.RADMAX = interp1(tutc_rad(iflt),mrad(iflt),UTC);
+    [tutc_unique,itutc_unique] = unique(tutc_rad(iflt));
+    data.RADMAX = interp1(tutc_unique,mrad(iflt(itutc_unique)),UTC);
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.RADMAX));
@@ -206,6 +209,9 @@ for i=idx_file_proc
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;
     data.Longitude(inans) = NaN;
+    for i=iradstart:length(names)
+        data.(names{i})(inans) = NaN;
+    end
     
     %% Now print the data to ICT file
     disp('Printing to file')
