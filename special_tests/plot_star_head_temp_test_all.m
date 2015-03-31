@@ -21,6 +21,7 @@
 %  - t2utch.m
 %  - starwavelength.m
 %  - smoothn.m : for time series smoothing
+%  - linfitxy.m : for linear fitting with uncertainties
 %
 % NEEDED FILES:
 %  - star.mat file compiled from raw data using allstarmat of each temp
@@ -31,11 +32,11 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, March 30th, 2015
-% Modified: 
+% Modified:
 %
 % -------------------------------------------------------------------------
-%function plot_star_fiber_temp_test_all
-%version_set('v1.0')
+function plot_star_fiber_temp_test_all
+version_set('v1.0')
 clear;
 toggle.docontour = false;
 dir = 'C:\Users\sleblan2\Research\4STAR\roof\';
@@ -209,40 +210,43 @@ tests(15).use_t4 = false;
 
 %% run through each test and plot it
 for i=1:length(tests);
-    % load the file
+    disp(['On test #' num2str(i) '/' num2str(length(tests))])
+    %% load the file
+    disp(['Loading file: ' tests(i).filepath])
     load(tests(i).filepath)
     %convert time to utc
     vis_park.utc = t2utch(vis_park.t);
     nir_park.utc = t2utch(nir_park.t);
     
-    % substract darks
+    %% substract darks
+    disp('Get counts')
+    if tests(i).norm2diode
+        diode_cts = abs(vis_park.Lat);
+        diode_per_heat = diode_cts(tests(i).iheat)./diode_cts(tests(i).iheat(1));
+        diode_per_cool = diode_cts(tests(i).icool)./diode_cts(tests(i).icool(1));
+    else
+        diode_per_heat = repmat(1.0,[length(tests(i).iheat),1]);
+        diode_per_cool = repmat(1.0,[length(tests(i).icool),1]);
+    end
+    
     vis_cts_cool = vis_park.raw(tests(i).icool,:)*0.0; vis_cts_heat = vis_park.raw(tests(i).iheat,:)*0.0;
     nir_cts_cool = nir_park.raw(tests(i).icool,:)*0.0; nir_cts_heat = nir_park.raw(tests(i).iheat,:)*0.0;
     vis_per_cool = vis_cts_cool; vis_per_heat = vis_cts_heat; nir_per_cool = nir_cts_cool; nir_per_heat = nir_cts_heat;
     for j=1:length(tests(i).icool);
         vis_cts_cool(j,:) = vis_park.raw(tests(i).icool(j),:)-vis_park.raw(tests(i).idark,:);
         nir_cts_cool(j,:) = nir_park.raw(tests(i).icool(j),:)-nir_park.raw(tests(i).idark,:);
-        vis_per_cool(j,:) = vis_cts_cool(j,:)./vis_cts_cool(1,:)*100.0;
-        nir_per_cool(j,:) = nir_cts_cool(j,:)./nir_cts_cool(1,:)*100.0;
+        vis_per_cool(j,:) = vis_cts_cool(j,:)./vis_cts_cool(1,:)*100.0./diode_per_cool(j);
+        nir_per_cool(j,:) = nir_cts_cool(j,:)./nir_cts_cool(1,:)*100.0./diode_per_cool(j);
     end;
     for j=1:length(tests(i).iheat);
-        vis_cts_heat(j,:) = (vis_park.raw(tests(i).iheat(j),:)-vis_park.raw(tests(i).idark,:))/vis_park.Alt(tests(i).iheat(j))*-1.0;
-        nir_cts_heat(j,:) = (nir_park.raw(tests(i).iheat(j),:)-nir_park.raw(tests(i).idark,:))/nir_park.Alt(tests(i).iheat(j))*-1.0;
-        vis_per_heat(j,:) = vis_cts_heat(j,:)./vis_cts_heat(1,:)*100.0;
-        nir_per_heat(j,:) = nir_cts_heat(j,:)./nir_cts_heat(1,:)*100.0;
+        vis_cts_heat(j,:) = (vis_park.raw(tests(i).iheat(j),:)-vis_park.raw(tests(i).idark,:));
+        nir_cts_heat(j,:) = (nir_park.raw(tests(i).iheat(j),:)-nir_park.raw(tests(i).idark,:));
+        vis_per_heat(j,:) = vis_cts_heat(j,:)./vis_cts_heat(1,:)*100.0./diode_per_heat(j);
+        nir_per_heat(j,:) = nir_cts_heat(j,:)./nir_cts_heat(1,:)*100.0./diode_per_heat(j);
     end;
     
-    if tests(i).norm2diode
-        diode_cts = abs(vis_park.Lat);
-        diode_per_heat = diode_cts(tests(i).iheat)./diode_cts(tests(i).iheat(1));
-        diode_per_cool = diode_cts(tests(i).icool)./diode_cts(tests(i).icool(1));
-        vis_per_heat = vis_per_heat./diode_per_heat;
-        nir_per_heat = nir_per_heat./diode_per_heat;
-        vis_per_cool = vis_per_cool./diode_per_cool;
-        nir_per_cool = nir_per_cool./diode_per_cool;
-    end
-    
     %% Get temperatures
+    disp('temps')
     if tests(i).use_t4
         vis_temp_heat = vis_park.RH(tests(i).iheat);
         vis_temp_cool = vis_park.RH(tests(i).icool);
@@ -255,113 +259,148 @@ for i=1:length(tests);
         nir_temp_cool = nir_park.Tst(tests(i).icool);
     end
     
-    %% Smooth the data
-    for v = 1:length(wv)
-        vis_per_heat(:,v) = smoothn(vis_per_heat(:,v));
-        vis_per_cool(:,v) = smoothn(vis_per_cool(:,v));
-    end
-    for w = 1:length(wn)
-        nir_per_heat(:,w) = smoothn(nir_per_heat(:,w));
-        nir_per_cool(:,w) = smoothn(nir_per_cool(:,w));
-    end
-    
+    %% Smooth and bin the data
+    disp('smooth and bin')
     vis_temp_heat = smoothn(vis_temp_heat);
     vis_temp_cool = smoothn(vis_temp_cool);
     nir_temp_heat = smoothn(nir_temp_heat);
     nir_temp_cool = smoothn(nir_temp_cool);
     
-    %% Bin to remove sampling issues
+    [tnum_heat,tcenter_heat] = hist(vis_temp_heat,50);
+    [tnum_cool,tcenter_cool] = hist(vis_temp_cool,50);
     
+    vis_per_heat_binned = repmat(NaN,[length(tcenter_heat),length(wv)]);
+    vis_per_cool_binned = repmat(NaN,[length(tcenter_cool),length(wv)]);
+    nir_per_heat_binned = repmat(NaN,[length(tcenter_heat),length(wn)]);
+    nir_per_cool_binned = repmat(NaN,[length(tcenter_cool),length(wn)]);
     
+    binnum_vis_heat = vis_per_heat_binned*NaN; binnum_vis_cool = vis_per_heat_binned*NaN; binstd_vis_heat = vis_per_heat_binned*NaN; binstd_vis_cool = vis_per_heat_binned*NaN;
+    binnum_nir_heat = nir_per_heat_binned*NaN; binnum_nir_cool = nir_per_heat_binned*NaN; binstd_nir_heat = nir_per_heat_binned*NaN; binstd_nir_cool = nir_per_heat_binned*NaN;
     
+    fit_vis_heat = repmat(NaN,[2,length(wv)]); fiter_vis_heat = fit_vis_heat;
+    fit_vis_cool = repmat(NaN,[2,length(wv)]); fiter_vis_cool = fit_vis_cool;
+    fit_nir_heat = repmat(NaN,[2,length(wn)]); fiter_nir_heat = fit_nir_heat;
+    fit_nir_cool = repmat(NaN,[2,length(wn)]); fiter_nir_cool = fit_nir_cool;
     
+    for v = 1:length(wv)
+        vis_per_heat(:,v) = smoothn(vis_per_heat(:,v));
+        vis_per_cool(:,v) = smoothn(vis_per_cool(:,v));
+        [vis_per_heat_binned(:,v),binnum_vis_heat(:,v),binstd_vis_heat(:,v)] = bindata(vis_temp_heat,vis_per_heat(:,v),tcenter_heat);
+        [vis_per_cool_binned(:,v),binnum_vis_cool(:,v),binstd_vis_cool(:,v)] = bindata(vis_temp_cool,vis_per_cool(:,v),tcenter_cool);
+        [fit_vis_heat(:,v),fiter_vis_heat(:,v)] = linfitxy(tcenter_heat,vis_per_heat_binned(:,v),tcenter_heat*0.05,binstd_vis_heat(:,v),'Plotting',false,'Verbosity',0);
+        [fit_vis_cool(:,v),fiter_vis_cool(:,v)] = linfitxy(tcenter_cool,vis_per_cool_binned(:,v),tcenter_cool*0.05,binstd_vis_cool(:,v),'Plotting',false,'Verbosity',0);
+    end
+    for w = 1:length(wn)
+        nir_per_heat(:,w) = smoothn(nir_per_heat(:,w));
+        nir_per_cool(:,w) = smoothn(nir_per_cool(:,w));
+        [nir_per_heat_binned(:,w),binnum_nir_heat(:,w),binstd_nir_heat(:,w)] = bindata(nir_temp_heat,nir_per_heat(:,w),tcenter_heat);
+        [nir_per_cool_binned(:,w),binnum_nir_cool(:,w),binstd_nir_cool(:,w)] = bindata(nir_temp_cool,nir_per_cool(:,w),tcenter_cool);
+        [fit_nir_heat(:,w),fiter_nir_heat(:,w)] = linfitxy(tcenter_heat,nir_per_heat_binned(:,w),tcenter_heat*0.05,binstd_nir_heat(:,w),'Plotting',false,'Verbosity',0);
+        [fit_nir_cool(:,w),fiter_nir_cool(:,w)] = linfitxy(tcenter_cool,nir_per_cool_binned(:,w),tcenter_cool*0.05,binstd_nir_cool(:,w),'Plotting',false,'Verbosity',0);
+    end
     
-    figure(i);
-    subplot(2,1,1);
-    plot(vis_park.Tst(tests(i).icool),vis_per_cool(:,i500),'b.');
-    pcool = polyfit(vis_park.Tst(tests(i).icool),vis_per_cool(:,i500),1);
-    hold on;
-    plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),'r+');
-    pheat = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),1);
-    grid();
-    title('Vis at 500 nm');
-    xlabel('Temperature [°C]');
-    ylabel('Percent of counts  normalized to photodiode [%]');
-    ylim(tests(i).ylim);
-    lsline();
-    text(5.0,99.0,['slope=' num2str(pcool(1))],'color','blue');
-    text(25.0,99.0,['slope=' num2str(pheat(1))],'color','red');
-    suptitle(tests(i).label);
+    tests(i).heat.vt = vis_temp_heat;
+    tests(i).cool.vt = vis_temp_cool;
+    tests(i).heat.nt = nir_temp_heat;
+    tests(i).cool.nt = nir_temp_cool;
+    tests(i).heat.vp = vis_per_heat;
+    tests(i).cool.vp = vis_per_cool;
+    tests(i).heat.np = nir_per_heat;
+    tests(i).cool.np = nir_per_cool;
+    tests(i).heat.tc = tcenter_heat;
+    tests(i).cool.tc = tcenter_cool;
+    tests(i).heat.vpb = vis_per_heat_binned;
+    tests(i).cool.vpb = vis_per_cool_binned;
+    tests(i).heat.npb = nir_per_heat_binned;
+    tests(i).cool.npb = nir_per_cool_binned;
+    tests(i).heat.vfit = fit_vis_heat;
+    tests(i).cool.vfit = fit_vis_cool;
+    tests(i).heat.nfit = fit_nir_heat;
+    tests(i).cool.nfit = fit_nir_cool;
+    tests(i).heat.vfite = fiter_vis_heat;
+    tests(i).cool.vfite = fiter_vis_cool;
+    tests(i).heat.nfite = fiter_nir_heat;
+    tests(i).cool.nfite = fiter_nir_cool;
     
-    subplot(2,1,2);
-    plot(nir_park.Tst(tests(i).icool),nir_per_cool(:,i1200),'b.');
-    pcooln = polyfit(nir_park.Tst(tests(i).icool),nir_per_cool(:,i1200),1);
-    hold on;
-    plot(nir_park.Tst(tests(i).iheat),nir_per_heat(:,i1200),'r+');
-    pheatn = polyfit(nir_park.Tst(tests(i).iheat),nir_per_heat(:,i1200),1);
-    grid();
-    title('Nir at 1200 nm');
-    xlabel('Temperature [°C]');
-    ylabel('Percent of counts normalized to photodiode [%]');
-    ylim(tests(i).ylim);
-    lsline();
-    text(5.0,99.5,['slope=' num2str(pcooln(1))],'color','blue');
-    text(25.0,99.5,['slope=' num2str(pheatn(1))],'color','red');
-    legend('Cooling','Heating')
-    
-    save_fig(i,[dir daystr 'tests_' num2str(i)],true);
-    
-    %%%% new figure of spectral plots %%%%
-    if toggle.docontour;
-        figure(i+10);
-        for v = 1:length(wv); vh(:,v)=smooth(vis_per_heat(:,v),5); end;
-        perlevels = linspace(95,105,21);
-        suptitle(tests(i).label);
-        
-        subplot(1,2,1);
-        contourf(wv,vis_park.Tst(tests(i).iheat),vh,perlevels,'edgecolor','none')
-        ylim([-10,20]);
-        ylabel('Temperature [°C]');
-        xlabel('Wavelength [\mum]');
-        title('Vis');
-        hh = colorbar;
-        ylabel(hh,'Percent change of counts [%]');
-        
-        subplot(1,2,2);
-        for v = 1:length(wn); nh(:,v)=smooth(nir_per_heat(:,v),5); end
-        contourf(wn,nir_park.RH(tests(i).iheat),nh,perlevels,'edgecolor','none')
-        ylim([-10,20]);
-        % ylabel('Temperature [°C]');
-        xlabel('Wavelength [\mum]');
-        title('NIR');
-        hh = colorbar;
-        ylabel(hh,'Percent change of counts [%]');
-        save_fig(i+10,[dir daystr 'tests_' num2str(i) '_carpet'],false);
-        clear vh; clear nh;
-    end;
-    
-    %%%% multispectral plots %%%%
-    figure(i+20);
-    plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),'b.');
-    hold on;
-    plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i650),'r.');
-    plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i750),'g.');
-    plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i850),'k.');
-    
-    pheat500 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),1);
-    pheat650 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i650),1);
-    pheat750 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i750),1);
-    pheat850 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i850),1);
-    
-    grid();
-    legend(['500 nm slope=' num2str(pheat500(1))],...
-    ['650 nm slope=' num2str(pheat650(1))],...
-    ['750 nm slope=' num2str(pheat750(1))],...
-    ['850 nm slope=' num2str(pheat850(1))]);
-    title('Vis');
-    xlabel('Temperature [°C]');
-    ylabel('Percent of counts normalized to photodiode [%]');
-    lsline();
-    save_fig(i+20,[dir daystr 'tests_' num2str(i) '_multispectral']);
-end;
+end %tests
+
+%% saving
+disp(['Saving results to: ' dir 'Temp_testing'])
+save([dir 'Temp_testing'],'tests','program_version','-mat');
+
+
+%% Now plot the test result
+disp('plotting...')
+figure(10);
+
+formstr = 'y = (%1.2f +/- %1.2f)X + (%1.2f +/- %1.2f)';
+
+plot(tests(1).heat.tc,tests(1).heat.vpb(:,i500),'s','DisplayName',tests(1).label);
+hold all;
+clr = jet(length(tests));
+for i=2:length(tests)
+    plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(i,:),'DisplayName',tests(i).label);
+    plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+        'Color',clr(i,:),...
+        'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+end
+legend(gca,'show')
+title('Signal variations at 500 nm')
+xlabel('Temperature [°C]')
+ylabel('Percent of counts [%]')
+save_fig(i,[dir 'combined_tests_500'],true);
+
+%     %%%% new figure of spectral plots %%%%
+%     if toggle.docontour;
+%         figure(i+10);
+%         for v = 1:length(wv); vh(:,v)=smooth(vis_per_heat(:,v),5); end;
+%         perlevels = linspace(95,105,21);
+%         suptitle(tests(i).label);
+%
+%         subplot(1,2,1);
+%         contourf(wv,vis_park.Tst(tests(i).iheat),vh,perlevels,'edgecolor','none')
+%         ylim([-10,20]);
+%         ylabel('Temperature [°C]');
+%         xlabel('Wavelength [\mum]');
+%         title('Vis');
+%         hh = colorbar;
+%         ylabel(hh,'Percent change of counts [%]');
+%
+%         subplot(1,2,2);
+%         for v = 1:length(wn); nh(:,v)=smooth(nir_per_heat(:,v),5); end
+%         contourf(wn,nir_park.RH(tests(i).iheat),nh,perlevels,'edgecolor','none')
+%         ylim([-10,20]);
+%         % ylabel('Temperature [°C]');
+%         xlabel('Wavelength [\mum]');
+%         title('NIR');
+%         hh = colorbar;
+%         ylabel(hh,'Percent change of counts [%]');
+%         save_fig(i+10,[dir daystr 'tests_' num2str(i) '_carpet'],false);
+%         clear vh; clear nh;
+%     end;
+%
+%     %%%% multispectral plots %%%%
+%     figure(i+20);
+%     plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),'b.');
+%     hold on;
+%     plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i650),'r.');
+%     plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i750),'g.');
+%     plot(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i850),'k.');
+%
+%     pheat500 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i500),1);
+%     pheat650 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i650),1);
+%     pheat750 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i750),1);
+%     pheat850 = polyfit(vis_park.Tst(tests(i).iheat),vis_per_heat(:,i850),1);
+%
+%     grid();
+%     legend(['500 nm slope=' num2str(pheat500(1))],...
+%     ['650 nm slope=' num2str(pheat650(1))],...
+%     ['750 nm slope=' num2str(pheat750(1))],...
+%     ['850 nm slope=' num2str(pheat850(1))]);
+%     title('Vis');
+%     xlabel('Temperature [°C]');
+%     ylabel('Percent of counts normalized to photodiode [%]');
+%     lsline();
+%     save_fig(i+20,[dir daystr 'tests_' num2str(i) '_multispectral']);
+%end;
 %end

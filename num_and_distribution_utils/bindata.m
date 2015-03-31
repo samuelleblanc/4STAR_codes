@@ -26,7 +26,8 @@ bins = xx + max(eps,eps*abs(xx));
 nn=nn(1:end-1);
 nn(nn==0)=NaN;
 
-idx=find(bin>0);
+%idx=find(bin>0);
+idx = find(bin>0 & bin<=length(gx));
 sum=full(sparse(bin(idx),idx*0+1,y(idx)));
 sum=[sum;zeros(length(gx)-length(sum),1)*nan];% add zeroes to the end
 b=sum./nn;
