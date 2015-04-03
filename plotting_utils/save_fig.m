@@ -59,6 +59,13 @@ if asktopause
   end;
 end
 saveas(pid,[fi '.fig']);
+set(pid,'PaperUnits','inches');
+po = get(pid,'Position');
+xwidth = po(3);
+ywidth = po(4);
+dpi = 150.0;
+set(pid,'PaperSize',[xwidth ywidth]./dpi);
+set(pid,'PaperPosition',[0 0 xwidth ywidth]./dpi);
 saveas(pid,[fi '.png']);
 disp(['saving figure at:' fi])
 return
