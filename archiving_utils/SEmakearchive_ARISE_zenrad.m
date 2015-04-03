@@ -32,17 +32,18 @@
 % Written (v1.0): Samuel LeBlanc, NASA Ames, March 18th, 2015
 %                 based on SEmakearchive_John_Nov2014_V06.m
 %                 based on ICARTTwriter_example.m
-% Modified:
+% Modified (v1.1): by Samuel LeBlanc, NASA Ames, April 2nd, 2015
+%                 - update to header comments
 %
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ARISE_zenrad
-version_set('v1.0')
+version_set('v1.1')
 %% set variables
 ICTdir = 'C:\Users\sleblan2\Research\ARISE\starzen_ict\';
 starinfo_path = 'C:\Users\sleblan2\Research\ARISE\starinfo\';
 starzen_path = 'C:\Users\sleblan2\Research\ARISE\starzen\';
-prefix='ARISE-4STAR-ZEN-RAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='ARISE_4STAR_ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'C130';
 
@@ -50,7 +51,7 @@ platform = 'C130';
 
 %% Prepare General header for each file
 HeaderInfo = {...
-    'Phil Russell';...                           % PI name
+    'Jens Redemann';...                           % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
     'ARISE';...                                  % Mission name
@@ -60,12 +61,12 @@ HeaderInfo = {...
     };
 
 NormalComments = {...
-    'PI_CONTACT_INFO: Philip.B.Russell@nasa.gov (650-604-5404)';...
+    'PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov';...
     'PLATFORM: NASA C-130';...
     'LOCATION: Arctic, Aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research - Used as a Zenith spectral radiance measurement at flight altitude';...
-    'DATA_INFO: measurements represent best measured radiance values over 1 second periods at Start_UTC.';...
+    'DATA_INFO: measurements represent radiance values optimized to avoid saturation at Start_UTC.';...
     'UNCERTAINTY: Nominal radiance uncertainty is wavelength-dependent and ranges from 3 %% to 5 %%. Specific uncertainty not included at this point';...
     'ULOD_FLAG: -7777';...
     'ULOD_VALUE: N/A';...
@@ -119,7 +120,7 @@ goodwvls = [30:950]; % array of wavelength indices that are not subject to high 
 %set the format of each field
 form = info;
 names = fieldnames(info);
-for ll=1:length(names); form.(names{ll}) = '%2.6f'; end;
+for ll=1:length(names); form.(names{ll}) = '%2.3f'; end;
 form.GPS_Alt = '%7.1f';
 form.Latitude = '%3.7f';
 form.Longitude = '%4.7f';
@@ -127,7 +128,7 @@ form.Longitude = '%4.7f';
 %% prepare list of details for each flight
 dslist={'20140830' '20140901' '20140902' '20140904' '20140905' '20140906' '20140907' '20140909' '20140910' '20140911' '20140913' '20140915' '20140916' '20140917' '20140918' '20140919' '20140921' '20140924' '20141002' '20141004' } ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          1          0          0          0          0          1          1          0          0          0          1  ] ; %set=1 to process
+jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1  ] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
