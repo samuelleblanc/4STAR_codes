@@ -11,6 +11,7 @@ corstr='';
 %dateprocstr='20140407';
 dateprocstr='20150113';
 %dateprocstr='20150114';
+%dateprocstr='20130708';
 stardir=['C:\Users\sleblan2\Research\4STAR\roof\' dateprocstr '\'];
 
 time_to_norm=19.2
@@ -41,8 +42,22 @@ vis_sun.raterelativeratiotoaats=rr;
 myColorOrder=[0 1 1; 0.6 0.8 1.0; 0 0 1; 0.6 1.0 0.6; 0 1 0; 0.5 0.6 0.0; 1 0 1; 1 0 0; 0.5 0.1 0.7; 0 0 0];
 
 %set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+%% load track from day
+disp(['loading star.mat file for ' dateprocstr]);
+fpp = [stardir dateprocstr 'star' corstr '.mat'];
+if ~exist(fpp)
+    [fns,pns] = uigetfile(starpaths,'star.mat',[dateprocstr 'star*.mat'])
+    fpp = [pns,fns];
+end
+load(fpp,'track');
 
 
+%% Save output
+fs = [stardir dateprocstr 'startoaats.mat'];
+disp(['Saving file to: ' fs])
+save(fs,'nir_sun','vis_sun','track','aats','program_version','-v7.3');
+
+stophere
 
 idxwvlvisp=[0 0 1 1 1 1 1 1 1 0 1 1 1];
 %UTlim=[22.5 23];%20.1];
@@ -96,8 +111,6 @@ set(hleg3,'fontsize',14);
 %linkaxes([ax1 ax2 ax3],'x')
 
 ax4=subplot(3,1,3);
-disp(['loading star.mat file for ' dateprocstr]);
-load([stardir dateprocstr 'star' corstr '.mat'],'track');
 hrs=timeMatlab_to_UTdechr(track.t);
 %temp=boxxfilt();
 bl=60/86400;

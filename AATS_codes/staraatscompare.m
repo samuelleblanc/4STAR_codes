@@ -6,18 +6,30 @@ corstr='';
 stardir=['C:\Users\Samuel\Research\4STAR\roof\' daystr '\'];
 stardir=['C:\Users\sleblan2\Research\4STAR\roof\' daystr ''];
 % load 4STAR
+fp = fullfile(stardir, [daystr 'starsun' corstr '.mat']);
+if ~exist(fp)
+   [fn,pn] = uigetfile(starpaths,[daystr 'starsun*.mat']);
+   fp = [pn,fn];
+end
+    
 try
-    s=load(fullfile(stardir, [daystr 'starsun' corstr '.mat']), 't', 'w', 'rate', 'tau_aero_noscreening','tau_aero', 'Lon','Lat','Alt','Tst','Pst','AZ_deg', 'El_deg', 'flag', 'filename', 'Str','raw');
+    s=load(fp, 't', 'w', 'rate', 'tau_aero_noscreening','tau_aero', 'Lon','Lat','Alt','Tst','Pst','AZ_deg', 'El_deg', 'flag', 'filename', 'Str','raw');
     t=s.t;
 catch;
-    load(fullfile(stardir, [daystr 'starsun' corstr '.mat']));
+    load(fp);
     t=vis_sun.t;
 end;
+
 
 % load AATS
 aatsdir='C:\Users\Samuel\Research\AATS\data\ames\';
 aatsdir='C:\Users\sleblan2\Research\AATS\data\ames\';
-load(fullfile(aatsdir, [daystr 'aats.mat'])); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
+fpa = fullfile(aatsdir, [daystr 'aats.mat']);
+if ~exist(fpa)
+    [fna,pna] = uigetfile(starpaths,[daystr 'aats.mat']);
+    fpa=[pna,fna];
+end
+load(fpa); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
 if ~exist('aats')
         aats.t=UT'/24+datenum(year,month,day);
 else
