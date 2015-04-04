@@ -39,7 +39,7 @@ startup_plotting;
 
 %% prepare variables
 ICTdir = 'C:\Users\sleblan2\Research\ARISE\starzen_ict\';
-prefix='ARISE-4STAR-ZEN-RAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='ARISE_4STAR_ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'C130';
 
@@ -143,6 +143,6 @@ for i=idx_file_proc
     exportToPPTX('addpicture',2,'Scale','maxfixed');
 end
 
-exportToPPTX('saveandclose',[ICTdir 'ARISE-4STAR-ZEN-RAD']);
+exportToPPTX('saveandclose',[ICTdir 'ARISE_4STAR_ZENRAD_' datestr(now,'yyyymmdd')]);
 
 end
