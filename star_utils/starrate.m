@@ -29,7 +29,9 @@ function [rate, dark, darkstd, note]=starrate(s, bounds)
 %                         VIS @ 574 nm > 1000, NIR @ 1283.7 nm > 2000
 % SL: v1.2, 2015/02/13: - added check in dark interpolation to skip if there is a
 %                         dark count for a specific wavelength that is zero to skip
-version_set('1.2');
+% SL: v1.3, 2015/03/04: - fixed bug of interpolating dark when there is
+%                         only one unique dark
+version_set('1.3');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -151,8 +153,13 @@ if any(any(isnan(dark)));
           % double check for non-unique values
           [darkrate_unique,iunique,inonunique] = unique(darkrate(:,iw));
           [t_withdark_unique, i_withdark_unique] = unique(s.t(inotemptydark(iunique)));
-          % interpolate the dark rate to all the available times
-          darkrate_filled(:,iw)=interp1(t_withdark_unique,darkrate_unique(i_withdark_unique),s.t,'linear','extrap');
+          % check if there is only one darkrate (SL 2015-04-03)
+          if length(t_withdark_unique)==1
+              darkrate_filled(:,iw) = repmat(darkrate_unique(i_withdark_unique),[length(s.t),1]);
+          else
+              % interpolate the dark rate to all the available times
+              darkrate_filled(:,iw)=interp1(t_withdark_unique,darkrate_unique(i_withdark_unique),s.t,'linear','extrap');
+          end
           % repopulate the empty darks with the new interpolated/extrapolated dark_rate*Tint
           dark(~inotemptydark,iw)=darkrate_filled(~inotemptydark,iw).*s.Tint(~inotemptydark);
         end;
