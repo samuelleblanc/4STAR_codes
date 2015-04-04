@@ -85,16 +85,18 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % with SEAC4RS fiber (not the long one going on ARISE)
         daystr = '20140624'; % date of cal
         filesuffix = 'from_20140624_016_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 9 13 0 0 0]);
+    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 10 25 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20140716';
-        filesuffix = 'from_20140716_004_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 9 13 0 0 0]);
+        filesuffix = 'from_20140716_003_VIS_park_with_20140606091700HISS';
+        %filesuffix = 'from_20140716_004_VIS_park_with_20140606091700HISS';
+    elseif t >= datenum([2014 10 25 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20141024';
-        filesuffix = 'from_20141024_009_VIS_park_with_20140606091700HISS';
+        filesuffix = 'from_20141024_005_VIS_park_with_20140606091700HISS';
+        %filesuffix = 'from_20141024_009_VIS_park_with_20140606091700HISS';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO

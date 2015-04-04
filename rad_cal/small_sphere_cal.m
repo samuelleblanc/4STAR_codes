@@ -35,7 +35,22 @@
 %  - radiance values of the small sphere
 %
 % EXAMPLE:
+% -- Run the code from command line, for one day, default directory
+% >> small_sphere_cal('20140926')
+%   applytempcorr set to 0
+%   verbose set to 0
 %
+%   infofile2 =
+%
+%   starinfo20140926
+%
+%   C:\Users\sleblan2\Research\4STAR\data\20141002_VIS_C0_refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc.dat
+%
+%   vv =
+%
+%   2014a
+% * output of plots *
+% --
 %
 % MODIFICATION HISTORY:
 % Written: Samuel LeBlanc, NASA Ames, August 1st, 2014
@@ -58,7 +73,9 @@
 %           dir.
 % Modified (v1.3): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %           - changed startup to startup_plotting
-%
+% Modified (v1.4): by Samuel LeBlanc, NASA Ames, 2015-04-03
+%           - Added example in comments
+%           - Changed units of plotting
 % -------------------------------------------------------------------------
 
 %% start of function
@@ -130,7 +147,7 @@ plot(nm,rad,'b-',...
      nm,rad-rad_std,'r.');
 title(['Small Sphere radiances from:' datestr]);
 xlabel('Wavelength [nm]');
-ylabel('Radiance [W m^{-2} \mum^{-1} sr^{-1}');
+ylabel('Radiance [W m^{-2} \mum^{-1} sr^{-1}]');
 legend('Radiance','+std','-std');
 fi=[dir datestr '_small_sphere_rad'];
 ylim([0 150]);

@@ -32,15 +32,18 @@
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                  - modidifed startup to startup_plotting
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2015-03-16
-%                  - changed the specific response funciton to write out
+%                  - changed the specific response function to write out
 %                  - added some comments
+% Modified (v1.3): by Samuel LeBlanc, NASA Ames, 2015-04-03
+%                  - Slight modifications for testing out responses with 12
+%                  pre and post ARISE (20140716 and 20141026)
 %
 % -------------------------------------------------------------------------
 
 %% Start of function
 function rad_cal=analysis_cal_rad
 startup_plotting
-version_set('1.1');
+version_set('1.3');
 
 %get response function calibration file
 [file pname fi]=uigetfile('*.mat','Find calibration files .mat');
@@ -49,7 +52,8 @@ version_set('1.1');
 %date='20131120'
 %date='20130506';
 date='20140624';
-%date='20140716';
+date='20140716';
+date='20141024';
 
 disp(['Loading the matlab file: ' pname file])
 disp(['for Date: ' date])
@@ -153,18 +157,18 @@ disp(nir.fname)
 
 % Select the proper variables for amount of lamps
 if date == '20141024';
-    ll = 9; % select the lamps-9
-    iint_vis = 4; % 12 ms int time
-    iint_nir = 4; % 150 ms int time
-    lampstr = 'Lamps_9';
-    fnum = '009';
+    ll = 12; % select the lamps-9
+    iint_vis = 3; % 8 ms int time
+    iint_nir = 3; % 100 ms int time
+    lampstr = 'Lamps_12';
+    fnum = '005';
     st = '013';
 elseif date == '20140716';
-    ll = 9; % select the lamps-9
-    iint_vis = 4; % 12 ms int time
-    iint_nir = 4; % 150 ms int time
-    lampstr = 'Lamps_9';
-    fnum = '004';
+    ll = 12; % select the lamps-9
+    iint_vis = 3; % 12 ms int time
+    iint_nir = 3; % 150 ms int time
+    lampstr = 'Lamps_12';
+    fnum = '003';
     st = '008';
 else
     ll=1; %select the lamps-9
