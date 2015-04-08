@@ -417,7 +417,7 @@ for i = 1:length(starsun.t)
            x0 = [5000 0.75 0.8 -2];
        end
         %if lampcalib==1
-            y = real((spectrum(i,:)));%this is total OD (divided by airmass)
+            y = real((spectrum(i,:)));%this is total OD
 %        else
 %             y = (spectrum(i,:));%waterOD(i,:);
 %        end
@@ -573,7 +573,7 @@ for i = 1:length(starsun.t)
 
     afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
-    cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';
+    cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
     end
     
 end % end of loop over all data points for wv retrieval

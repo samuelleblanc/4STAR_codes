@@ -67,8 +67,10 @@ function	s=starwrapper(s, s2, varargin)
 %                       combines this toggle structure to the defaults, with preference over the
 %                       input
 % MS: v1.7, 2015-02-19: added total optical depth fields for gas utils
+% MS: v1.8, 2015-04-07: added tau_O4nir field in preparation to use fitted
+%                       gases subtraction for archiving
 
-version_set('1.7');
+version_set('1.8');
 %********************
 %% prepare for processing
 %********************
@@ -669,7 +671,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     s.tau_aero=s.tau_aero_noscreening;
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray));
+    tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray))./tr(s.m_ray, tau_O4nir);
     s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
     s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
     
