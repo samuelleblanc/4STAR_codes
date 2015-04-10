@@ -49,6 +49,8 @@
 %                  - update to include post-ARISE cals
 % Modified (v1.3): Samuel LeBlanc, NASA Ames, 2015-03-16
 %                  - update to include recently modified ARISE cals
+% Modified (v1.3): Michal Segal, NASA Ames, 2015-04-10, modified cal dates
+%                  for SEAC4RS to correct a bug
 %
 % -------------------------------------------------------------------------
 
@@ -72,12 +74,12 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % response linked to 20130506_VIS_SKY_Resp_with_20130605124300HISS.dat
         daystr = '20130506';
         filesuffix = 'with_20130605124300HISS';    
-    elseif t>= datenum([2013 8 1 0 0 0]) && t < datenum([2013 9 20 0 0 0]);
+    elseif t>= datenum([2013 8 1 0 0 0]) && t < datenum([2013 9 24 0 0 0]);
         % updated by SL to use May 2013 radiance calibration from the
         % sphere with 9 lamps - For SEAC4RS data
         daystr = '20130507';
         filesuffix = 'from_20130507_008_VIS_park_with_20130605124300HISS';
-    elseif t>= datenum([2013 9 1 0 0 0]) && t < datenum([2014 5 20 0 0 0]);
+    elseif t>= datenum([2013 9 24 0 0 0]) && t < datenum([2014 5 20 0 0 0]);
         daystr = '20131121';
         filesuffix = 'from_20131121_010_VIS_park_with_20130605124300HISS';
     elseif t>= datenum([2014 5 21 0 0 0]) && t < datenum([2014 7 15 0 0 0]);
