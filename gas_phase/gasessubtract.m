@@ -43,6 +43,7 @@
 % 2015-02-19 MSR: replaced tau_OD with new starwrapper tau_tot fields
 %                 added version set for better tracking of changes
 %                 changed loadCrossSections into local function
+% 2015-04-15 MSR: added various no2 spectral regions for testing
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -90,7 +91,10 @@ wnir = s.w(1045:end);
  nm_0300 = interp1(wvis,[1:length(wvis)],0.330,  'nearest');
  nm_0900 = interp1(wvis,[1:length(wvis)],0.900,  'nearest');
  nm_0400 = interp1(wvis,[1:length(wvis)],0.430,  'nearest');
+ nm_0450 = interp1(wvis,[1:length(wvis)],0.450,  'nearest');
+ nm_0480 = interp1(wvis,[1:length(wvis)],0.480,  'nearest');
  nm_0500 = interp1(wvis,[1:length(wvis)],0.490,  'nearest');
+ nm_0515 = interp1(wvis,[1:length(wvis)],0.515,  'nearest');% this range has h2o in it...
  
  wln_vis1 = find(wvis<=wvis(nm_0990)&wvis>=wvis(nm_0880)); 
  wln_vis2 = find(wvis<=wvis(nm_0870)&wvis>=wvis(nm_0780)); 
@@ -99,6 +103,8 @@ wnir = s.w(1045:end);
  wln_vis5 = find(wvis<=wvis(nm_0768)&wvis>=wvis(nm_0757)); 
  wln_vis6 = find(wvis<=wvis(nm_0675)&wvis>=wvis(nm_0490)); 
  wln_vis7 = find(wvis<=wvis(nm_0500)&wvis>=wvis(nm_0400)); 
+ wln_vis8 = find(wvis<=wvis(nm_0450)&wvis>=wvis(nm_0400)); 
+ wln_vis9 = find(wvis<=wvis(nm_0515)&wvis>=wvis(nm_0480)); 
  wln_nir1 = find(s.w<=s.w(nm_1240)&s.w>=s.w(nm_1040)); 
  wln_nir2 = find(s.w<=s.w(nm_1520)&s.w>=s.w(nm_1300)); 
  wln_nir3 = find(s.w<=s.w(nm_1630)&s.w>=s.w(nm_1555)); 
@@ -242,31 +248,64 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 
    % perform pca on no2 wln range
    wln4pca = find(wvis<=wvis(nm_0900)&wvis>=wvis(nm_0300)); 
-   % find no2 range within wln4pca
-   nm_0400pca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
-   nm_0500pca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.490,  'nearest');
-   
+      
    [s] =starPCA(s,wln4pca,0);
    
    % perform fit on pca spectra
     pcastr = strcat('pca_',num2str(round(1000*s.w(wln4pca(1)))),'_',num2str(round(1000*s.w(wln4pca(end)))));
+    
+%% test several wavelength ranges first
+for jj=2%1:3
+
+    if jj==1
+        wln = find(wvis<=wvis(nm_0500)&wvis>=wvis(nm_0400)); %wln_vis7
+        % find no2 range within wln4pca (since using pca OD)
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.490,  'nearest');
+    elseif jj==2
+        wln = find(wvis<=wvis(nm_0450)&wvis>=wvis(nm_0400)); %wln_vis8
+        % find no2 range within wln4pca
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.450,  'nearest');
+    elseif jj==3
+       wln = find(wvis<=wvis(nm_0515)&wvis>=wvis(nm_0480)); %wln_vis9
+        % find no2 range within wln4pca
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.480,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.515,  'nearest');
+    end
+
 %    
 %    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcadata);
 %    no2dat = [NO2conc NO2resi];
 %    save('no2dat_pca_430_490OD.dat','-ASCII','no2dat');
 %    tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
-   % perform fit on original spectra
-   %[NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau_OD);
-   
+
+%    perform fit
+%----------------
+if jj==3
+   % [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau_OD);
+   % perform fit on pca spectra
+   [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc_wh2o(s,no2coef,o4coef,o3coef,h2ocoef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
    % perform linear inversion
    % all coef are in [atm x cm]
-   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1)];
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1)];
+
+else
+    % perform fit on pca spectra w/o water vapor region
+   [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
+   %[ss NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc_wss(s,no2coef,o4coef,o3coef,wln,tau_OD,nm_startpca,nm_endpca);
+   % perform linear inversion
+   % all coef are in [atm x cm]
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
+
+end
+
 
    ccoefno2pca=[];
    RRno2pca=[];
    for k=1:pp;
         %coefno2pca=basisno2\tau_pca_mRay(k,(wln))';
-        coefno2pca=basisno2\s.(pcastr).pcadata(k,nm_0400pca:nm_0500pca)';
+        coefno2pca=basisno2\s.(pcastr).pcaOD(k,nm_startpca:nm_endpca)';
         reconno2pca=basisno2*coefno2pca;
         RRno2pca=[RRno2pca reconno2pca];
         ccoefno2pca=[ccoefno2pca coefno2pca];
@@ -282,7 +321,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    
    % calculate error
    % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
-   no2Err   = (s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);      % in atm cm
+   no2Err   = (s.(pcastr).pcadata(:,nm_startpca:nm_endpca)'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);      % in atm cm
    MSEno2DU = real((1000*(1/length(wln))*sum(no2Err.^2))');                                               % convert from atm cm to DU
    RMSEno2  = real(sqrt(real(MSEno2DU)));
    
@@ -297,13 +336,13 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
           
    % prepare to plot spectrum OD and no2 cross section
    %no2spectrum_pca     = tau_pca_mRay(:,(wln))-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
-   no2spectrum_pca     = s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
+   no2spectrum_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
    no2fit_pca          = ccoefno2pca(1,:)'*basisno2(:,1)';
    %no2residual_pca     = tau_pca_mRay(:,(wln))-RRno2pca';
-   no2residual_pca     = s.(pcastr).pcadata(:,nm_0400pca:nm_0500pca)-RRno2pca';
+   no2residual_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca';
    
-%    % 8. plot fitted and "measured" no2 spectrum
-%      for i=1:10:length(s.t)
+   % 8. plot fitted and "measured" no2 spectrum
+%      for i=1:100:length(s.t)
 %          figure(888);
 %          plot(wvis((wln)),no2spectrum_pca(i,:),'-k','linewidth',2);hold on;
 %          plot(wvis((wln)),no2fit_pca(i,:),'-r','linewidth',2);hold on;
@@ -333,6 +372,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    %tau_aero_fitsubtract(:,wln_vis7) = tau_ODslant(:,wln_vis7) - no2subtract;
    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
 %% end fmincon
+
+end % test no2 spectral range results
 %%
 % plot subtraction results
 % comment out to increase speed
