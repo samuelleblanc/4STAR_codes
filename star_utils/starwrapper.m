@@ -82,7 +82,7 @@ toggle.savefigure=false;
 toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
-toggle.applytempcorr=true;
+toggle.applytempcorr=true;% true is for SEAC4RS data
 toggle.gassubtract = true;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
