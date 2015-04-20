@@ -17,10 +17,12 @@ h2o_coef = PAR(:,3);
 Xdat=meas(:,1);
 Ydat=meas(:,2);
 
-% water vapor transmittance model
+% ozone band transmittance model
 %---------------------------------
+% Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
+%                             .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2 + x0(:,7)*Xdat.^3));
 Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
-                            .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2 + x0(:,7)*Xdat.^3));
+                            .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2));
 
 % adjust objective function if ==zero
 Tmodel(Tmodel==0) = 1e-12;
