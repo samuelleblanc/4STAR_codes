@@ -86,6 +86,9 @@ wnir = s.w(1045:end);
  nm_0470 = interp1(wvis,[1:length(wvis)],0.470,  'nearest');
  nm_0490 = interp1(wvis,[1:length(wvis)],0.490,  'nearest');
  nm_0675 = interp1(wvis,[1:length(wvis)],0.6823,  'nearest');%0.675
+%  nm_0490 = interp1(wvis,[1:length(wvis)],0.480,  'nearest');
+%  nm_0675 = interp1(wvis,[1:length(wvis)],0.675,  'nearest');%0.675
+ 
  
  % no2 (with o3 and o4)
  nm_0300 = interp1(wvis,[1:length(wvis)],0.330,  'nearest');
@@ -200,6 +203,23 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    wln = wln_vis6;
    O3conc=[];H2Oconc=[];O4conc=[];O3resi=[];o3OD=[];
    [O3conc H2Oconc O4conc O3resi o3OD] = o3corecalc(s,o3coef,o4coef,h2ocoef,wln,tau_OD);
+   
+   xts = 60/3600;   %60 sec in decimal time
+   tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+   [o3VCDfitsmooth, sn]  = boxxfilt(tplot, O3conc, xts);
+   [o3resifitsmooth, sn] = boxxfilt(tplot, sqrt(O3resi), xts);
+   gas.o3 = real(o3VCDfitsmooth);
+   gas.o3resi = o3resifitsmooth;
+   
+   figure;subplot(211);plot(tplot,O3conc,'.r');hold on;
+          plot(tplot,gas.o3,'.g');hold on;
+          axis([tplot(1) tplot(end) 250 350]);
+          xlabel('time');ylabel('o3 [DU]');
+          legend('best fit','best fit smooth');
+          subplot(212);plot(tplot,o3resifitsmooth,'.r');hold on;
+          axis([tplot(1) tplot(end) 0 5]);
+          xlabel('time');ylabel('o3 RMSE [DU]');
+   
    gas.o3  = O3conc; % in [DU] slant converted to vertical
    gas.o4  = O4conc; % slant converted to vertical
    gas.h2o = H2Oconc;% slant converted to vertical
@@ -225,6 +245,63 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %    
    %tau_aero_fitsubtract(:,wln_vis6) = tau_ODslant(:,wln_vis6) - o3subtract;
    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
+   
+%% LS for O3
+ basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1)];
+ basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
+ ccoefo3=[];
+   RRo3=[];
+   for k=1:pp;
+        coefo3=basiso3\tau_OD(k,(wln))';
+        recono3=basiso3*coefo3;
+        RRo3=[RRo3 recono3];
+        ccoefo3=[ccoefo3 coefo3];
+   end
+   
+   % calculate o3 vcd
+   o3VCD = real((((ccoefo3(1,:))*1000))');
+   % create smooth o3 time-series
+   xts = 60/3600;   %60 sec in decimal time
+   tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+   [o3VCDsmooth, sn] = boxxfilt(tplot, o3VCD, xts);
+   o3vcd_smooth = real(o3VCDsmooth);
+   
+   % calculate error
+   % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
+   o3Err   = (tau_OD(:,wln)'-RRo3(:,:))./repmat((o3coef(wln)),1,pp);      % in atm cm
+   MSEo3DU = real((1000*(1/length(wln))*sum(o3Err.^2))');                 % convert from atm cm to DU
+   RMSEo3  = real(sqrt(real(MSEo3DU)));
+   
+   gas.o3Inv    = o3vcd_smooth;
+   gas.o3resiInv= RMSEo3;
+   
+   figure;subplot(211);plot(tplot,o3VCD,'.r');hold on;
+          plot(tplot,o3vcd_smooth,'.g');hold on;
+          axis([tplot(1) tplot(end) 250 350]);
+          xlabel('time');ylabel('o3 [DU]');
+          legend('inversion','inversion smooth');
+          subplot(212);plot(tplot,RMSEo3,'.r');hold on;
+          axis([tplot(1) tplot(end) 0 5]);
+          xlabel('time');ylabel('o3 RMSE [DU]');
+          
+   % prepare to plot spectrum OD and o3 cross section
+   
+   o3spectrum     = tau_OD(:,wln)-RRo3' + ccoefo3(1,:)'*basiso3(:,1)';
+   o3fit          = ccoefo3(1,:)'*basiso3(:,1)';
+   o3residual     = tau_OD(:,wln)-RRo3';
+   
+%      plot fitted and "measured" no2 spectrum
+%      for i=1:100:length(s.t)
+%          figure(888);
+%          plot(wvis((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
+%          plot(wvis((wln)),o3fit(i,:),'-r','linewidth',2);hold on;
+%          plot(wvis((wln)),o3residual(i,:),':k','linewidth',2);hold off;
+%          xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' o3VCD= ',num2str(o3vcd_smooth(i)),' RMSE = ',num2str(RMSEo3(i))),...
+%                 'fontsize',14,'fontweight','bold');
+%          ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted O_{3} spectrum','residual');
+%          set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
+%          pause(1);
+%      end
 %%
 %% subtract/retrieve NO2/O3/O4 region
    wln = wln_vis7;
@@ -296,7 +373,7 @@ else
    %[ss NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc_wss(s,no2coef,o4coef,o3coef,wln,tau_OD,nm_startpca,nm_endpca);
    % perform linear inversion
    % all coef are in [atm x cm]
-   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) log(wvis(wln))'.*ones(length(wln),1)];
 
 end
 
