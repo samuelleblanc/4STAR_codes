@@ -35,8 +35,10 @@ for i = 1:length(starsun.t)
        
        
        % bounds
-            lb = [0 0 0.2 -2 -2];
-            ub = [2 5 1 2 2];
+%             lb = [0 0 0.2 -2 -2];
+%             ub = [2 5 1 2 2];
+            lb = [0 0 0.2 0 -1];% intercept should always be positive
+            ub = [2 5 1 1 1];   % slope is slightly negative
 %            lb = [0 0 0.2 -2 -2 -2];
 %            ub = [0.2 5 0.5 2 2 2];%this is with o4 *10000
            
@@ -67,14 +69,17 @@ for i = 1:length(starsun.t)
              
 %                    yopt_ =  exp(-(((no2coef(wln))/1000).*real(U_(1)))).*exp(-(o4coef(wln).*10000*real(U_(2)))).*exp(-(o3coef(wln).*real(U_(3))))...
 %                             .*exp(-(U_(4) + U_(5)*meas(:,1) + U_(6)*meas(:,1).^2));
-                   yopt_ =  exp(-(((no2coef(wln))/1000).*real(U_(1)))).*exp(-(o4coef(wln).*100000.*real(U_(2)))).*exp(-(o3coef(wln).*real(U_(3))))...
-                            .*exp(-(U_(4) + U_(5)*meas(:,1)));
-                   yopt  = -log(yopt_);
+%                    yopt_ =  exp(-(((no2coef(wln))/1000).*real(U_(1)))).*exp(-(o4coef(wln).*100000.*real(U_(2)))).*exp(-(o3coef(wln).*real(U_(3))))...
+%                             .*exp(-(U_(4) + U_(5)*meas(:,1)));
+%                    yopt  = -log(yopt_);
+                   yopt =  (((no2coef(wln))/1000.*real(U_(1)))) + (o4coef(wln).*100000.*real(U_(2))) + (o3coef(wln).*real(U_(3)))...
+                            + U_(4)*ones(length(meas(:,1)),1) + U_(5)*log(meas(:,1));% this is with log(lambda)
+                   
                    yno2subtractall   =  -log(exp(-((no2coef(wln)/1000).*real(U_(1)))).*exp(-(o4coef(wln).*100000.*real(U_(2)))).*exp(-(o3coef(wln).*real(U_(3)))));
-                   yno2subtract   =  -log(exp(-((no2coef(wln)/1000).*real(U_(1)))));
+                   yno2subtract  =  -log(exp(-((no2coef(wln)/1000).*real(U_(1)))));
                    yo4subtract   =  -log(exp(-(o4coef(wln).*100000.*real(U_(2)))));
-                   yo3subtract  =  -log(exp(-(o3coef(wln).*real(U_(3)))));
-                   linesubtract = -log(exp(-(U_(4) + U_(5)*meas(:,1))));
+                   yo3subtract   =  -log(exp(-(o3coef(wln).*real(U_(3)))));
+                   linesubtract  = U_(4)*ones(length(meas(:,1)),1) + U_(5)*log(meas(:,1));
                    
                    if size(tau_OD,2)<1556 && nargin >6
                        tau_no2_subtract(i,nm_startpca:nm_endpca)   = y'-yno2subtractall;
@@ -96,6 +101,7 @@ for i = 1:length(starsun.t)
 %                          plot(starsun.w(wln),yno2subtract,'--g');hold on;
 %                          plot(starsun.w(wln),yo4subtract,'--c');hold on;
 %                          plot(starsun.w(wln),yo3subtract,'--m');hold on;
+%                          plot(starsun.w(wln),linesubtract,'-k');hold on;
 %                          %plot(starsun.w(wln),y'-yno2subtractall,':k');hold off;
 %                          %plot(starsun.w(wln),-log(exp(-(U_(4) + U_(5)*meas(:,1)))),':y');hold on;
 %                          %plot(starsun.w(wln),y'-linesubtract,':m');hold on;
@@ -104,7 +110,7 @@ for i = 1:length(starsun.t)
 % %                          plot(starsun.w(wln),y'-linesubtract - yno2subtract,':g');hold on;
 %                         plot(starsun.w(wln),y'-yno2subtract - yo4subtract - yo3subtract,':k');hold off;
 %                         xlabel('wavelength','fontsize',12);ylabel('total OD','fontsize',12);
-%                         legend('measured','calculated (fit)','no2 spectrum to subtract','o4 spectrum to subtract','o3 spectrum to subtract','subtracted spectrum');
+%                         legend('measured','calculated (fit)','no2 spectrum to subtract','o4 spectrum to subtract','o3 spectrum to subtract','aerosol baseline','subtracted spectrum');
 %                         title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Alt(i)) 'm' ' NO2= ' num2str(no2_DU_) '[DU]']);
 %                         ymax = yopt + 0.2;
 %                         axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 max(ymax)]);
