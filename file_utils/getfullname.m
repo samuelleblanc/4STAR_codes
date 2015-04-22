@@ -1,4 +1,4 @@
-function [fullname] = getfullname_(fspec,pathfile,dialog);
+function [fullname] = getfullnam(fspec,pathfile,dialog);
 % function [fullname] = getfullname_(fspec,pathfile,dialog);
 % fspec is a string indicating the file mask to be used with uigetfile
 % pathfile is a string indicating the filename stem of the mat-file to use
@@ -9,20 +9,27 @@ function [fullname] = getfullname_(fspec,pathfile,dialog);
 
 % Check for datapath.m.  If the file exists and if it corresponds to an
 % existing directory and if the permissions
-upath = which ('userpath.m');
-if ~isempty(upath)&&exist(upath,'file')&&exist(strtok(userpath,pathsep),'dir')&&...
-      exist([strtok(userpath,pathsep),filesep,'datapath'],'dir')
-   pathdir = [strtok(userpath,pathsep),filesep,'datapath',filesep];
-else %start from scratch.  Identify userpath, create datapath directory
-   userpath('reset');
-   upath = userpath;
-   status = mkdir([strtok(upath,pathsep),filesep,'datapath']);
-   if ~status
-      disp(['Failure to find or create datapath directory beneath userpath:',userpath]);
-   else
-      pathdir = [strtok(upath,pathsep),filesep,'datapath',filesep];
-   end
+[pname, mname,ext] = fileparts(mfilename('fullpath')); 
+pathdir = [pname, filesep,'datapath'];
+if ~exist(pathdir,'dir')
+    mkdir(pname, 'datapath');
 end
+pathdir = [pathdir,filesep];
+% 
+% upath = which ('userpath.m');
+% if ~isempty(upath)&&exist(upath,'file')&&exist(strtok(userpath,pathsep),'dir')&&...
+%       exist([strtok(userpath,pathsep),filesep,'datapath'],'dir')
+%    pathdir = [strtok(userpath,pathsep),filesep,'datapath',filesep];
+% else %start from scratch.  Identify userpath, create datapath directory
+%    userpath('reset');
+%    upath = userpath;
+%    status = mkdir([strtok(upath,pathsep),filesep,'datapath']);
+%    if ~status
+%       disp(['Failure to find or create datapath directory beneath userpath:',userpath]);
+%    else
+%       pathdir = [strtok(upath,pathsep),filesep,'datapath',filesep];
+%    end
+% end
 
 
 if ~exist('dialog','var')||isempty(dialog)
@@ -55,7 +62,7 @@ end
 
 if exist([pathdir,pathfile],'file')
    load([pathdir,pathfile]);
-   if ~exist('pname','var')
+   if ~exist('pname','var')||isempty(pname)
       pname = pwd;
    end
   if ~ischar(pname)||~exist(pname,'dir')
@@ -70,17 +77,18 @@ else
 end;
 
 if exist(fspec,'file')&&~exist(fspec,'dir')
-   [pname, fname, ext] = fileparts(fspec);
+    this = which(fspec,'-all');
+   [pname, fname, ext] = fileparts(this{:});
    fname = [fname ext];
 else
    [pth,fstem,ext] = fileparts(fspec);
    fspec = [fstem,ext];
    if exist(pth,'dir')
-      [fname,pname] = uigetfile([pth,filesep,fspec],dialog);
+      [fname,pname] = uigetfile([pth,filesep,fspec],dialog,'multiselect','on');
    elseif exist(pname,'dir')
       [fname,pname] = uigetfile([pname,filesep,fspec],dialog,'multiselect','on');
    else
-      [fname,pname] = uigetfile(fspec,dialog);
+      [fname,pname] = uigetfile(fspec,dialog,'multiselect','on');
    end
 end
 if ~isequal(pname,0)
