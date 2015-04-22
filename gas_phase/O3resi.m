@@ -37,12 +37,16 @@ I_meas = I_meas + offset;
 %---------------------------------
 % Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
 %                             .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2 + x0(:,7)*Xdat.^3));
-Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
-                            .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2));
+% Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
+%                             .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2));
+% Tmodel = exp(-(o3_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(h2o_coef.*x0(:,3)))...
+%                             .*exp(-(x0(:,4) + x0(:,5)*Xdat));
+
 
 % adjust objective function if ==zero
-Tmodel(Tmodel==0) = 1e-12;
-Y_model = -log(Tmodel);
+% Tmodel(Tmodel==0) = 1e-12;
+% Y_model = -log(Tmodel);
+Y_model = o3_coef.*x0(:,1)+ o4_coef.*x0(:,2) + h2o_coef.*x0(:,3) + x0(:,4)*ones(length(Xdat),1) + x0(:,5)*log(Xdat);
 
 % residual
 %-----------------
