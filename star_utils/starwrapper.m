@@ -672,6 +672,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
     tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+    s.rateslant        = real(s.rate./repmat(s.f,1,qq));
     s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray))./tr(s.m_ray, tau_O4nir);
     s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
     s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
@@ -708,6 +709,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         %-----------------------------------------------------
         if toggle.gassubtract
             if toggle.verbose; disp('gases subtractions start'), end;
+            %[s.tau_aero_fitsubtract s.gas] = gasesretrieve(s);
             [s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
