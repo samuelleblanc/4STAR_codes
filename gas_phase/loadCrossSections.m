@@ -4,7 +4,7 @@
  % alt) for CO2/H2O/CH4/O4, Richards et al. 2010 for O4, Vandaele et al.,
  % 1997 for NO2, Bogumil et al., 2003 for O3
  %----------------------------------------------------------------------
- %function s= loadCrossSections
+ function xs= loadCrossSections
      Loschmidt=2.686763e19;             % molec/cm3*atm
      vis.nm = load(fullfile(starpaths,'visLambda.txt'));
      nir.nm = load(fullfile(starpaths,'nirLambda.txt'));
@@ -74,7 +74,9 @@
      % o3
      o3coef = ([o3.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      
-%return;
+     xs = [o3coef no2coef o4coef h2ocoef o2coef co2coef ch4coef];
+     
+return;
      % plot cross sections
 %     figure;plot(vis.nm,water.visInterp,'-b');hold on;plot(nir.nm,water.nirInterp,'-r');hold on;
 %     hold on;
