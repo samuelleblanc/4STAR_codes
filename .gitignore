@@ -46,4 +46,25 @@ Temporary Items
 *.asv
 
 # vi temporary files
+<<<<<<< HEAD
+
 *.*~
+
+#data path folder
+file_utils/datapath/
+=======
+*.*~
+>>>>>>> origin/master
+
+file_utils/datapath/psapb.mat
+file_utils/datapath/clapa1.mat
+file_utils/datapath/clapb1.mat
+file_utils/datapath/lastpath.mat
+file_utils/datapath/lastpath.mat
+file_utils/datapath/lastpath.mat
+<<<<<<< HEAD
+file_utils/datapath/lastpath.mat
+
+=======
+file_utils/datapath/lastpath.mat
+>>>>>>> origin/master
