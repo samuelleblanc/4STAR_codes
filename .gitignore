@@ -22,49 +22,53 @@ $RECYCLE.BIN/
 # =========================
 
 .DS_Store
+
 .AppleDouble
+
 .LSOverride
 
-# Icon must end with two \r
+
+
+# Icon must end with two 
+\r
 Icon
 
+
 # Thumbnails
+
 ._*
 
+
+
 # Files that might appear on external disk
+
 .Spotlight-V100
+
 .Trashes
 
+
+
 # Directories potentially created on remote AFP share
+
 .AppleDB
+
 .AppleDesktop
-Network Trash Folder
+
+
+#Network Trash Folder
 Temporary Items
+
 .apdisk
 
 # Matlab temporary files
 *.asv
 
 # vi temporary files
-<<<<<<< HEAD
-
 *.*~
 
 #data path folder
 file_utils/datapath/
-=======
-*.*~
->>>>>>> origin/master
-
 file_utils/datapath/psapb.mat
 file_utils/datapath/clapa1.mat
 file_utils/datapath/clapb1.mat
 file_utils/datapath/lastpath.mat
-file_utils/datapath/lastpath.mat
-file_utils/datapath/lastpath.mat
-<<<<<<< HEAD
-file_utils/datapath/lastpath.mat
-
-=======
-file_utils/datapath/lastpath.mat
->>>>>>> origin/master
