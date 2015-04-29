@@ -183,6 +183,7 @@ if ~exist('visc0')
             else;
                 a=importdata(fullfile(starpaths,visfilename));
                 visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+                %visc0mod(i,:)=a(:,3)';
             end;
             sprintf('%s',size(a,1)) ;
             sprintf('%f',size(a,2)) ;
@@ -216,6 +217,7 @@ if ~exist('visc0')
             else;
                 a=importdata(fullfile(starpaths,nirfilename));
                 nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+                %nirc0mod(i,:)=a(:,3)';
             end;
 %             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
 %                 nirc0moderr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';

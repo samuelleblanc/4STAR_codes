@@ -227,9 +227,11 @@ pcastr = strcat('pca_',num2str(round(1000*s.w(range(1)))),'_',num2str(round(1000
 s.(pcastr).pcadata = NaN(length(s.t),length(range));
 
 if     mode==0
-    % reconstruct OD if rate is input - this is slant data
+    % reconstruct OD if rate is input - this is total slant data
     s.(pcastr).pcadata(subd,:) = ...
                real(-log(reconstructedout./repmat(s.c0(range),length(subd),1)));
+           
+    s.(pcastr).pcaOD = s.(pcastr).pcadata - s.tau_ray(:,range);
 elseif mode==1
     s.(pcastr).pcadata(subd,:) = reconstructedout;
 end

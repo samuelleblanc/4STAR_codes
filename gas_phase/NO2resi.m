@@ -4,7 +4,9 @@ function resi=NO2resi(x0,meas,PAR)
 % PAR are additional parameters (e.g. o3, o4, water vapor coef and pre-factors of polynomial fit)
 % x0 is U initial guess (from coef calculations)
 % modified: July 25 2014
-% MS
+% MS, 2015-04-20, modified Y_model to contain log(lambda) dependance and
+%                 lambda dependance
+% --------------------------------------------------------------------------------------------------
 
 % initial parameter values
 %----------------------------------------------
@@ -17,14 +19,18 @@ o3_coef = PAR(:,3);
 Xdat=meas(:,1);
 Ydat=meas(:,2);
 
-% water vapor transmittance model
-%---------------------------------
-Tmodel = exp(-(no2_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(o3_coef.*x0(:,3)))...
-                            .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2));
+% transmittance model
+%--------------------
+% Tmodel = exp(-(no2_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(o3_coef.*x0(:,3)))...
+%                             .*exp(-(x0(:,4) + x0(:,5)*Xdat + x0(:,6)*Xdat.^2));
+% Tmodel = exp(-(no2_coef.*x0(:,1))).*exp(-(o4_coef.*x0(:,2))).*exp(-(o3_coef.*x0(:,3)))...
+%                             .*exp(-(x0(:,4)*ones(length(Xdat),1) + x0(:,5)*Xdat));
 
 % adjust objective function if ==zero
-Tmodel(Tmodel==0) = 1e-12;
-Y_model = -log(Tmodel);
+% Tmodel(Tmodel==0) = 1e-12;
+% Y_model = -log(Tmodel);
+Y_model = no2_coef.*x0(:,1)+ o4_coef.*x0(:,2) + o3_coef.*x0(:,3) + x0(:,4)*ones(length(Xdat),1) + x0(:,5)*log(Xdat);
+
 
 % residual
 %-----------------
