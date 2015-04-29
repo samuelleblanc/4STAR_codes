@@ -4,6 +4,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % measurement. t must be in the Matlab time format. Leave blank and now is
 % assumed. 
 % MS, 2015-01-09, adopted from starc0 to reflect starc0lamp choice
+% 2015-04-14, MS, added seac4rs adjusted c0 filename
+%---------------------------------------------------------------------------------------------------
 
 
 version_set('1.0');
@@ -44,7 +46,24 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
        
     elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
         if now>=datenum([2014 10 17]);
-            disp('need to generate SEAC4RS starc0 lamp adjusted');
+            
+            % values
+            % vis
+            visfilename='20140716_scaled_langley_seac4rs_c0.dat';
+            a=importdata(fullfile(starpaths,visfilename));
+            visc0(1,:)=a.data(1:1044,3)';
+            visc0err(1,:)=NaN(1,size(visc0,2));
+            % nir
+            nirfilename='20140716_scaled_langley_seac4rs_c0.dat';
+            a=importdata(fullfile(starpaths,nirfilename));
+            nirc0(1,:)=a.data(1045:1556,3)';
+            nirc0err(1,:)=NaN(1,size(nirc0,2));
+            
+            % notes
+            visnote=['C0 from ' ];
+            nirnote=['C0 from ' ];
+            visnote=[visnote visfilename ', '];
+            nirnote=[nirnote nirfilename ', '];
         elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
             disp('need to generate SEAC4RS starc0 lamp adjusted');
         elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
