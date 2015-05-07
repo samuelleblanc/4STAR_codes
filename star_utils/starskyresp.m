@@ -124,6 +124,9 @@ if ~exist('visresp')
         visfilename=[daystr{i} '_VIS_SKY_Resp_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
+            if not(exist(fullfile(starpaths,visfilename)));
+                warning(['*** File not found:' fullfile(starpaths,visfilename)])
+            end;
             a=importdata(fullfile(starpaths,visfilename));
             visresp(i,:)=a.data(:,strcmp(lower(a.colheaders), 'resp'))';
             if sum(strcmp(lower(a.colheaders), 'resperr'))>0;
