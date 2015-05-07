@@ -152,7 +152,8 @@ if any(any(isnan(dark)));
           if any(~darkrate(:,iw)); continue, end; % make sure that the darkrate is not just zeros
           % double check for non-unique values
           [darkrate_unique,iunique,inonunique] = unique(darkrate(:,iw));
-          [t_withdark_unique, i_withdark_unique] = unique(s.t(inotemptydark(iunique)));
+          inum_notemptydark = find(inotemptydark);
+          [t_withdark_unique, i_withdark_unique] = unique(s.t(inum_notemptydark(iunique)));
           % check if there is only one darkrate (SL 2015-04-03)
           if length(t_withdark_unique)==1
               darkrate_filled(:,iw) = repmat(darkrate_unique(i_withdark_unique),[length(s.t),1]);
