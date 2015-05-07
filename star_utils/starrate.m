@@ -31,7 +31,12 @@ function [rate, dark, darkstd, note]=starrate(s, bounds)
 %                         dark count for a specific wavelength that is zero to skip
 % SL: v1.3, 2015/03/04: - fixed bug of interpolating dark when there is
 %                         only one unique dark
-version_set('1.3');
+% SL: v1.4, 2015/05/06: - changed of calculating darks from rawcorr to raw
+%                         (not corrected for nonlinearity)
+%                       - added fix to dark interpolation when only single
+%                         integration time of dark present, but not in
+%                         right integration times of signal.
+version_set('1.4');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -56,11 +61,11 @@ end;
 % integration time changes for different sky zone we'll want to subtract
 % the correct darks for each integration time.
 % determine dark and its variability
-dark=s.rawcorr;
+dark=s.raw;
 %dark=s.raw;
 dark(s.Str~=0,:)=NaN;
 % darkstd=s.rawFORJcorr+NaN;
-darkstd=s.rawcorr+NaN;
+darkstd=s.raw+NaN;
 [tintu, ui, uj]=unique(s.Tint);
 for uu=1:length(tintu); % for each integration time
     rowsu=find(uj==uu);
@@ -189,4 +194,4 @@ adj=1;
 rate=(s.rawcorr-dark)./repmat(s.Tint,1,q).*adj;
 rate(s.Str==0,:)=NaN; % exclude rate when shutter was closed
 % dark(s.Str==0,:)=s.rawFORJcorr(s.Str==0,:); % give the direct dark measurements when available instead of extrapolated values
-dark(s.Str==0,:)=s.rawcorr(s.Str==0,:); % give the direct dark measurements when available instead of extrapolated values
+dark(s.Str==0,:)=s.raw(s.Str==0,:); % give the direct dark measurements when available instead of extrapolated values
