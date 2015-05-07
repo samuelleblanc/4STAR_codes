@@ -27,7 +27,40 @@
 %
 % NEEDED FILES:
 %
-% EXAMPLE:
+% EXAMPLE: 
+% - get the the correct names of files (fnames), their respective
+%   filter indices (flt) for day 20140914, with a base directory (where the
+%   20140914 calibration folder exist), with no background radiance files.
+% >> daystr = '20140914';
+% >> dir = 'C:\Users\sleblan2\Research\4STAR\cal\';
+% >>[fnames,flt,fnamesbak,fltbak,isbackground]=small_sphere_select(daystr,dir)
+% 
+% fnames = 
+%     'C:\Users\sleblan2\Research\4STAR\cal\\20140914\small_sphere\20140914_028_VIS_park.dat'
+%     'C:\Users\sleblan2\Research\4STAR\cal\\20140914\small_sphere\20140914_028_NIR_park.dat'
+% 
+% flt =
+%   Columns 1 through 21 
+%     72    73    74    75    76    77    78    79    80    81    82    83    84    85    86    87    88    89    90    91    92
+%   Columns 22 through 42
+%     93    94    95    96    97    98    99   100   101   102   103   104   105   106   107   108   109   110   111   112   113
+%   Columns 43 through 63
+%    114   115   116   117   118   119   120   121   122   123   124   125   126   127   128   129   130   131   132   133   134
+%   Columns 64 through 73
+%    135   136   137   138   139   140   141   142   143   144
+% 
+% fnamesbak = 
+%     'C:\Users\sleblan2\Research\4STAR\cal\\20140914\small_sphere\20140914_028_VIS_park.dat'
+%     'C:\Users\sleblan2\Research\4STAR\cal\\20140914\small_sphere\20140914_028_NIR_park.dat'
+% 
+% fltbak =
+%   Columns 1 through 21
+%     72    73    74    75    76    77    78    79    80    81    82    83    84    85    86    87    88    89   182   183   184
+%   Column 22
+%    185
+% 
+% isbackground =
+%      0
 %
 %
 % MODIFICATION HISTORY:
@@ -36,6 +69,7 @@
 %                  - bug fix for no default flight date with background
 % Modified (v1.2): Samuel LeBlanc, NASA Ames, May 6th, 2015
 %                  - bug fix in getfullname_ to getfullname
+%                  - added example
 %
 % -------------------------------------------------------------------------
 
