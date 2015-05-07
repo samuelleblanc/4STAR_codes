@@ -34,18 +34,28 @@
 % Written (v1.0): Samuel LeBlanc, NASA Ames, October 17th, 2014
 % Modified (v1.1): Samuel LeBlanc, NASA Ames, January 9th, 2015
 %                  - bug fix for no default flight date with background
+% Modified (v1.2): Samuel LeBlanc, NASA Ames, May 6th, 2015
+%                  - bug fix in getfullname_ to getfullname
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [fnames,flt,fnamesbak,fltbak,isbackground]=small_sphere_select(daystr,dir)
-version_set('1.1');
+version_set('1.2');
 
 if ~exist('dir','var'); 
     dir=uigetfolder('','Select folder where calibrations are stored');
 end;
 
 switch daystr
+    case '20140624'
+        fnames={[dir filesep daystr filesep 'small_sphere' filesep daystr '_019_VIS_park.dat'];...
+                [dir filesep daystr filesep 'small_sphere' filesep daystr '_019_NIR_park.dat']};
+        flt=[12:124];
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_017_VIS_park.dat'];...
+                   [dir filesep daystr filesep 'Lamps_0' filesep daystr '_017_NIR_park.dat']};
+        fltbak=[1:35];
     case '20140716'
         fnames={[dir filesep daystr filesep 'small_sphere' filesep daystr '_010_VIS_park.dat'];...
                 [dir filesep daystr filesep 'small_sphere' filesep daystr '_010_NIR_park.dat']};
@@ -104,11 +114,11 @@ switch daystr
         fltbak=[[6:13],[21:26]];
     otherwise
         warning('daystr not found in small_sphere_select, please manually select:');
-        fnames=getfullname_('*.dat','Select calibration files');
+        fnames=getfullname('*.dat','Select calibration files');
         flt=[-999];
         isbackground=menu('Is there a background radiation file?','Yes','No');
         if isbackground == 1; 
-            fnamesbak=getfullname_('*.dat','Select background files');
+            fnamesbak=getfullname('*.dat','Select background files');
             fltbak=[1:10];
         else; 
             isbackground=0; 

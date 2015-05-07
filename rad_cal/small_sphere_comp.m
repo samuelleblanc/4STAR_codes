@@ -147,7 +147,7 @@ disp('done')
 
 %% Plot the time trace of the changes of radiance with each calibration
 figure(14);
-set(13,'Position',[20 30 1200 800]);
+set(14,'Position',[20 30 1000 600]);
 [n i500] = min(abs(d.(fields{1}).nm-500.0));
 [n i650] = min(abs(d.(fields{1}).nm-650.0));
 [n i800] = min(abs(d.(fields{1}).nm-800.0));
@@ -181,6 +181,27 @@ title('Small sphere calibration over time');
 grid;
 fi4 = [dir 'Comp_rad_sphere_time'];
 save_fig(14,fi4);
+
+%% plot the relative time trace of radiance change with each calibration
+figure(15);
+set(15,'Position',[20 30 1000 600]);
+plot(r500/r500(2)*100.0,'*-')
+hold all;
+plot(r650/r650(2)*100.0,'*-')
+plot(r800/r800(2)*100.0,'*-')
+plot(r1000/r1000(2)*100.0,'*-')
+plot(r1200/r1200(2)*100.0,'*-')
+plot(r1600/r1600(2)*100.0,'*-')
+plot(r1600*0.0+100.0,'k-')
+hold off;
+set(gca,'xticklabel',fields)
+xlabel('Calibrations');
+ylabel('Relative Radiances [%]');
+legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
+title('Small sphere relative calibration over time');
+grid;
+fi5 = [dir 'Comp_rel_rad_sphere_time'];
+save_fig(15,fi5);
 
 end
 
