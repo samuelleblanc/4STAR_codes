@@ -98,6 +98,7 @@ hold off;
  axis([350 1700 75 125]);
  grid;
  title('Relative change in response functions');
+ ylim([94,106])
 ylabel('Response change [%]');
 xlabel('Wavelenght [nm]');
 legend('VIS post/pre','NIR post/pre');
