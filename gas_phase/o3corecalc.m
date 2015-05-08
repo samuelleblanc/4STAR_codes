@@ -75,7 +75,7 @@ for i = 1:length(starsun.t)
        if ~isNaN(y(1)) && isreal(y) && sum(ypos)>length(wln)-15 && sum(isinf(y))==0
             ylarge=logical(y>=7);
             if sum(ylarge)<10
-            [U_,fval,exitflag,output]  = fmincon('O3resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
+            [U_,fval,exitflag,output]  = fmincon('O3resi_lin',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             end
             
                 if ~isreal(U_(1)) || U_(1)<0
