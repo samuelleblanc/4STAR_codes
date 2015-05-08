@@ -1,4 +1,4 @@
-% flight=[datenum('00:00:00') datenum('00:10:21')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+ flight=[datenum('00:00:00') datenum('28:59:21')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
