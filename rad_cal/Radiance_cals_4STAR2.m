@@ -67,8 +67,8 @@ else
     %date='20140624'
     date='20140716'
     %date='20141024'
-    docorrection=true; %do nonlinear correction
 end
+docorrection=true; %do nonlinear correction
 
 if ~exist(['C:\Users\sleblan2\Research\4STAR\cal\' date])
     pname=uigetdir('C:\','Find folder for calibration files');
@@ -78,6 +78,8 @@ else
 end
 if date(1:4)=='2014';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20140606091700HISS.txt');
+elseif date(1:4)=='2013';
+    hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20130605124300HISS.txt');
 else
     hiss = get_hiss;
 end;
@@ -164,8 +166,8 @@ for ll = lamps
     
     
     %% build rate counts an response functions from raw counts
-    vis.nm = s.w(1:1044)*1000.0;
-    nir.nm = s.w(1045:end)*1000.0;
+    vis.nm = s.w(1:1044)*1000.0; vis.time = s.t;
+    nir.nm = s.w(1045:end)*1000.0; nir.time = s.t;
     for vs = length(vis_tints):-1:1
         cal.(lamp_str).vis.t_ms(vs) = vis_tints(vs);
         cal.(lamp_str).vis.dark(vs,:) = mean(s.dark(s.visTint==vis_tints(vs),1:1044));
