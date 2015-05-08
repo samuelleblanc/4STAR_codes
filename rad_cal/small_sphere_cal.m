@@ -1,7 +1,7 @@
 %% Details of the program:
 % NAME:
 %   small_sphere_cal
-% 
+%
 % PURPOSE:
 %  Create the calibration for the small sphere
 %
@@ -12,13 +12,13 @@
 %  daystr: input day of calibration in form of a string (yyyymmdd), optional
 %  dir: input of directory to se as base, optional
 %  varargin:
-% 
+%
 % OUTPUT:
 %  d: structure of variables with radiance, radiance std dev, wavelength,
 %  response functions
 %  - plot of calibrated spectrum of the sphere
 %  - text file of calibrated values
-%  - .mat file of the calibrated sphere of radiances and 4STAR response 
+%  - .mat file of the calibrated sphere of radiances and 4STAR response
 %  - text file of response files
 %
 % DEPENDENCIES:
@@ -31,7 +31,7 @@
 %  - small_sphere_select.m : for selecting the right files for each day
 %
 % NEEDED FILES:
-%  - small sphere park files 
+%  - small sphere park files
 %  - radiance values of the small sphere
 %
 % EXAMPLE:
@@ -62,7 +62,7 @@
 %           - added version control of this script via version_set
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, October 14th, 2014
 %           - handling of rate with radiances
-%           - building of new response functions and saving of those files 
+%           - building of new response functions and saving of those files
 %           in conjunction with load_sphere_transfer
 %           - set flag for use of background data
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, Octoer, 17th, 2014
@@ -81,10 +81,10 @@
 %% start of function
 function d=small_sphere_cal(daystr, dir, varargin)
 startup_plotting;
-version_set('1.3')
+version_set('1.4')
 
 if ~exist('daystr','var');
-  daystr='20140804'; % set the default
+    daystr='20140804'; % set the default
 end;
 % setting the standard variables
 if ~exist('dir','var'); dir='C:\Users\sleblan2\Research\4STAR\cal\'; end;
@@ -100,8 +100,9 @@ load(sourcefile,contents0{:},'program_version');
 
 %% add variables and make adjustments common among all data types. Also
 % combine the two structures.
-    s=starwrapper(vis_park, nir_park,'applytempcorr',false,'verbose',false);
-    for i=1:length(s.t); s.rad(i,:)=s.rate(i,:)./s.skyresp; end;
+s=starwrapper(vis_park, nir_park,'applytempcorr',false,'verbose',false);
+for i=1:length(s.t); s.rad(i,:)=s.rate(i,:)./s.skyresp; end;
+note = s.note;
 
 %% build the mean and standard dev radiance values
 if flt(1) == -999;
@@ -120,12 +121,13 @@ if isbackground
     disp('There is a background file')
     [sourcefile, contents0, savematfile]=startupbusiness('park',fnamesbak,['.' filesep 'tempmatdata.mat'], varargin{:});
     s2=load(sourcefile,contents0{:});
-
+    
     % add variables and make adjustments common among all data types. Also
     % combine the two structures.
     sbak=starwrapper(s2.vis_park, s2.nir_park,'applytempcorr',false,'verbose',false);
     for i=1:length(sbak.t); sbak.rad(i,:)=sbak.rate(i,:)./sbak.skyresp; end;
-
+    note = [note; {'*** Background file notes:'}; sbak.note];
+    
     % build the mean and standard dev radiance values
     rad_back=nanmean(sbak.rad(fltbak(sbak.sat_time(fltbak)==0),:));
     rad_back_std=nanstd(sbak.rad(fltbak(sbak.sat_time(fltbak)==0),:));
@@ -143,8 +145,8 @@ end;
 figure(11);
 datestr=s.filename{1}(end-24:end-17);
 plot(nm,rad,'b-',...
-     nm,rad+rad_std,'r.',...
-     nm,rad-rad_std,'r.');
+    nm,rad+rad_std,'r.',...
+    nm,rad-rad_std,'r.');
 title(['Small Sphere radiances from:' datestr]);
 xlabel('Wavelength [nm]');
 ylabel('Radiance [W m^{-2} \mum^{-1} sr^{-1}]');
@@ -165,8 +167,10 @@ dlmwrite(fl,dat,'-append','delimiter','\t','precision',7);
 
 %% save to mat file
 disp(['saving to mat file: ' fi])
-save(fi, 'rad', 'rad_std', 'nm','program_version','isbackground','units');
+save(fi, 'rad', 'rad_std', 'nm','program_version','isbackground','units','note');
 
+disp('Display of notes:')
+disp(note)
 %% set output variables
 d.rad=rad;
 d.rad_std=rad_std;
@@ -183,12 +187,12 @@ disp(['nirrate=' num2str(rate(ind2))])
 disp(['visratestd=' num2str(rate_std(ind1))])
 disp(['nirratestd=' num2str(rate_std(ind2))])
 for i=1:length(visTint)
-  visraw=nanmean(s.raw(flt(s.visTint(flt)==visTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind1));
-  disp(['visraw:' num2str(visraw) ' at visTint:' num2str(visTint(i))])
+    visraw=nanmean(s.raw(flt(s.visTint(flt)==visTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind1));
+    disp(['visraw:' num2str(visraw) ' at visTint:' num2str(visTint(i))])
 end;
 for i=1:length(nirTint)
-  nirraw=nanmean(s.raw(flt(s.nirTint(flt)==nirTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind2));
-  disp(['nirraw:' num2str(nirraw) ' at nirTint:' num2str(nirTint(i))])
+    nirraw=nanmean(s.raw(flt(s.nirTint(flt)==nirTint(i) & s.sat_time(flt)==0 & s.Str(flt)==2),ind2));
+    disp(['nirraw:' num2str(nirraw) ' at nirTint:' num2str(nirTint(i))])
 end;
 disp(['num=' num2str(length(s.raw(flt,ind1)))])
 
@@ -209,7 +213,7 @@ if writenew==1;
     
     [vis.fresp,nir.fresp]=write_SkyResp_files_2(vis,nir,tra,dir);
     disp('Response function file written');
-    save([fi '_responses'],'vis','nir','program_version','tra');
+    save([fi '_responses'],'vis','nir','program_version','tra','note');
     d.resp=resp;
     d.vis=vis; d.nir=nir;
 else;
