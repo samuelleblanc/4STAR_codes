@@ -3,9 +3,9 @@
  % HITRAN convolved with 4STAR (we might want to create LUT for various
  % alt) for CO2/H2O/CH4/O4, Richards et al. 2010 for O4, Vandaele et al.,
  % 1997 for NO2, Bogumil et al., 2003 for O3
- % MS, 2015-05-01, added HCOH, BrO cross sections.
+ % MS, 2015-05-01, added HCOH and BrO cross sections
  %----------------------------------------------------------------------
- function xs= loadCrossSections
+ %function s= loadCrossSections
      Loschmidt=2.686763e19;             % molec/cm3*atm
      vis.nm = load(fullfile(starpaths,'visLambda.txt'));
      nir.nm = load(fullfile(starpaths,'nirLambda.txt'));
@@ -23,12 +23,12 @@
      o2.visnm     = o2vis.data(:,1);
      o2.visXs     = o2vis.data(:,2);
      o2.visInterp = interp1(o2.visnm, o2.visXs, vis.nm,'pchip','extrap');
-     o2nir  = importdata(fullfile(starpaths,'O2_1013mbar273K_nir4star.xs'))
+     o2nir  = importdata(fullfile(starpaths,'O2_1013mbar273K_nir4star.xs'));
      o2.nirnm     = o2nir.data(:,1);
      o2.nirXs     = o2nir.data(:,2);
      o2.nirInterp = interp1(o2.nirnm, o2.nirXs, nir.nm,'pchip','extrap');
      % co2
-     co2vis = importdata(fullfile(starpaths,'CO2_1013mbar273K_vis4star.xs'))
+     co2vis = importdata(fullfile(starpaths,'CO2_1013mbar273K_vis4star.xs'));
      co2.visnm     = co2vis.data(:,1);
      co2.visXs     = co2vis.data(:,2);
      co2.visInterp = interp1(co2.visnm, co2.visXs, vis.nm,'pchip','extrap');
@@ -89,9 +89,7 @@
      % hcoh
      hcohcoef = ([hcoh.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      
-     xs = [o3coef no2coef o4coef h2ocoef o2coef co2coef ch4coef brocoef hcohcoef];
-     
-return;
+%return;
      % plot cross sections
 %     figure;plot(vis.nm,water.visInterp,'-b');hold on;plot(nir.nm,water.nirInterp,'-r');hold on;
 %     hold on;
