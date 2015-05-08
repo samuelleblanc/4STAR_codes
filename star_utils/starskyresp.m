@@ -51,12 +51,14 @@
 %                  - update to include recently modified ARISE cals
 % Modified (v1.3): Michal Segal, NASA Ames, 2015-04-10, modified cal dates
 %                  for SEAC4RS to correct a bug
+% Modified (v1.4): Samuel LeBlanc, NASA Ames, 2015-05-08
+%                  for ARISE update with new set of the response functions
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.3');
+version_set('1.4');
 
 % control the input
 if nargin==0;
