@@ -104,6 +104,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20130214';
             filesuffix='modified_Langley_on_G1_secondL_flight_6_85km_screened_2x_withOMIozone';
             filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone_averagedwith20130214';
+            filesuffix='refined_Langley_on_G1_firstL_flight_20PCAscreened_2x_withOMIozone';
             model_atmosphere=2;% TCAPII (mid-lat winter)
         elseif now>=datenum([2013 2 19 0 0 0]);
             daystr='20130212';
