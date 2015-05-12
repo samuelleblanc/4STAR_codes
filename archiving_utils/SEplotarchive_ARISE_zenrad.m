@@ -109,6 +109,7 @@ for i=idx_file_proc
     xlabel('Start UTC [seconds]');
 
     linkaxes([ax1,ax2,ax3,ax4],'x');
+    xlim([nanmin(data.Start_UTC),nanmax(data.Start_UTC)])
 
     figname = [ICTdir daystr '_UTC_alt_lat_lon'];
     save_fig(1,figname,false)
@@ -130,6 +131,10 @@ for i=idx_file_proc
        plot(data.UTC,data.(names{i}),'.')        
     end
     hold off;
+    xr = [nanmin(data.Start_UTC/3600.0),nanmax(data.Start_UTC/3600.0)];
+    if isfinite(xr(1));
+        xlim(xr);
+    end;
     xlabel('UTC [Hours]')
     ylabel('Radiances [Wm^{-2}sr^{-1}nm^{-1}]')
     legend(names{7:end},'Location','NorthEastOutside')
