@@ -53,12 +53,15 @@
 %                  for SEAC4RS to correct a bug
 % Modified (v1.4): Samuel LeBlanc, NASA Ames, 2015-05-08
 %                  for ARISE update with new set of the response functions
+% Modified (v1.5): Samuel LeBlanc, NASA Ames, 2015-05-12
+%                  Update to ARISE, decision to use pre-cal for entire field
+%                  mission, until 2014-10-24
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.4');
+version_set('1.5');
 
 % control the input
 if nargin==0;
@@ -89,13 +92,13 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % with SEAC4RS fiber (not the long one going on ARISE)
         daystr = '20140624'; % date of cal
         filesuffix = 'from_20140624_016_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 9 13 0 0 0]);
+    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 10 23 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20140716';
         filesuffix = 'from_20140716_003_VIS_park_with_20140606091700HISS';
         %filesuffix = 'from_20140716_004_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 9 13 0 0 0]);
+    elseif t >= datenum([2014 10 23 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20141024';
