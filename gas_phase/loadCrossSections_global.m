@@ -9,6 +9,7 @@
      Loschmidt=2.686763e19;             % molec/cm3*atm
      vis.nm = load(fullfile(starpaths,'visLambda.txt'));
      nir.nm = load(fullfile(starpaths,'nirLambda.txt'));
+     
      % h2o
      watervis = importdata(fullfile(starpaths,'H2O_1013mbar273K_vis.xs'));
      water.visnm     = watervis.data(:,1);
@@ -18,6 +19,7 @@
      water.nirnm     = waternir.data(:,1);
      water.nirXs     = waternir.data(:,2);
      water.nirInterp = interp1(water.nirnm, water.nirXs, nir.nm,'pchip','extrap');
+     
      % o2
      o2vis  = importdata(fullfile(starpaths,'O2_1013mbar273K_vis4star.xs'));
      o2.visnm     = o2vis.data(:,1);
@@ -27,6 +29,7 @@
      o2.nirnm     = o2nir.data(:,1);
      o2.nirXs     = o2nir.data(:,2);
      o2.nirInterp = interp1(o2.nirnm, o2.nirXs, nir.nm,'pchip','extrap');
+     
      % co2
      co2vis = importdata(fullfile(starpaths,'CO2_1013mbar273K_vis4star.xs'));
      co2.visnm     = co2vis.data(:,1);
@@ -36,11 +39,13 @@
      co2.nirnm     = co2nir.data(:,1);
      co2.nirXs     = co2nir.data(:,2);
      co2.nirInterp = interp1(co2.nirnm, co2.nirXs, nir.nm,'pchip','extrap');
+     
      % ch4
      ch4nir = importdata(fullfile(starpaths,'CH4_1013mbar273K_nir4star.xs'));
      ch4.nirnm     = ch4nir.data(:,1);
      ch4.nirXs     = ch4nir.data(:,2);
      ch4.nirInterp = interp1(ch4.nirnm, ch4.nirXs, nir.nm,'pchip','extrap');
+     
      % o4
      o4vis  = importdata(fullfile(starpaths,'O4_CIA_296K_vis.xs'));
      o4.visnm     = o4vis.data(:,1);
@@ -50,11 +55,27 @@
      o4.nirnm     = o4nir.data(:,1);
      o4.nirXs     = o4nir.data(:,2);
      o4.nirInterp = interp1(o4.nirnm, o4.nirXs, nir.nm,'pchip','extrap');
+     
+     % no2-220K
+     no2vis = importdata(fullfile(starpaths,'no2_220K_vanDaele4star_vis.xs'));
+     no2_220.visnm     = no2vis.data(:,1);
+     no2_220.visXs     = no2vis.data(:,2);
+     no2_220.visInterp = interp1(no2_220.visnm, no2_220.visXs, vis.nm,'pchip','extrap');
+     clear no2vis
+     
+     % no2-298K
+     no2vis = importdata(fullfile(starpaths,'no2_298K_vanDaele4star_vis.xs'));
+     no2_298.visnm     = no2vis.data(:,1);
+     no2_298.visXs     = no2vis.data(:,2);
+     no2_298.visInterp = interp1(no2_298.visnm, no2_298.visXs, vis.nm,'pchip','extrap');
+     clear no2vis
+     
      % no2
      no2vis = load(fullfile(starpaths,'no2_vis4star.txt'));
      no2.visnm     = no2vis(:,1);
      no2.visXs     = no2vis(:,2);
      no2.visInterp = interp1(no2.visnm, no2.visXs, vis.nm,'pchip','extrap');
+     
      % o3
      o3vis  = load(fullfile(starpaths,'O3_223K_convTech5.txt'));
      o3.visnm     = o3vis(:,1);
@@ -80,6 +101,12 @@
      o2coef = ([o2.visInterp;o2.nirInterp])*Loschmidt;% convert to atmxcm
      % o4
      o4coef = ([o4.visInterp;o4.nirInterp])*(Loschmidt^2);% convert to (atmxcm)^2
+     % no2-220K
+     no2_220Kcoef = ([no2_220.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
+     % no2-298K
+     no2_298Kcoef = ([no2_298.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
+     % no2diff (298-220)
+     no2coefdiff = no2_220Kcoef - no2_298Kcoef;
      % no2
      no2coef = ([no2.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      % o3
