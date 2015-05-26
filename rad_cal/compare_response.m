@@ -37,12 +37,14 @@
 %                  - change startup to startup_plotting
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2015-01-08
 %                  - added post ARISE rad cals
+% Modified (v1.3): by Samuel LeBlanc, NASA Ames, 2015-05-06
+%                  - change plotting limits of relative changes
 % -------------------------------------------------------------------------
 
 %% Start of function
 function compare_response
 startup_plotting
-version_set('1.2');
+version_set('1.3');
 
 % setting the standard variables
 dir='C:\Users\sleblan2\Research\4STAR\cal\';
@@ -110,6 +112,7 @@ for LL=Lamps
    xlabel('Wavelength [nm]');
    ylabel('Response Change [%]');
    xlim([300 1050]);
+   ylim([-10,30]);
    grid on;
    
    %nir resp
@@ -124,6 +127,7 @@ for LL=Lamps
    xlabel('Wavelength [nm]');
    ylabel('Response Change [%]');
    xlim([950 1700]);
+   ylim([-10,30]);
    grid on;
    
    linkaxes([ax1,ax3],'x');

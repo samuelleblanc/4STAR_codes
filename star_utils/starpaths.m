@@ -26,7 +26,7 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 version_set('1.2');
 
 % get the version of matlab
-vv = version('-release')
+vv = version('-release');
 newmatlab = false; 
 if str2num(vv(1:4)) >= 2013;
     newmatlab = true;
@@ -72,7 +72,7 @@ elseif ~isempty(strfind(lower(userpath),'samuel'))
     figurefolder='C:\Users\Samuel\Research\4STAR\figs\fov\';
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'))
-    matfolder='C:\Users\sleblan2\Research\4STAR\data\' ;
+    matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
     figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
     author='Samuel';
     if nargin>0;

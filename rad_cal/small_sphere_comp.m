@@ -63,10 +63,15 @@ for l=1:num;
     files(l,:) = [dir dates(l,:) '_small_sphere_rad.mat'];
     fields{l}=['r' dates(l,:)];
     d.(fields{l})=load(files(l,:));
+    files_resp(l,:) = [dir dates(l,:) '_small_sphere_rad_responses.mat'];
+    r.(fields{l})=load(files_resp(l,:));
 end;
 
 % set reference radiances
-spref=d.(fields{ref}).rad;
+spref = d.(fields{ref}).rad;
+% set reference response function
+spref_vis_resp = r.(fields{ref}).vis.resp;
+spref_nir_resp = r.(fields{ref}).nir.resp;
 
 %% plot the radiances of the integrating sphere as it varies with multiple different 
 figure(12); 
@@ -144,10 +149,75 @@ linkaxes([ax1,ax2],'x');
 save_fig(13,fi,true);
 disp('done')
 
+%% plot the responses of the integrating sphere as it varies with multiple different 
+figure(22); 
+set(22,'Position',[20 30 1200 800]);
+set(0,'DefaultAxesColorOrder',hsv(num))
+
+ax1=subplot(2,2,1);
+plot(r.(fields{1}).vis.nm,r.(fields{1}).vis.resp);
+hold all;
+for i=2:num
+  plot(r.(fields{i}).vis.nm,r.(fields{i}).vis.resp);  
+end
+hold off;
+xlabel('Wavelength (nm)');
+ylabel('Responses [cts/ms.(Wm^{-2}sr^{-1}\mum^{-1})^{-1}]');
+title('Small integrating Sphere responses');
+legend(dates,'location','west');
+ylim([0,5.5]);
+xlim([300 1000]);
+
+ax2=subplot(2,2,3);
+plot(r.(fields{1}).vis.nm,r.(fields{1}).vis.resp./spref_vis_resp);
+hold all;
+for i=2:num
+  plot(r.(fields{i}).vis.nm,r.(fields{i}).vis.resp./spref_vis_resp);  
+end
+hold off;
+xlabel('Wavelength (nm)');
+ylabel('Ratio of Sphere Responses');
+title(['Change in sphere responses compared to: ' dates(ref,:)]);
+ylim([0.8,1.15]);
+xlim([300 1000]);
+grid on;
+linkaxes([ax1,ax2],'x');
+
+axn1=subplot(2,2,2);
+plot(r.(fields{1}).nir.nm,r.(fields{1}).nir.resp);
+hold all;
+for i=2:num
+  plot(r.(fields{i}).nir.nm,r.(fields{i}).nir.resp);  
+end
+hold off;
+xlabel('Wavelength (nm)');
+ylabel('Responses [cts/ms.(Wm^{-2}sr^{-1}\mum^{-1})^{-1}]');
+title('Small integrating Sphere responses');
+%legend(dates,'location','west');
+ylim([0,0.25]);
+xlim([930 1730]);
+
+axn2=subplot(2,2,4);
+plot(r.(fields{1}).nir.nm,r.(fields{1}).nir.resp./spref_nir_resp);
+hold all;
+for i=2:num
+  plot(r.(fields{i}).nir.nm,r.(fields{i}).nir.resp./spref_nir_resp);  
+end
+hold off;
+xlabel('Wavelength (nm)');
+ylabel('Ratio of Sphere Responses');
+title(['Change in sphere responses compared to: ' dates(ref,:)]);
+ylim([0.8,1.15]);
+xlim([930 1730]);
+grid on;
+linkaxes([axn1,axn2],'x');
+
+fi22=[dir 'Comp_resp_sphere'];
+save_fig(22,fi22,true);
 
 %% Plot the time trace of the changes of radiance with each calibration
 figure(14);
-set(13,'Position',[20 30 1200 800]);
+set(14,'Position',[20 30 1000 600]);
 [n i500] = min(abs(d.(fields{1}).nm-500.0));
 [n i650] = min(abs(d.(fields{1}).nm-650.0));
 [n i800] = min(abs(d.(fields{1}).nm-800.0));
@@ -182,6 +252,84 @@ grid;
 fi4 = [dir 'Comp_rad_sphere_time'];
 save_fig(14,fi4);
 
+%% plot the relative time trace of radiance change with each calibration
+figure(15);
+set(15,'Position',[20 30 1000 600]);
+plot(r500/r500(2)*100.0,'*-')
+hold all;
+plot(r650/r650(2)*100.0,'*-')
+plot(r800/r800(2)*100.0,'*-')
+plot(r1000/r1000(2)*100.0,'*-')
+plot(r1200/r1200(2)*100.0,'*-')
+plot(r1600/r1600(2)*100.0,'*-')
+plot(r1600*0.0+100.0,'k-')
+hold off;
+set(gca,'xticklabel',fields)
+xlabel('Calibrations');
+ylabel('Relative Radiances [%]');
+legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
+title('Small sphere relative calibration over time');
+grid;
+fi5 = [dir 'Comp_rel_rad_sphere_time'];
+save_fig(15,fi5);
+
+%% Plot the time trace of the changes of responses with each calibration
+figure(24);
+set(24,'Position',[20 30 1000 600]);
+[n i500] = min(abs(r.(fields{1}).vis.nm-500.0));
+[n i650] = min(abs(r.(fields{1}).vis.nm-650.0));
+[n i800] = min(abs(r.(fields{1}).vis.nm-800.0));
+[n i1000] = min(abs(r.(fields{1}).nir.nm-1000.0));
+[n i1200] = min(abs(r.(fields{1}).nir.nm-1200.0));
+[n i1600] = min(abs(r.(fields{1}).nir.nm-1600.0));
+
+r500 = []; r650 = []; r800 = []; r1000 = []; r1200 = []; r1600 = [];
+for x = fieldnames(d)'
+    r500 = horzcat(r500, r.(x{:}).vis.resp(i500));
+    r650 = horzcat(r650, r.(x{:}).vis.resp(i650));
+    r800 = horzcat(r800, r.(x{:}).vis.resp(i800));
+    r1000 = horzcat(r1000, r.(x{:}).nir.resp(i1000));
+    r1200 = horzcat(r1200, r.(x{:}).nir.resp(i1200));
+    r1600 = horzcat(r1600, r.(x{:}).nir.resp(i1600));
+end
+
+plot(r500,'*-')
+hold all;
+plot(r650,'*-')
+plot(r800,'*-')
+plot(r1000,'*-')
+plot(r1200,'*-')
+plot(r1600,'*-')
+hold off;
+set(gca,'xticklabel',fields)
+xlabel('Calibrations');
+ylabel('Responses [Cts/ms.(Wm^{-2}sr^{-1}\mum^{-1})^{-1}]');
+legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
+title('Small sphere responses over time');
+grid;
+fi24 = [dir 'Comp_resp_sphere_time'];
+save_fig(24,fi24);
+
+%% plot the relative time trace of response change with each calibration
+figure(25);
+set(25,'Position',[20 30 1000 600]);
+plot(r500/r500(2)*100.0,'*-')
+hold all;
+plot(r650/r650(2)*100.0,'*-')
+plot(r800/r800(2)*100.0,'*-')
+plot(r1000/r1000(2)*100.0,'*-')
+plot(r1200/r1200(2)*100.0,'*-')
+plot(r1600/r1600(2)*100.0,'*-')
+plot(r1600*0.0+100.0,'k-')
+hold off;
+set(gca,'xticklabel',fields)
+xlabel('Calibrations');
+ylabel('Relative Responses [%]');
+legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
+title('Small sphere relative responses over time');
+grid;
+fi25 = [dir 'Comp_rel_resp_sphere_time'];
+save_fig(25,fi25);
 end
 
  

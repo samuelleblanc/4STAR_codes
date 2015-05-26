@@ -39,7 +39,7 @@ startup_plotting;
 
 %% prepare variables
 ICTdir = 'C:\Users\sleblan2\Research\ARISE\starzen_ict\';
-prefix='ARISE_4STAR_ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='ARISE-4STAR-ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'C130';
 
@@ -109,6 +109,7 @@ for i=idx_file_proc
     xlabel('Start UTC [seconds]');
 
     linkaxes([ax1,ax2,ax3,ax4],'x');
+    xlim([nanmin(data.Start_UTC),nanmax(data.Start_UTC)])
 
     figname = [ICTdir daystr '_UTC_alt_lat_lon'];
     save_fig(1,figname,false)
@@ -130,6 +131,10 @@ for i=idx_file_proc
        plot(data.UTC,data.(names{i}),'.')        
     end
     hold off;
+    xr = [nanmin(data.Start_UTC/3600.0),nanmax(data.Start_UTC/3600.0)];
+    if isfinite(xr(1));
+        xlim(xr);
+    end;
     xlabel('UTC [Hours]')
     ylabel('Radiances [Wm^{-2}sr^{-1}nm^{-1}]')
     legend(names{7:end},'Location','NorthEastOutside')
