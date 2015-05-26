@@ -30,7 +30,7 @@
 % MODIFICATION HISTORY:
 % Written: Michal Segal, NASA Ames, February 19th, 2015
 % Modified:
-%
+% MS, 2015-04-23, added rate filtered pca struct
 % -------------------------------------------------------------------------
 function [s] =starPCA(s,range,mode)
 
@@ -38,9 +38,9 @@ figureflag = 0; % 0 is no figure generation/1 is yes
 
 %% assign data according to mode and spectral range
 if     mode==0
-    dat = s.ratetot(:,range);
+    dat = s.ratetot(:,range);% ratetot is slant corrected for sun-earth and ray
 elseif mode==1
-    dat = s.tau_tot_slant(:,range);
+    dat = s.ratetot(:,range);% ratetot is slant corrected for sun-earth and ray;%s.tau_tot_slant(:,range);
 end
 
 %% filter out NaN's or inf values in data
@@ -225,13 +225,17 @@ end
 %***********************************
 pcastr = strcat('pca_',num2str(round(1000*s.w(range(1)))),'_',num2str(round(1000*s.w(range(end)))));
 s.(pcastr).pcadata = NaN(length(s.t),length(range));
+s.(pcastr).pcarate = NaN(length(s.t),length(range));
 
 if     mode==0
     % reconstruct OD if rate is input - this is total slant data
     s.(pcastr).pcadata(subd,:) = ...
                real(-log(reconstructedout./repmat(s.c0(range),length(subd),1)));
+% !!! need to filter c0 if using pca!!!
+%     s.(pcastr).pcarate(subd,:) = ...
+%                real(-log(reconstructedout./repmat(s.c0(range),length(subd),1)));
            
-    s.(pcastr).pcaOD = s.(pcastr).pcadata - s.tau_ray(:,range);
+    s.(pcastr).pcaOD = s.(pcastr).pcadata;% ratetot is already corrected - s.tau_ray(:,range);
 elseif mode==1
     s.(pcastr).pcadata(subd,:) = reconstructedout;
 end
