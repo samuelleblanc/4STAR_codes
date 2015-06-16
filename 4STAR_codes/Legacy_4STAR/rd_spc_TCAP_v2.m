@@ -10,7 +10,7 @@ version_set('2.0');
 % consistent or inconsisten labels and yielding consistent
 % 
 if ~exist('infile','var')||~exist(infile,'file')
-    infile = getfullname_('*NIR*;*VIS*','4STAR_F2','Select spectrometer file (NIR or VIS)');
+    infile = getfullname('*NIR*;*VIS*','4STAR_F2','Select spectrometer file (NIR or VIS)');
 end
 
 spc.raw = rd_spc_raw_tcap_v2(infile);

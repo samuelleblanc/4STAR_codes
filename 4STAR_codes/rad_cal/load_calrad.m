@@ -10,7 +10,7 @@ function [cals pname date corstr]=load_calrad();
 %pname='C:\Users\sleblan2\Research\4STAR\cal\20131120\2013_11_20.4STAR.NASA_Ames.Flynn\'
 %date='20131120'
 
-%infile = getfullname_('*rad_cal.mat','radcals','Select "All Lamp" radcals file.');
+%infile = getfullname('*rad_cal.mat','radcals','Select "All Lamp" radcals file.');
 [file pname]=uigetfile('*rad_cal*.mat','Select radcals from 4STAR with all lamsp');
 
 sfile={file};

@@ -19,7 +19,7 @@ function fix_star_name
 
 
 
-infile = getfullname__('*.dat','4STAR','Select a 4STAR data file in the directory you want to examine');
+infile = getfullname('*.dat','4STAR','Select a 4STAR data file in the directory you want to examine');
 
 [pname, fname, ext] = fileparts(infile);
 pname = [pname, filesep];

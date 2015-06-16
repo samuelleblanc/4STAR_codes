@@ -52,7 +52,7 @@ version_set('1.2');
 %% legacy code
 % 
 % if ~exist('infile','var')
-% ins = rd_spc_F4_v2(getfullname__('*FOV*.dat','Star_FOV'));
+% ins = rd_spc_F4_v2(getfullname('*FOV*.dat','Star_FOV'));
 % close(gcf);
 % else
 %    if ~isstruct(infile)

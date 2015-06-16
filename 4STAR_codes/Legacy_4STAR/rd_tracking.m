@@ -1,6 +1,6 @@
 function track = rd_tracking_F4_v2(infile);
 if ~exist('infile','var')||~exist(infile,'file')
-    infile = getfullname_('*_TRACK.dat','SPICE2','Select tracking file');
+    infile = getfullname('*_TRACK.dat','SPICE2','Select tracking file');
 end
 % Read first two lines
 % First line is original filename

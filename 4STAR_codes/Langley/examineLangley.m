@@ -20,7 +20,7 @@ plotQA = false;
 %%
 % load input files
 %********************
- dat = getfullname_('*starsun.mat','ARISE','Select starsun Langley file.');
+ dat = getfullname('*starsun.mat','ARISE','Select starsun Langley file.');
 
 [pname_, fname, ext] = fileparts(dat);
 load(dat,'tau_aero','rateaero','m_aero','sza','Alt','Lat','Lon','t','Rh','AZ_deg','AZstep','Headng','sunaz');

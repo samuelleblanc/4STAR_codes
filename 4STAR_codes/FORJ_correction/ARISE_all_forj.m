@@ -1,6 +1,6 @@
 function ARISE_all_forj
 
-vis = getfullname_('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
+vis = getfullname('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
 
 [pname_, fname, ext] = fileparts(vis);
 matdir = [pname_,filesep, 'mat']

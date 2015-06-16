@@ -59,10 +59,10 @@ if ~exist('in','var')
 %    in = ['D:\case_studies\radiation_cals\spheres\HISS\20130605124300HISS.txt'];
    [fin nin]=uigetfile('*.txt','Select a calibrated radiance file of Sphere');
    in=strcat(nin,fin);
-   %      in = getfullname_(in,'radcals','Select a calibrated radiance file of Sphere');
+   %      in = getfullname(in,'radcals','Select a calibrated radiance file of Sphere');
 else
     while ~exist(in,'file')
-        in = getfullname_(in,'radcals','Select a calibrated radiance file of Sphere');
+        in = getfullname(in,'radcals','Select a calibrated radiance file of Sphere');
     end
     
 end

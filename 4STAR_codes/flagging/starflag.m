@@ -101,7 +101,7 @@ s.note{end+1} = ['Flagging with starflag with output at:' flagfile]
 % slsun(daystr, 't'); %Get time from the starsun file because we need it to convert the
 % ng structure in the initial starinfo file into logical flags of length(t)
 sinfo_file=fullfile(starpaths, ['starinfo' daystr '.m']);
-% sinfo_file = getfullname_(['starinfo',daystr,'*.m'],'starinfo','Select starinfo file.');
+% sinfo_file = getfullname(['starinfo',daystr,'*.m'],'starinfo','Select starinfo file.');
 [sinfo] = get_starinfo_parts(sinfo_file,daystr);
 if isfield(sinfo,'flight')
     flight = sinfo.flight;
