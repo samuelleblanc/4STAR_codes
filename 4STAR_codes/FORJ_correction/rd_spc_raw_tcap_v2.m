@@ -4,7 +4,7 @@ function spc = rd_spc_raw_tcap_v2(infile);
 % This version fixes an accidental sign error in AZ_deg by computing AZ_deg
 % directly from AZstep
 if ~exist('infile','var')||~exist(infile,'file')
-   infile = getfullname_('*NIR*;*VIS*','4STAR_F4','Select spectrometer file (NIR or VIS)');
+   infile = getfullname('*NIR*;*VIS*','4STAR_F4','Select spectrometer file (NIR or VIS)');
 end
 % %Mission: 
 % %Operator: 

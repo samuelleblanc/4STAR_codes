@@ -559,7 +559,7 @@ end
 % % Read G1 met file here 20120715a.met.txt
 % 
 % while ~exist('star_met_fname','var')||~exist(star_met_fname,'file')
-%     star_met_fname = getfullname_([pname, '..',filesep,'..',filesep,'G1',filesep,datestr(star.t(1),'yyyymmdd'),'*.met*.txt']);
+%     star_met_fname = getfullname([pname, '..',filesep,'..',filesep,'G1',filesep,datestr(star.t(1),'yyyymmdd'),'*.met*.txt']);
 % end
 % %%
 % % star_light_fname = ['C:\Users\d3k014\Desktop\TCAP\instruments\4STAR\mats\20120722starsun_about22.mat'];

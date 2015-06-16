@@ -1,5 +1,5 @@
-function [fullname] = getfullnam(fspec,pathfile,dialog);
-% function [fullname] = getfullname_(fspec,pathfile,dialog);
+function [fullname] = getfullname(fspec,pathfile,dialog);
+% function [fullname] = getfullname(fspec,pathfile,dialog);
 % fspec is a string indicating the file mask to be used with uigetfile
 % pathfile is a string indicating the filename stem of the mat-file to use
 % containing the "filepath" desired.
@@ -7,12 +7,11 @@ function [fullname] = getfullnam(fspec,pathfile,dialog);
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
 
-% Check for datapath.m.  If the file exists and if it corresponds to an
-% existing directory and if the permissions
-[pname, mname,ext] = fileparts(mfilename('fullpath')); 
-pathdir = [pname, filesep,'datapath'];
+
+pname = strrep(userpath,';',filesep);
+pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
-    mkdir(pname, 'datapath');
+    mkdir(pname, 'filepaths');
 end
 pathdir = [pathdir,filesep];
 % 

@@ -67,7 +67,7 @@ for i=idx_file_proc
     %% get the current ict file to load
     fl = ls([ICTdir prefix '_' platform '_' daystr '_R' rev '.ict']);
     if isempty(fl)
-        filepath = getfullname_([ICTdir '*' daystr '*.ict']);
+        filepath = getfullname([ICTdir '*' daystr '*.ict']);
     else
         filepath = [ICTdir fl];
     end

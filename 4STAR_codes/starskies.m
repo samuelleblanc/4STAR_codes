@@ -24,7 +24,7 @@ version_set('1.0');
 %********************
 % regulate input and read source
 %********************
-infiles = getfullname_('*star.mat','starmats','Select one or more star.mat files');
+infiles = getfullname('*star.mat','starmats','Select one or more star.mat files');
 
 contentx = {'nir_skya';'nir_skyp';'vis_skya';'vis_skya'}
 for in = 1:length(infiles)

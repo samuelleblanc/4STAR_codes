@@ -24,7 +24,7 @@ version_set('1.0');
 %********************
 % regulate input and read source
 %********************
-infiles = getfullname_('*star.mat','starsuns','Select one or more starsun.mat files');
+infiles = getfullname('*star.mat','starsuns','Select one or more starsun.mat files');
 for in = 1:length(infiles)
     [~,stem,ext] = fileparts(infiles{in});
     OK = menu(['Process ', stem, ext, '?'],'Yes','No, skip','Done, EXIT');

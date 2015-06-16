@@ -6,7 +6,7 @@ function out = evalstarinfo(in_file, keyword)
 % but not all (e.g., starinfo20130225.m).
 % Yohei, 2013/03/19.
 if ~exist('in_file','var')||~exist(in_file,'file')
-    in_file = getfullname_('starinfo*.m','starinfo','Select a starinfo file.');
+    in_file = getfullname('starinfo*.m','starinfo','Select a starinfo file.');
 end
 % parse the daystr out of the in_file name...
 % identify the file

@@ -24,7 +24,7 @@ function [flags,flag_info,t] = cnvt_mark2flags(marked,t)
 % tt = unique([t;ng(:,1);ng(:,2)]);
 if ~exist('marked','var')||~isstruct(marked)
     if ~exist('marked','var')||~exist(marked,'file')
-      marked = getfullname_('starflags_*_marks_*.m','star_marks','Select star mark file');
+      marked = getfullname('starflags_*_marks_*.m','star_marks','Select star mark file');
     end
     marked = get_starinfo_parts(marked);
 end

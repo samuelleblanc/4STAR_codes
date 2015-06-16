@@ -43,8 +43,8 @@ function [o3out no2out] = genOMIo3no2mean(domainbounds)
 startup_plotting; 
 
 dirOMI = 'F:\ARISE\OMI\Gridded\';
-o3infile  = getfullname__('*L2G-OMTO3G*.he5','F:','Select o3  gridded file');
-no2infile = getfullname__('*L2G-OMNO2G*.he5','F:','Select no2 gridded file');
+o3infile  = getfullname('*L2G-OMTO3G*.he5','F:','Select o3  gridded file');
+no2infile = getfullname('*L2G-OMNO2G*.he5','F:','Select no2 gridded file');
 
 [pname, fname, ext] = fileparts(o3infile);
 date = fname(20:29);

@@ -1,7 +1,7 @@
 function forj_vis_out = TCAPII_forj_az(vis)
 % v2 attempt to clean up darks and lights, added "lights" boolean
 if ~exist('vis','var')||~exist(vis,'file');
-    vis = getfullname_('*_VIS_FORJ.dat','forj','Select a forj data file.');
+    vis = getfullname('*_VIS_FORJ.dat','forj','Select a forj data file.');
 end
 % TCAPII_forj_vis_and_nir_az  (Look in other TCAPII forj function for
 % remnant tests of El rotatation
