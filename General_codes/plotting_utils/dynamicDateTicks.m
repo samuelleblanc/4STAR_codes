@@ -51,7 +51,7 @@ end
 % Apply datetick to all axes in axH, and store any linking information
 axesInfo.Type = 'dateaxes'; % Information stored in axes userdata indicating that these are date axes
 for i = 1:length(axH)
-    datetick(axH(i), 'x', 'keeplimits');
+    datetick(axH(i), 'x');
     if nargin > 1 && ~isempty(link) % If axes are linked, 
         axesInfo.Linked = axH; % Need to modify all axes at once
     else
@@ -67,20 +67,17 @@ figH = get(axH, 'Parent');
 if iscell(figH)
     figH = unique([figH{:}]);
 end
-% if length(figH) > 1
-   figH_ = figH;
-   for figH = figH_
-      %     error('Axes should be part of the same plot (have the same figure parent)');
-      % end
-      
-      z = zoom(figH);
-      p = pan(figH);
-      d = datacursormode(figH);
-      
-      set(z,'ActionPostCallback',@updateDateLabel);
-      set(p,'ActionPostCallback',@updateDateLabel);
-      set(d,'UpdateFcn',@dateTip);
-   end
+if length(figH) > 1
+    error('Axes should be part of the same plot (have the same figure parent)');
+end
+
+z = zoom(figH);
+p = pan(figH);
+d = datacursormode(figH);
+
+set(z,'ActionPostCallback',@updateDateLabel);
+set(p,'ActionPostCallback',@updateDateLabel);
+set(d,'UpdateFcn',@dateTip);
 
 % ------------ End of dynamicDateTicks-----------------------
 
@@ -151,12 +148,8 @@ end
             
             % Add month/day/year information to the first tick and month/day to other ticks where the day changes
             ind = find(diff(da))+1; 
-            if isempty(strfind(axesInfo.mdformat,'yyyy'))
-               newlabels{1}   = datestr(ticks(1), ['yyyy-',axesInfo.mdformat, ' ']); % Add month/day/year to first tick
-            else
-               newlabels{1}   = datestr(ticks(1), [axesInfo.mdformat ' ']); % Add month/day/year to first tick
-            end
-            newlabels(ind) = cellstr(datestr(ticks(ind), [axesInfo.mdformat ' '])); % Add month/day to ticks where day changes
+            newlabels{1}   = datestr(ticks(1), [axesInfo.mdformat '/yy-']); % Add month/day/year to first tick
+            newlabels(ind) = cellstr(datestr(ticks(ind), [axesInfo.mdformat '-'])); % Add month/day to ticks where day changes
             labels = strcat(newlabels, labels);
             
         end
