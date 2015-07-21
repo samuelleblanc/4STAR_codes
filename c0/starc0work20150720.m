@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
@@ -8,6 +8,21 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % importdata.m. To save new c0 data, use starsavec0.m.    
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
+% Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
+% Samuel, v1.1, 2014/10/15, added verbose keyword
+% Michal, v1.2, 2014/11/17, combined version from NAS
+% MS, 2014-11-19, added ARISE cal-flight Langley to list
+% MS, changed line 21 from 8 1 000 to 7 1 000 to account for pre-ARISE cal
+% MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
+
+
+
+version_set('1.2');
+if ~exist('verbose','var')
+    verbose=true;
+end;
+
+if verbose; disp('In starc0'), end;
 
 % control the input
 if nargin==0;
@@ -16,10 +31,15 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
-        if now>=datenum([2014 9 1 0 0 0]);
-            daystr='20140830';
-            filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+    if t>=datenum([2014 7 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+        if now>=datenum([2014 8 1 0 0 0]);
+            daystr='20141002';
+            %daystr='20140830';
+            %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            %filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
+            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc'; % for in flight langley modified to remove aod variations, default for ARISE cal
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
@@ -30,10 +50,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         %             daystr='20130708';
         %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled2p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
     elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
-        if now>=datenum([2015 7 17]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
-        elseif now>=datenum([2014 10 17]);
+        if now>=datenum([2014 10 17]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
             % use for separate starsun files to obtaine modified Langley
@@ -127,7 +144,9 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
+            disp(fullfile(starpaths,visfilename))
             a=importdata(fullfile(starpaths,visfilename));
+            %a=load(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -150,6 +169,7 @@ if ~exist('visc0')
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
             a=importdata(fullfile(starpaths,nirfilename));
+            %a=load(fullfile(starpaths,nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
