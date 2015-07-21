@@ -22,14 +22,16 @@
 %  - starwrapper
 %  - pca_rad
 %  - subset_high_signal_no_sat
+%  - catstruct.m
+%  - parse_struct.m
 %
 % NEEDED FILES:
 %  SKY_RESP files
 %
 % EXAMPLE:
-%   starsky; % this prompts user interfaces
-%   starsky({'D:\4star\data\raw\20120307_013_VIS_SKYP.dat';'D:\4star\data\raw\20120307_013_NIR_SKYP.dat'}, 'D:\4star\data\99999999skysun.mat');
-%   [savematfile, contents]=starsun(...) returns the path for the resulting mat-file and its contents.
+%   starzen; % this prompts user interfaces
+%   starzen({'D:\4star\data\raw\20120307_013_VIS_ZEN.dat';'D:\4star\data\raw\20120307_013_NIR_ZEN.dat'}, 'D:\4star\data\99999999starzen.mat');
+%   [savematfile, contents]=starzen(...) returns the path for the resulting mat-file and its contents.
 %
 % MODIFICATION HISTORY:
 % Written: Yohei Shinozuka, NASA Ames, 2012/03/19
@@ -49,11 +51,15 @@
 %                   Component Analysis in the rads
 % Modified (v1.2): Samuel LeBlanc, 2015/03/16
 %                 - changed comments
+% Modified (v1.3): Samuel LeBlanc, NASA Ames, 2015-07-21
+%                 - added checking of input for toggle structure to change
+%                 the default behaviour
+%                 - added dependence to catstruct and parse_struct 
 % -------------------------------------------------------------------------
 
 
 function [savematfile, contents]=starzen(varargin)
-version_set('1.2');
+version_set('1.3');
 
 toggle.verbose = true;
 toggle.subsetting_Tint = true;
@@ -61,10 +67,16 @@ toggle.pca_filter = false;
 toggle.applytempcorr = false;
 toggle.doflagging = false;
 
+if (~isempty(varargin));
+    [toggle_in,vars] = parse_struct(varargin{:});
+    toggle = catstruct(toggle,toggle_in);
+else
+    vars = varargin;
+end
 %********************
 %% regulate input and read source
 %********************
-[sourcefile, contents0, savematfile]=startupbusiness('zen', varargin{:});
+[sourcefile, contents0, savematfile]=startupbusiness('zen', vars{:});
 contents=[];
 if isempty(contents0);
     savematfile=[];
@@ -116,5 +128,3 @@ contents=[contents; fieldnames(s)];
 
 
 end
-
-
