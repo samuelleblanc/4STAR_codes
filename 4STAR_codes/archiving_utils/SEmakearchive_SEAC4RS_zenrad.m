@@ -19,6 +19,7 @@
 %  - t2utch.m
 %  - ICARTTwriter.m
 %  - evalstarinfo.m
+%  - interp_withspaces.m
 %  - ...
 %
 % NEEDED FILES:
@@ -37,16 +38,19 @@
 % Modified (v1.2): by Samuel LeBlanc, Santa Cruz, CA, 2015-07-20
 %                 - ported ARISE codes to SEAC4RS values, mostly only
 %                 changed the paths save herein
+% Modified (v1.3): by Samuel LeBlanc, NASA Ames, 2015-07-21
+%                 - added interpolation with spaces, to account for large
+%                 times between measurements
 %
 % -------------------------------------------------------------------------
 
 function SEmakearchive_SEAC4RS_zenrad
-version_set('v1.2')
+version_set('v1.3')
 %% set variables
 ICTdir = 'C:\Users\sleblan2\Research\SEAC4RS\starzen_ict\';
 starinfo_path = 'C:\Users\sleblan2\Research\SEAC4RS\starinfo\';
 starzen_path = 'C:\Users\sleblan2\Research\SEAC4RS\starzen\';
-prefix='ARISE-4STAR-ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='SEAC4RS-4STAR-ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
@@ -132,8 +136,11 @@ form.Longitude = '%4.7f';
 dslist={'20130806' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' ...
         '20130830' '20130902' '20130904' '20130906' '20130909' '20130911' '20130913' '20130916' '20130918' '20130921' '20130923'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          0          0          1          0          0          1          1          0          1  ...
+jproc=[         1          0          0          1          0          0          1          1          1          1  ...
                 1          1          1          1          0          1          1          1          1          1          1 ] ; %set=1 to process
+
+%jproc=[         0          0          0          0          0          0          0          0          0          1  ...
+%                0          0          0          0          0          0          0          0          0          0          0 ] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -142,14 +149,19 @@ for i=idx_file_proc
     daystr=dslist{i};
     disp(['on day:' daystr])
     keyword = 'flight';
-   % try; 
+    try; 
         s.dummy = true;
         run([starinfo_path 'starinfo' daystr '.m']); 
-    %catch; 
-     %   eval(['assignin(''caller'',keyword, ' keyword ');']);
-    %end;
-    UTCflight=t2utch(flight);
-    
+    catch; 
+        eval(['assignin(''caller'',keyword, ' keyword ');']);
+    end;
+    if length(size(flight)) > 1
+        UTCflight = t2utch(flight);
+        UTCflight(1) = min(UTCflight);
+        UTCflight(2) = max(UTCflight);
+    else
+        UTCflight=t2utch(flight);
+    end
     %% build the Start_UTC time array, spaced at one second each
     Start_UTCs = [UTCflight(1)*3600:UTCflight(2)*3600];
     UTC = Start_UTCs/3600.;
@@ -206,13 +218,13 @@ for i=idx_file_proc
         iflt = find(rads(:,save_iwvls(ii)) > 0 | isnan(rads(:,save_iwvls(ii))));
         % make sure to only have unique values
         [tutc_unique,itutc_unique] = unique(tutc_rad(iflt));
-        data.(names{nn}) = interp1(tutc_unique,rads(iflt(itutc_unique),save_iwvls(ii)),UTC);
+        data.(names{nn}) = interp_withspaces(tutc_unique,rads(iflt(itutc_unique),save_iwvls(ii)),UTC,0.01);
     end;
     %special case for maximum radiances
     mrad = max(rads(:,goodwvls),[],2);
     iflt = find(mrad > 0 | isnan(mrad));
     [tutc_unique,itutc_unique] = unique(tutc_rad(iflt));
-    data.RADMAX = interp1(tutc_unique,mrad(iflt(itutc_unique)),UTC);
+    data.RADMAX = interp_withspaces(tutc_unique,mrad(iflt(itutc_unique)),UTC,0.01);
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.RADMAX));
