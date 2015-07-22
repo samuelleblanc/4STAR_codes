@@ -19,11 +19,20 @@ function [savematfile, contents]=starsun(varargin)
 % Yohei, 2012/03/19, 2012/04/11, 2012/06/27, 2012/08/14, 2012/10/01,
 % 2012/10/05.
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
-version_set('1.0');
+% Samuel, v1.1, 2015/07/22, added control of input toggles for specifying
+%                           exact properties of runs. Similar to starzen
+version_set('1.1');
 %********************
 % regulate input and read source
 %********************
-[sourcefile, contents0, savematfile]=startupbusiness('sun', varargin{:});
+toggle.applynonlinearcorr=true;
+if (~isempty(varargin));
+    [toggle_in,vars] = parse_struct(varargin{:});
+    toggle = catstruct(toggle,toggle_in);
+else
+    vars = varargin;
+end
+[sourcefile, contents0, savematfile]=startupbusiness('sun', vars{:});
 contents=[];
 if isempty(contents0);
     savematfile=[];
@@ -43,7 +52,7 @@ load(sourcefile,contents0{:},'program_version');
 
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
-s=starwrapper(vis_sun, nir_sun);
+s=starwrapper(vis_sun, nir_sun,toggle);
 
 %********************
 % save
