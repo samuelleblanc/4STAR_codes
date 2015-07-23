@@ -85,9 +85,10 @@ elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on plei
     figurefolder='/home5/sleblan2/4STAR/figs/';
     author='Samuel';
     if nargin>0;
-        pp='/nobackupp8/sleblan2/ARISE/c130/';
-        matfolder=[pp ls([pp '*ARISE*' source]) filesep];
-        if nargin>1; matfolder=[matfolder raw filesep]; end;
+        matfolder = '/nobackupp8/sleblan2/SEAC4RS/dc8/SEAC4RS/';
+        %pp='/nobackupp8/sleblan2/ARISE/c130/';
+        %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
+        %if nargin>1; matfolder=[matfolder raw filesep]; end;
     end;
 else
     warning('Update starpaths.m');
