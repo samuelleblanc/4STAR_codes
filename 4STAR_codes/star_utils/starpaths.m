@@ -81,7 +81,7 @@ elseif ~isempty(strfind(lower(userpath),'sleblan2'))
         if nargin>1; matfolder=[matfolder raw filesep]; end;
     end;
 elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
-    matfolder='/home5/sleblan2/4STAR/data/' ;
+    matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
     figurefolder='/home5/sleblan2/4STAR/figs/';
     author='Samuel';
     if nargin>0;
