@@ -26,7 +26,9 @@ if length(days)>1;
     %concatenate the track struct.
     tnames = fieldnames(track);
     for i=1:length(tnames);
-        track.(tnames{i}) = [track.(tnames{i});t2.(tnames{i})];
+        try;
+            track.(tnames{i}) = [track.(tnames{i});t2.(tnames{i})];
+        end;
     end;
 end;
 % smooth the temperature record
