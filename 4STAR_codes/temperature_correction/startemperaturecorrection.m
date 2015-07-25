@@ -18,7 +18,7 @@ if length(days)>1;
     % read track data
     daystr2 = datestr(t(idays(2)),'yyyymmdd');
     try
-        t2 = load(fullfile(starpaths(daystr), [daystr2 'star.mat']), 'track');
+        t2 = load(fullfile(starpaths(daystr2), [daystr2 'star.mat']), 'track');
     catch
         [fna pna]=uigetfile(['*' daystr2 '*star.mat'], ['star.mat file for temperature corrections on ' daystr2],starpaths(daystr2));
         t2 = load([pna fna],'track');
