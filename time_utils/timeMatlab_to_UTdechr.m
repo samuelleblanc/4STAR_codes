@@ -1,3 +1,0 @@
-function[UT]=timeMatlab_to_UTdechr(t)
-[yy mm dd hh mm ss]=datevec(t);
-UT=hh+mm/60.+ss/3600;

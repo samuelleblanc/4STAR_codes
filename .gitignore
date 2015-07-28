@@ -47,3 +47,8 @@ Temporary Items
 
 # vi temporary files
 *.*~
+
+General_codes/file_utils/datapath/
+lastUsedDir.mat
+
+data_folder/lastUsedDir.mat

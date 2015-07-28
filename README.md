@@ -5,6 +5,8 @@ Collection of Matlab codes used for routine and special analysis of 4STAR measur
 - Includes codes for zenith radiance calculations (starzen)
 - Includes codes for sky scans, almucantar and principal plane (starsky)
 
+These codes are grouped together in the 4STAR_codes subdirectory. General use Matlab codes can be found in the General_codes directory. AATS_codes combine some analysis software for AATS codes. atm_codes represent a combination of codes for General and special 4STAR use for atmosphere profile and modelling analysis. 
+
 Combination of codes to run 4STAR data analysis from NASA Ames Research Center
 
 
