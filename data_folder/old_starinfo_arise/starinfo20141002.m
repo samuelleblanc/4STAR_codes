@@ -1,4 +1,7 @@
-flight=[datenum('00:00:00') datenum('01:56')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+%flight=[datenum('0:0:0') datenum('2:00');  datenum('21:30:00') datenum('28:00:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+flight=[datenum('21:33:00') datenum('28:59:21')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+langley=[datenum('0:0:0') datenum('2:00');  datenum('25:00:00') datenum('27:36:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+%this is Langley flight- start on Oct-02-2014, Langley portion on Oct-03 2014 UTC
 % 
 % No good time periods ([start end]) and memo for all pixels
 %  flag: 1 for unknown or others, 2 for before and after measurements, 10 for unspecified type of clouds, 90 for cirrus, 100 for unspecified instrument trouble, 200 for instrument tests, 300 for frost.
@@ -11,8 +14,8 @@ s.sd_aero_crit=0.01;
 
 % Ozone and other gases
 s.O3h=21;
-s.O3col=0.256;
-s.NO2col=3.18e15;
+s.O3col =0.338;  % this is from OMI 10-02-2014 L2 23:20 UTC file%L2G 321
+s.NO2col=3.15e15;% OMI stratospheric value
 
 % other tweaks
 if isfield(s, 'Pst');
