@@ -23,7 +23,12 @@ if exist(starinfofile)~=2;
 end;
 
 % look for a line starting with the keyword
-try;run(starinfofile);  end;
+try;
+    run(starinfofile);  
+catch;
+    s.dummy=true;
+    eval(starinfofile);
+end;
 if exist(keyword);
     eval(['assignin(''caller'',keyword, ' keyword ');']);
 else

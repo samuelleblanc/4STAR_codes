@@ -1,11 +1,11 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
 % assumed. New calibration files should be linked to this code, and all
 % other 4STAR codes should obtain the c0 from this code. See also
 % starwavelengths.m and Langley.m. To read data from a known c0 file, use
-% importdata.m. To save new c0 data, use starsavec0.m.
+% importdata.m. To save new c0 data, use starsavec0.m.    
 % Yohei, 2012/05/28, 2012/05/31, 2013/02/19.
 % Michal, 2013/02/19.
 % Samuel, v1.0, 2014/10/13, added version_set, to version control the current m script
@@ -14,10 +14,10 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, 2014-11-19, added ARISE cal-flight Langley to list
 % MS, changed line 21 from 8 1 000 to 7 1 000 to account for pre-ARISE cal
 % MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
-% SL, v1.3, 2015-07-22, updated the starc0 for special case testing of lower c0
-%                 from Yohei sent on 20150720, new c0 from 20130708
 
-version_set('1.3');
+
+
+version_set('1.2');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -31,10 +31,15 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
-        if now>=datenum([2014 9 1 0 0 0]);
-            daystr='20140830';
-            filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+    if t>=datenum([2014 7 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+        if now>=datenum([2014 8 1 0 0 0]);
+            daystr='20141002';
+            %daystr='20140830';
+            %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            %filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
+            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
+            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc'; % for in flight langley modified to remove aod variations, default for ARISE cal
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
@@ -45,11 +50,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         %             daystr='20130708';
         %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled2p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
     elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
-        if now>=datenum([2015 7 17]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
-        elseif now>=datenum([2014 10 17]);
+        if now>=datenum([2014 10 17]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
             % use for separate starsun files to obtaine modified Langley
@@ -143,7 +144,9 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
+            disp(fullfile(starpaths,visfilename))
             a=importdata(fullfile(starpaths,visfilename));
+            %a=load(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -166,6 +169,7 @@ if ~exist('visc0')
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
             a=importdata(fullfile(starpaths,nirfilename));
+            %a=load(fullfile(starpaths,nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -209,9 +213,9 @@ niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01
 % niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
 % niraerosolcols1=[];
 % !!! note the 1236 nm is excluded, as Beat says it's affected by gases??
-% niraerosolcols2=[repmat(nirc([11 13]),3,1)+1044+repmat([-1 0 1]',1,2)];
-% % niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+1044+repmat([-1 0 1]',1,1)];
-% niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+repmat([-1 0 1]',1,1)];
+% niraerosolcols2=[repmat(nirc([11 13]),3,1)+1044+repmat([-1 0 1]',1,2)]; 
+% % niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+1044+repmat([-1 0 1]',1,1)]; 
+% niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+repmat([-1 0 1]',1,1)]; 
 % niraerosolcols=union(niraerosolcols1,niraerosolcols2(:)');
 % niraerosolcols=union(niraerosolcols,niraerosolcols3);
 aerosolcols =[visaerosolcols(:)' niraerosolcols(:)'];

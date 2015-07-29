@@ -1,6 +1,10 @@
 function starinfo20130826
 %get variables from caller
-s=evalin('caller','s');
+try;
+    s=evalin('caller','s');
+catch;
+    s.dummy = true;
+end;
 daystr=evalin('caller','daystr');
 
 
