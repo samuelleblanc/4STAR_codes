@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
