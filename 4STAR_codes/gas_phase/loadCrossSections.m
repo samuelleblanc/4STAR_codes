@@ -61,12 +61,12 @@
      o3.visXs     = o3vis(:,2);
      o3.visInterp = interp1(o3.visnm, o3.visXs, vis.nm,'pchip','extrap');
      % hcoh
-     hcohvis = load(fullfile(starpaths,'xs\HCHO_293K4STAR.txt'));
+     hcohvis = load(fullfile(starpaths,['xs' filesep 'HCHO_293K4STAR.txt']));
      hcoh.visnm     = hcohvis(:,1);
      hcoh.visXs     = hcohvis(:,2);
      hcoh.visInterp = interp1(hcoh.visnm, hcoh.visXs, vis.nm,'pchip','extrap');
      % bro
-     brovis = load(fullfile(starpaths,'xs\BrO_243K_AIR4star.txt'));
+     brovis = load(fullfile(starpaths,['xs' filesep 'BrO_243K_AIR4star.txt']));
      bro.visnm     = brovis(:,1);
      bro.visXs     = brovis(:,2);
      bro.visInterp = interp1(bro.visnm, bro.visXs, vis.nm,'pchip','extrap');

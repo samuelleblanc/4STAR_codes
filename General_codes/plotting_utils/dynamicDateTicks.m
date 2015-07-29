@@ -39,7 +39,7 @@ function dynamicDateTicks(axH, link, mdformat)
 % ax2 = subplot(2,1,2); plot(dates, Signal4);
 % linkaxes([ax1 ax2], 'x');
 % dynamicDateTicks([ax1 ax2], 'linked')
-
+% cjf: 2015_07_15, this version supports axes in multiple figures. 
 if nargin < 1 || isempty(axH) % If no axes is specified, use the current axes
     axH = gca;
 end
