@@ -1,6 +1,5 @@
-%flight=[datenum('0:0:0') datenum('2:00');  datenum('21:30:00') datenum('28:00:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-flight=[datenum('21:33:00') datenum('28:59:21')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-langley=[datenum('0:0:0') datenum('2:00');  datenum('25:00:00') datenum('27:36:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+flight=[datenum('21:33:00') datenum('29:53')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+langley=[datenum('25:00:00') datenum('27:36:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 %this is Langley flight- start on Oct-02-2014, Langley portion on Oct-03 2014 UTC
 % 
 % No good time periods ([start end]) and memo for all pixels

@@ -1,5 +1,4 @@
-%flight=[datenum('0:0:0') datenum('0:46:36');datenum('20:20:0') datenum('27:12')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-flight=[datenum('20:19:59') datenum('27:12:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+flight=[datenum('20:20:0') datenum('27:12')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 % 
 % No good time periods ([start end]) and memo for all pixels
 %  flag: 1 for unknown or others, 2 for before and after measurements, 10 for unspecified type of clouds, 90 for cirrus, 100 for unspecified instrument trouble, 200 for instrument tests, 300 for frost.
