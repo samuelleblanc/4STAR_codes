@@ -17,8 +17,9 @@ tic
 %could do same for starinfo*.m file but have not implemented that
 %datadirec_special=[];     %JML
 datadirec_special='DC8_';  %JML
-datadirec_special='../../SEAC4RS/starmat/';  %JML
+datadirec_special='../../SEAC4RS/starmat/';  %SL
 datadirec_short_special='DC8_starsunfinalfiles_Nov14'; %'DC8_starsunfinalfiles_Oct14';
+datadirec_short_special='../../SEAC4RS/starsun/';  %SL
 
 flag_T4temp_filter=1; %value=0 or 1; if==1 will set flags=1 if ratio AODcorr due to temp>=cutoffratio_AODcorr
 wvl_T4filt=1.02; %0.8645; %1.587; %1.02
@@ -32,7 +33,7 @@ aoddiffNIR_threshold=0.1; %difference threshold
 
 % set variables
 prefix='SEAC4RS-4STAR-AOD-CWV'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV'; 
-R='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+R='2'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 if isempty(str2num(R)); % in field
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130902' '20130904' '20130906'} ; % put one day string
 
@@ -41,7 +42,7 @@ if isempty(str2num(R)); % in field
     tend=NaN(size(dslist));
     tend(1)=87370; % the last time stamp
     tend(10)=87996; % the last time stamp
-elseif isequal(R,'0') | isequal(R,'1') % post field  
+elseif isequal(R,'0') | isequal(R,'1') | isequal(R,'2') % post field  
     %JML flights that span 2 days will have to be listed separately and need to be added
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130831' '20130902' '20130904' '20130906' '20130907' '20130909' '20130910' '20130911' '20130913' '20130916' '20130917' '20130918' '20130921' '20130923'} ; % put one day string
     %Values of jproc: 1=archive 0=do not archive  JML 4/7/14
@@ -210,11 +211,12 @@ for i=idx_file_proc,   %JML 4/7/14
             [~,ia,ib]=intersect(tosave, tosave0(:,1));
             tosave=[tosave -9999*ones(size(tosave,1), size(tosave0,2)-1)];
             tosave(ia, 2:end)=tosave0(ib,2:end);
-        elseif isequal(R, '0') | isequal(R,'1'); % all other days, post field
+        elseif isequal(R, '0') | isequal(R,'1') | isequal(R,'2'); % all other days, post field
             % load data
             if ~isempty(datadirec_special)  %JML
                 %starfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'starsunfinalshort.mat']);  %JML
                 starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsunfinal.mat_short.mat']);  %JML
+                starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsun.mat']);  %JML
                 %filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
             else   %JML
                 starfile=fullfile(starpaths, [dslist{i} 'starsunfinal.mat']);
