@@ -33,8 +33,10 @@ end;
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
-            daystr='20140830';
-            filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            %daystr='20140830';
+            daystr='20141002';
+            %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
