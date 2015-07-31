@@ -21,7 +21,7 @@ datadirec_special='../../SEAC4RS/starmat/';  %SL
 datadirec_short_special='DC8_starsunfinalfiles_Nov14'; %'DC8_starsunfinalfiles_Oct14';
 datadirec_short_special='../../SEAC4RS/starsun/';  %SL
 
-flag_T4temp_filter=1; %value=0 or 1; if==1 will set flags=1 if ratio AODcorr due to temp>=cutoffratio_AODcorr
+flag_T4temp_filter=0; %value=0 or 1; if==1 will set flags=1 if ratio AODcorr due to temp>=cutoffratio_AODcorr
 wvl_T4filt=1.02; %0.8645; %1.587; %1.02
 cutoffratio_AODcorr=0.5;  %arbitrary 50% cutoff
 T4cutoff=-15;
@@ -374,6 +374,11 @@ for i=idx_file_proc,   %JML 4/7/14
                     title(sprintf('rec:%6i   UT:%8.4f',irec,UTstarsunfile(irec)),'fontsize',14)
                     ax2=subplot(3,1,2);
                     set(gca,'position',[0.131 0.362 0.775 0.216]);
+                    if ~exist('UTplot')
+                        UTplot=UTstarsunfile;
+                        idxnextday=find(UTplot>=0 & UTplot<=3);
+                        UTplot(idxnextday)=UTplot(idxnextday)+24;
+                    end
                     plot(UTplot(ig),aoddiff_nirminusobs,'g.','markersize',10)
                     hold on
                     plot(UTplot(ig),aod865_nirfit,'r.','markersize',10)
