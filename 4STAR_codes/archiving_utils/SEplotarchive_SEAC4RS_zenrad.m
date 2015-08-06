@@ -40,7 +40,7 @@ startup_plotting;
 
 %% prepare variables
 ICTdir = 'C:\Users\sleblan2\Research\SEAC4RS\starzen_ict\';
-prefix='SEAC4RS-4STAR-ZENRAD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='SEAC4RS-4STAR-ZENITH'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
@@ -150,6 +150,6 @@ for i=idx_file_proc
     exportToPPTX('addpicture',2,'Scale','maxfixed');
 end
 
-exportToPPTX('saveandclose',[ICTdir 'SEAC4RS_4STAR_ZENRAD_' datestr(now,'yyyymmdd')]);
+exportToPPTX('saveandclose',[ICTdir prefix '_' datestr(now,'yyyymmdd')]);
 
 end
