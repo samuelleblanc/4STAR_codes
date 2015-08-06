@@ -7,6 +7,8 @@ function [NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc(starsun,no2coef
 %                 spectra
 %                 corrected bug to subtract tau_ray
 %                 used first order polynomial as basis (instead of 2nd)
+% MS, 2015-08-06, added if-else terms in lines 49/125 to account for
+%                 no good spectra
 %----------------------------------------------------------------------
 ODfit = zeros(length(starsun.t),length(starsun.w));
 tau_no2_subtract = tau_OD;
@@ -49,7 +51,7 @@ for i = 1:length(starsun.t)
             ylarge = logical(y>=5);
             if sum(ylarge)<10
             [U_,fval,exitflag,output]  = fmincon('NO2resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
-            end
+            %end
                 if ~isreal(U_(1)) || U_(1)<0
 
 %                         U_ = [NaN NaN NaN NaN NaN NaN NaN];
@@ -119,6 +121,17 @@ for i = 1:length(starsun.t)
                 % subtract fitted spectrum from slant
                 % tau_aero_subtract(i,wln) = tau_ODslant(i,wln) - ODfit(i,wln);
                 % hold on; plot(starsun.w(wln),yopt,'--g'); legend('measured','calculated (opt)','spectrum to subtract');
+                
+                
+             else
+          
+               U_ = [NaN NaN NaN NaN NaN];
+               sc = [sc; U_];
+               sc_residual = [sc_residual;NaN];
+               no2_DU = [no2_DU;NaN];
+               
+            end
+            
        else
           
                U_ = [NaN NaN NaN NaN NaN];

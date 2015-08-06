@@ -45,6 +45,8 @@
 %                 changed loadCrossSections into local function
 % 2015-04-15 MSR: added various no2 spectral regions for testing
 % 2015-04-21-23, MS: added versions of trace gas routined for testing
+% 2015-08-06,    MS: reverted gasessubtract to original case of no2 for
+%                    SEAC4RS; continue testing/editing on Michal branch
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -231,14 +233,14 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    gas.h2o = H2Oconc./s.m_H2O;% slant converted to vertical
    gas.o3OD  = o3OD;          % this is to be subtracted from slant path this is slant
    tplot = serial2hs(s.t);
-   figure;subplot(211);plot(tplot,O3conc,'.r');hold on;
-          axis([tplot(1) tplot(end) 250 350]);
-          xlabel('time');ylabel('o3 [DU]');
-          legend('best fit','best fit smooth');
-          subplot(212);plot(tplot,sqrt(O3resi),'.r');hold on;
-          axis([tplot(1) tplot(end) 0 5]);
-          xlabel('time');ylabel('o3 RMSE [DU]');
-          title([datestr(s.t(1),'yyyy-mm-dd'), 'best fit']);
+%    figure;subplot(211);plot(tplot,O3conc,'.r');hold on;
+%           axis([tplot(1) tplot(end) 250 350]);
+%           xlabel('time');ylabel('o3 [DU]');
+%           legend('best fit','best fit smooth');
+%           subplot(212);plot(tplot,sqrt(O3resi),'.r');hold on;
+%           axis([tplot(1) tplot(end) 0 5]);
+%           xlabel('time');ylabel('o3 RMSE [DU]');
+%           title([datestr(s.t(1),'yyyy-mm-dd'), 'best fit']);
    
    o3amount = -log(exp(-(real(O3conc/1000)*o3coef')));%(O3conc/1000)*o3coef';
    o4amount = -log(exp(-(real(O4conc)*o4coef')));%O4conc*o4coef';
@@ -291,15 +293,15 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    gas.o3Inv    = o3vcd_smooth;
    gas.o3resiInv= RMSEo3;
    
-   figure;subplot(211);plot(tplot,o3VCD,'.r');hold on;
-          plot(tplot,o3vcd_smooth,'.g');hold on;
-          axis([tplot(1) tplot(end) 250 350]);
-          xlabel('time');ylabel('o3 [DU]');
-          legend('inversion','inversion smooth');
-          subplot(212);plot(tplot,RMSEo3,'.r');hold on;
-          axis([tplot(1) tplot(end) 0 5]);
-          xlabel('time');ylabel('o3 RMSE [DU]');
-          title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
+%    figure;subplot(211);plot(tplot,o3VCD,'.r');hold on;
+%           plot(tplot,o3vcd_smooth,'.g');hold on;
+%           axis([tplot(1) tplot(end) 250 350]);
+%           xlabel('time');ylabel('o3 [DU]');
+%           legend('inversion','inversion smooth');
+%           subplot(212);plot(tplot,RMSEo3,'.r');hold on;
+%           axis([tplot(1) tplot(end) 0 5]);
+%           xlabel('time');ylabel('o3 RMSE [DU]');
+%           title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
           
    % prepare to plot spectrum OD and o3 cross section
    
@@ -324,9 +326,9 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    wln = wln_vis7;
    NO2conc = []; NO2resi=[];
    %[NO2conc, NO2resi, no2OD, tau_OD_fitsubtract5, varall] = no2corecalc_lin(s,no2coef,o4coef,o3coef,wln,tau_OD);
-   [NO2conc, NO2resi, no2O3conc, no2O4conc, varall] = no2corecalc_lin(s,no2coef,o4coef,o3coef,wln,tau_OD);
-   gas.no2  = NO2conc;%in [DU]
-   gas.no2resi= NO2resi;
+   %[NO2conc, NO2resi, no2O3conc, no2O4conc, varall] = no2corecalc_lin(s,no2coef,o4coef,o3coef,wln,tau_OD);
+%    gas.no2  = NO2conc;%in [DU]
+%    gas.no2resi= NO2resi;
    
 %    wln = wln_vis10;
 %    HCOHconc = []; HCOHresi=[];
@@ -350,84 +352,100 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    
 
    % perform pca on no2 wln range
-%    wln4pca = find(wvis<=wvis(nm_0900)&wvis>=wvis(nm_0300)); 
-%       
-%    [s] =starPCA(s,wln4pca,0);
-%    
-%    % perform fit on pca spectra
-%     pcastr = strcat('pca_',num2str(round(1000*s.w(wln4pca(1)))),'_',num2str(round(1000*s.w(wln4pca(end)))));
-%     
+   wln4pca = find(wvis<=wvis(nm_0900)&wvis>=wvis(nm_0300)); 
+      
+   [s] =starPCA(s,wln4pca,0);
+   
+   % perform fit on pca spectra
+    pcastr = strcat('pca_',num2str(round(1000*s.w(wln4pca(1)))),'_',num2str(round(1000*s.w(wln4pca(end)))));
+    
 % %% test several wavelength ranges first
-% for jj=2%1:3
-% 
-%     if jj==1
-%         wln = find(wvis<=wvis(nm_0500)&wvis>=wvis(nm_0400)); %wln_vis7
-%         % find no2 range within wln4pca (since using pca OD)
-%        nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
-%        nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.490,  'nearest');
-%     elseif jj==2
-%         wln = find(wvis<=wvis(nm_0450)&wvis>=wvis(nm_0400)); %wln_vis8
-%         % find no2 range within wln4pca
-%        nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
-%        nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.450,  'nearest');
-%     elseif jj==3
-%        wln = find(wvis<=wvis(nm_0515)&wvis>=wvis(nm_0480)); %wln_vis9
-%         % find no2 range within wln4pca
-%        nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.480,  'nearest');
-%        nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.515,  'nearest');
-%     end
-% 
-% %    
-% %    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcadata);
-% %    no2dat = [NO2conc NO2resi];
-% %    save('no2dat_pca_430_490OD.dat','-ASCII','no2dat');
-% %    tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
-% 
-% %    perform fit
-% %----------------
-% if jj==3
-%    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau_OD);
-%    % perform fit on pca spectra
-%    %[NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc_wh2o(s,no2coef,o4coef,o3coef,h2ocoef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
-%    % perform linear inversion
-%    % all coef are in [atm x cm]
-%    basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1)];
-% 
-% else
-%     % perform fit on pca spectra w/o water vapor region
-%    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
-%    %[ss NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc_wss(s,no2coef,o4coef,o3coef,wln,tau_OD,nm_startpca,nm_endpca);
-%    % perform linear inversion
-%    % all coef are in [atm x cm]
-%    basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) log(wvis(wln))'.*ones(length(wln),1)];
-% 
-% end
-% 
-% 
-%    ccoefno2pca=[];
-%    RRno2pca=[];
-%    for k=1:pp;
-%         %coefno2pca=basisno2\tau_pca_mRay(k,(wln))';
-%         coefno2pca=basisno2\s.(pcastr).pcaOD(k,nm_startpca:nm_endpca)';
-%         reconno2pca=basisno2*coefno2pca;
-%         RRno2pca=[RRno2pca reconno2pca];
-%         ccoefno2pca=[ccoefno2pca coefno2pca];
-%    end
+for jj=2%1:3
+
+    if jj==1
+        wln = find(wvis<=wvis(nm_0500)&wvis>=wvis(nm_0400)); %wln_vis7
+        % find no2 range within wln4pca (since using pca OD)
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.490,  'nearest');
+    elseif jj==2
+        wln = find(wvis<=wvis(nm_0450)&wvis>=wvis(nm_0400)); %wln_vis8
+        % find no2 range within wln4pca
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.430,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.450,  'nearest');
+    elseif jj==3
+       wln = find(wvis<=wvis(nm_0515)&wvis>=wvis(nm_0480)); %wln_vis9
+        % find no2 range within wln4pca
+       nm_startpca = interp1(wvis(wln4pca),[1:length(wln4pca)],0.480,  'nearest');
+       nm_endpca   = interp1(wvis(wln4pca),[1:length(wln4pca)],0.515,  'nearest');
+    end
+
 %    
-%    % calculate no2 vcd
-%    no2VCDpca = real((((ccoefno2pca(1,:))*1000)./(s.m_NO2)')');
-%    % create smooth no2 time-series
-%    xts = 60/3600;   %60 sec in decimal time
+%    [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcadata);
+%    no2dat = [NO2conc NO2resi];
+%    save('no2dat_pca_430_490OD.dat','-ASCII','no2dat');
 %    tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
-%    [no2VCDsmoothpca, sn] = boxxfilt(tplot, no2VCDpca, xts);
-%    no2vcdpca_smooth = real(no2VCDsmoothpca);
-%    
-%    % calculate error
-%    % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
-%    no2Err   = (s.(pcastr).pcadata(:,nm_startpca:nm_endpca)'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);      % in atm cm
-%    MSEno2DU = real((1000*(1/length(wln))*sum(no2Err.^2))');                                               % convert from atm cm to DU
-%    RMSEno2  = real(sqrt(real(MSEno2DU)));
-%    
+
+%    perform fit
+%----------------
+if jj==3
+   [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,tau_OD);
+   % perform fit on pca spectra
+   %[NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc_wh2o(s,no2coef,o4coef,o3coef,h2ocoef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
+   % perform linear inversion
+   % all coef are in [atm x cm]
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1)];
+
+else
+    % perform fit on pca spectra w/o water vapor region
+   [NO2conc NO2resi no2OD tau_OD_fitsubtract5] = no2corecalc(s,no2coef,o4coef,o3coef,wln,s.(pcastr).pcaOD,nm_startpca,nm_endpca);
+   %[ss NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc_wss(s,no2coef,o4coef,o3coef,wln,tau_OD,nm_startpca,nm_endpca);
+   % perform linear inversion
+   % all coef are in [atm x cm]
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) log(wvis(wln))'.*ones(length(wln),1)];
+
+end
+
+% figure;subplot(211);plot(tplot,NO2conc,'.g');
+%           axis([tplot(1) tplot(end) 0 0.5]);
+%           xlabel('time');ylabel('no2 [DU]');
+%           if jj==1
+%               title('NO2 retrieval 430-490 nm');
+%           elseif jj==2
+%               title('NO2 retrieval 430-450 nm');
+%           elseif jj==3
+%               title('NO2 retrieval 480-515 nm');
+%           end
+%           subplot(212);plot(tplot,NO2resi,'.r');hold on;
+%           axis([tplot(1) tplot(end) 0 0.005]);
+%           xlabel('time');ylabel('no2 RMSE [DU]');
+          
+          
+
+
+   ccoefno2pca=[];
+   RRno2pca=[];
+   for k=1:pp;
+        %coefno2pca=basisno2\tau_pca_mRay(k,(wln))';
+        coefno2pca=basisno2\s.(pcastr).pcaOD(k,nm_startpca:nm_endpca)';
+        reconno2pca=basisno2*coefno2pca;
+        RRno2pca=[RRno2pca reconno2pca];
+        ccoefno2pca=[ccoefno2pca coefno2pca];
+   end
+   
+   % calculate no2 vcd
+   no2VCDpca = real((((ccoefno2pca(1,:))*1000)./(s.m_NO2)')');
+   % create smooth no2 time-series
+   xts = 60/3600;   %60 sec in decimal time
+   tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+   [no2VCDsmoothpca, sn] = boxxfilt(tplot, no2VCDpca, xts);
+   no2vcdpca_smooth = real(no2VCDsmoothpca);
+   
+   % calculate error
+   % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
+   no2Err   = (s.(pcastr).pcadata(:,nm_startpca:nm_endpca)'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);      % in atm cm
+   MSEno2DU = real((1000*(1/length(wln))*sum(no2Err.^2))');                                               % convert from atm cm to DU
+   RMSEno2  = real(sqrt(real(MSEno2DU)));
+   
 %    figure;subplot(211);plot(tplot,no2VCDpca,'.r');hold on;
 %           plot(tplot,no2vcdpca_smooth,'.g');hold on;
 %           axis([tplot(1) tplot(end) 0 0.3]);
@@ -436,48 +454,52 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %           subplot(212);plot(tplot,RMSEno2,'.r');hold on;
 %           axis([tplot(1) tplot(end) 0 0.005]);
 %           xlabel('time');ylabel('no2 RMSE [DU]');
-%           
-%    % prepare to plot spectrum OD and no2 cross section
-%    %no2spectrum_pca     = tau_pca_mRay(:,(wln))-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
-%    no2spectrum_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
-%    no2fit_pca          = ccoefno2pca(1,:)'*basisno2(:,1)';
-%    %no2residual_pca     = tau_pca_mRay(:,(wln))-RRno2pca';
-%    no2residual_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca';
-%    
-%    % 8. plot fitted and "measured" no2 spectrum
-% %      for i=1:100:length(s.t)
-% %          figure(888);
-% %          plot(wvis((wln)),no2spectrum_pca(i,:),'-k','linewidth',2);hold on;
-% %          plot(wvis((wln)),no2fit_pca(i,:),'-r','linewidth',2);hold on;
-% %          plot(wvis((wln)),no2residual_pca(i,:),':k','linewidth',2);hold off;
-% %          xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcdpca_smooth(i)),' RMSE = ',num2str(RMSEno2(i))),...
-% %                 'fontsize',14,'fontweight','bold');
-% %          ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted NO_{2} spectrum','residual');
-% %          set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
-% %          pause(0.001);
-% %      end
-% 
-%    % no2OD is the spectrum portion to subtract
+          
+   % prepare to plot spectrum OD and no2 cross section
+   %no2spectrum_pca     = tau_pca_mRay(:,(wln))-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
+   no2spectrum_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca' + ccoefno2pca(1,:)'*basisno2(:,1)';
+   no2fit_pca          = ccoefno2pca(1,:)'*basisno2(:,1)';
+   %no2residual_pca     = tau_pca_mRay(:,(wln))-RRno2pca';
+   no2residual_pca     = s.(pcastr).pcadata(:,nm_startpca:nm_endpca)-RRno2pca';
+   
+   % 8. plot fitted and "measured" no2 spectrum
+%      for i=1:100:length(s.t)
+%          figure(888);
+%          plot(wvis((wln)),no2spectrum_pca(i,:),'-k','linewidth',2);hold on;
+%          plot(wvis((wln)),no2fit_pca(i,:),'-r','linewidth',2);hold on;
+%          plot(wvis((wln)),no2residual_pca(i,:),':k','linewidth',2);hold off;
+%          xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcdpca_smooth(i)),' RMSE = ',num2str(RMSEno2(i))),...
+%                 'fontsize',14,'fontweight','bold');
+%          ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted NO_{2} spectrum','residual');
+%          set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
+%          pause(0.001);
+%      end
+
+   % no2OD is the spectrum portion to subtract
 %    gas.no2  = no2vcdpca_smooth;%NO2conc;%in [DU]
 %    gas.no2resi= RMSEno2;%sqrt(NO2resi);
-%    %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
-%    %no2amount = (NO2conc)*no2coef';
-%    no2amount = (no2vcdpca_smooth/1000)*no2coef';
+   
+   gas.no2  = NO2conc;%in [DU]
+   gas.no2resi= NO2resi;
+   
+   %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
+   %no2amount = (NO2conc)*no2coef';
+   %no2amount = (no2vcdpca_smooth/1000)*no2coef';
    no2amount = (NO2conc/1000)*no2coef';
    %no2amount = (1.86e-4)*repmat(no2coef',pp,1);  % constant value
    tau_OD_fitsubtract5 = tau_OD_fitsubtract4 - real(no2amount);
    tau_sub = tau_OD_fitsubtract5;%tau_OD_fitsubtract4;
    %tau_sub(:,1:nm_0490) = starsun.tau_a_avg(:,1:nm_0490);
    %tau_sub(:,1:nm_0470) = s.tau_aero(:,1:nm_0470);
-% %    figure;
-% %    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
-% %    plot(starsun.w,tau_ODslant(end-500,:)-no2amount(end-500,:),'--y');xlabel('wavelength');ylabel('OD');
-% %    legend('total OD','OD after NO2 subtraction');
-%    %tau_aero_fitsubtract(:,wln_vis7) = tau_ODslant(:,wln_vis7) - no2subtract;
-%    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
-% %% end fmincon
-% 
-% end % test no2 spectral range results
+%    figure;
+%    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
+%    plot(starsun.w,tau_ODslant(end-500,:)-no2amount(end-500,:),'--y');xlabel('wavelength');ylabel('OD');
+%    legend('total OD','OD after NO2 subtraction');
+   %tau_aero_fitsubtract(:,wln_vis7) = tau_ODslant(:,wln_vis7) - no2subtract;
+   %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
+%% end fmincon
+
+end % test no2 spectral range results
 %%
 % plot subtraction results
 % comment out to increase speed
