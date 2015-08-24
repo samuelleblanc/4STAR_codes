@@ -16,7 +16,7 @@ function stamp(filename, author)
 xx=0.13;
 yy=0.01;
 % author
-if nargin<2 | author='';
+if nargin<2 | author=='';
   %  author='Yohei';
   author=getUserName;
 end;

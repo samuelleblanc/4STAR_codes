@@ -1,4 +1,4 @@
-[dir]=function plot_fov();
+function dir = plot_fov();
 make_fig=true;
 
 
