@@ -23,7 +23,7 @@ elseif exist(fullfile(starpaths(source), [source '.mat']))==2;
 elseif exist(fullfile(starpaths(source), source))==2;
     file=fullfile(starpaths(source), source);
 else
-    disp('Did not find the filetype: ' filetype ' for day: ' source)
+    disp(['Did not find the filetype: ' filetype ' for day: ' source])
     try
       [fna pna]=uigetfile(['*' filetype '*.mat'],['Searching for day: ' source],starpaths);
       file=[pna fna];
