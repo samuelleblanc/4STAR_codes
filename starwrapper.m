@@ -83,7 +83,7 @@ toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=true;% true is for SEAC4RS data
-toggle.gassubtract = false;
+toggle.gassubtract = true;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = true; % for running any Yohei style flagging

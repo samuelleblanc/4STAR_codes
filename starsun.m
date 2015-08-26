@@ -27,7 +27,7 @@ version_set('1.1');
 %********************
 disp(path)
 toggle.applynonlinearcorr=true;
-toggle.gassubstract = false;
+toggle.gassubtract = true;
 if (~isempty(varargin));
     [toggle_in,vars] = parse_struct(varargin{:});
     toggle = catstruct(toggle,toggle_in);
