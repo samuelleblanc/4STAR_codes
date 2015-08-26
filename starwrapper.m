@@ -83,7 +83,7 @@ toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=true;% true is for SEAC4RS data
-toggle.gassubtract = true;
+toggle.gassubtract = false;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = true; % for running any Yohei style flagging
@@ -145,7 +145,11 @@ if (~isempty(varargin))
 else nnarg=0;
 end; % if
 
-if toggle.verbose;  disp('In Starwrapper'), end;
+if toggle.verbose;  
+  disp('In Starwrapper') 
+  disp('toggles')
+  disp(toggle)
+end;
 
 % start taking notes
 if ~isfield(s, 'note');
@@ -181,6 +185,9 @@ infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
+
+  eval(infofile2)
+if 0;
 if exist(infofile2)==2;
     eval(infofile2);
 elseif exist(infofile)==2;
@@ -200,6 +207,7 @@ else; % copy an existing old starinfo file and run it
 end;
 if dayspast>=maxdayspast;
     error(['Make ' infofile ' available.']);
+end;
 end;
 if isempty(s.O3h) || isempty(s.O3col);
     warning(['Enter ozone height and column density in starinfo' daystr '.m.']);

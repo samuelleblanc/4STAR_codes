@@ -72,14 +72,26 @@ elseif ~isempty(strfind(lower(userpath),'samuel'))
     figurefolder='C:\Users\Samuel\Research\4STAR\figs\fov\';
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'))
-    matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
-    figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
-    author='Samuel';
-    if nargin>0;
+    if isunix;
+      matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
+      figurefolder='/home5/sleblan2/4STAR/figs/';
+      author='Samuel';
+      if nargin>0;
+        matfolder = '/nobackupp8/sleblan2/SEAC4RS/dc8/SEAC4RS/';
+        %pp='/nobackupp8/sleblan2/ARISE/c130/';
+        %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
+        %if nargin>1; matfolder=[matfolder raw filesep]; end;
+      end;
+    else
+      matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
+      figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
+      author='Samuel';
+      if nargin>0;
         pp='C:\Users\sleblan2\Research\ARISE\c130\';
         matfolder=[pp ls([pp '*ARISE*' source]) filesep];
         if nargin>1; matfolder=[matfolder raw filesep]; end;
-    end;
+      end;
+   end
 elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
     matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
     figurefolder='/home5/sleblan2/4STAR/figs/';
