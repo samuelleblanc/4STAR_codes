@@ -7,12 +7,13 @@
 % John,  2014/04/12: complete working CWV code in a separate version for the time being
 % John,  2014/10/02; updated to more AOD wvls and AOD unc for final SEAC4RS archival
 % John,  2014/10/24; updated to add CWV variables for inclusion in AOD archive file
-% 
+% Sam, 2015-08-24: Updated to use R2 calculated on Pleiades 
 clear
 close all
 
 tic
 
+def_starpaths = false;
 %JML: following gives user flexibility to store *starsun.mat & flag files in a subdirectory under starpaths;
 %could do same for starinfo*.m file but have not implemented that
 %datadirec_special=[];     %JML
@@ -20,6 +21,13 @@ datadirec_special='DC8_';  %JML
 datadirec_special='../../SEAC4RS/starmat/';  %SL
 datadirec_short_special='DC8_starsunfinalfiles_Nov14'; %'DC8_starsunfinalfiles_Oct14';
 datadirec_short_special='../../SEAC4RS/starsun/';  %SL
+fp_starmat = '/nobackup/sleblan2/SEAC4RS/dc8/SEAC4RS/';
+fp_starsun = '/nobackup/sleblan2/SEAC4RS/starsun_R2/';
+fp_figs = '/nobackup/sleblan2/SEAC4RS/figs/';
+fp_ict = '/nobackup/sleblan2/SEAC4RS/starict_R2/'
+
+fig_vis = {'Visible','off'}
+savefigs = true;
 
 flag_T4temp_filter=0; %value=0 or 1; if==1 will set flags=1 if ratio AODcorr due to temp>=cutoffratio_AODcorr
 wvl_T4filt=1.02; %0.8645; %1.587; %1.02
@@ -69,6 +77,7 @@ for i=idx_file_proc,   %JML 4/7/14
     UTflight=timeMatlab_to_UTdechr(flight);
     
     % load track data
+    if def_starpaths
     if ~isempty(datadirec_special)  %JML
         filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
         if ~exist(filestar)
@@ -77,8 +86,12 @@ for i=idx_file_proc,   %JML 4/7/14
     else   %JML
         filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
     end    %JML
+    else
+	filestar = fullfile(fp_starmat, [dslist{i} 'star.mat'])
+    end
     load(filestar,'track');
-   
+       
+
     if strcmp(daystr,'20130827')
         iii=find(track.t>=flight(1));
         track1_t=track.t(iii);
@@ -97,10 +110,14 @@ for i=idx_file_proc,   %JML 4/7/14
     end
     
     if flight(end)>track1_t(end)& flag_flightendcheck
-        filestar2=fullfile(starpaths, [sprintf('%s%s',datadirec_special,num2str(str2num(dslist{i})+1)) filesep num2str(str2num(dslist{i})+1) 'star.mat']);  %JML
+        if def_starpaths
+	filestar2=fullfile(starpaths, [sprintf('%s%s',datadirec_special,num2str(str2num(dslist{i})+1)) filesep num2str(str2num(dslist{i})+1) 'star.mat']);  %JML
          if ~exist(filestar2)
             filestar2 = fullfile(starpaths, [sprintf('%s%s',datadirec_special, dslist{i}) 'star.mat']); 
         end;
+	else
+	  filestar2 = fullfile(fp_starmat,[num2str(str2num(dslist{i})+1) 'star.mat'])
+	end;
         load(filestar2,'track');
         switch daystr
             case '20130827'
@@ -142,7 +159,7 @@ for i=idx_file_proc,   %JML 4/7/14
     track.tsm=boxxfilt(track_t, track_T4, bl);
     [track.tsorted, iisav]=unique(track_t);
 
-    figure(191)
+    figure(191,fig_vis{:})
     ax1=subplot(2,1,1);
     plot(track_t,ones(length(track_t),1)*1.25,'c.')
     hold on
@@ -169,6 +186,12 @@ for i=idx_file_proc,   %JML 4/7/14
     ylabel('T4 Temp (C)','fontsize',20)
     xlabel('Time','fontsize',20)
     linkaxes([ax1 ax2],'x')
+    if savefigs
+      fp_f = [fp_figs dslist{i} '_track_t_vs_T4.fig']
+      saveas(gcf,fp_f);
+      makevisible(fp_f);
+    end
+
     clear track_t track_T4 track1_t track2_t track1_T4 track2_T4
     
     % read data to be saved
@@ -177,7 +200,7 @@ for i=idx_file_proc,   %JML 4/7/14
             tosave=[];
             warning(['For the ' dslist{i} ' file, add "No AOD measurements were made on this flight." to the header.']);
         elseif isempty(str2num(R)); % all other days, in field
-            starfile=fullfile(starpaths, [dslist{i} 'starsun.mat']);
+            starfile=fullfile(starpaths, [dslist{i} 'starsun.mat'])
             load(starfile,'t','w','Lat','Lon','Alt','tau_aero','tau_aero_err');
             if ~exist('tau_aero_err');
                 load(starfile,'tau_aero_errlo','tau_aero_errhi');
@@ -213,6 +236,7 @@ for i=idx_file_proc,   %JML 4/7/14
             tosave(ia, 2:end)=tosave0(ib,2:end);
         elseif isequal(R, '0') | isequal(R,'1') | isequal(R,'2'); % all other days, post field
             % load data
+	    if def_starpaths
             if ~isempty(datadirec_special)  %JML
                 %starfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'starsunfinalshort.mat']);  %JML
                 starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsunfinal.mat_short.mat']);  %JML
@@ -222,6 +246,9 @@ for i=idx_file_proc,   %JML 4/7/14
                 starfile=fullfile(starpaths, [dslist{i} 'starsunfinal.mat']);
                 %filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
             end    %JML
+	    else
+	        starfile = fullfile(fp_starsun,[dslist{i} 'starsun_R2.mat'])
+  	    end
             %vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening' 'flagallcols','m_aero'};  %used for R='0' Apr 2014
             %vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','flagallcols','m_aero','tau_aero_err'};  %added 'tau_aero_err' for R='1' Oct 2014
             vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','m_aero','tau_aero_err','cwv','flagallcols'}; %added 'cwv' for R='1',Oct 2014
@@ -297,7 +324,7 @@ for i=idx_file_proc,   %JML 4/7/14
                 flagsav=flags;
                 idxreset=jjj(abs_ratio_AODcorr>=cutoffratio_AODcorr | T4degC_smintp(jjj)<T4cutoff);
                 flags(idxreset)=1; %set flags=1 if ratio>cutoff                
-                figure(701) %for QA
+                figure(701,vis_fig{:}) %for QA
                 UTplot=UTstarsunfile;
                 idxnextday=find(UTplot>=0 & UTplot<=3);
                 UTplot(idxnextday)=UTplot(idxnextday)+24;
@@ -328,6 +355,12 @@ for i=idx_file_proc,   %JML 4/7/14
                 ylabel('{\color{black}abs|ratioAODcorr|},{\color{green}cutoffratio}','fontsize',14)
                 xlabel('UT (hr)','fontsize',20)
                 linkaxes([ax1 ax2 ax3],'x')
+                if savefigs 
+                  fp_f = [fp_figs dslist{i} '_aero_noscreening_time_flags.fig']
+                  saveas(gcf,fp_f);
+                  makevisible(fp_f);
+                end
+
                 %stophere168
             end
  
@@ -351,7 +384,7 @@ for i=idx_file_proc,   %JML 4/7/14
                 aodratio_nirtoobs=aod865_nirfit'./tau_aero_noscreening(ig,c(idx865)); %of interest but not used for filtering
                 idxig_NIRbad=find(aoddiff_nirminusobs>=aoddiffNIR_threshold); %used below for filtering
                 if length(idxig_NIRbad)>0
-                    figure(711) %for QA
+                    figure(711,vis_fig{:}) %for QA
                     subplot(3,1,1)
                     set(gca,'position',[0.131 0.655 0.775 0.307]);
                     %irecfnd=find(UTstarsunfile>18.3894);
@@ -398,8 +431,14 @@ for i=idx_file_proc,   %JML 4/7/14
                     linkaxes([ax2 ax3],'x')
                     tau_aero_noscreening(ig(idxig_NIRbad),idxnir)=NaN;
                     tau_aero_err(ig(idxig_NIRbad),idxnir)=NaN;
+	            if savefigs 
+		        fp_f = [fp_figs dslist{i} '_loglog_aod_diff.fig']
+      			saveas(gcf,fp_f);
+      			makevisible(fp_f);
+    		    end
+
                 else
-                    figure(712)
+                    figure(712,vis_fig{:})
                     ax1=subplot(2,1,1);
                     plot(UTplot(ig),aoddiff_nirminusobs,'b.','markersize',10)
                     hold on
@@ -422,7 +461,12 @@ for i=idx_file_proc,   %JML 4/7/14
                     set(gca,'fontsize',16)
                     ylabel('{\color{black}AOD ratio:NIR/obs}, {\color{blue}AOD diff*10}','fontsize',16)
                     xlabel('UT (hr)','fontsize',20)
-                    linkaxes([ax1 ax2],'x')                   
+                    linkaxes([ax1 ax2],'x')
+                    if savefigs
+                        fp_f = [fp_figs dslist{i} '_aod_diff.fig']
+                        saveas(gcf,fp_f);
+                        makevisible(fp_f);
+                    end                   
                 end
             end
             
@@ -601,7 +645,8 @@ for i=idx_file_proc,   %JML 4/7/14
     %templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '.ict']);
     %savefilename=fullfile(starpaths, [prefix '_' platform '_' dslist{i} '_R' num2str(R) '.ict']);
     %templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V03_John.ict']);
-    templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V06_John.ict']);
+    if def_starpaths
+     templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V06_John.ict']);
     if ~isempty(datadirec_special)  %JML updated 11/25/14
         %savefilename=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep], [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_John.ict']);
         savefilename=fullfile('c:\johnmatlab\4STAR\SEAC4RS_archive_files\R1archive_AOD_files_JML_rev03\', [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_John.ict']);
@@ -611,6 +656,10 @@ for i=idx_file_proc,   %JML 4/7/14
     if exist(savefilename);
         error([savefilename ' exists.']);
     end;
+    else
+       savefilename = fullfile(fp_ict,[prefix '_' platform '_' dslist{i} '_R' num2str(R) '.ict'])
+       templatefile=fullfile(fp_ict, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V06_John.ict']);
+    end
     fid0=fopen(templatefile, 'r');
     fid=fopen(savefilename, 'w');
     for ii=1:6;
