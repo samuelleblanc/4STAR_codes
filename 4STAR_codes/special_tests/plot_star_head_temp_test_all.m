@@ -477,6 +477,38 @@ ylabel('Percent of counts [%]')
 hold off;
 save_fig(12,[dir 'combined_tests_subsubset_500'],true);
 
+%% Plotting only sub-subset
+figure(13);
+set(gcf,'Position',[100,50,1550,950]);
+sub = [3,4,6];
+i = 1;
+j = 1;
+clr = hsv(length(sub)+1);
+plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+hold all;
+plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+    'Color',clr(j,:),...
+    'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+for i=1:length(tests)
+    if ismember(i,sub)
+        j = j+1;
+        if i==19;
+            tests(i).heat.vpb(:,i500) = tests(i).heat.vpb(:,i500)./tests(i).heat.vpb(1,i500)*100.0;
+            tests(i).heat.vfit(2,i500) = tests(i).heat.vfit(2,i500)-11.0;
+        end;
+        plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+        plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+            'Color',clr(j,:),...
+            'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+    end
+end
+grid on;
+legend(gca,'show','Location','NorthEastOutside')
+title('Signal variations at 500 nm')
+xlabel('Temperature [°C]')
+ylabel('Percent of counts [%]')
+hold off;
+save_fig(13,[dir 'combined_tests_microbending_500'],true);
 
 %% now for 850 nm
 
