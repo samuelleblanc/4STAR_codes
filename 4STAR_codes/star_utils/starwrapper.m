@@ -69,8 +69,10 @@ function	s=starwrapper(s, s2, varargin)
 % MS: v1.7, 2015-02-19: added total optical depth fields for gas utils
 % MS: v1.8, 2015-04-07: added tau_O4nir field in preparation to use fitted
 %                       gases subtraction for archiving
+% SL: v1.9, 2015-08-27: added useability of starwrapper with toggles and a
+%                       single s struct, no s2
 
-version_set('1.8');
+version_set('1.9');
 %********************
 %% prepare for processing
 %********************
@@ -142,7 +144,14 @@ if (~isempty(varargin))
             end % switch
         end % for
     end; % nargin==1
-else nnarg=0;
+else
+    nnarg = 0;
+    if nargin==2;
+        if ~isfield(s2,'t');
+            nnarg=1;
+            toggle = catstruct(toggle,s2)
+        end;
+    end;
 end; % if
 
 if toggle.verbose;  disp('In Starwrapper'), end;
@@ -166,7 +175,7 @@ s2.note={};
 %% get data type
 if toggle.verbose; disp('get data types'), end;
 [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
-if nargin>=2+nnarg
+if nargin>=(2+nnarg)
     [daystr2, filen2, datatype2]=starfilenames2daystr(s2.filename, 1);
 end;
 
