@@ -27,7 +27,11 @@ try;
     run(starinfofile);  
 catch;
     s.dummy=true;
-    eval(starinfofile);
+    try;
+       run(starinfofile)
+    catch;
+	eval(starinfofile);
+    end;
 end;
 if exist(keyword);
     eval(['assignin(''caller'',keyword, ' keyword ');']);

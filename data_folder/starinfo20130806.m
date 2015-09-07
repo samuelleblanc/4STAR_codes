@@ -11,7 +11,7 @@ flight=[datenum('17:58:48') datenum('26:42:42')]-datenum('00:00:00')+datenum([da
 smoke=[datenum('19:50:00') datenum('20:06:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 % from Livingston's flight notes.
 groundcomparison=[datenum('14:25:00') datenum('17:58:29')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-!!! A rough timing, to be updated. No good post-flight comparison, as dirt may have deposited during the flight.
+%!!! A rough timing, to be updated. No good post-flight comparison, as dirt may have deposited during the flight.
 % horileg=[datenum('02:04:05') datenum('02:22:59')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 horilegs=[datenum('18:23:56') datenum('18:48:43'); ...
     datenum('19:01:47') datenum('19:14:16'); ...
