@@ -2,8 +2,9 @@
 % it on
 
 function makevisible(file)
-f=load(file,'-mat');
-n=fieldnames(f);
-f.(n{1}).properties.Visible='on';
-save(file,'-struct','f')
+
+%f=load(file,'-mat');
+%n=fieldnames(f);
+%f.(n{1}).properties.Visible='on';
+%save(file,'-struct','f')
 end

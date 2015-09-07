@@ -25,6 +25,7 @@ fp_starmat = '/nobackup/sleblan2/SEAC4RS/dc8/SEAC4RS/';
 fp_starsun = '/nobackup/sleblan2/SEAC4RS/starsun_R2/';
 fp_figs = '/nobackup/sleblan2/SEAC4RS/figs/';
 fp_ict = '/nobackup/sleblan2/SEAC4RS/starict_R2/'
+fp_flag = ''
 
 fig_vis = {'Visible','off'}
 savefigs = true;
@@ -54,7 +55,7 @@ elseif isequal(R,'0') | isequal(R,'1') | isequal(R,'2') % post field
     %JML flights that span 2 days will have to be listed separately and need to be added
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130831' '20130902' '20130904' '20130906' '20130907' '20130909' '20130910' '20130911' '20130913' '20130916' '20130917' '20130918' '20130921' '20130923'} ; % put one day string
     %Values of jproc: 1=archive 0=do not archive  JML 4/7/14
-    jproc=[         0          0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0]; %set=1 to process    %JML 4/7/14
+    jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1]; %set=1 to process    %JML 4/7/14
     %Values of idflag: 1=old flagging,2=new flagging JML 4/7/14   
     idflag=[        2          2          2          2          2          2          2          2          1          1          1          1          1          1          2          2          1          1          2          2          2          2          2          2          2          2          2]; %JML 4/7/14
     %JML updated datamanager for the purpose of these runs, but of course 9/6-7 is really Yohei and he has already archived that file
@@ -159,7 +160,7 @@ for i=idx_file_proc,   %JML 4/7/14
     track.tsm=boxxfilt(track_t, track_T4, bl);
     [track.tsorted, iisav]=unique(track_t);
 
-    figure(191,fig_vis{:})
+    figure(fig_vis{:})
     ax1=subplot(2,1,1);
     plot(track_t,ones(length(track_t),1)*1.25,'c.')
     hold on
@@ -270,6 +271,7 @@ for i=idx_file_proc,   %JML 4/7/14
                     flags(flags0==1)=1; %JML
                 case 2  %new flagging
                     flagfilename=select_flagfile(dslist{i},R);
+                    if def_starpaths
                     if ~isempty(datadirec_special)  %JML
                         flagfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep flagfilename]);  %JML
                         if ~exist(flagfile);
@@ -277,6 +279,9 @@ for i=idx_file_proc,   %JML 4/7/14
                         end;
                     else
                         flagfile=fullfile(starpaths,flagfilename); %JML 4/7/14
+                    end
+		    else
+			flagfile = fullfile(fp_flag,flagfilename);
                     end
                     load(flagfile,'flags','flags_struct'); %JML 4/7/14
                     UTflagfile=timeMatlab_to_UTdechr(flags.time.t);
@@ -324,7 +329,7 @@ for i=idx_file_proc,   %JML 4/7/14
                 flagsav=flags;
                 idxreset=jjj(abs_ratio_AODcorr>=cutoffratio_AODcorr | T4degC_smintp(jjj)<T4cutoff);
                 flags(idxreset)=1; %set flags=1 if ratio>cutoff                
-                figure(701,vis_fig{:}) %for QA
+                figure(vis_fig{:}) %for QA
                 UTplot=UTstarsunfile;
                 idxnextday=find(UTplot>=0 & UTplot<=3);
                 UTplot(idxnextday)=UTplot(idxnextday)+24;
@@ -384,7 +389,7 @@ for i=idx_file_proc,   %JML 4/7/14
                 aodratio_nirtoobs=aod865_nirfit'./tau_aero_noscreening(ig,c(idx865)); %of interest but not used for filtering
                 idxig_NIRbad=find(aoddiff_nirminusobs>=aoddiffNIR_threshold); %used below for filtering
                 if length(idxig_NIRbad)>0
-                    figure(711,vis_fig{:}) %for QA
+                    figure(vis_fig{:}) %for QA
                     subplot(3,1,1)
                     set(gca,'position',[0.131 0.655 0.775 0.307]);
                     %irecfnd=find(UTstarsunfile>18.3894);
@@ -438,7 +443,7 @@ for i=idx_file_proc,   %JML 4/7/14
     		    end
 
                 else
-                    figure(712,vis_fig{:})
+                    figure(vis_fig{:})
                     ax1=subplot(2,1,1);
                     plot(UTplot(ig),aoddiff_nirminusobs,'b.','markersize',10)
                     hold on
@@ -658,7 +663,7 @@ for i=idx_file_proc,   %JML 4/7/14
     end;
     else
        savefilename = fullfile(fp_ict,[prefix '_' platform '_' dslist{i} '_R' num2str(R) '.ict'])
-       templatefile=fullfile(fp_ict, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V06_John.ict']);
+       templatefile=fullfile(fp_ict, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '.ict']);
     end
     fid0=fopen(templatefile, 'r');
     fid=fopen(savefilename, 'w');
