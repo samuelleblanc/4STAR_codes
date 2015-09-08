@@ -39,7 +39,7 @@ function plot_FOVs(filein)
 version_set('1.0')
 %% setup and load the files
 if nargin<1 || isempty(filein)
-    [filename, sourcefolder]=uigetfile('*star.mat','Pick the star.mat files');
+    [filename, sourcefolder]=uigetfile2({'*star.mat';'*starfov.mat'},'Pick the star.mat or starfov.mat files');
     filein=[sourcefolder filename];
 end;
 
