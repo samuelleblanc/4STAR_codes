@@ -23,7 +23,9 @@ function [savematfile, contents]=starfov(varargin)
 % MS: 2014-08-22: corrected line 108 to include rate and darkstd only; line 120 to take
 % only note(first line) for dimension consistancy
 % SL: v1.0, 2014-10-13: added version control of this m script via version_set
-version_set('1.0');
+% SL: v1.1, 2015-08-27: added toggle use for starwrapper, default to not
+% run temp correction
+version_set('1.1');
 %********************
 % regulate input and read source
 %********************
@@ -37,6 +39,7 @@ end;
 %********************
 % do the core calculations
 %********************
+toggle.applytempcorr = false;
 for ff=1:length(contents0);
     % grab each structure
     s0=load(sourcefile, contents0{ff});
@@ -47,7 +50,7 @@ for ff=1:length(contents0);
         if ~isempty(s.t);
             
             % add variables and make adjustments common among all data types
-            s=starwrapper(s);
+            s=starwrapper(s,toggle);
             
             % normalize the count rate
             rows_before_initial_sun=4;
