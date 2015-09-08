@@ -78,9 +78,12 @@ elseif ~isempty(strfind(lower(userpath),'sleblan2'))
       author='Samuel';
       if nargin>0;
         matfolder = '/nobackupp8/sleblan2/SEAC4RS/dc8/SEAC4RS/';
-        %pp='/nobackupp8/sleblan2/ARISE/c130/';
-        %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
+        if str2num(source) > 20140601;
+           pp='/nobackupp8/sleblan2/ARISE/c130/';
+           matfolder = pp;
+           %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
         %if nargin>1; matfolder=[matfolder raw filesep]; end;
+        end;
       end;
     else
       matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
