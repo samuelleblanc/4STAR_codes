@@ -25,9 +25,10 @@ fp_starmat = '/nobackup/sleblan2/SEAC4RS/dc8/SEAC4RS/';
 fp_starsun = '/nobackup/sleblan2/SEAC4RS/starsun_R2/';
 fp_figs = '/nobackup/sleblan2/SEAC4RS/figs/';
 fp_ict = '/nobackup/sleblan2/SEAC4RS/starict_R2/'
-fp_flag = ''
+fp_flag = '/u/sleblan2/4STAR/4STAR_codes/data_folder/'
 
 fig_vis = {'Visible','off'}
+vis_fig = {'Visible','off'}
 savefigs = true;
 
 flag_T4temp_filter=0; %value=0 or 1; if==1 will set flags=1 if ratio AODcorr due to temp>=cutoffratio_AODcorr
@@ -55,7 +56,7 @@ elseif isequal(R,'0') | isequal(R,'1') | isequal(R,'2') % post field
     %JML flights that span 2 days will have to be listed separately and need to be added
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130831' '20130902' '20130904' '20130906' '20130907' '20130909' '20130910' '20130911' '20130913' '20130916' '20130917' '20130918' '20130921' '20130923'} ; % put one day string
     %Values of jproc: 1=archive 0=do not archive  JML 4/7/14
-    jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1]; %set=1 to process    %JML 4/7/14
+    jproc=[         0          0          0          0          0          0          0          0          0          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1]; %set=1 to process    %JML 4/7/14
     %Values of idflag: 1=old flagging,2=new flagging JML 4/7/14   
     idflag=[        2          2          2          2          2          2          2          2          1          1          1          1          1          1          2          2          1          1          2          2          2          2          2          2          2          2          2]; %JML 4/7/14
     %JML updated datamanager for the purpose of these runs, but of course 9/6-7 is really Yohei and he has already archived that file
@@ -285,6 +286,13 @@ for i=idx_file_proc,   %JML 4/7/14
                     end
                     load(flagfile,'flags','flags_struct'); %JML 4/7/14
                     UTflagfile=timeMatlab_to_UTdechr(flags.time.t);
+                    %% Sam 2015-09-08, modified to match the time of the flags to the time of the measurement
+		    disp('UT starsun file')
+		    if length(UTstarsunfile) ~= length(UTflagfile)
+			disp('Problem with time mismatch')
+			disp('Problem with time mismatch')
+		    end                    
+
                     flagsnew=flags; %JML 4/7/14
                     flags0=flagsnew.before_or_after_flight | flagsnew.bad_aod;  %JML 4/7/14
                     idx_flags_cld=find(flagsnew.unspecified_clouds & ~flagsnew.smoke);
@@ -333,6 +341,10 @@ for i=idx_file_proc,   %JML 4/7/14
                 UTplot=UTstarsunfile;
                 idxnextday=find(UTplot>=0 & UTplot<=3);
                 UTplot(idxnextday)=UTplot(idxnextday)+24;
+                if length(UTplot) > length(ig);
+                   UTplot = UTplot(1:length(ig));
+                   disp('modifying the UTplot becasue it was too long')
+                end;
                 ax1=subplot(3,1,1)
                 plot(UTplot(jjj),tau_aero_noscreening(jjj,c(idxT4filt)),'b.')
                 hold on
@@ -378,13 +390,20 @@ for i=idx_file_proc,   %JML 4/7/14
                 w865=w(c(idx865));
                 log865=log(w865);
                 ig=find(flags==0);
+		disp('lenght of ig')
+                length(ig)
                 for jloop=1:length(ig),
                     ival=ig(jloop);
                     %[pvis,Svis] = polyfit(xfvis,log(tau_aero(i,idxvis)),2);
                     %aod865_visfit(j)=exp(polyval(pvis,log865));
                     [pnir,Snir] = polyfit(xfnir,log(tau_aero_noscreening(ival,idxnir)),2);
                     aod865_nirfit(jloop)=real(exp(polyval(pnir,log865)));
+
                 end
+                if length(aod865_nirfit) > length(ig)
+                   aod865_nirfit = aod865_nirfit(1:length(ig));
+                   disp('Modyfying the length of aod865_nirfit to match') %SL
+                end;
                 aoddiff_nirminusobs=aod865_nirfit'-tau_aero_noscreening(ig,c(idx865));%use this quantity for filtering
                 aodratio_nirtoobs=aod865_nirfit'./tau_aero_noscreening(ig,c(idx865)); %of interest but not used for filtering
                 idxig_NIRbad=find(aoddiff_nirminusobs>=aoddiffNIR_threshold); %used below for filtering
