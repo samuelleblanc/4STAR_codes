@@ -30,7 +30,7 @@ catch;
     try;
        run(starinfofile)
     catch;
-	eval(starinfofile);
+       eval(starinfofile);
     end;
 end;
 if exist(keyword);
