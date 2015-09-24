@@ -41,13 +41,15 @@
 %           calculated sun position with the offset from 4STAR.
 % Modified (v1.2): by Samuel LeBlanc, December 5th, 2014, NASA Ames
 %           - slight modifications to plotting of the line FOV.
+% Modified (v1.3): by Samuel LeBlanc, August 27th, 2015, NASA Ames
+%           - small bug fix in plotting
 %
 % -------------------------------------------------------------------------
 
 %% Start of code
 
 function ins = FOV_scan(ins)
-version_set('1.2');
+version_set('1.3');
 
 %% legacy code
 % 
@@ -175,6 +177,11 @@ if ins.is_vis
 else
    good_pix = (ins.rangeCCD>100)&(rem([1:length(ins.nm)],50)==0);
 end
+
+if ~any(good_pix);
+    disp('*** No good pixels found, showing more')
+    good_pix = (ins.rangeCCD>5)&(rem([1:length(ins.nm)],50)==0);
+end;
 %%   
 %scat_ang_degs(sza, saz, za, az) 
 %sza = 90-interp1(abs(ins.El_deg(icenter)).*ones(size(ins.AZ_deg));

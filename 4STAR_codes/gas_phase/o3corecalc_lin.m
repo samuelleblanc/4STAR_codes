@@ -47,7 +47,7 @@ for i = 1:length(s.t)
             signal=logical(y<=10);
             if sum(signal)<10
                     [U_,fval,exitflag,output]  = fmincon('O3resi_lin',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
-            end
+            %end
             
                 if ~isreal(U_(1)) || U_(1)<0 %|| (exist(exitflag) && exitflag~=1)
                         U_(1) = NaN;U_(2) = NaN; U_(3) = NaN;
@@ -94,7 +94,7 @@ for i = 1:length(s.t)
 %                        title([datestr(s.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(s.Alt(i)) 'm' ' VCD O3= ' num2str(o3_DU_round) '[DU]' ' RMS fit = ' num2str(sqrt(fval))]);
 %                        ymax = yfit + 0.2;
 %                        axis([min(s.w(wln)) max(s.w(wln)) 0 max(ymax)]);
-
+% 
 %                        ax(2)=subplot(212);
 %                        plot(s.w(wln),ymeas'-yo4subtract-yh2osubtract-polysubtract,'-b');hold on;% o3 measured
 %                        plot(s.w(wln),yo3subtract,'--r');hold on;                               % o3 retrieved
@@ -103,6 +103,16 @@ for i = 1:length(s.t)
 %                        legend('O_{3} measured','O_{3} fitted','residual','orientation','horizontal');
 %                        axis([min(s.w(wln)) max(s.w(wln)) -0.02 0.15]);
 %                        pause(0.0001);
+
+             else
+          
+               U_ = [NaN NaN NaN NaN NaN NaN NaN];
+               sc = [sc; U_];
+               sc_residual = [sc_residual;NaN];
+               o3_DU = [o3_DU;NaN];
+                       
+                       
+             end
        else
           
                U_ = [NaN NaN NaN NaN NaN NaN NaN];

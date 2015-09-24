@@ -32,13 +32,14 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, March 30th, 2015
-% Modified:
+% Modified (v1.1): By Samuel LeBlanc, NASA Ames, 2015-08-26
+%           - changed some plotting for preparing the interim report
 %
 % -------------------------------------------------------------------------
 function plot_star_fiber_temp_test_all
-version_set('v1.0')
+version_set('v1.1')
 clear;
-toggle.make_new_save = true;
+toggle.make_new_save = false;
 dir = 'C:\Users\sleblan2\Research\4STAR\roof\';
 
 %% disable some warnings
@@ -442,6 +443,72 @@ xlabel('Temperature [°C]')
 ylabel('Percent of counts [%]')
 hold off;
 save_fig(11,[dir 'combined_tests_subset_500'],true);
+
+%% Plotting only sub-subset
+figure(12);
+set(gcf,'Position',[100,50,1550,950]);
+sub = [13,14,16,17,18,19];
+i = 13;
+j = 1;
+clr = hsv(length(sub));
+plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+hold all;
+plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+    'Color',clr(j,:),...
+    'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+for i=14:length(tests)
+    if ismember(i,sub)
+        j = j+1;
+        if i==19;
+            tests(i).heat.vpb(:,i500) = tests(i).heat.vpb(:,i500)./tests(i).heat.vpb(1,i500)*100.0;
+            tests(i).heat.vfit(2,i500) = tests(i).heat.vfit(2,i500)-11.0;
+        end;
+        plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+        plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+            'Color',clr(j,:),...
+            'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+    end
+end
+grid on;
+legend(gca,'show','Location','NorthEastOutside')
+title('Signal variations at 500 nm')
+xlabel('Temperature [°C]')
+ylabel('Percent of counts [%]')
+hold off;
+save_fig(12,[dir 'combined_tests_subsubset_500'],true);
+
+%% Plotting only sub-subset
+figure(13);
+set(gcf,'Position',[100,50,1550,950]);
+sub = [3,4,6];
+i = 1;
+j = 1;
+clr = hsv(length(sub)+1);
+plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+hold all;
+plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+    'Color',clr(j,:),...
+    'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+for i=1:length(tests)
+    if ismember(i,sub)
+        j = j+1;
+        if i==19;
+            tests(i).heat.vpb(:,i500) = tests(i).heat.vpb(:,i500)./tests(i).heat.vpb(1,i500)*100.0;
+            tests(i).heat.vfit(2,i500) = tests(i).heat.vfit(2,i500)-11.0;
+        end;
+        plot(tests(i).heat.tc,tests(i).heat.vpb(:,i500),'s','Color',clr(j,:),'DisplayName',tests(i).label);
+        plot(tests(i).heat.tc,tests(i).heat.tc*tests(i).heat.vfit(1,i500)+tests(i).heat.vfit(2,i500),...
+            'Color',clr(j,:),...
+            'DisplayName',sprintf(formstr,tests(i).heat.vfit(1,i500),tests(i).heat.vfite(1,i500),tests(i).heat.vfit(2,i500),tests(i).heat.vfite(2,i500)));
+    end
+end
+grid on;
+legend(gca,'show','Location','NorthEastOutside')
+title('Signal variations at 500 nm')
+xlabel('Temperature [°C]')
+ylabel('Percent of counts [%]')
+hold off;
+save_fig(13,[dir 'combined_tests_microbending_500'],true);
 
 %% now for 850 nm
 

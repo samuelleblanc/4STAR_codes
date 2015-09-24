@@ -31,15 +31,12 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 7 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
-        if now>=datenum([2014 8 1 0 0 0]);
-            daystr='20141002';
+    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+        if now>=datenum([2014 9 1 0 0 0]);
             %daystr='20140830';
+            daystr='20141002';
             %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
-            %filesuffix='refined_Langley_on_C-130_from20141002';  % this is from cal-flight (still not final)
-            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
             filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
-            %filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc'; % for in flight langley modified to remove aod variations, default for ARISE cal
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;
@@ -52,6 +49,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
         if now>=datenum([2015 7 17]);
             daystr='20130708';
+            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
         elseif now>=datenum([2014 10 17]);
             daystr='20130708';
@@ -147,9 +145,7 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            disp(fullfile(starpaths,visfilename))
             a=importdata(fullfile(starpaths,visfilename));
-            %a=load(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -172,7 +168,6 @@ if ~exist('visc0')
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
             a=importdata(fullfile(starpaths,nirfilename));
-            %a=load(fullfile(starpaths,nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
