@@ -34,10 +34,13 @@
 % Written (v1.0): Samuel LeBlanc, NASA Ames, March 30th, 2015
 % Modified (v1.1): By Samuel LeBlanc, NASA Ames, 2015-08-26
 %           - changed some plotting for preparing the interim report
+% Modified (v1.2): By Samuel LeBlanc, NASA Ames, 2015-09-16
+%           - added most recent test of full head, with fiber backed off
+%           from diffuser
 %
 % -------------------------------------------------------------------------
 function plot_star_fiber_temp_test_all
-version_set('v1.1')
+version_set('v1.2')
 clear;
 toggle.make_new_save = false;
 dir = 'C:\Users\sleblan2\Research\4STAR\roof\';
@@ -260,6 +263,16 @@ if toggle.make_new_save
     tests(20).norm2diode = false;
     tests(20).use_t4 = false;
     
+    tests(21).label = 'Head - backed off diffuser - NAAMES 2015 configuration';
+    tests(21).icool = [7806:9825]; 
+    tests(21).iheat = [9989:14320]; 
+    tests(21).idark = [9891]; 
+    tests(21).ylim  = [98.5,101];
+    tests(21).daystr = '20150911';
+    tests(21).filepath = ['C:\Users\sleblan2\Research\4STAR\roof\20150911_HeadTempTest\20150911star.mat'];
+    tests(21).norm2diode = false;
+    tests(21).use_t4 = true;
+    
     %% run through each test and plot it
     for i=1:length(tests);
         disp(['On test #' num2str(i) '/' num2str(length(tests))])
@@ -447,7 +460,7 @@ save_fig(11,[dir 'combined_tests_subset_500'],true);
 %% Plotting only sub-subset
 figure(12);
 set(gcf,'Position',[100,50,1550,950]);
-sub = [13,14,16,17,18,19];
+sub = [13,14,16,17,18,19,21];
 i = 13;
 j = 1;
 clr = hsv(length(sub));
@@ -478,6 +491,7 @@ hold off;
 save_fig(12,[dir 'combined_tests_subsubset_500'],true);
 
 %% Plotting only sub-subset
+if false;
 figure(13);
 set(gcf,'Position',[100,50,1550,950]);
 sub = [3,4,6];
@@ -509,6 +523,7 @@ xlabel('Temperature [°C]')
 ylabel('Percent of counts [%]')
 hold off;
 save_fig(13,[dir 'combined_tests_microbending_500'],true);
+end;
 
 %% now for 850 nm
 
