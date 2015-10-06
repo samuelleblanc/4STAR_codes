@@ -164,9 +164,9 @@ wnir = s.w(1045:end);
    gas.band1600co2 = CO2conc;       % this is vertical column amount
    gas.band1600ch4 = CH4conc;       % this is vertical column amount
    gas.band1600resi= CO2resi;
-   co2amount = CO2conc*co2coef';    % this is wavelength dependent slant OD
-   ch4amount = CH4conc*ch4coef';    % this is wavelength dependent slant OD
-   tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - real(co2amount) - real(ch4amount);   % this is wv, co2 and ch4 subtraction
+   co2amount = real(CO2conc*co2coef');    co2amount(isnan(co2amount))=0;% this is wavelength dependent slant OD
+   ch4amount = real(CH4conc*ch4coef');    ch4amount(isnan(ch4amount))=0;% this is wavelength dependent slant OD
+   tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - co2amount - ch4amount;   % this is wv, co2 and ch4 subtraction
 %  tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - tau_co2ch4_subtract;
 %     figure;
 %     plot(starsun.w,tau_OD(end-500,:),'-b');hold on;
