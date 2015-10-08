@@ -7,7 +7,7 @@ langley=[datenum('25:00:00') datenum('27:36:00')]-datenum('00:00:00')+datenum([d
 % daystr=mfilename;
 % daystr=daystr(end-7:end);
 % No good time periods ([start end]) for specific pixels
-s.ng=s.ng;
+% s.ng=s.ng;
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
