@@ -39,6 +39,7 @@
 %                 adjusted to general path names
 % MS, 2015-01-09, accept Langley region of 700 nm
 %                 accept Lamp region below 500 nm
+% MS, 2015-10-07, added data for calibration on 2015-09-15
 % -------------------------------------------------------------------------
 %% function routine
 function Langs_and_lamps = Irradiance_cals_lamp_to_langley(varargin)
@@ -48,6 +49,7 @@ function Langs_and_lamps = Irradiance_cals_lamp_to_langley(varargin)
 % 2014-06-24: vis/nir_park_023.dat   %lamp926
 % 2014-07-16: vis/nir_park_012.dat   %lamp926
 % 2014-10-24: vis/nir_park_018.dat   %lamp926 % make sure to chose 6000ms
+% 2015-09-15: vis/nir_park_020.dat   %lamp926
 
 startup_plotting;
 [matfolder, figurefolder, askforsourcefolder, author]=starpaths;
