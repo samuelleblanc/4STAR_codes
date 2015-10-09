@@ -16,8 +16,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
 % SL, v1.3, 2015-07-22, updated the starc0 for special case testing of lower c0
 %                 from Yohei sent on 20150720, new c0 from 20130708
+% Yohei, v1.4, 2015/09/24, added NAAMES phase#1 temporary calibration
 
-version_set('1.3');
+version_set('1.4');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -31,7 +32,12 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+    if t>=datenum([2015 9 16 0 0 0]); % NAAMES phase#1
+        if now>=datenum([2015 9 24 0 0 0]);
+            daystr='20150916';
+            filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
+        end;        
+    elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
             %daystr='20140830';
             daystr='20141002';
