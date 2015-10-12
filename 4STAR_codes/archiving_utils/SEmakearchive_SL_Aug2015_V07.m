@@ -13,19 +13,23 @@ close all
 
 tic
 
-def_starpaths = false;
+def_starpaths = true; % false; % Yohei, 2015/10/01, for running on my laptop
 %JML: following gives user flexibility to store *starsun.mat & flag files in a subdirectory under starpaths;
 %could do same for starinfo*.m file but have not implemented that
 %datadirec_special=[];     %JML
 datadirec_special='DC8_';  %JML
 datadirec_special='../../SEAC4RS/starmat/';  %SL
+datadirec_special=''; % Yohei
 datadirec_short_special='DC8_starsunfinalfiles_Nov14'; %'DC8_starsunfinalfiles_Oct14';
 datadirec_short_special='../../SEAC4RS/starsun/';  %SL
+datadirec_short_special='';  % Yohei
 fp_starmat = '/nobackup/sleblan2/SEAC4RS/dc8/SEAC4RS/';
 fp_starsun = '/nobackup/sleblan2/SEAC4RS/starsun_R2/';
 fp_figs = '/nobackup/sleblan2/SEAC4RS/figs/';
+[~, fp_figs] = starpaths; fp_figs = fullfile(fp_figs, 'fig', filesep); % Yohei
 fp_ict = '/nobackup/sleblan2/SEAC4RS/starict_R2/'
 fp_flag = '/u/sleblan2/4STAR/4STAR_codes/data_folder/'
+fp_flag = fullfile(paths, 'code', '\4STAR_codes\data_folder');
 
 fig_vis = {'Visible','off'}
 vis_fig = {'Visible','off'}
@@ -80,14 +84,14 @@ for i=idx_file_proc,   %JML 4/7/14
     
     % load track data
     if def_starpaths
-    if ~isempty(datadirec_special)  %JML
-        filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
-        if ~exist(filestar)
-            filestar = fullfile(starpaths, [sprintf('%s%s',datadirec_special, dslist{i},'star.mat')]); 
-        end;
-    else   %JML
-        filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
-    end    %JML
+        if ~isempty(datadirec_special)  %JML
+            filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
+            if ~exist(filestar)
+                filestar = fullfile(starpaths, [sprintf('%s%s',datadirec_special, dslist{i},'star.mat')]);
+            end;
+        else   %JML
+            filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
+        end    %JML
     else
 	filestar = fullfile(fp_starmat, [dslist{i} 'star.mat'])
     end
@@ -113,13 +117,13 @@ for i=idx_file_proc,   %JML 4/7/14
     
     if flight(end)>track1_t(end)& flag_flightendcheck
         if def_starpaths
-	filestar2=fullfile(starpaths, [sprintf('%s%s',datadirec_special,num2str(str2num(dslist{i})+1)) filesep num2str(str2num(dslist{i})+1) 'star.mat']);  %JML
-         if ~exist(filestar2)
-            filestar2 = fullfile(starpaths, [sprintf('%s%s',datadirec_special, dslist{i}) 'star.mat']); 
+            filestar2=fullfile(starpaths, [sprintf('%s%s',datadirec_special,num2str(str2num(dslist{i})+1)) filesep num2str(str2num(dslist{i})+1) 'star.mat']);  %JML
+            if ~exist(filestar2)
+                filestar2 = fullfile(starpaths, [sprintf('%s%s',datadirec_special, dslist{i}) 'star.mat']);
+            end;
+        else
+            filestar2 = fullfile(fp_starmat,[num2str(str2num(dslist{i})+1) 'star.mat'])
         end;
-	else
-	  filestar2 = fullfile(fp_starmat,[num2str(str2num(dslist{i})+1) 'star.mat'])
-	end;
         load(filestar2,'track');
         switch daystr
             case '20130827'
@@ -129,7 +133,7 @@ for i=idx_file_proc,   %JML 4/7/14
             case '20130826'
                 itsav=find(track.t<=(datenum('25:47:41')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])));
                 track2_t=track.t(itsav);
-                track2_T4=track.T4(itsav);                
+                track2_T4=track.T4(itsav);
             otherwise
                 itsav=[];
                 itsav=find(track.t>=flight(end));
@@ -142,17 +146,17 @@ for i=idx_file_proc,   %JML 4/7/14
                 end
         end
         %not sure about the following
-%         if ~isempty(itsav) & ~strcmp(daystr,'20130827')
-%             track2_t=track2_t(itsav(1):itsav(2));
-%             track2_T4=track2_T4(itsav(1):itsav(2));
-%         end
+        %         if ~isempty(itsav) & ~strcmp(daystr,'20130827')
+        %             track2_t=track2_t(itsav(1):itsav(2));
+        %             track2_T4=track2_T4(itsav(1):itsav(2));
+        %         end
         UTtrack2=timeMatlab_to_UTdechr(track2_t);
         track_t=[track1_t;track2_t];
         track_T4=[track1_T4;track2_T4];
     else
         itsav=[];
         track_t=track1_t;
-        track_T4=track1_T4;       
+        track_T4=track1_T4;
     end
     
     clear track
@@ -238,19 +242,20 @@ for i=idx_file_proc,   %JML 4/7/14
             tosave(ia, 2:end)=tosave0(ib,2:end);
         elseif isequal(R, '0') | isequal(R,'1') | isequal(R,'2'); % all other days, post field
             % load data
-	    if def_starpaths
-            if ~isempty(datadirec_special)  %JML
-                %starfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'starsunfinalshort.mat']);  %JML
-                starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsunfinal.mat_short.mat']);  %JML
-                starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsun.mat']);  %JML
-                %filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
-            else   %JML
-                starfile=fullfile(starpaths, [dslist{i} 'starsunfinal.mat']);
-                %filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
-            end    %JML
-	    else
-	        starfile = fullfile(fp_starsun,[dslist{i} 'starsun_R2.mat'])
-  	    end
+            if def_starpaths
+%                 if ~isempty(datadirec_special)  %JML
+                    %starfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'starsunfinalshort.mat']);  %JML
+                    starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsunfinal.mat_short.mat']);  %JML
+                    starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsun.mat']);  %JML
+                    starfile=fullfile(starpaths, [datadirec_short_special filesep dslist{i} 'starsun_R2.mat']);  %JML
+                    %filestar=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep dslist{i} 'star.mat']);  %JML
+%                 else   %JML
+%                     starfile=fullfile(starpaths, [dslist{i} 'starsunfinal.mat']);
+                    %filestar=fullfile(starpaths, [dslist{i} 'star.mat']);
+%                 end    %JML
+            else
+                starfile = fullfile(fp_starsun,[dslist{i} 'starsun_R2.mat'])
+            end
             %vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening' 'flagallcols','m_aero'};  %used for R='0' Apr 2014
             %vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','flagallcols','m_aero','tau_aero_err'};  %added 'tau_aero_err' for R='1' Oct 2014
             vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','m_aero','tau_aero_err','cwv','flagallcols'}; %added 'cwv' for R='1',Oct 2014
@@ -273,16 +278,17 @@ for i=idx_file_proc,   %JML 4/7/14
                 case 2  %new flagging
                     flagfilename=select_flagfile(dslist{i},R);
                     if def_starpaths
-                    if ~isempty(datadirec_special)  %JML
-                        flagfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep flagfilename]);  %JML
-                        if ~exist(flagfile);
-                            flagfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special, flagfilename)]);
-                        end;
+                        if ~isempty(datadirec_special)  %JML
+                            flagfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep flagfilename]);  %JML
+                            if ~exist(flagfile);
+                                flagfile=fullfile(starpaths, [sprintf('%s%s',datadirec_special, flagfilename)]);
+                            end;
+                        else
+                            flagfile=fullfile(starpaths,flagfilename); %JML 4/7/14
+                            flagfile=fullfile(fp_flag,flagfilename); %JML 4/7/14
+                        end
                     else
-                        flagfile=fullfile(starpaths,flagfilename); %JML 4/7/14
-                    end
-		    else
-			flagfile = fullfile(fp_flag,flagfilename);
+                        flagfile = fullfile(fp_flag,flagfilename);
                     end
                     load(flagfile,'flags','flags_struct'); %JML 4/7/14
                     UTflagfile=timeMatlab_to_UTdechr(flags.time.t);
@@ -416,7 +422,7 @@ for i=idx_file_proc,   %JML 4/7/14
                     irec=ig(idxig_NIRbad(1));
                     UTstarsunfile(irec)
                     loglog(w(c),tau_aero_noscreening(irec,c),'bo','markersize',8,'markerfacecolor','b'); %idxig_NIRbad(1)
-                    hold on                    
+                    hold on
                     loglog(w(c),tau_aero(irec,c),'rs','markersize',10) ;%idxig_NIRbad(1)
                     [pnir,Snir] = polyfit(xfnir,log(tau_aero_noscreening(irec,idxnir)),2);
                     aodnirfit_plot=real(exp(polyval(pnir,[log865 xfnir])));
@@ -455,11 +461,11 @@ for i=idx_file_proc,   %JML 4/7/14
                     linkaxes([ax2 ax3],'x')
                     tau_aero_noscreening(ig(idxig_NIRbad),idxnir)=NaN;
                     tau_aero_err(ig(idxig_NIRbad),idxnir)=NaN;
-	            if savefigs 
-		        fp_f = [fp_figs dslist{i} '_loglog_aod_diff.fig']
-      			saveas(gcf,fp_f);
-      			makevisible(fp_f);
-    		    end
+                    if savefigs
+                        fp_f = [fp_figs dslist{i} '_loglog_aod_diff.fig']
+                        saveas(gcf,fp_f);
+                        makevisible(fp_f);
+                    end
 
                 else
                     figure(vis_fig{:})
@@ -671,11 +677,13 @@ for i=idx_file_proc,   %JML 4/7/14
     %templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V03_John.ict']);
     if def_starpaths
      templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_V06_John.ict']);
+     templatefile=fullfile(starpaths, [prefix '_' platform '_' 'yyyymmdd_R' num2str(R) '_Yohei.ict']);
     if ~isempty(datadirec_special)  %JML updated 11/25/14
         %savefilename=fullfile(starpaths, [sprintf('%s%s',datadirec_special,dslist{i}) filesep], [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_John.ict']);
         savefilename=fullfile('c:\johnmatlab\4STAR\SEAC4RS_archive_files\R1archive_AOD_files_JML_rev03\', [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_John.ict']);
     else
         savefilename=fullfile(starpaths, [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_John.ict']);
+        savefilename=fullfile(starpaths, [prefix '_' platform '_' dslist{i} '_R' num2str(R) '_Yohei.ict']);
     end  
     if exist(savefilename);
         error([savefilename ' exists.']);

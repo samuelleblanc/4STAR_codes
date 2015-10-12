@@ -1,0 +1,79 @@
+79, 1001
+Phil Russell
+NASA Ames Research Center
+Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)
+SEAC4RS
+1, 1
+2013, mm, dd, 2015, mm, dd
+1
+Start_UTC, UTC seconds, Elapsed seconds from 0 hours UT on day given by DATE
+42
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+-9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999
+Latitude, deg, Aircraft latitude at the indicated time
+Longitude, deg, Aircraft longitude at the indicated time
+GPS_alt, m, Aircraft GPS geometric altitude at the indicated time
+qual_flag, unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability
+amass_aer, unitless, aerosol optical airmass
+T4temp, degC, instrument head temperature
+CWV, g/cm^2, column water vapor calculated as average of values retrieved in 940-960 nm band
+std_CWV, g/cm^2, standard deviation of CWV
+AOD0380, unitless, Aerosol optical depth at 380.0 nm 
+AOD0452, unitless, Aerosol optical depth at 451.7 nm
+AOD0501, unitless, Aerosol optical depth at 500.7 nm
+AOD0520, unitless, Aerosol optical depth at 520.0 nm
+AOD0532, unitless, Aerosol optical depth at 532.0 nm
+AOD0550, unitless, Aerosol optical depth at 550.3 nm
+AOD0606, unitless, Aerosol optical depth at 605.5 nm
+AOD0620, unitless, Aerosol optical depth at 619.7 nm
+AOD0675, unitless, Aerosol optical depth at 675.2 nm
+AOD0781, unitless, Aerosol optical depth at 780.6 nm
+AOD0865, unitless, Aerosol optical depth at 864.6 nm
+AOD1020, unitless, Aerosol optical depth at 1019.9 nm
+AOD1040, unitless, Aerosol optical depth at 1039.6 nm
+AOD1064, unitless, Aerosol optical depth at 1064.2 nm
+AOD1236, unitless, Aerosol optical depth at 1235.8 nm
+AOD1559, unitless, Aerosol optical depth at 1558.7 nm
+AOD1627, unitless, Aerosol optical depth at 1626.6 nm
+UNCAOD0380, unitless, Uncertainty in aerosol optical depth at 380.0 nm 
+UNCAOD0452, unitless, Uncertainty in aerosol optical depth at 451.7 nm
+UNCAOD0501, unitless, Uncertainty in aerosol optical depth at 500.7 nm
+UNCAOD0520, unitless, Uncertainty in aerosol optical depth at 520.0 nm
+UNCAOD0532, unitless, Uncertainty in aerosol optical depth at 532.0 nm
+UNCAOD0550, unitless, Uncertainty in aerosol optical depth at 550.3 nm
+UNCAOD0606, unitless, Uncertainty in aerosol optical depth at 605.5 nm
+UNCAOD0620, unitless, Uncertainty in aerosol optical depth at 619.7 nm
+UNCAOD0675, unitless, Uncertainty in aerosol optical depth at 675.2 nm
+UNCAOD0781, unitless, Uncertainty in aerosol optical depth at 780.6 nm
+UNCAOD0865, unitless, Uncertainty in aerosol optical depth at 864.6 nm
+UNCAOD1020, unitless, Uncertainty in aerosol optical depth at 1019.9 nm
+UNCAOD1040, unitless, Uncertainty in aerosol optical depth at 1039.6 nm
+UNCAOD1064, unitless, Uncertainty in aerosol optical depth at 1064.2 nm
+UNCAOD1236, unitless, Uncertainty in aerosol optical depth at 1235.8 nm
+UNCAOD1559, unitless, Uncertainty in aerosol optical depth at 1558.7 nm
+UNCAOD1627, unitless, Uncertainty in aerosol optical depth at 1626.6 nm
+2
+For specific science goals (e.g., smoke, dust, cirrus...), please contact the Ames Sunphotometer/Satellite group.
+flagging details: flag_T4temp_filter:1  wvl_T4filt:1.020  cutoffratio_AODcorr:0.5  T4cutoff:-15.0  flag_NIRfilter:1  aoddiffNIR_thresh:0.10  dummyflagfilename
+21
+C0_source: 20130708_NIR/VIS_C0_refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013.dat
+PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov (805-218-8729)
+PLATFORM: DC8
+LOCATION: Aircraft latitude, longitude, altitude are included in the data records
+ASSOCIATED_DATA: N/A
+INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)
+DATA_INFO: measurements represent averages over 1 second at Start_UTC. 
+UNCERTAINTY: added in this version
+ULOD_FLAG: -7777
+ULOD_VALUE: N/A
+LLOD_FLAG: -8888
+LLOD_VALUE: N/A
+DM_CONTACT_INFO: (AOD)Yohei Shinozuka, Yohei.Shinozuka@nasa.gov; (CWV)Michal-Segal Rosenheimer, michal.segalrozenhaimer@nasa.gov 
+PROJECT_INFO: SEAC4RS deployment; August-September 2013; Palmdale, CA and Houston, TX
+STIPULATIONS_ON_USE: none
+OTHER_COMMENTS: N/A
+REVISION: R2; R1; R0
+R2: The calibration has been revised and AOD lowered.
+R1: Even after extensive scrutiny of the data, there may be residual uncertainties in AOD due to the effects listed in the R0 comment below. These are not included in the current uncertainty estimates, and their quantification is the subject of ongoing research.
+R0: The data are subject to additional uncertainties associated with detector stability, cloud screening, transfer efficiency of light through fiber optic cable, diffuse light, tracking error, gas absorption and deposition on the front windows.  
+Start_UTC,Latitude,Longitude, GPS_alt, qual_flag, amass_aer,   T4temp,    CWV, std_CWV,   AOD0380,   AOD0452,   AOD0501,   AOD0520,   AOD0532,   AOD0550,   AOD0606,    AOD0620,    AOD0675,    AOD0781,    AOD0865,   AOD1020,   AOD1040,   AOD1064,   AOD1236,   AOD1559,   AOD1627,UNCAOD0380,UNCAOD0452,UNCAOD0501,UNCAOD0520,UNCAOD0532,UNCAOD0550,UNCAOD0606,UNCAOD0620,UNCAOD0675,UNCAOD0781,UNCAOD0865,UNCAOD1020,UNCAOD1040,UNCAOD1064,UNCAOD1236,UNCAOD1559,UNCAOD1627
