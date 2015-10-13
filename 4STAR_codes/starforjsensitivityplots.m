@@ -12,21 +12,21 @@ ddAZdt=[diff(dAZdt)./diff(t)/86400; 0]; % the differential in the rotation rate
 
 % eliminate time periods with near zero counts
 maxzerocountrate=0.24;
-maxzerostd=1;
-col=407; % column (407 corresponds to 500 nm)
+maxzerostd=1000; % 1;
+col=520:560; % 407; % column (407 corresponds to 500 nm)
 rate1=rate;
 idx1=repmat((1:size(rate,1))',1,2)+repmat([-1 1]*4,size(rate,1),1);
 idx1(idx1<1)=1;
 idx1(idx1>size(rate,1))=size(rate,1);
-rate1std=stdvec(rate(:,col), idx1);
-nearzero=find(rate1(:,col)<maxzerocountrate | rate1std>maxzerostd);
+rate1std=stdvec(sum(rate(:,col),2), idx1);
+nearzero=find(sum(rate1(:,col),2)<maxzerocountrate | rate1std>maxzerostd);
 rate1(nearzero,:)=NaN;
 clear idx1
 
 % isolate cycles
 minrotation=0.25; % tweak this if necessary
 if ~isempty(nearzero);
-changes=unique([find(abs(ddAZdt)>minrotation); find(diff(visfilen)>0); nearzero(1); nearzero(diff(nearzero)>1); nearzero(end)]);
+    changes=unique([find(abs(ddAZdt)>minrotation); find(diff(visfilen)>0); nearzero(1); nearzero(diff(nearzero)>1); nearzero(end)]);
 else
     changes=unique([find(abs(ddAZdt)>minrotation); find(diff(visfilen)>0)]);
 end;
@@ -35,9 +35,9 @@ idx(:,1)=[1;changes+1];
 idx(:,2)=[changes;numel(AZstep)];
 goodidx=false(size(idx,1),1);
 for i=1:size(idx,1);
-    yy=rate1(idx(i,1):idx(i,2), col);
+    yy=sum(rate1(idx(i,1):idx(i,2), col),2);
     if any(isfinite(yy));
-       goodidx(i)=true; 
+        goodidx(i)=true;
     end;
 end;
 idx=idx(goodidx,:);
@@ -55,10 +55,10 @@ clr=NaN(pp,3);
 clr(abs(rotmean)<=minrotation,:)=clrz(1:numel(find(abs(rotmean)<=minrotation)),:);
 clr(rotmean>minrotation,:)=clrp(1:numel(find(rotmean>minrotation)),:);
 clr(rotmean<-minrotation,:)=clrm(1:numel(find(rotmean<-minrotation)),:);
-bl=10;bl=2; % degrees over which smoothing is applied
+bl=0; % degrees over which smoothing is applied
 h=NaN(2,pp);
 nmy=NaN(pp,2);
-savefigure=0;
+savefigure=1;
 yl0=[0.98 1.02];
 refrate=[];
 
@@ -71,7 +71,7 @@ for i=1:pp;
         if any(xx0)
             warning('AZ deg not zero - puzzling.');
         end;
-        yy=rate1(idx(i,1):idx(i,2), col);yy = mean(rate1(idx(i,1):idx(i,2), [col-20:col+20]),2);
+        yy=sum(rate1(idx(i,1):idx(i,2), col),2);
         if isempty(refrate);
             refrate=nanmean(yy);
             yla=['Count Rate, avg(' datestr(t(idx(i,1)),13) '-' datestr(t(idx(i,2)),13) ')=1'];
@@ -90,13 +90,12 @@ for i=1:pp;
 end;
 if pp>1 && numel(find(abs(rotmean)>minrotation))>1;
     try
-nmy(abs(rotmean)>minrotation,2)=interp1(nmy(abs(rotmean)<=minrotation,1),nmy(abs(rotmean)<=minrotation,2),nmy(abs(rotmean)>minrotation,1));
+        nmy(abs(rotmean)>minrotation,2)=interp1(nmy(abs(rotmean)<=minrotation,1),nmy(abs(rotmean)<=minrotation,2),nmy(abs(rotmean)>minrotation,1));
     catch;keyboard;end;!!!
-plot(nmy(abs(rotmean)>minrotation,1),nmy(abs(rotmean)>minrotation,2)/refrate, 'o','color', [.5 .5 .5],'markersize',6);
+    plot(nmy(abs(rotmean)>minrotation,1),nmy(abs(rotmean)>minrotation,2)/refrate, 'o','color', [.5 .5 .5],'markersize',6);
 end;
 plot(xlim,[1 1], '-k');
-% dateticky('x','keeplimits');
-dynamicDateTicks;
+dateticky('x','keeplimits');
 lh=legend(h(1,abs(rotmean)<minrotation),lstr(abs(rotmean)<minrotation));
 set(lh,'fontsize',12,'location','best');
 ggla;
@@ -113,7 +112,6 @@ grid on;
 if savefigure;
     starsas(['star' daystr 'FORJsensitivitytseries.fig, starforjsensitivityplots.m']);
 end;
-close(gcf);
 
 figure; % against angle; rotation only
 for i=1:pp;
@@ -121,10 +119,9 @@ for i=1:pp;
         tt0=t(idx(i,1):idx(i,2)); % time
         xx0=AZstep(idx(i,1):idx(i,2))/(-50); % AZ angle
         xx=mod(xx0,360); % AZ angle mod 360
-        yy=rate1(idx(i,1):idx(i,2), col); 
-         yy = mean(rate1(idx(i,1):idx(i,2), [col-20:col+20]),2);
+        yy=sum(rate1(idx(i,1):idx(i,2), col),2);
         yyn=yy./repmat(refrate, size(yy,1),1);
-        if numel(xx0)>1
+        if numel(xx0)>1 && bl>0
             yynsm=boxxfilt(xx0,yyn,bl);
         else
             yynsm=yyn;
@@ -167,9 +164,9 @@ if pp>1 && numel(find(abs(rotmean)>minrotation))>1;
             tt0=t(idx(i,1):idx(i,2)); % time
             xx0=AZstep(idx(i,1):idx(i,2))/(-50); % AZ angle
             xx=mod(xx0,360); % AZ angle mod 360
-            yy=rate1(idx(i,1):idx(i,2), col);yy = mean(rate1(idx(i,1):idx(i,2), [col-20:col+20]),2);
+            yy=sum(rate1(idx(i,1):idx(i,2), col),2);
             yyn=yy./nmy(i,2);
-            if numel(xx0)>1
+            if numel(xx0)>1 && bl>0
                 yynsm=boxxfilt(xx0,yyn,bl);
             else
                 yynsm=yyn;
@@ -208,12 +205,12 @@ if pp>1 && numel(find(abs(rotmean)>minrotation))>1;
     end;
     title([daystr ', adj''d to lamp intensity at avg(' datestr(t(idx(lampi,1)),13) '-' datestr(t(idx(lampi,2)),13) ')']);
     grid on;
-if savefigure;
-    starsas(['star' daystr 'FORJsensitivityvAZdegmod360lampadjusted.fig, starforjsensitivityplots.m']);
-end;
+    if savefigure;
+        starsas(['star' daystr 'FORJsensitivityvAZdegmod360lampadjusted.fig, starforjsensitivityplots.m']);
+    end;
 end;
 % carpet plots - take long
-plotcarpet=true;
+plotcarpet=false;
 if plotcarpet
     refrate=[];
     for i=1:pp;
@@ -228,7 +225,11 @@ if plotcarpet
                 yla=['Count Rate, avg(' datestr(t(idx(i,1)),13) '-' datestr(t(idx(i,2)),13) ')=1'];
             end;
             yyn=yy./repmat(refrate, size(yy,1),1);
+            if bl>0
             yynsm=boxxfilt(xx0,yyn,bl);
+            else
+                yynsm=yyn;
+            end;
             ph=contourf(w,xx0,yynsm,0.98:0.01:1.02,'linestyle','none');
             gglwa;
             ylabel('AZ deg');
