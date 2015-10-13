@@ -467,12 +467,14 @@ end;
 if toggle.verbose; disp('adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
-[forj_corr, detail] = get_forj_corr(s.t(1));
-% apply correction on s.rate
-AZ_deg_   = s.AZstep/(-50);
-AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
-AZunique = unique(AZ_deg);
-s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
+if isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
+    [forj_corr, detail] = get_forj_corr(s.t(1));
+    % apply correction on s.rate
+    AZ_deg_   = s.AZstep/(-50);
+    AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
+    AZunique = unique(AZ_deg);
+    s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
+end;
 
 %% apply temp correction to rate structs
 if toggle.applytempcorr

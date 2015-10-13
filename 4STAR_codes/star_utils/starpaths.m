@@ -25,13 +25,18 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 % Modified (v1.3): by Samuel LeBlanc, 2015-08-26
 %                  - added check for linux, for use on pleaides
 %---------------------------------------------------------------------
-version_set('1.3');
+version_set('1.4');
 
 % get the version of matlab
 vv = version('-release');
 newmatlab = false; 
 if str2num(vv(1:4)) >= 2013;
     newmatlab = true;
+end;
+if isempty(userpath)
+    [~, userpath1]=system('hostname'); % somehow Yohei's laptop returns blank userpath; call for system hostname
+else
+    userpath1='';
 end;
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
@@ -67,6 +72,10 @@ elseif ~isempty(strfind(lower(userpath),'livings'));
     author='John';
 elseif ~isempty(strfind(lower(userpath),'ys')) | ~isempty(strfind(lower(userpath),'yohei'))
     matfolder=fullfile(paths, '4star','data');
+    figurefolder=fullfile(paths, '4star','figures');
+    author='Yohei';
+elseif ~isempty(strfind(lower(userpath1),'yohei')); % Yohei's laptop
+    matfolder=fullfile(paths, 'code\4STAR_codes\data_folder');
     figurefolder=fullfile(paths, '4star','figures');
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath),'samuel'))
