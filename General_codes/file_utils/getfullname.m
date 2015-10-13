@@ -77,7 +77,7 @@ end;
 
 if exist(fspec,'file')&&~exist(fspec,'dir')
     this = which(fspec,'-all');
-   [pname, fname, ext] = fileparts(this{:});
+   [pname, fname, ext] = fileparts(this{1});
    fname = [fname ext];
 else
    [pth,fstem,ext] = fileparts(fspec);

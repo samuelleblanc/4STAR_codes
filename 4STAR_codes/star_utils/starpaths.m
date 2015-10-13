@@ -55,6 +55,7 @@ elseif ~isempty(strfind(lower(userpath),'qin'));
     author='Qin';
 elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor'));
     matfolder='D:\data\4STAR\yohei\mat\';
+    matfolder='C:\Users\d3k014\Documents\GitHub\4STAR_codes\data_folder\';
     figurefolder='D:\data\4STAR\yohei\img\';
     author='Connor';
 elseif ~isempty(strfind(lower(userpath),'jens'));
