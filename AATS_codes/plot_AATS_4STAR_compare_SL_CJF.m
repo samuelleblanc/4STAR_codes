@@ -108,6 +108,28 @@ cim_2_aats = [2,2;3,3;4,4;5,7;6,9;7,10;8,11;9,11;10,13];
 figure; these = plot(aats.t(ainc), aats.nrate(cim_2_aats(:,2),ainc)./nsu.nrate(cina,cim_2_aats(:,1))','-'); dynamicDateTicks
 legend(cim_leg(cim_2_aats(:,1)))
 
+% %Temperature positions
+% T_leg = {...
+% 1,  'hot detector plate #1'
+% 2, 'hot detector plate #2'
+% 3,'filter plate #1'
+% 4,  'electronics can'
+% 5,  'cold detector #1'
+% 6,  'cold detector #2'
+% 7,  'argus'
+% 8,  'hot PCA'
+% 9,  'cold PCA'
+% 10, 'filter plate #2'
+% 11, 'T stat / cool in'
+% 12, 'GPS alt. / cool out'
+% 13,  'data CPU'
+% 14, 'trk CPU'
+% 15, 'RH / pwr supply'};
+% %
+% for w = length(aats.lambda):-1:1
+% w = w +1; V_leg(w) = {sprintf('%4.1f nm',1000.*aats.lambda(w))};
+% end
+
 
 %set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
 %% load track from day

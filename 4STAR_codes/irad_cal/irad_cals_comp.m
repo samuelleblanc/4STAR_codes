@@ -27,34 +27,30 @@
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer, NASA Ames, August 29th, 2014
-% MS, 2015-10-07, added data point from 2015-09-15 calibration
-%               , changed dir and dirf path to fit with new computer
-%               , changed comparison ratio to 20140716 instead of 20141024
-%                 which seemed irregular
+%
 % -------------------------------------------------------------------------
 
 %% start of function
 function irad_cals_comp(varargin)
 additionalplots = false;
-startup_plotting;
+startup;
 % [matfolder, figurefolder, askforsourcefolder, author]=starpaths;
 % dirf = figurefolder;
 % dir  = matfolder;
 % startup
- dir='C:\matlab\cal_lab\data\';  %'C:\MatlabCodes\data\';
- dirf='C:\matlab\cal_lab\figs\'; %'C:\MatlabCodes\figs\';
+ dir='C:\MatlabCodes\data\';
+ dirf='C:\MatlabCodes\figs\';
  ll='\';
 
 
 %% setup the files to load and load them
-dates=['20131122';'20140624';'20140716';'20141024';'20150915'];
+dates=['20131122';'20140624';'20140716';'20141024'];
 ref1=2;
-ref2=3;
+ref2=4;
 files=[dir dates(1,:) '_scaled_langley.mat';...
        dir dates(2,:) '_scaled_langley.mat';...
        dir dates(3,:) '_scaled_langley.mat';...
-       dir dates(4,:) '_scaled_langley.mat';
-       dir dates(5,:) '_scaled_langley.mat'];
+       dir dates(4,:) '_scaled_langley.mat'];
    
 num=length(dates(:,1));
 for l=1:num
@@ -110,7 +106,7 @@ grid on;
 fi=[dirf 'scaled_langley_compare2adjc0'];
 
 linkaxes([ax1,ax2],'x');
-save_fig(12,fi,false);
+save_fig(12,fi,true);
 
 
 % relative to SEAC4RS-MLO c0
@@ -142,11 +138,8 @@ plot(d.(fields{2}).nm,d.(fields{ref2}).c0./c0ref2);
 for i=2
   plot(d.(fields{i}).nm,d.(fields{i}).lampc0./c0ref1);  
 end
-for i=3:4
+for i=3:num
   plot(d.(fields{i}).nm,d.(fields{i}).lampc0./c0ref2);  
-end
-for i=5
-  plot(d.(fields{i}).nm,d.(fields{i}).lampc0./c0ref2,'-k');  
 end
 hold off;
 xlabel('Wavelength (nm)');
@@ -164,8 +157,7 @@ save_fig(13,fi,true);
 strcts=[dir dates(1,:) '_Langs_and_Lamps.mat';...
         dir dates(2,:) '_Langs_and_Lamps.mat';...
         dir dates(3,:) '_Langs_and_Lamps.mat';...
-        dir dates(4,:) '_Langs_and_Lamps.mat';
-        dir dates(5,:) '_Langs_and_Lamps.mat'];
+        dir dates(4,:) '_Langs_and_Lamps.mat'];
 
 for l=1:num
     Lfields{l}=['L' dates(l,:)];
@@ -179,7 +171,7 @@ for i=1:num
   plot(d.(Lfields{i}).Langs_and_lamps.vis.nm,d.(Lfields{i}).Langs_and_lamps.vis.Sratio,...
        '-','linewidth',1.5,'color',[0.2+i/8 0.2 0.2+i/8]);  hold on;
 end
-errorx_vis = [400 550 700 800 950];
+errorx_vis = [400 550 700 950];
 for i=1:num
   errorbar(errorx_vis(i),d.(Lfields{i}).Langs_and_lamps.vis.SratioAvgMod,...
            d.(Lfields{i}).Langs_and_lamps.vis.SratioStdMod,'s','color',[0.2+i/8 0.2 0.2+i/8],...
@@ -189,26 +181,24 @@ xlabel('wavelength');
 ylabel('Langley/FEL responsivity ratio');
 legend(dates);
 ylim([1.0e-4 1.6e-4]);
-%ylim([1.0e-4 1.6e-3]);
 xlim([300 1000]);
 grid on;
 % NIR
 subplot(122);
 for i=1:num
   plot(d.(Lfields{i}).Langs_and_lamps.nir.nm,d.(Lfields{i}).Langs_and_lamps.nir.Sratio,...
-       '-','linewidth',1.5,'color',[0.35+i/8 0.2 0.2+i/8]);  hold on;
+       '-','linewidth',1.5,'color',[0.5+i/8 0.2 0.2+i/8]);  hold on;
 end
-errorx_nir = [1100 1250 1400 1550 1650];
+errorx_nir = [1100 1250 1400 1550];
 for i=1:num
   errorbar(errorx_nir(i),d.(Lfields{i}).Langs_and_lamps.nir.SratioAvgMod,...
-           d.(Lfields{i}).Langs_and_lamps.nir.SratioStdMod,'s','color',[0.35+i/8 0.2 0.2+i/8],...
-           'markerfacecolor',[0.35+i/8 0.2 0.2+i/8],'markersize',16);hold on;
+           d.(Lfields{i}).Langs_and_lamps.nir.SratioStdMod,'s','color',[0.5+i/8 0.2 0.2+i/8],...
+           'markerfacecolor',[0.5+i/8 0.2 0.2+i/8],'markersize',16);hold on;
 end
 xlabel('wavelength');
 ylabel('Langley/FEL responsivity ratio');
 legend(dates);
 ylim([1.0e-4 1.8e-4]);
-%ylim([1.0e-4 1.8e-3]);
 xlim([1000 1700]);
 grid on;
 fi=[dirf 'compareSratio3'];

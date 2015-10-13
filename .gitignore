@@ -57,3 +57,13 @@ data_folder/lastUsedDir.mat
 General_codes/file_utils/datapath/lastpath.mat
 General_codes/file_utils/datapath/lastpath.mat
 General_codes/file_utils/datapath/lastpath.mat
+*.mat
+data_folder/lastUsedDir.mat
+*.dat
+data_folder/20150915_020_NIR_park.dat
+*.mat
+data_folder/20150915_scaled_langley.dat
+data_folder/starinfo20140901.m
+*.m
+*.mat
+data_folder/lastUsedDir.mat
