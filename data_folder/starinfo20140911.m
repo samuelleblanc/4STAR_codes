@@ -5,7 +5,7 @@ flight=[datenum('18:45:00') datenum('25:56')]-datenum('00:00:00')+datenum([dayst
 % daystr=mfilename;
 % daystr=daystr(end-7:end);
 % No good time periods ([start end]) for specific pixels
-s.ng=s.ng;
+% s.ng=s.ng;
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
