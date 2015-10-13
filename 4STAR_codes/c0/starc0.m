@@ -51,14 +51,17 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 10 17]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
