@@ -2,18 +2,26 @@ function [vis_sun, nir_sun, aats]=staraatscompare(daystr, noonrow)
 
 % load 4STAR
 try
-    s=load(fullfile(starpaths, [daystr 'starsun.mat']), 't', 'w', 'rate', 'tau_aero_noscreening','tau_aero', 'Lon','Lat','Alt','Tst','Pst','AZ_deg', 'El_deg', 'flag', 'filename', 'Str');
+    s=load(fullfile(starpaths, [daystr 'starsun.mat']), 't', 'w', 'rate', 'm_ray','tau_ray', 'Lon','Lat','Alt','Tst','Pst','AZ_deg', 'El_deg', 'flag', 'filename', 'Str');
     t=s.t;
 catch;
     load(fullfile(starpaths, [daystr 'starsun.mat']));
     t=vis_sun.t;
 end;
 
+s.rate_nonray = s.rate ./ tr(s.m_ray, s.tau_ray);
 % load AATS
-load(fullfile(starpaths, [daystr 'aats.mat'])); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
-if ~exist('aats') || ~isfield(aats,'t')
+
+% load(fullfile(starpaths, [daystr 'aats.mat'])); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
+% aat = load(getfullname('*aats*.mat','aats_mats'));
+aats = aats2matx;
+aats = cataats(aats,aats2matx);
+if ~exist('aats','var') 
     aats.t=UT'/24+datenum(year,month,day);
 end;
+if ~isfield(aats,'t')
+    aats.t=UT'/24+datenum(year,month,day);
+end
 % if floor(t(end))-floor(t(1))==1; % the 4STAR ran into the next day
 %     nextdaystr=datestr(datenum(str2num(daystr(1:4)),str2num(daystr(5:6)),str2num(daystr(7:8)))+1,30);
 %     nextdaystr=nextdaystr(1:8);
@@ -38,11 +46,11 @@ end;
 % if ~exist('aats') | ~isfield(aats,'t')
 %     aats.t=UT'/24+datenum(year,month,day);
 % end;
-aats.data=data';
+% aats.data=data';
 [aats.w, aats.fwhm, aats.V0]=aatslambda;
 qq=size(aats.w,2);
-aats.m_ray=m_ray;
-aats.m_aero=m_aero;
+% aats.m_ray=m_ray;
+% aats.m_aero=m_aero;
 if exist('tau_aero');
     aats.tau_aero=tau_aero;
     aats.tau_ray=tau_ray;
@@ -85,28 +93,34 @@ if ~exist('vis_sun')
     s.rateratiotoaats=repmat(NaN, pp, qq);
     s.rateratiorangetoaats=repmat(NaN, pp, qq);
     s.aatsw=aats.w;
-    rateratio=repmat(NaN, size(data,2), qq);
-    rateratiorange=repmat(NaN, size(data,2), qq);
-    aatsrate=repmat(NaN, size(data,2), qq);
+    rateratio=repmat(NaN, size(aats.data,2), qq);
+    rateratiorange=repmat(NaN, size(aats.data,2), qq);
+    aatsrate=repmat(NaN, size(aats.data,2), qq); aats_tau_ray = aatsrate;
     combined=repmat(NaN, pp, qq);
     index(:,1)=ceil(interp1(s.t,1:pp,aats.t-3/86400/2));
     index(:,2)=floor(interp1(s.t,1:pp,aats.t+3/86400/2));
     s.rate(s.Str==0,:)=NaN; % Yohei, 2012/12/19
-    aatsrate(:,cok)=avgvec(s.rate(:,c(cok)), index);
+    aatsrate(:,cok)=avgvec(s.rate_nonray(:,c(cok)), index);
+    aats_m_ray = interp1(s.t, s.m_ray,aats.t);
+    for cc = 1:13
+    aats_tau_ray(:,cc) = interp1(s.t, s.tau_ray(:,c(cc)), aats.t);
+    end
+    aats.data_noray = aats.data ./ tr(aats_m_ray,aats_tau_ray)';
+    
     difft=[diff(aats.t);1];
     for i=1:length(cok);
         wi=cok(i);
-        combined(:,wi)=nanmean(s.rate(:,crange(1,wi):crange(2,wi))')'; % radiance averaged over adjacent pixels, to match the AATS wavelength width
-        s.rateratiotoaats(:,wi)=s.rate(:,c(wi))./interp1(aats.t(difft>0),data(wi,difft>0)',s.t);
-        s.rateratiorangetoaats(:,wi)=combined(:,wi)./interp1(aats.t(difft>0),data(wi,difft>0)',s.t);
+        combined(:,wi)=nanmean(s.rate_nonray(:,crange(1,wi):crange(2,wi))')'; % radiance averaged over adjacent pixels, to match the AATS wavelength width
+        s.rateratiotoaats(:,wi)=s.rate_nonray(:,c(wi))./interp1(aats.t(difft>0),aats.data_noray(wi,difft>0)',s.t);
+        s.rateratiorangetoaats(:,wi)=combined(:,wi)./interp1(aats.t(difft>0),aats.data_noray(wi,difft>0)',s.t);
         if isfield(s,'tau_aero') & isfield(aats, 'tau_aero');
             s.dtau_aero(:,wi)=s.tau_aero(:,c(wi))-interp1(aats.t(difft>0),aats.tau_aero(wi,difft>0)',s.t);
             s.trratio(:,wi)=exp(-s.dtau_aero(:,wi).*interp1(aats.t(difft>0), m_aero(difft>0)', s.t));
         end;
     end;
     [aatsraterange, sn]=avgvec(combined, index);
-    rateratio(:,cok)=aatsrate(:,cok)./data(cok,:)';
-    rateratiorange(:,cok)=aatsraterange(:,cok)./data(cok,:)';
+    rateratio(:,cok)=aatsrate(:,cok)./aats.data(cok,:)';
+    rateratiorange(:,cok)=aatsraterange(:,cok)./aats.data(cok,:)';
     s.c=[crange(1,:);c;crange(2,:)];
     
     % smooth, normalize and calculate OD differences
@@ -199,7 +213,7 @@ for k=1:2;
     if nargin<2;
         isf=sum(isfinite(rateratiotoaats),2);
         isfok=find(isf==max(isf)); % This method does not always avoid NaN, but almost always.
-        isfok=find(isf==max(isf) & sum(s.flag,2)==0); % This method does not always avoid NaN, but almost always.
+%         isfok=find(isf==max(isf) & sum(s.flag,2)==0); % This method does not always avoid NaN, but almost always.
         [dummy, s.noonrow]=min(s.m_ray(isfok)); % find solar noon
         s.noonrow=isfok(s.noonrow);
         clear isf isfok;

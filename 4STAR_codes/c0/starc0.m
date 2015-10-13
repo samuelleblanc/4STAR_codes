@@ -16,9 +16,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
 % SL, v1.3, 2015-07-22, updated the starc0 for special case testing of lower c0
 %                 from Yohei sent on 20150720, new c0 from 20130708
-% Yohei, v1.4, 2015/09/24, added NAAMES phase#1 temporary calibration
 
-version_set('1.4');
+version_set('1.3');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -32,12 +31,7 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2015 9 16 0 0 0]); % NAAMES phase#1
-        if now>=datenum([2015 9 24 0 0 0]);
-            daystr='20150916';
-            filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
-        end;        
-    elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
             %daystr='20140830';
             daystr='20141002';
@@ -57,14 +51,17 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 10 17]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';

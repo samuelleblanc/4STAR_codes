@@ -18,6 +18,17 @@ if nargin<2 || isempty(source)
 end;
 % cjf: Modified to include filen, to be used when datetype has "sky"
 [sourcefile, ext, daystr,filen]=starsource(source, datatype);
+
+% Load sky scans 2x2, not 1x1.
+if numel(sourcefile)==1 && (~isempty(strfind(sourcefile{1},'VIS_SKY'))||~isempty(strfind(sourcefile{1},'NIR_SKY')))
+   if ~isempty(strfind(sourcefile{1},'NIR_SKY'))
+      sourcefile(2) = {strrep(sourcefile{1},'NIR','VIS')};
+   elseif ~isempty(strfind(sourcefile{1},'VIS_SKY'))
+      sourcefile(2) = {strrep(sourcefile{1},'VIS','NIR')};
+   end
+   sourcefile = sourcefile';
+end
+
 if isempty(sourcefile);
     savematfile=0;
     return;

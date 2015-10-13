@@ -19,17 +19,22 @@ star.Az_offset_sun = mean(star.Headng(star.Str==1&star.Zn==0&star.Headng~=0)+  .
     star.Az_deg(star.Str==1 & star.Zn==0 & star.Headng~=0) - star.sunaz(star.Str==1 & star.Zn==0 & star.Headng~=0));
 star.El_offset_sun = mean(star.El_deg(star.Str==1 & star.Zn==0 & star.Headng~=0) - star.sunel(star.Str==1 & star.Zn==0 & star.Headng~=0));
 star.Az_true = mod(star.Headng+ star.Az_deg - star.Az_offset_sun,360);
+star.Az_true = star.Az_deg;
 star.El_true = star.El_deg- star.El_offset_sun;
+star.El_true = star.El_deg;
 star.El_true(star.Str==2) = star.El_deg(star.Str==2) - star.sun_sky_El_offset;
 star.isPPL = std(star.El_true)>std(star.Az_true);
 %%
 figdir = ['D:\data\4STAR\yohei\img\'];
 
+% star.sat_time = max(star.raw,[],2)==65535; % we already have star.sat_time
+% star.sat_pixel = max(star.raw,[],1)==65535; % we have star.sat_ij instead.
+
 if sum(star.sat_time)>0
-    if any(star.sat_pixel(1:1044))
+    if any(star.sat_ij(1:1044))
         filename = star.filename{1};
         Tint = star.visTint(star.sat_time);
-    elseif any(star.sat_pixel(1045:end))
+    elseif any(star.sat_ij(1045:end))
         filename = star.filename{2};
         Tint = star.nirTint(star.sat_time);
     end
@@ -42,7 +47,7 @@ if sum(star.sat_time)>0
     disp(sprintf('Record, Zone, tint, dAz, dEl'));
     disp(sprintf('%d,    %d,   %d,   %2.2f,  %2.2f \n', [recs(star.sat_time),star.Zn(star.sat_time),...
         Tint, ...
-        star.Az_true(star.sat_time)-star.sunaz(star.sat_time),...
+        star.Az_true(star.sat_time)+star.Headng(star.sat_time)-star.sunaz(star.sat_time),...
         star.El_true(star.sat_time)-star.sunel(star.sat_time)]'))
 end
 modes = unique(star.Md);
@@ -136,6 +141,9 @@ end
 over_top = star.El_true>90;
 star.El_true(over_top) = 180-star.El_true(over_top);
 star.Az_true(over_top) = mod(star.Az_true(over_top)+180,360);
+%(az_deg, el_deg, heading_deg, pitch_deg, roll_deg)
+[star.Az_gnd, star.El_gnd] = ac_to_gnd_SEACRS(star.Az_true, star.El_true, star.Headng,  star.pitch, star.roll );
+
 %  star.aeronetcols = [332, 624,880,1040];
 vis_pix = find(star.aeronetcols);
 % vis_pix = find((1000*star.w(star.aeronetcols))<1000);
@@ -146,19 +154,21 @@ star.vis_pix = vis_pix;
 %%
 % Use zone==0 and Str==1 to define the actual sun position and the
 % angular offsets.
-star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
-recs = (1:length(star.time));
+% star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
+star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
 
-s(1) = subplot(2,1,1);
-plot(recs(star.Str==0),star.Zn(star.Str==0),'b.',recs(star.Str==1),star.Zn(star.Str==1),'bo',...
-    recs(star.Str==2),star.Zn(star.Str==2),'gx',...
-    recs(star.Str==0&star.sat_time),star.Zn(star.Str==0&star.sat_time),'r.',...
-    recs(star.Str==1&star.sat_time),star.Zn(star.Str==1&star.sat_time),'ro',...
-    recs(star.Str==2&star.sat_time),star.Zn(star.Str==2&star.sat_time),'rx');
-title(fstem,'interp','none');
-ylabel('zone');
-legend('closed','sun','sky','location','northwest')
-s(2) = subplot(2,1,2);
+% recs = (1:length(star.time));
+
+% s(1) = subplot(2,1,1);
+% plot(recs(star.Str==0),star.Zn(star.Str==0),'b.',recs(star.Str==1),star.Zn(star.Str==1),'bo',...
+%     recs(star.Str==2),star.Zn(star.Str==2),'gx',...
+%     recs(star.Str==0&star.sat_time),star.Zn(star.Str==0&star.sat_time),'r.',...
+%     recs(star.Str==1&star.sat_time),star.Zn(star.Str==1&star.sat_time),'ro',...
+%     recs(star.Str==2&star.sat_time),star.Zn(star.Str==2&star.sat_time),'rx');
+% title(fstem,'interp','none');
+% ylabel('zone');
+% legend('closed','sun','sky','location','northwest')
+% s(2) = subplot(2,1,2);
 % plot(recs(star.Str==0),star.visTint(star.Str==0),'r.',recs(star.Str==1),star.visTint(star.Str==1),'bo',...
 %     recs(star.Str==2),star.visTint(star.Str==2),'gx')
 % title('Tints');
@@ -172,53 +182,53 @@ s(2) = subplot(2,1,2);
 %
 % s(3) = subplot(3,1,3);&star.sat_time
 
-plot(recs(star.Str==0&star.Headng~=0),star.SA(star.Str==0&star.Headng~=0),'b.',...
-    recs(star.Str==1&star.Headng~=0),star.SA(star.Str==1&star.Headng~=0),'bo',...
-    recs(star.Str==2&star.Headng~=0),star.SA(star.Str==2&star.Headng~=0),'gx',....
-    recs(star.Str==0&star.sat_time&star.Headng~=0),star.SA(star.Str==0&star.sat_time&star.Headng~=0),'r.',...
-    recs(star.Str==1&star.sat_time&star.Headng~=0),star.SA(star.Str==1&star.sat_time&star.Headng~=0),'ro',...
-    recs(star.Str==2&star.sat_time&star.Headng~=0),star.SA(star.Str==2&star.sat_time&star.Headng~=0),'rx')
-ylabel('scattering angle [deg]')
-linkaxes(s,'x')
+% plot(recs(star.Str==0&star.Headng~=0),star.SA(star.Str==0&star.Headng~=0),'b.',...
+%     recs(star.Str==1&star.Headng~=0),star.SA(star.Str==1&star.Headng~=0),'bo',...
+%     recs(star.Str==2&star.Headng~=0),star.SA(star.Str==2&star.Headng~=0),'gx',....
+%     recs(star.Str==0&star.sat_time&star.Headng~=0),star.SA(star.Str==0&star.sat_time&star.Headng~=0),'r.',...
+%     recs(star.Str==1&star.sat_time&star.Headng~=0),star.SA(star.Str==1&star.sat_time&star.Headng~=0),'ro',...
+%     recs(star.Str==2&star.sat_time&star.Headng~=0),star.SA(star.Str==2&star.sat_time&star.Headng~=0),'rx')
+% ylabel('scattering angle [deg]')
+% linkaxes(s,'x')
 
 % figout = savefig(gcf,[figdir, fstem,'.zones.png'],true);
 %%
 
 
 % Nominal, before correcting for symmetry
-star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
-recs = (1:length(star.time));
-figure;
-ss(1) = subplot(2,1,1);
-plot(recs,star.skyrad(:,star.aeronetcols(vis_pix(end))), '-b.');
-title(fstem,'interp','none');
-ylabel('rate');
-ss(2) = subplot(2,1,2);
-if ~star.isPPL
-    plot(recs(star.Str==0&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==0&star.Headng~=0)-star.sunaz((star.Str==0&star.Headng~=0)))),'b.',...
-        recs(star.Str==1&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==1&star.Headng~=0)-star.sunaz(star.Str==1&star.Headng~=0))),'bo',...
-        recs(star.Str==2&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==2&star.Headng~=0)-star.sunaz(star.Str==2&star.Headng~=0))),'gx',....
-        recs(star.Str==0&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==0&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==0&star.sat_time&star.Headng~=0))),'r.',...
-        recs(star.Str==1&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==1&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==1&star.sat_time&star.Headng~=0))),'ro',...
-        recs(star.Str==2&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==2&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==2&star.sat_time&star.Headng~=0))),'rx')
-    ylabel('Az - Sunaz [deg]')
-else
-    plot(recs(star.Str==0),star.El_true(star.Str==0)-star.sunaz((star.Str==0)),'b.',...
-        recs(star.Str==1),star.El_true(star.Str==1)-star.sunel(star.Str==1),'bo',...
-        recs(star.Str==2),star.El_true(star.Str==2)-star.sunel(star.Str==2),'gx',....
-        recs(star.Str==0&star.sat_time),star.El_true(star.Str==0&star.sat_time)-star.sunel(star.Str==0&star.sat_time),'r.',...
-        recs(star.Str==1&star.sat_time),star.El_true(star.Str==1&star.sat_time)-star.sunel(star.Str==1&star.sat_time),'ro',...
-        recs(star.Str==2&star.sat_time),star.El_true(star.Str==2&star.sat_time)-star.sunel(star.Str==2&star.sat_time),'rx')
-    ylabel('El - Sunel [deg]')
-    
-end
-legend('closed','sun','sky','location','south')
-linkaxes([s,ss],'x')
+% star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
+% recs = (1:length(star.time));
+% figure;
+% ss(1) = subplot(2,1,1);
+% plot(recs,star.skyrad(:,star.aeronetcols(vis_pix(end))), '-b.');
+% title(fstem,'interp','none');
+% ylabel('rate');
+% ss(2) = subplot(2,1,2);
+% if ~star.isPPL
+%     plot(recs(star.Str==0&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==0&star.Headng~=0)-star.sunaz((star.Str==0&star.Headng~=0)))),'b.',...
+%         recs(star.Str==1&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==1&star.Headng~=0)-star.sunaz(star.Str==1&star.Headng~=0))),'bo',...
+%         recs(star.Str==2&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==2&star.Headng~=0)-star.sunaz(star.Str==2&star.Headng~=0))),'gx',....
+%         recs(star.Str==0&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==0&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==0&star.sat_time&star.Headng~=0))),'r.',...
+%         recs(star.Str==1&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==1&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==1&star.sat_time&star.Headng~=0))),'ro',...
+%         recs(star.Str==2&star.sat_time&star.Headng~=0),acosd(cosd(star.Az_true(star.Str==2&star.sat_time&star.Headng~=0)-star.sunaz(star.Str==2&star.sat_time&star.Headng~=0))),'rx')
+%     ylabel('Az - Sunaz [deg]')
+% else
+%     plot(recs(star.Str==0),star.El_true(star.Str==0)-star.sunaz((star.Str==0)),'b.',...
+%         recs(star.Str==1),star.El_true(star.Str==1)-star.sunel(star.Str==1),'bo',...
+%         recs(star.Str==2),star.El_true(star.Str==2)-star.sunel(star.Str==2),'gx',....
+%         recs(star.Str==0&star.sat_time),star.El_true(star.Str==0&star.sat_time)-star.sunel(star.Str==0&star.sat_time),'r.',...
+%         recs(star.Str==1&star.sat_time),star.El_true(star.Str==1&star.sat_time)-star.sunel(star.Str==1&star.sat_time),'ro',...
+%         recs(star.Str==2&star.sat_time),star.El_true(star.Str==2&star.sat_time)-star.sunel(star.Str==2&star.sat_time),'rx')
+%     ylabel('El - Sunel [deg]')
+%     
+% end
+% legend('closed','sun','sky','location','south')
+% linkaxes([s,ss],'x')
 
 % figout = savefig(gcf,[figdir, fstem,'.rate_trace.png'],true);
 
 %%
-
+% 
 if star.isPPL
     title_str = {['Principal Plane Scan: ',fstem] ; ...
         [datestr(star.time(1),'mmm dd, yyyy HH:MM UTC'),'. Altitude=',sprintf('%3.0f m',mean(star.Alt)), ...
@@ -228,40 +238,40 @@ if star.isPPL
         max(star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb,star.aeronetcols(vis_pix(end))))]);
     highest_bot = max([min(star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb,star.aeronetcols(vis_pix(end)))),...
         min(star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb,star.aeronetcols(vis_pix(end))))]);
-    overlap =(lowest_top+highest_bot)./2;
-    rad_b4 = star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb,star.aeronetcols(vis_pix(end)));
-    el_b4  = star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-...
-        star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb);
-    el_b4 = el_b4(~isNaN(rad_b4));
-    rad_b4 = rad_b4(~isNaN(rad_b4));
-    [rad_b4, ij] = unique(rad_b4);
-    el_b4 = el_b4(ij);
-    
-    rad_f2 = star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb,star.aeronetcols(vis_pix(end)));
-    el_f2  = star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb)...
-        -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb);
-    el_f2 = el_f2(~isNaN(rad_b4));
-    rad_f2 = rad_f2(~isNaN(rad_b4));
-    [rad_f2, ij] = unique(rad_f2);
-    el_f2 = el_f2(ij);
-    if (length(rad_b4)>1)&&(length(rad_f2)>1)
-        below = interp1(rad_b4,el_b4,overlap,'pchip','extrap');
-        above = interp1(rad_f2, el_f2,overlap,'pchip','extrap');
-        miss = (above+below)./2;
-    else
-        miss = 0;
-    end
-    
-    %     subplot(2,1,1);
-    %     plot(star.El_true((abs(star.Zn)==3))-star.sunel((abs(star.Zn)==3)), ...
-    %         star.skyrad((abs(star.Zn)==3),star.aeronetcols(vis_pix(end))),'-',...
-    %         star.El_true((abs(star.Zn)==3)&below_orb)-star.sunel((abs(star.Zn)==3)&below_orb), ...
-    %         star.skyrad((abs(star.Zn)==3)&below_orb,star.aeronetcols(vis_pix(end))),'o',...
-    %         star.El_true((abs(star.Zn)==3)&~below_orb)-star.sunel((abs(star.Zn)==3)&~below_orb), ...
-    %         star.skyrad((abs(star.Zn)==3)&~below_orb,star.aeronetcols(vis_pix(end))),'x');
-    %     % See if the two branches have any overlapping intensity.
-    %     %
-    %     subplot(2,1,2);
+%     overlap =(lowest_top+highest_bot)./2;
+%     rad_b4 = star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb,star.aeronetcols(vis_pix(end)));
+%     el_b4  = star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-...
+%         star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb);
+%     el_b4 = el_b4(~isNaN(rad_b4));
+%     rad_b4 = rad_b4(~isNaN(rad_b4));
+%     [rad_b4, ij] = unique(rad_b4);
+%     el_b4 = el_b4(ij);
+%     
+%     rad_f2 = star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb,star.aeronetcols(vis_pix(end)));
+%     el_f2  = star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb)...
+%         -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&~below_orb);
+%     el_f2 = el_f2(~isNaN(rad_b4));
+%     rad_f2 = rad_f2(~isNaN(rad_b4));
+%     [rad_f2, ij] = unique(rad_f2);
+%     el_f2 = el_f2(ij);
+%     if (length(rad_b4)>1)&&(length(rad_f2)>1)
+%         below = interp1(rad_b4,el_b4,overlap,'pchip','extrap');
+%         above = interp1(rad_f2, el_f2,overlap,'pchip','extrap');
+%         miss = (above+below)./2;
+%     else
+%         miss = 0;
+%     end
+%     
+%     %     subplot(2,1,1);
+%     %     plot(star.El_true((abs(star.Zn)==3))-star.sunel((abs(star.Zn)==3)), ...
+%     %         star.skyrad((abs(star.Zn)==3),star.aeronetcols(vis_pix(end))),'-',...
+%     %         star.El_true((abs(star.Zn)==3)&below_orb)-star.sunel((abs(star.Zn)==3)&below_orb), ...
+%     %         star.skyrad((abs(star.Zn)==3)&below_orb,star.aeronetcols(vis_pix(end))),'o',...
+%     %         star.El_true((abs(star.Zn)==3)&~below_orb)-star.sunel((abs(star.Zn)==3)&~below_orb), ...
+%     %         star.skyrad((abs(star.Zn)==3)&~below_orb,star.aeronetcols(vis_pix(end))),'x');
+%     %     % See if the two branches have any overlapping intensity.
+%     %     %
+%     %     subplot(2,1,2);
     figure;
     plot(abs(star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)...
         -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-miss), ...
@@ -274,7 +284,7 @@ if star.isPPL
     xlabel('El shifted - sun El');
     star.El_miss = miss;
     star.El_true(star.Str==2) = star.El_true(star.Str==2) - miss;
-%     figout = savefig(gcf,[figdir, fstem,'.ppl_shift.png'],true);
+% %     figout = savefig(gcf,[figdir, fstem,'.ppl_shift.png'],true);
 else
     title_str = {['Almucantar Scan: ',fstem] ; ...
         [datestr(star.time(1),'mmm dd, yyyy HH:MM UTC'),'. Altitude=',sprintf('%3.0f m',mean(star.Alt)), ...
@@ -299,31 +309,31 @@ else
         max(star.skyrad(after,star.aeronetcols(vis_pix(end))))]);
     highest_bot = max([min(star.skyrad(before,star.aeronetcols(vis_pix(end)))),...
         min(star.skyrad(after,star.aeronetcols(vis_pix(end))))]);
-    overlap =(lowest_top+highest_bot)./2;
-    rad_b4 = star.skyrad(before,star.aeronetcols(vis_pix(end)));
-    az_b4  = star.Az_true(before)-star.sunaz(before);
-    az_b4 = az_b4(~isNaN(rad_b4));
-    rad_b4 = rad_b4(~isNaN(rad_b4));
-    [rad_b4, ij] = unique(rad_b4);
-    az_b4 = az_b4(ij);
-    
-    
-    rad_f2 = star.skyrad(after,star.aeronetcols(vis_pix(end)));
-    az_f2  = star.Az_true(after)-star.sunaz(after);
-    az_f2 = az_f2(~isNaN(rad_f2));
-    rad_f2 = rad_f2(~isNaN(rad_f2));
-    [rad_f2, ij] = unique(rad_f2);
-    az_f2 = az_f2(ij);
-    %%
-    if (length(rad_b4)>1)&&(length(rad_f2)>1)
-        below = interp1(rad_b4,az_b4,overlap,'pchip','extrap');
-        above = interp1(rad_f2,az_f2 ,overlap,'pchip','extrap');
-        miss = (above+below)./2;
-    else
-        miss = 0;
-    end
-    star.Az_miss_legA = miss;
-    star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
+%     overlap =(lowest_top+highest_bot)./2;
+%     rad_b4 = star.skyrad(before,star.aeronetcols(vis_pix(end)));
+%     az_b4  = star.Az_true(before)-star.sunaz(before);
+%     az_b4 = az_b4(~isNaN(rad_b4));
+%     rad_b4 = rad_b4(~isNaN(rad_b4));
+%     [rad_b4, ij] = unique(rad_b4);
+%     az_b4 = az_b4(ij);
+%     
+%     
+%     rad_f2 = star.skyrad(after,star.aeronetcols(vis_pix(end)));
+%     az_f2  = star.Az_true(after)-star.sunaz(after);
+%     az_f2 = az_f2(~isNaN(rad_f2));
+%     rad_f2 = rad_f2(~isNaN(rad_f2));
+%     [rad_f2, ij] = unique(rad_f2);
+%     az_f2 = az_f2(ij);
+%     %%
+%     if (length(rad_b4)>1)&&(length(rad_f2)>1)
+%         below = interp1(rad_b4,az_b4,overlap,'pchip','extrap');
+%         above = interp1(rad_f2,az_f2 ,overlap,'pchip','extrap');
+%         miss = (above+below)./2;
+%     else
+%         miss = 0;
+%     end
+%     star.Az_miss_legA = miss;
+%     star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
     figure;    
     subplot(2,1,1);
     plot(star.Az_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_A)...
@@ -339,12 +349,12 @@ title(fstem,'interp','none');
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'-o',...
         abs(star.Az_true(after)-star.sunaz(after)), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'-x');
-    title(['Near-sun ALM leg A sky zone shifted by ',sprintf('%2.2f deg',star.Az_miss_legA)]);
+    title(['Near-sun ALM Leg A sky zone']);
     ylabel('radiance');
-    xlabel('Az shifted - sun Az');
-    saveas(gcf,[figdir, fstem,'.alm_legA_shift.png']);
-    %%
-
+    xlabel('Az - sun Az');
+%     saveas(gcf,[figdir, fstem,'.alm_legA_shift.png']);
+%     %%
+% 
     before = ((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_B&(star.Az_true<star.sunaz);
     after = ((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_B&(star.Az_true>star.sunaz);
     
@@ -352,30 +362,30 @@ title(fstem,'interp','none');
         max(star.skyrad(after,star.aeronetcols(vis_pix(end))))]);
     highest_bot = max([min(star.skyrad(before,star.aeronetcols(vis_pix(end)))),...
         min(star.skyrad(after,star.aeronetcols(vis_pix(end))))]);
-    overlap =(lowest_top+highest_bot)./2;
-    rad_b4 = star.skyrad(before,star.aeronetcols(vis_pix(end)));
-    az_b4  = star.Az_true(before)-star.sunaz(before);
-    az_b4 = az_b4(~isNaN(rad_b4));
-    rad_b4 = rad_b4(~isNaN(rad_b4));
-        [rad_b4, ij] = unique(rad_b4);
-    az_b4 = az_b4(ij);
-    
-    rad_f2 = star.skyrad(after,star.aeronetcols(vis_pix(end)));
-    az_f2  = star.Az_true(after)-star.sunaz(after);
-    az_f2 = az_f2(~isNaN(rad_f2));
-    rad_f2 = rad_f2(~isNaN(rad_f2));
-    [rad_f2, ij] = unique(rad_f2);
-    az_f2 = az_f2(ij);
-    
-    if (length(rad_b4)>1)&&(length(rad_f2)>1)
-        below = interp1(rad_b4,az_b4,overlap,'pchip','extrap');
-    above = interp1(rad_f2,az_f2 ,overlap,'pchip','extrap');
-    miss = (above+below)./2;
-    else
-        miss = 0;
-    end
-    star.Az_miss_legB = miss;
-    star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
+%     overlap =(lowest_top+highest_bot)./2;
+%     rad_b4 = star.skyrad(before,star.aeronetcols(vis_pix(end)));
+%     az_b4  = star.Az_true(before)-star.sunaz(before);
+%     az_b4 = az_b4(~isNaN(rad_b4));
+%     rad_b4 = rad_b4(~isNaN(rad_b4));
+%         [rad_b4, ij] = unique(rad_b4);
+%     az_b4 = az_b4(ij);
+%     
+%     rad_f2 = star.skyrad(after,star.aeronetcols(vis_pix(end)));
+%     az_f2  = star.Az_true(after)-star.sunaz(after);
+%     az_f2 = az_f2(~isNaN(rad_f2));
+%     rad_f2 = rad_f2(~isNaN(rad_f2));
+%     [rad_f2, ij] = unique(rad_f2);
+%     az_f2 = az_f2(ij);
+%     
+%     if (length(rad_b4)>1)&&(length(rad_f2)>1)
+%         below = interp1(rad_b4,az_b4,overlap,'pchip','extrap');
+%     above = interp1(rad_f2,az_f2 ,overlap,'pchip','extrap');
+%     miss = (above+below)./2;
+%     else
+%         miss = 0;
+%     end
+%     star.Az_miss_legB = miss;
+%     star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
         figure;
     subplot(2,1,1);
     plot(star.Az_true(before|after)...
@@ -391,22 +401,22 @@ title(fstem,'interp','none');
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'-o',...
         abs(star.Az_true(after)-star.sunaz(after)), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'-x');
-    title(['Near-sun ALM leg B sky zone shifted by ',sprintf('%2.2f deg',star.Az_miss_legB)]);
+    title(['Near-sun ALM leg B ']);
     ylabel('radiance');
-    xlabel('Az_shifted - sun Az','interp','none');
-    saveas(gcf,[figdir, fstem,'.alm_legB_shift.png']);    
-    % If both miss legA and miss legB ==0, don't shift either leg.
-    % If only one is zero, shift that leg to match the other. 
-    % If both are non-zero, then shift compute the shift for both
-    % overlapping portions and take the average.
-    % But for now, we'll just move on...
-    
-    %%
-       
+    xlabel('Az - sun Az','interp','none');
+%     saveas(gcf,[figdir, fstem,'.alm_legB_shift.png']);    
+%     % If both miss legA and miss legB ==0, don't shift either leg.
+%     % If only one is zero, shift that leg to match the other. 
+%     % If both are non-zero, then shift compute the shift for both
+%     % overlapping portions and take the average.
+%     % But for now, we'll just move on...
+%     
+%     %%
+%        
 end
 
 
-star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
+% star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
 
 % star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
 % if star.isPPL

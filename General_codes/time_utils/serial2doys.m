@@ -7,7 +7,7 @@ doy = serial2doy1(serial);
 first = datevec(serial(1));
 first = [first(1) 1 1  0 0 0];
 doy_diff = diff(doy);
-while any(doy_diff<0)
+while any(doy_diff<0 & diff(serial)>0)
     wrap = find(doy_diff<0,1,'first')+1;
     wrap_y = datevec(serial(wrap)); wrap_y = [wrap_y(1), 1,1,0,0,0];
     doy(wrap:end) = serial2doy1(serial(wrap:end)) + round(etime(wrap_y,first)/(60*60*24));
