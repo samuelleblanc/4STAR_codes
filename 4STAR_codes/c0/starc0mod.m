@@ -51,6 +51,8 @@
 %           - changed to version 1.3
 % Modified, Michal Segal, February, 18, 2015
 %           - fixed bug related to newmatlab
+% Modified, Michal segal, October, 10, 2015
+%           - added new 20141002 ARISE c0mod
 %
 % -------------------------------------------------------------------------
 %% function routine
@@ -77,7 +79,8 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2014 7 1 0 0 0]); % ARISE;
         if now>=datenum([2014 8 1 0 0 0]);
             daystr='20141002';
-            filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
             model_atmosphere=3;% ARISE (first archive MidLat winter coefficients)
         end;
     elseif t>=datenum([2013 6 18 0 0 0]); % fiber swapped in the evening of June 17, 2013 at Dryden.

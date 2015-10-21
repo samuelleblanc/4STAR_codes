@@ -16,6 +16,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
 % SL, v1.3, 2015-07-22, updated the starc0 for special case testing of lower c0
 %                 from Yohei sent on 20150720, new c0 from 20130708
+% MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0
 
 version_set('1.3');
 if ~exist('verbose','var')
@@ -36,7 +37,9 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %daystr='20140830';
             daystr='20141002';
             %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
-            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+            %before Oct-08-2015
+            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';% on Oct-20-2015
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         end;

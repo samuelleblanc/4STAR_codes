@@ -43,6 +43,10 @@
 %                 post-division of airmass factor
 % MS: 2014-11-17:-replaced all _avg values with original ones
 %                -added water vapor subtraction from OD spectra
+% MS: 2015-10-20: added QA plots for various structures; commented out
+%                 subtracted water vapor from 
+%                 line 607: used starsun.tau_aero_tot (O2-O2 NIR
+%                 subtracted) with water vapor subtraction
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(starsun,modc0,model_atmosphere)
@@ -83,6 +87,33 @@ wnir = starsun.w(1045:end);
  tau_ODslant = -log(Tslant);
  %rateall    = real(starsun.rate./repmat(starsun.f,1,qq)./tr(starsun.m_ray, starsun.tau_ray)); % rate adjusted for the Rayleigh component
  %tau_OD     = real(-log(rateall./repmat(starsun.c0,pp,1)));%./repmat(starsun.m_aero,1,qq));   % total slant optical depth (Rayeigh subtracted)
+ 
+% QA plot of tau_ODslant vs.s.tau_tot_slant
+%     wi = [1084,1109,1213,1439,1503];
+%     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
+%     figure;
+%     for ll=1:length(wi)
+%         subplot(length(wi),1,ll);
+%         plot(starsun.UTHh,tau_ODslant(:,wi(ll))-...
+%              starsun.tau_tot_slant(:,wi(ll)),'ok');hold on;
+%          if ll==3
+%          xlabel('time [UTC]');
+%          ylabel('\Delta (tau-aero OD slant (cwv routine) - tau-aero-slant (starwrapper))');
+%          end
+%         legend(le{ll,:});
+%         axis([min(starsun.UTHh) max(starsun.UTHh) -0.05 0.05]);
+%         plot(starsun.UTHh,zeros(length(starsun.UTHh),1),'-m');hold off;
+%     end
+    
+    
+%     figure;
+%     
+%         plot(starsun.w,tau_ODslant([9850],:),'-k');hold on;
+%         plot(starsun.w,starsun.tau_tot_slant([9850],:),':k');hold on;
+%         legend('tau-aero OD slant','tau-tot-slant');
+%         xlabel('wavelength');
+%         
+
  
 %
 %% apply modified calib to rate
@@ -573,8 +604,26 @@ for i = 1:length(starsun.t)
 
     afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
-    cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
+    %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
+    cwv.tau_OD_wvsubtract(i,:) = starsun.tau_tot_slant(i,:)-wvamount';% this is a structure with o2-o2 NIR subtracted
     end
+    
+    % QA plot of tau_OD_wvsubtract vs.tau_ODslant
+%     wi = [1084,1109,1213,1439,1503];
+%     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
+%     figure;
+%     for ll=1:length(wi)
+%         subplot(length(wi),1,ll);
+%         plot(starsun.UTHh,tau_ODslant(:,wi(ll))-...
+%              cwv.tau_OD_wvsubtract(:,wi(ll)),'ok');hold on;
+%          if ll==3
+%          xlabel('time [UTC]');
+%          ylabel('\Delta (tau-aero slant - tau-aero-wvsubtract)');
+%          end
+%         legend(le{ll,:});
+%         axis([min(starsun.UTHh) max(starsun.UTHh) -0.0005 0.0005]);
+%         plot(starsun.UTHh,zeros(length(starsun.UTHh),1),'-m');hold off;
+%     end
     
 end % end of loop over all data points for wv retrieval
    cwv_opt = (swv_opt(:,1)/H2O_conv)./starsun.m_H2O;% retrieval is made on slant./starsun.m_H2O;  %conversion from slant path to vertical

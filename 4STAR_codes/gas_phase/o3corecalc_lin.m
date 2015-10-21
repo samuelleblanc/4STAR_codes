@@ -7,6 +7,7 @@ function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin(s,o3coef,o4
 % MS, July, 24, 2014
 % MS, 2015-04-21, modified to use linear contrained fit on rate
 %                 instaed od OD
+% MS, 2015-10-21, converted O4 and H2O to be in vertical amount
 %------------------------------------------------------------------
 ODfit = zeros(length(s.t),length(s.w));
 tau_o3o4h2o_subtract = tau_OD;
@@ -126,8 +127,8 @@ end
 
 %% save variables
 O3conc  = o3_DU;
-O4conc  = 10000*sc(:,2); % scaling back retrieved values due to scale down of coef
-H2Oconc = 10000*sc(:,3);% scaling back retrieved values due to scale down of coef
+O4conc  = 10000*sc(:,2)./s.m_ray; % scaling back retrieved values due to scale down of coef
+H2Oconc = 10000*sc(:,3)./s.m_H2O;% scaling back retrieved values due to scale down of coef
 O3resi  = sqrt(sc_residual);
 o3OD    = ODfit;
 allvar  = sc;
