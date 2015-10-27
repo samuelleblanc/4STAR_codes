@@ -60,7 +60,9 @@ elseif isequal(R,'0') | isequal(R,'1') | isequal(R,'2') % post field
     %JML flights that span 2 days will have to be listed separately and need to be added
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130831' '20130902' '20130904' '20130906' '20130907' '20130909' '20130910' '20130911' '20130913' '20130916' '20130917' '20130918' '20130921' '20130923'} ; % put one day string
     %Values of jproc: 1=archive 0=do not archive  JML 4/7/14
-    jproc=[         0          0          0          0          0          0          0          0          0          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1]; %set=1 to process    %JML 4/7/14
+    jproc=[         1          0          1          1          1          1          1          1          1          1          1          0          1          0          1          1          1          0          1          0          1          1          1          0          1          1          1]; %set=1 to process    %JML 4/7/14
+    !!! missing: 20130812_starflag_man_created20141111_1434by_JL.mat, 20130814_starflag_man_created20141107_1648by_JL.mat, 20130918_starflag_man_created20141111_0911by_JL.mat, 20130922 proper star.mat and starinfo
+    !!! cleared: several "day #2" starsun.mat files
     %Values of idflag: 1=old flagging,2=new flagging JML 4/7/14   
     idflag=[        2          2          2          2          2          2          2          2          1          1          1          1          1          1          2          2          1          1          2          2          2          2          2          2          2          2          2]; %JML 4/7/14
     %JML updated datamanager for the purpose of these runs, but of course 9/6-7 is really Yohei and he has already archived that file
@@ -260,6 +262,19 @@ for i=idx_file_proc,   %JML 4/7/14
             %vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','flagallcols','m_aero','tau_aero_err'};  %added 'tau_aero_err' for R='1' Oct 2014
             vars={'t','w','Lat','Lon','Alt','tau_aero_noscreening','tau_aero','m_aero','tau_aero_err','cwv','flagallcols'}; %added 'cwv' for R='1',Oct 2014
             load(starfile,vars{:});
+            if t(end)<flight(end); % date change within the flight
+                ds2=datestr(datenum(dslist{i},'yyyymmdd')+1,'yyyymmdd');
+                starfile_day2=fullfile(starpaths, [datadirec_short_special filesep ds2 'starsun_R2.mat']); % this line needs to be consistent with the starfile above
+                vars_tobemerged = setdiff(vars, {'w', 'cwv'});
+                merge({starfile;starfile_day2}, vars_tobemerged);
+                cwv2=load(starfile_day2, 'cwv');
+                cwv.tau_OD_wvsubtract=[cwv.tau_OD_wvsubtract; cwv2.cwv.tau_OD_wvsubtract];
+                cwv.cwv940m1=[cwv.cwv940m1; cwv2.cwv.cwv940m1];
+                cwv.cwv940m1std=[cwv.cwv940m1std; cwv2.cwv.cwv940m1std];
+                cwv.cwv940m2=[cwv.cwv940m2; cwv2.cwv.cwv940m2];
+                cwv.cwv940m2resi=[cwv.cwv940m2resi; cwv2.cwv.cwv940m2resi];
+                clear ds2 starfile_day2 vars_tobemerged cvw2
+            end;
             UTstarsunfile=timeMatlab_to_UTdechr(t);
             T4degC_smintp=interp1(track.tsorted, track.tsm(iisav), t);
             idx_T4nan=find(isnan(T4degC_smintp));
@@ -747,38 +762,135 @@ for i=idx_file_proc,   %JML 4/7/14
 end;
 
 % plot
-savefigure=false;
+savefigure=true;
 if isequal(prefix,'SEAC4RS-4STAR-AOD');
 %     fn='AOD355'; % one field name
     fn='AOD550'; % one field name
+    fn='AOD0550'; % one field name
 elseif isequal(prefix,'SEAC4RS-4STAR-WV');
 elseif isequal(prefix,'SEAC4RS-4STAR-SKYSCAN');
     fn='c5000'; % one field name
 end;
-if savefigure;
-    figure;
-        %r=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '.ict']));
-        if ~isempty(datadirec_special)  %JML
-            r=ictread(fullfile(starpaths,[sprintf('%s%s',datadirec_special,dslist{i}) filesep],[prefix '_' platform '_' daystr '_R' num2str(R) '_John.ict']));
-        else
-            r=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '_John.ict']));
-        end
+contents=[]; % to generate a powerpoint file
+[~,figurefolder]=starpaths;
+
+for daystrc=dslist(23:end); 
+    daystr=daystrc{:};
+if savefigure && exist(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '_Yohei.ict']))
+    
+    figure('visible','off');
+    %r=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '.ict']));
+    if ~isempty(datadirec_special)  %JML
+        r=ictread(fullfile(starpaths,[sprintf('%s%s',datadirec_special,dslist{i}) filesep],[prefix '_' platform '_' daystr '_R' num2str(R) '_John.ict']));
+    else
+        %             r=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '_John.ict']));
+        r=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '_Yohei.ict']));
+    end
+    if R=='2';
+        r.w=[380 452 501 520 532 550 606 620 675 781 865 1020 1040 1064 1236 1559 1627]/1000;
+        r.AOD=[r.AOD0380 r.AOD0452 r.AOD0501 r.AOD0520 r.AOD0532 r.AOD0550 r.AOD0606 r.AOD0620 r.AOD0675 r.AOD0781 r.AOD0865 r.AOD1020 r.AOD1040 r.AOD1064 r.AOD1236 r.AOD1559 r.AOD1627];
+        r.UNCAOD=[r.UNCAOD0380 r.UNCAOD0452 r.UNCAOD0501 r.UNCAOD0520 r.UNCAOD0532 r.UNCAOD0550 r.UNCAOD0606 r.UNCAOD0620 r.UNCAOD0675 r.UNCAOD0781 r.UNCAOD0865 r.UNCAOD1020 r.UNCAOD1040 r.UNCAOD1064 r.UNCAOD1236 r.UNCAOD1559 r.UNCAOD1627];
+        ph=plot(r.t, r.AOD, '.', r.t(r.qual_flag==0), r.AOD(r.qual_flag==0, :), '.');
+        set(ph(1:numel(r.w)),'color' ,[ .5 .5 .5]);
+        lstr=setspectrumcolor(ph(numel(r.w)+1:end), r.w);
+        fn='AOD';
+        r1=ictread(fullfile(starpaths,[prefix '_' platform '_' daystr '_R1.ict']));
+        r1.w=[380 452 501 520 532 550 606 620 675 781 865 1020 1040 1064 1236 1559 1627]/1000;
+        r1.AOD=[r1.AOD0380 r1.AOD0452 r1.AOD0501 r1.AOD0520 r1.AOD0532 r1.AOD0550 r1.AOD0606 r1.AOD0620 r1.AOD0675 r1.AOD0781 r1.AOD0865 r1.AOD1020 r1.AOD1040 r1.AOD1064 r1.AOD1236 r1.AOD1559 r1.AOD1627];
+        r1.UNCAOD=[r1.UNCAOD0380 r1.UNCAOD0452 r1.UNCAOD0501 r1.UNCAOD0520 r1.UNCAOD0532 r1.UNCAOD0550 r1.UNCAOD0606 r1.UNCAOD0620 r1.UNCAOD0675 r1.UNCAOD0781 r1.UNCAOD0865 r1.UNCAOD1020 r1.UNCAOD1040 r1.UNCAOD1064 r1.UNCAOD1236 r1.UNCAOD1559 r1.UNCAOD1627];
+    else
         ph=plot(r.t, r.(fn), '.');
-%         r0=ictread(fullfile(starpaths,['4STAR_G1_' daystr '_R0.ict']));
-%         r1=ictread(fullfile(starpaths,['4STAR_G1_' daystr '_R1.ict']));
-%         [xx,yy,xx1,yy1]=errorbars(r1.t,r1.(fn)+r1.(['unc' fn]),r1.(fn)-r1.(['unc' fn]));
-%         ph=plot(r1.t, r1.(fn), 'ob', xx,yy, '-b', r0.t,r0.(fn), '.k');
-%         set(ph(end),'color',[.5 .5 .5]);
+    end;
+    %         r0=ictread(fullfile(starpaths,['4STAR_G1_' daystr '_R0.ict']));
+    %         [xx,yy,xx1,yy1]=errorbars(r1.t,r1.(fn)+r1.(['unc' fn]),r1.(fn)-r1.(['unc' fn]));
+    %         ph=plot(r1.t, r1.(fn), 'ob', xx,yy, '-b', r0.t,r0.(fn), '.k');
+    %         set(ph(end),'color',[.5 .5 .5]);
     ggla;
     grid on;
     datetick('x','keeplimits');
     xlabel('UTC');
-    ylabel(fn);    
+    ylabel(fn);
     title(daystr);
-    lh=legend(ph, ['R' num2str(R)]);
-%     lh=legend(ph([1 3]), 'R1', 'R0');
+    lh=legend(ph(end), ['R' num2str(R)]);
+    %     lh=legend(ph([1 3]), 'R1', 'R0');
     set(lh,'fontsize',12,'location','best');
     starsas(['star' daystr 'archive' fn 'tseries_R' num2str(R) '.fig, ' mfilename '.m']);
-end;
+        close;
+    contents=[contents {fullfile(figurefolder, ['star' daystr 'archive' fn 'tseries_R' num2str(R) '.png'])}];
+    
+    % t series highlighting changes from R1
+    if R=='2';
+        figure('visible','off');
+        if ~isequal(numel(r.t), numel(r1.t));
+            warning('Data sizes differ.');
+            stats=NaN(1,4);
+        else;
+        stats(1)=numel(find(r.qual_flag==0 & r1.qual_flag==0));
+        stats(2)=numel(find(r.qual_flag==0 & r1.qual_flag==1));
+        stats(3)=numel(find(r.qual_flag==1 & r1.qual_flag==0));
+        stats(4)=numel(find(r.qual_flag==1 & r1.qual_flag==1));
+        ph=plot(r.t, r.AOD-r1.AOD, '.', ...
+            r.t(r.qual_flag==0 & r1.qual_flag==0), r.AOD(r.qual_flag==0 & r1.qual_flag==0, :)-r1.AOD(r.qual_flag==0 & r1.qual_flag==0, :), '.');
+        phl=ph(numel(r.w)+1);
+        lstr=['Good (flag=0), n=' num2str(stats(1))];
+        hold on;
+        if stats(2)>0
+            ph2=plot(r.t(r.qual_flag==0 & r1.qual_flag==1), r.AOD(r.qual_flag==0 & r1.qual_flag==1, :)-r1.AOD(r.qual_flag==0 & r1.qual_flag==1, :), '.');
+            set(ph2, 'markeredgecolor','r');
+            phl=[phl; ph2(1)];
+            lstr=[lstr;{['Good in R2, n=' num2str(stats(2))]}];
+        end;
+        if stats(3)>0
+            ph3=plot(r.t(r.qual_flag==1 & r1.qual_flag==0), r.AOD(r.qual_flag==1 & r1.qual_flag==0, :)-r1.AOD(r.qual_flag==1 & r1.qual_flag==0, :), '.');
+            set(ph3, 'markeredgecolor','m');
+            phl=[phl; ph3(1)];
+            lstr=[lstr;{['Good in R1, n=' num2str(stats(3))]}];
+        end;
+        plot(xlim, [0 0], '-k');
+        set(ph(1:numel(r.w)),'color' ,[ .5 .5 .5]);
+        lstr0=setspectrumcolor(ph(numel(r.w)+1:2*numel(r.w)), r.w);
+        fn='AOD';
+        ggla;
+        grid on;
+        datetick('x','keeplimits');
+        xlabel('UTC');
+        ylabel('\Delta AOD, R2-R1');
+        ylim([-0.06 0.06]);
+        lh=legend(phl, lstr);
+        set(lh,'fontsize',12,'location','best');
+        end;
+        title(daystr);
+        starsas(['star' daystr 'archive' 'deltaAOD' 'tseries_R' num2str(R) '.fig, ' mfilename '.m']);
+        close;
+        contents=[contents {fullfile(figurefolder, ['star' daystr 'archive' 'deltaAOD' 'tseries_R' num2str(R) '.png'])}];
+    end;
 
+    % UNC t series
+    if R=='2';
+        figure('visible','off');
+        ph=plot(r.t, r.UNCAOD, '.', r.t(r.qual_flag==0), r.UNCAOD(r.qual_flag==0, :), '.');
+        set(ph(1:numel(r.w)),'color' ,[ .5 .5 .5]);
+        lstr=setspectrumcolor(ph(numel(r.w)+1:end), r.w);
+        fn='Uncertainty in AOD';
+        ggla;
+        grid on;
+        datetick('x','keeplimits');
+        xlabel('UTC');
+        ylabel(fn);
+        ylim([0 0.06]);
+        title(daystr);
+        lh=legend(ph(end), ['R' num2str(R)]);
+        set(lh,'fontsize',12,'location','best');
+        starsas(['star' daystr 'archive' 'UNCAOD' 'tseries_R' num2str(R) '.fig, ' mfilename '.m']);
+        close;
+        contents=[contents {fullfile(figurefolder, ['star' daystr 'archive' 'UNCAOD' 'tseries_R' num2str(R) '.png'])}];
+    end;
+end;
+end;
+if savefigure;
+    pptfilename=fullfile(figurefolder, 'SEAC4RS_4STAR_AOD_R2.ppt');
+    makeppt(pptfilename, 'SEAC4RS 4STAR AOD R2', contents{:});
+end;
 toc
+
+
