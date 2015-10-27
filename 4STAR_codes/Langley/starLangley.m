@@ -9,6 +9,10 @@
 %                     changed version to 1.1
 % Michal, 2015-01-20, added an option for further data range screening for
 %                     Langley (Line 45)
+% Michal, 2015-10-20, added options for the new Oct 2015 re-run of ARISE c0
+%                     added NIR wavelengths in cols for plots
+%--------------------------------------------------------------------------
+
 version_set('1.1');
 
 %********************
@@ -17,7 +21,8 @@ version_set('1.1');
 daystr='20141002';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
-cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
+% cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
+cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
 savefigure=0;
 
 %********************
@@ -26,7 +31,9 @@ savefigure=0;
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
 elseif isequal(daystr, '20141002')
-    source='20141002starsun.mat';% this was using most accurate c0 wFORJ
+    source='20141002starsun_R2.mat';% after latest code modification - starsun generated on Oct-08-2015
+    %source='20141002starsun.mat';% this was using most accurate c0 wFORJ
+    %(before Oct 2015)
     %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
 else
     source=[daystr 'starsun.mat'];
@@ -40,7 +47,8 @@ AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
 starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 s=importdata(starinfofile);
-s1=s(strmatch('langley',s));
+%s1=s(strmatch('langley',s));
+s1=s(strncmp('langley',s,1));
 eval(s1{:});
 ok=incl(t,langley);
 % perform different QA filtering
@@ -56,7 +64,7 @@ end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
-    [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols);
+    [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
     lstr=setspectrumcolor(h(:,1), w(cols));
     lstr=setspectrumcolor(h(:,2), w(cols));
     hold on;
@@ -234,6 +242,8 @@ end;
 %********************
 % save new c0
 %********************
+viscols=1:1044;
+nircols=1044+(1:512);
 k=1; % select one of the multiple screening criteria (stdev_mult), or NaN (see below).
 c0unc = real(c0unc(k,:));
 if isnumeric(k) && k>=1; % save results from the screening/regression above
@@ -245,7 +255,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorr';
     % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened';
     % filesuffix='refined_Langley
-    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+    % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';

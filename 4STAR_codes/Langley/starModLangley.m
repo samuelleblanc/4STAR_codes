@@ -7,6 +7,8 @@
 % MS: 2014/11/18, changed ,rate_noFORJcorr field to rate
 % MS: 2015/02/09, added airmass constrain for ARISE and save section
 %                 added some additional tweaks for 20141002 dataset
+% MS: 2015/10/02, added some more tweaks to adopt to ARISE 20141002
+%                 Langley, after code changes
 %********************
 % set parameters
 %********************
@@ -22,6 +24,8 @@ savefigure=0;
 %********************
 if isequal(daystr, '20120722'); % TCAP July 2012
     source='20120722Langleystarsun.mat';
+elseif isequal(daystr, '20141002'); % ARISE
+     source='20141002starsun_R2.mat';% after latest code modification - starsun generated on Oct-08-2015
 else
     source=[daystr 'starsun.mat'];
     %source=[daystr 'starsunLangley.mat'];
@@ -30,7 +34,8 @@ file=fullfile(starpaths, source);
 load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_aero','tau_O3','tau_NO2','tau_O4','tau_ray','rate');
 starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 s=importdata(starinfofile);
-s1=s(strmatch('langley',s));
+%s1=s(strmatch('langley',s));
+s1=s(strncmp('langley',s,1));
 eval(s1{:});
 % chose Langley period values
 ok=incl(t,langley);
@@ -39,7 +44,8 @@ ok=incl(t,langley);
 % watvapcoef =load('C:\MatlabCodes\data\cross_sections_uv_vis_swir_all.mat');  % 3.4km MidLatSummer
 % watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat');         % 3.4km Tropical MLO
 % watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');     % 6.85km MidLatWinter for 20130214
- watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');         % 6.0km MidLatWinter for 20130212
+% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');         % 6.0km MidLatWinter for 20130212
+ watvapcoef =load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);         % 6.0km MidLatWinter for 20130212
 % watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat');   % 6.0km-3coef. MidLatwinter
 
  
@@ -138,15 +144,29 @@ elseif strcmp(daystr,'20130214')
     % filesuffix='modified_Langley_on_G1_secondL_flight_6km_3c_screened_2x_withOMIozone';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 elseif strcmp(daystr,'20141002')  
-    c0=importdata(fullfile(starpaths, '20141002_VIS_C0_refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc.dat'));
+    %c0old=importdata(fullfile(starpaths, '20141002_VIS_C0_refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc.dat'));
+    c0=importdata(fullfile(starpaths,  '20141002_VIS_C0_refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes.dat'));
+    %c0modold=importdata(fullfile(starpaths,  '20141002_VIS_C0_modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc.dat'));
     c0vis = c0.data(:,3);
     c0mod = c0vis;
     c0mod(iwln2) = c0_mod(24:end);% applying only the region from 900 nm to end
     % test figure;
-    figure;
-    plot(wln,c0vis,'-b');hold on;plot(wln,c0mod,'--c');legend('c0','modc0');
-    axis([0.8 1 0 200]);
-    filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+%     figure;
+%     plot(wln,c0vis,'-b');hold on;
+%     plot(wln,c0old.data(:,3),'--g');hold on;
+%     plot(wln,c0mod,'--c');hold on;
+%     plot(wln,c0modold.data(:,3),':m');hold on;
+%     legend('c0','coold','modc0','modc0old');
+%     axis([0.3 1 0 800]);
+%     figure;
+%     %plot(wln,100*(c0old.data(:,3) - c0vis)./c0old.data(:,3),'-m');
+%     %axis([1 1.7 -0.1 0.1]);
+%     plot(w(1045:end),100*(c0old.data(:,3) - c0.data(:,3))./c0old.data(:,3),'-r');
+%     xlabel('wavelength');ylabel('%');legend('c0old - c0');
+%     axis([1 1.7 -5 1]);
+    %axis([0.8 1 0 200]);
+    %filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+    filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');
