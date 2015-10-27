@@ -47,6 +47,11 @@
 % 2015-04-21-23, MS: added versions of trace gas routined for testing
 % 2015-08-06,    MS: reverted gasessubtract to original case of no2 for
 %                    SEAC4RS; continue testing/editing on Michal branch
+% 2015-10-21,    MS: O4/H2O are changed to be in vertical amount in
+%                    o3corecalc routine so no need for the division here;
+%                    this was also to correct total OD subtraction of
+%                    tau_aero with the vertical amounts of O4/H2O
+%                    corrected a bug to subtract o4 only in vis 
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -229,8 +234,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %    
    gas.o3 = O3conc;
    gas.o3resi = (O3resi);
-   gas.o4  = O4conc./s.m_ray; % slant converted to vertical
-   gas.h2o = H2Oconc./s.m_H2O;% slant converted to vertical
+   gas.o4  = O4conc;% already converted in routine./s.m_ray; % slant converted to vertical
+   gas.h2o = H2Oconc;% already converted in routine./s.m_H2O;% slant converted to vertical
    gas.o3OD  = o3OD;          % this is to be subtracted from slant path this is slant
    tplot = serial2hs(s.t);
 %    figure;subplot(211);plot(tplot,O3conc,'.r');hold on;
@@ -243,6 +248,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %           title([datestr(s.t(1),'yyyy-mm-dd'), 'best fit']);
    
    o3amount = -log(exp(-(real(O3conc/1000)*o3coef')));%(O3conc/1000)*o3coef';
+   o4coefVIS = zeros(qq,1); o4coefVIS(1:1044) = o4coef(1:1044);
    o4amount = -log(exp(-(real(O4conc)*o4coef')));%O4conc*o4coef';
    h2ocoefVIS = zeros(qq,1); h2ocoefVIS(wln_vis6) = h2ocoef(wln_vis6);
    h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';

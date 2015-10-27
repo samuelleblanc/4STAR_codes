@@ -71,6 +71,8 @@ function	s=starwrapper(s, s2, varargin)
 %                       gases subtraction for archiving
 % SL: v1.9, 2015-08-27: added useability of starwrapper with toggles and a
 %                       single s struct, no s2
+% MS: v1.9, 2015-10-20: added verification plots comparing rateaero and
+%                       gases subtracted structures, commented out
 
 version_set('1.9');
 %********************
@@ -84,7 +86,7 @@ toggle.savefigure=false;
 toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
-toggle.applytempcorr=true;% true is for SEAC4RS data
+toggle.applytempcorr=false;% true is for SEAC4RS data
 toggle.gassubtract = true;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
@@ -684,10 +686,86 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % total optical depth (Rayleigh subtracted) needed for gas processing
     tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
     s.rateslant        = real(s.rate./repmat(s.f,1,qq));
-    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray))./tr(s.m_ray, tau_O4nir);
+    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
     s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
     s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
     
+    % compare rate structures:
+    
+%     figure;
+%     plot(s.w,s.tau_O4([9850 9860 9890],:),'-');
+%     
+%     wi = [1084,1109,1213,1439,1503];
+%     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
+%     figure;
+%     for ll=1:length(wi)
+%         subplot(length(wi),1,ll);
+%         plot(serial2Hh(s.t),s.rateaero(:,wi(ll)) - ...
+%              s.ratetot(:,wi(ll)), 'ok','markersize',8);hold on;
+%         
+%          if ll==3
+%          xlabel('time [UTC]');
+%          ylabel('\Delta (rate-aero - rate-aero minus O4)');
+%          end
+%         legend(le{ll,:});
+%         axis([min(serial2Hh(s.t)) max(serial2Hh(s.t)) -0.005 0.005]);
+%         plot(serial2Hh(s.t),zeros(length(serial2Hh(s.t)),1),'-m');hold off;
+%     end
+%     
+%     figure;
+%     plot(s.w,s.rateaero(9850,:) - s.ratetot(9850,:),'-.b');
+%     axis([0.3 1.7 0 10]);
+%     legend('rateaero-ratetot(O4nir sub)')
+%     
+%     figure;
+%     plot(s.w,s.tau_aero_noscreening(9850,:) - ...
+%          s.tau_tot_vertical(9850,:),'-.b');hold on;
+%     
+%     legend('tau-aero-noscreening - tau-aero-minus-nirO4');
+%     axis([0.3 1.7 0 1]);
+%     
+%     figure;
+%     plot(s.w,s.tau_aero_noscreening([9850 9900,9950 9980],:),'-.');hold on;
+%     plot(s.w,s.tau_tot_vertical([9850 9900,9950 9980],:),    ':'); hold on;
+%     plot(s.w,s.dark([9850 9900,9950 9980],:)/10000,'-k');hold on;
+%     legend('tau-aero-noscreening','tau-aero-minus-nirO4');
+%     
+%     figure;
+%     plot(s.UTHh,s.dark(:,1083),'ob');hold on;
+%     plot(s.UTHh,s.dark(:,1085),'og');hold on;
+%     legend('dark at peak (1.018)','dark at valley (1.022)');
+%     
+%     figure;
+%     plot(s.UTHh,s.rate(:,1083),'ob');hold on;
+%     plot(s.UTHh,s.rate(:,1085),'og');hold on;
+%     legend('rate at peak (1.018)','rate at valley (1.022)');
+%     
+%     figure;
+%     plot(s.UTHh,s.ratetot(:,1083),'ob');hold on;
+%     plot(s.UTHh,s.ratetot(:,1085),'og');hold on;
+%     legend('ratetot at peak (1.018)','ratetot at valley (1.022)');
+%     
+%     figure;
+%     plot(s.w,s.c0-s.rateaero(9850,:),'-b');hold on;
+%     plot(s.w,s.c0-s.ratetot(9850,:) ,'-g');hold on;
+%     axis([0.3 1.7 -1 1]);
+%     xlabel('wavelength');ylabel('c0-rate');
+%     legend('rateaero','ratetot');
+%     
+%     figure;
+%     plot(s.w,s.c0,'-b');hold on;
+%     plot(s.w,s.rateaero(9850,:),':g');hold on;
+%     %plot(s.w,s.ratetot(9850,:),':m');hold on;
+%     plot(s.w,smooth(s.c0),'--b','linewidth',2);hold on;
+%     plot(s.w,smooth(s.rateaero(9850,:)),'.-g','linewidth',2);hold on;
+%     %plot(s.w,smooth(s.ratetot(9850,:)), '.-m','linewidth',2);hold on;
+%     legend('c0','rateaero','smooth c0','smooth rateaero');
+%     xlabel('wavelength');ylabel('dark subtracted, corrected counts');
+%     axis([0.3 1.7 0 10]);
+%     
+%     figure;
+%     plot(s.w,s.tau_aero_noscreening([9850:9855],:),'-');
+%     xlabel('wavelength');ylabel('tau-aero-noscreening');title('2014-09-02');
     
     % apply screening here
     %flags bad_aod, unspecified_clouds and before_and_after_flight
