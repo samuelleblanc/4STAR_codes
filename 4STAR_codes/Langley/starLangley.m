@@ -11,6 +11,7 @@
 %                     Langley (Line 45)
 % Michal, 2015-10-20, added options for the new Oct 2015 re-run of ARISE c0
 %                     added NIR wavelengths in cols for plots
+% Michal, 2015-10-28, tweaked to adjust ARISE unc to 0.03
 %--------------------------------------------------------------------------
 
 version_set('1.1');
@@ -65,8 +66,8 @@ end
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
     [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
-    lstr=setspectrumcolor(h(:,1), w(cols));
-    lstr=setspectrumcolor(h(:,2), w(cols));
+    %lstr=setspectrumcolor(h(:,1), w(cols));
+    %lstr=setspectrumcolor(h(:,2), w(cols));
     hold on;
     h0=plot(m_aero(ok), rateaero(ok,cols), '.','color',[.5 .5 .5]);
     chi=get(gca,'children');
@@ -174,7 +175,8 @@ elseif isequal(daystr, '20120722'); % TCAP July 2012
     unc=sqrt((1.6/100).^2+(c7.data(:,3)./c22.data(:,3)-1).^2); % 1.6% FORJ impact and the deviation of the July 7 cal from the July 22.
     c0unc=c0new.*unc';
 elseif isequal(daystr, '20141002'); % ARISE Oct 2014
-    unc=1.5/100; % 1.5% this if for the range of min-max values due to changing aerosol in the scene.
+    %unc=1.5/100; % 1.5% this if for the range of min-max values due to changing aerosol in the scene.
+    unc=3.0/100; % 3.0% this if for the range of min-max values due to changing aerosol in the scene and temperature effect
     c0unc=c0new.*unc';
 end;
 
@@ -247,7 +249,8 @@ nircols=1044+(1:512);
 k=1; % select one of the multiple screening criteria (stdev_mult), or NaN (see below).
 c0unc = real(c0unc(k,:));
 if isnumeric(k) && k>=1; % save results from the screening/regression above
-    c0unc=NaN(size(w)); % put NaN for uncertainty - to be updated later
+    %c0unc=NaN(size(w)); % put NaN for uncertainty - to be updated later
+    c0unc = real(c0unc(k,:));
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
     % filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
@@ -256,7 +259,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened';
     % filesuffix='refined_Langley
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
-    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
+    % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
+    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
