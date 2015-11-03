@@ -33,7 +33,12 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+    if t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
+        if now>=datenum([2015 9 24 0 0 0]);
+            daystr='20150916';
+            filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
+        end;        
+    elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
             %daystr='20140830';
             daystr='20141002';
