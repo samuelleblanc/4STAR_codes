@@ -73,6 +73,8 @@ function	s=starwrapper(s, s2, varargin)
 %                       single s struct, no s2
 % MS: v1.9, 2015-10-20: added verification plots comparing rateaero and
 %                       gases subtracted structures, commented out
+% YS: v2.0, 2015-11-02: slimmed down the output when
+%                       saveadditionalvariables is set to false
 
 version_set('1.9');
 %********************
@@ -684,11 +686,13 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     s.tau_aero=s.tau_aero_noscreening;
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
-    s.rateslant        = real(s.rate./repmat(s.f,1,qq));
-    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
-    s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
-    s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+    if toggle.gassubtract
+        tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+        s.rateslant        = real(s.rate./repmat(s.f,1,qq));
+        s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
+        s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
+        s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+    end;
     
     % compare rate structures:
     
@@ -930,7 +934,11 @@ end;
 %% remove some of the results for a lighter file
 %********************
 if ~toggle.saveadditionalvariables;
-    s=rmfield(s, {'darkstd' 'rate' 'forjunc' 'rate_noFORJcorr' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' 'rate_tot' 'tau_tot_slant' 'tau_tot_vertical'});
+    s=rmfield(s, {'darkstd' 'rate' 'rate_noFORJcorr' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' 'rate_tot' 'tau_tot_slant' 'tau_tot_vertical' ...
+        'rawmean' 'rawstd' 'sat_ij' });
+    if toggle.computeerror;
+        s=rmfield(s, {'tau_aero_err1' 'tau_aero_err2' 'tau_aero_err3' 'tau_aero_err4' 'tau_aero_err5' 'tau_aero_err6' 'tau_aero_err7' 'tau_aero_err8' 'tau_aero_err9' 'tau_aero_err10' 'tau_aero_err11'});
+    end;
 end;
 
 %********************
