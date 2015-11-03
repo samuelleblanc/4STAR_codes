@@ -76,7 +76,7 @@ function	s=starwrapper(s, s2, varargin)
 % YS: v2.0, 2015-11-02: slimmed down the output when
 %                       saveadditionalvariables is set to false
 
-version_set('1.9');
+version_set('2.0');
 %********************
 %% prepare for processing
 %********************
