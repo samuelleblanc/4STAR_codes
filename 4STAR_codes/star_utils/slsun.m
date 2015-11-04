@@ -17,13 +17,15 @@ function slsun(source, varargin)
 % Yohei, 2013/07/26
 
 if nargin==0
-    file=starfinder('starsun');
-else
-    file=starfinder('starsun', source);
+    source=starfinder('starsun');
+elseif exist('source','var') && ~exist(source,'file')
+    source=starfinder('starsun', source);
 end;
-expression=['load(''' file];
+expression=['load(''' source];
 for i=1:numel(varargin);
     expression=[expression ''', ''' varargin{i}];
 end;
 expression=[expression ''');'];
 evalin('caller', expression);
+
+return

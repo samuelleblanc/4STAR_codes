@@ -20,7 +20,8 @@ ends(:,4) = ends(:,4) +24.*(ends(:,3)-ends(1,3));
 ends(:,6) = floor(ends(:,6));    
 %%
  tmp_ = [starts(:,4:6), ends(:,4:6), ng(3,:)'];
-ng_str = sprintf('%s \n ', 's.intervals=[');
+ng_str = sprintf('%s  \n ',['daystr = ''',daystr,''';']);
+ng_str = [ng_str, sprintf('%s \n ', 's.intervals=[')];
 ng_str = [ng_str, sprintf('datenum(''%02d:%02d:%02d'') datenum(''%02d:%02d:%02d'') %02d \n',...
     tmp_'  )];
 
