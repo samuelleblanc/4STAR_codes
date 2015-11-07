@@ -557,38 +557,38 @@ end;
 %********************
 % plot FOV carpet
 %********************
-v=who('-file', fullfile(starpaths, [daystr 'star.mat'])); % list all variables in the star.mat (not starsun.mat)
-datatypelist={'vis_fova' 'nir_fova' 'vis_fovp' 'nir_fovp'};
-existingfigures=get(0,'children');
-for dtli=1:numel(datatypelist);
-    datatype=datatypelist{dtli};
-    if any(ismember(v, datatype)); % check if any FOV was taken 
-        load(fullfile(starpaths, [daystr 'star.mat']), datatype); % load the variable of the specific datatype
-        eval(['v2=' datatype ';']);
-        for i=1:numel(v2); % go through each set of FOV test
-            if ~isempty(v2(i).t) && ~isempty(incl(nanmean(v2(i).t(1)),tlim)); % see if there is actually a data point
-                ins = FOV_scan(v2(i)); % run Connor's code
-                existingfigures2=get(0,'children'); 
-                newfigures=setxor(existingfigures,existingfigures2); % identify new figures
-                for nn=1:numel(newfigures);
-                    figure(newfigures(nn));
-                    [~,filename0,~]=fileparts(v2(i).filename{:});
-                    filename=['star' filename0 'figure' num2str(nn)];
-                    if savefigure;
-                        starsas([filename '.fig, ' mfilename '.m'])
-                    end;
-                    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}]; % prepare to save the figures in the PowerPoint file to be created
-                    clear filename0 filename;
-                end;
-                for nn=1:ceil(numel(newfigures)/4)*4-numel(newfigures); % feed the ppt file with blank, so the next set of FOV plots go to a new page
-                    pptcontents0=[pptcontents0; {' ' 4}];
-                end;
-                existingfigures=existingfigures2;
-                clear existingfigures2;
-            end;
-        end;
-    end;
-end;
+% % % v=who('-file', fullfile(starpaths, [daystr 'star.mat'])); % list all variables in the star.mat (not starsun.mat)
+% % % datatypelist={'vis_fova' 'nir_fova' 'vis_fovp' 'nir_fovp'};
+% % % existingfigures=get(0,'children');
+% % % for dtli=1:numel(datatypelist);
+% % %     datatype=datatypelist{dtli};
+% % %     if any(ismember(v, datatype)); % check if any FOV was taken 
+% % %         load(fullfile(starpaths, [daystr 'star.mat']), datatype); % load the variable of the specific datatype
+% % %         eval(['v2=' datatype ';']);
+% % %         for i=1:numel(v2); % go through each set of FOV test
+% % %             if ~isempty(v2(i).t) && ~isempty(incl(nanmean(v2(i).t(1)),tlim)); % see if there is actually a data point
+% % %                 ins = FOV_scan(v2(i)); % run Connor's code
+% % %                 existingfigures2=get(0,'children'); 
+% % %                 newfigures=setxor(existingfigures,existingfigures2); % identify new figures
+% % %                 for nn=1:numel(newfigures);
+% % %                     figure(newfigures(nn));
+% % %                     [~,filename0,~]=fileparts(v2(i).filename{:});
+% % %                     filename=['star' filename0 'figure' num2str(nn)];
+% % %                     if savefigure;
+% % %                         starsas([filename '.fig, ' mfilename '.m'])
+% % %                     end;
+% % %                     pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}]; % prepare to save the figures in the PowerPoint file to be created
+% % %                     clear filename0 filename;
+% % %                 end;
+% % %                 for nn=1:ceil(numel(newfigures)/4)*4-numel(newfigures); % feed the ppt file with blank, so the next set of FOV plots go to a new page
+% % %                     pptcontents0=[pptcontents0; {' ' 4}];
+% % %                 end;
+% % %                 existingfigures=existingfigures2;
+% % %                 clear existingfigures2;
+% % %             end;
+% % %         end;
+% % %     end;
+% % % end;
 
 %********************
 % Generate a new PowerPoint file
