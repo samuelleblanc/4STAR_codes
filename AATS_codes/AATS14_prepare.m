@@ -24,6 +24,7 @@ global deltaT Tstat_new RH_new
 %data_dir='/Users/meloe/Programs.dir/ReadAATS/ForMLO/InputDataAATS/AMES_May2012_05_05/ames/';
 %xsect_dir='c:/johnmatlab/AATS14_data_2012/';
 xsect_dir='C:\Users\sleblan2\Research\AATS\other\';
+xsect_dir='c:\work\4star\data\raw\AATS\';
 CrossSec_name='Ames14#1_2012_05182012.asc';%'Ames14#1_2008_05142008.asc'(ARCATS-summer),'Ames14#1_2011_09222011.asc'(MLO-Sept2011),'Ames14#1_2012_05182012.asc' (MLO-May2012)
 %xsect_dir='c:/johnmatlab/AATS14_data_2011/';
 %CrossSec_name='Ames14#1_2011_10182011_final.asc';%'Ames14#1_2008_05142008.asc'(ARCATS-summer),'Ames14#1_2011_09222011.asc'(MLO-Sept2011),'Ames14#1_2012_05182012.asc' (MLO-May2012)
@@ -34,7 +35,8 @@ CrossSec_name='Ames14#1_2012_05182012.asc';%'Ames14#1_2008_05142008.asc'(ARCATS-
 %data_dir='c:/johnmatlab/AATS14_data_2013/Mauna Loa/';
 %data_dir='c:/johnmatlab/AATS14_data_2013/Palmdale/';
 %data_dir='c:/johnmatlab/AATS14_data_2013/Houston/';
-data_dir='C:\Users\sleblan2\Research\AATS\data\ames\';
+% data_dir='C:\Users\sleblan2\Research\AATS\data\ames\';
+data_dir='C:\work\4star\data\raw\AATS\Wallops\';
 %Also modify DefineV0Input_MK and DefineO3AndPress_MLO_MK 
 %-------------------------------------------------------------------------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -82,7 +84,7 @@ if strcmp(instrument,'AMES14#1_2002')  % AATS-14 after August 1, 2002, when we u
     fid=fopen([xsect_dir CrossSec_name]);
     
     %MK-Cross section file for absorption coefficients for gases
-    fgetl(fid);
+keyboard;    fgetl(fid);
     fgetl(fid);
     xsect=fscanf(fid,'%f',[11,inf]);
     xsect=xsect';
@@ -298,8 +300,29 @@ DefineV0Input_MK
             
             DefineO3AndPress_MLO_MK
             
-%-------------------------------------------------------------------------%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %-------------------------------------------------------------------------%
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+        case 'wallops'; % despite the location-specific classification, the parameters also assume a season 
+            geog_long=ones(1,n)*-75.47;
+            geog_lat=ones(1,n)*37.93;
+            r=ones(1,n)*0.000; % 0 m altitude
+            temp=ones(n,1)*288.0;
+            press=ones(n,1)*1013; %standard pressure in mb for Houston altitude
+            id_model_atm=3; % Midlatitude Winter
+            m_aero_max=inf;
+            tau_aero_limit=inf
+            alpha_min=-.2;
+            tau_aero_err_max=0.05;
+            GPS_Alt=r;
+            Press_Alt=r;
+            tempfudge=T_stat';
+            sd_crit_H2O=0.1;
+            sd_crit_aero=0.01; 
+            zGPS_highalt_crit=4;
+            alpha_min_lowalt=-inf;
+            
+            DefineO3AndPress_SEAC4RS; % this is to be updated but doen't affect most channels
 
             
             %         case 'arctassummer'

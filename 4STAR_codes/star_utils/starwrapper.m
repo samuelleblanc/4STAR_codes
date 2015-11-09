@@ -75,8 +75,9 @@ function	s=starwrapper(s, s2, varargin)
 %                       gases subtracted structures, commented out
 % YS: v2.0, 2015-11-02: slimmed down the output when
 %                       saveadditionalvariables is set to false
+% YS: v2.1, 2015-11-06: added the applyforjcorr toggle 
 
-version_set('2.0');
+version_set('2.1');
 %********************
 %% prepare for processing
 %********************
@@ -89,6 +90,7 @@ toggle.computeerror=true;
 toggle.inspectresults=false;
 toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;% true is for SEAC4RS data
+toggle.applyforjcorr=false;% true is for data up to 2013, and possibly later
 toggle.gassubtract = true;
 toggle.booleanflagging = true;
 toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
@@ -471,7 +473,7 @@ end;
 if toggle.verbose; disp('adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
-if isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
+if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
     [forj_corr, detail] = get_forj_corr(s.t(1));
     % apply correction on s.rate
     AZ_deg_   = s.AZstep/(-50);
