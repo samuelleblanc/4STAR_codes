@@ -1,0 +1,51 @@
+51, 1001
+Jens Redemann
+NASA Ames Research Center
+Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)
+NAAMES
+1, 1
+2015, 11, dd, 2015, mm, dd
+1
+Start_UTC, UTC seconds, Elapsed seconds from 0 hours UT on day given by DATE
+21
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+-9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999, -9999
+Latitude, deg, Aircraft latitude at the indicated time
+Longitude, deg, Aircraft longitude at the indicated time
+GPS_alt, m, Aircraft GPS geometric altitude at the indicated time
+qual_flag, unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability
+AOD0380, unitless, Aerosol optical depth at 380.0 nm 
+AOD0452, unitless, Aerosol optical depth at 451.7 nm
+AOD0501, unitless, Aerosol optical depth at 500.7 nm
+AOD0520, unitless, Aerosol optical depth at 520.0 nm
+AOD0532, unitless, Aerosol optical depth at 532.0 nm
+AOD0550, unitless, Aerosol optical depth at 550.3 nm
+AOD0606, unitless, Aerosol optical depth at 605.5 nm
+AOD0620, unitless, Aerosol optical depth at 619.7 nm
+AOD0675, unitless, Aerosol optical depth at 675.2 nm
+AOD0781, unitless, Aerosol optical depth at 780.6 nm
+AOD0865, unitless, Aerosol optical depth at 864.6 nm
+AOD1020, unitless, Aerosol optical depth at 1019.9 nm
+AOD1040, unitless, Aerosol optical depth at 1039.6 nm
+AOD1064, unitless, Aerosol optical depth at 1064.2 nm
+AOD1236, unitless, Aerosol optical depth at 1235.8 nm
+AOD1559, unitless, Aerosol optical depth at 1558.7 nm
+AOD1627, unitless, Aerosol optical depth at 1626.6 nm
+0
+16
+PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov (805-218-8729)
+LOCATION: Aircraft latitude, longitude, altitude are included in the data records
+ASSOCIATED_DATA: N/A
+INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)
+DATA_INFO: measurements represent averages over 1 second at Start_UTC. 
+UNCERTAINTY: added in this version
+ULOD_FLAG: -7777
+ULOD_VALUE: N/A
+LLOD_FLAG: -8888
+LLOD_VALUE: N/A
+DM_CONTACT_INFO: Yohei Shinozuka, Yohei.Shinozuka@nasa.gov
+PROJECT_INFO: NAAMES #1 November 2015; St. John's, Newfoundland, Canada
+STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI.
+REVISION: RA
+RA: The data are considered preliminary and not intended for publication. Final calibrations have not yet been applied. The data are subject to uncertainties associated with detector stability, cloud screening, transfer efficiency of light through fiber optic cable, diffuse light, tracking error, gas absorption and deposition on the front windows. 
+Start_UTC,Latitude,Longitude, GPS_alt, qual_flag, AOD0380,   AOD0452,   AOD0501,   AOD0520,   AOD0532,   AOD0550,   AOD0606,    AOD0620,    AOD0675,    AOD0781,    AOD0865,   AOD1020,   AOD1040,   AOD1064,   AOD1236,   AOD1559,   AOD1627

@@ -60,6 +60,8 @@ data_folder/20150915_scaled_langley.dat
 data_folder/starinfo20140901.m
 data_folder/lastUsedDir.mat
 
-
-data_folder/modify_starinfo.m
-data_folder/modify_starinfos_in_dir.m
+# ignore the large mat files
+data_folder/20151103star.mat
+data_folder/????????star.mat
+data_folder/????????starsun*.mat
+*.ict

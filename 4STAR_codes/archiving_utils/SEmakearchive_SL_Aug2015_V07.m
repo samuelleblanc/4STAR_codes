@@ -774,7 +774,7 @@ end;
 contents=[]; % to generate a powerpoint file
 [~,figurefolder]=starpaths;
 
-for daystrc=dslist(23:end); 
+for daystrc=dslist; 
     daystr=daystrc{:};
 if savefigure && exist(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' num2str(R) '_Yohei.ict']))
     
@@ -845,6 +845,13 @@ if savefigure && exist(fullfile(starpaths,[prefix '_' platform '_' daystr '_R' n
             set(ph3, 'markeredgecolor','m');
             phl=[phl; ph3(1)];
             lstr=[lstr;{['Good in R1, n=' num2str(stats(3))]}];
+        end;
+        ssfile=fullfile(starpaths, [daystr 'starsun_R2.mat']);
+        if exist(ssfile);
+            ss=load(ssfile, 'm_aero','t');
+            phm=plot(ss.t-datenum(2012,12,31), -0.03./ss.m_aero, '-k');
+            phl=[phl; phm];
+            lstr=[lstr;{'-0.03 / m_{aero}'}];
         end;
         plot(xlim, [0 0], '-k');
         set(ph(1:numel(r.w)),'color' ,[ .5 .5 .5]);
