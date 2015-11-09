@@ -76,8 +76,9 @@ function	s=starwrapper(s, s2, varargin)
 % YS: v2.0, 2015-11-02: slimmed down the output when
 %                       saveadditionalvariables is set to false
 % SL: v2.1, 2015-11-05: using outside function (update_toggle) to set default toggles
+% YS: v2.2, 2015-11-06: added the applyforjcorr toggle 
 
-version_set('2.1');
+version_set('2.2');
 %********************
 %% prepare for processing
 %********************
@@ -486,7 +487,7 @@ end;
 if toggle.verbose; disp('adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
-if isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
+if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
     [forj_corr, detail] = get_forj_corr(s.t(1));
     % apply correction on s.rate
     AZ_deg_   = s.AZstep/(-50);

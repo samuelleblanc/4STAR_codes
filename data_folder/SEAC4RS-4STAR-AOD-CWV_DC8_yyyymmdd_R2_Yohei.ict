@@ -73,7 +73,7 @@ PROJECT_INFO: SEAC4RS deployment; August-September 2013; Palmdale, CA and Housto
 STIPULATIONS_ON_USE: none
 OTHER_COMMENTS: N/A
 REVISION: R2; R1; R0
-R2: The calibration has been revised and AOD lowered.
+R2: The calibration has been reassessed after lab tests on the instrument throughput.
 R1: Even after extensive scrutiny of the data, there may be residual uncertainties in AOD due to the effects listed in the R0 comment below. These are not included in the current uncertainty estimates, and their quantification is the subject of ongoing research.
 R0: The data are subject to additional uncertainties associated with detector stability, cloud screening, transfer efficiency of light through fiber optic cable, diffuse light, tracking error, gas absorption and deposition on the front windows.  
 Start_UTC,Latitude,Longitude, GPS_alt, qual_flag, amass_aer,   T4temp,    CWV, std_CWV,   AOD0380,   AOD0452,   AOD0501,   AOD0520,   AOD0532,   AOD0550,   AOD0606,    AOD0620,    AOD0675,    AOD0781,    AOD0865,   AOD1020,   AOD1040,   AOD1064,   AOD1236,   AOD1559,   AOD1627,UNCAOD0380,UNCAOD0452,UNCAOD0501,UNCAOD0520,UNCAOD0532,UNCAOD0550,UNCAOD0606,UNCAOD0620,UNCAOD0675,UNCAOD0781,UNCAOD0865,UNCAOD1020,UNCAOD1040,UNCAOD1064,UNCAOD1236,UNCAOD1559,UNCAOD1627

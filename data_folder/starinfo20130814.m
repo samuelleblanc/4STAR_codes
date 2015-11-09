@@ -49,7 +49,7 @@ datenum('18:01:04') datenum('18:05:23');...
 % daystr=mfilename;
 % daystr=daystr(end-7:end);
 % No good time periods ([start end]) for specific pixels
-s.ng=s.ng;
+% s.ng=s.ng;
 
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;

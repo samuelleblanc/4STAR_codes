@@ -34,7 +34,10 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
-        if now>=datenum([2015 9 24 0 0 0]);
+        if now>=datenum([2015 11 6 0 0 0]);
+            daystr='20151104';
+            filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
+        elseif now>=datenum([2015 9 24 0 0 0]);
             daystr='20150916';
             filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
         end;        
