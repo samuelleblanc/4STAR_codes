@@ -55,17 +55,15 @@
 %                 - added checking of input for toggle structure to change
 %                 the default behaviour
 %                 - added dependence to catstruct and parse_struct 
+% Modified (v1.4): Samuel LeBlanc, NASA Ames, 2015-11-05
+%                 - added using the default toggles defined in outside file
 % -------------------------------------------------------------------------
 
 
 function [savematfile, contents]=starzen(varargin)
-version_set('1.3');
+version_set('1.4');
 
-toggle.verbose = true;
-toggle.subsetting_Tint = true;
-toggle.pca_filter = false;
-toggle.applytempcorr = false;
-toggle.doflagging = false;
+toggle = update_toggle; % use the default toggles that are set
 
 if (~isempty(varargin));
     [toggle_in,vars] = parse_struct(varargin{:});

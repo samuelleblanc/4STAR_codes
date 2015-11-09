@@ -9,7 +9,7 @@ toggle.saveadditionalvariables=true;
 toggle.savefigure=false;
 toggle.computeerror=true;
 toggle.inspectresults=false;
-toggle.applynonlinearcorr=false;
+toggle.applynonlinearcorr=true;
 toggle.applytempcorr=false;% true is for SEAC4RS data
 toggle.gassubtract = false;
 toggle.booleanflagging = true;
@@ -18,5 +18,8 @@ toggle.doflagging = true; % for running any Yohei style flagging
 toggle.dostarflag = true; 
 toggle.lampcalib  = false; 
 toggle.runwatervapor = false;
+toggle.subsetting_Tint = true;
+toggle.pca_filter = false;
+
 
 return

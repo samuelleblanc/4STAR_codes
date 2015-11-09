@@ -75,27 +75,15 @@ function	s=starwrapper(s, s2, varargin)
 %                       gases subtracted structures, commented out
 % YS: v2.0, 2015-11-02: slimmed down the output when
 %                       saveadditionalvariables is set to false
+% SL: v2.1, 2015-11-05: using outside function (update_toggle) to set default toggles
 
-version_set('2.0');
+version_set('2.1');
 %********************
 %% prepare for processing
 %********************
 
-%% set default switches
-toggle.verbose=true;
-toggle.saveadditionalvariables=true;
-toggle.savefigure=false;
-toggle.computeerror=true;
-toggle.inspectresults=false;
-toggle.applynonlinearcorr=true;
-toggle.applytempcorr=false;% true is for SEAC4RS data
-toggle.gassubtract = true;
-toggle.booleanflagging = true;
-toggle.flagging = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
-toggle.doflagging = true; % for running any Yohei style flagging
-toggle.dostarflag = true; 
-toggle.lampcalib  = false; 
-toggle.runwatervapor = true;
+%% set default toggle switches
+toggle = update_toggle;
 
 if isfield(s, 'toggle')
    s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
@@ -164,9 +152,17 @@ else
     end;
 end; % if
 
+%% remerge the toggles and if not created make the s.toggle struct
+if isfield(s, 'toggle')
+   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+   toggle = s.toggle;
+else
+   s.toggle = toggle;
+end
+
 if toggle.verbose;  disp('In Starwrapper'), end;
 
-% start taking notes
+%% start taking notes
 if ~isfield(s, 'note');
     s.note={};
 end;
