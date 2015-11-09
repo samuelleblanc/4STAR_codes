@@ -51,7 +51,7 @@ groundcomparison=[datenum('13:23:25') datenum('14:27:08')]-datenum('00:00:00')+d
 % daystr=mfilename;
 % daystr=daystr(end-7:end);
 % No good time periods ([start end]) for specific pixels
-s.ng=s.ng;
+% s.ng=s.ng;
 
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
