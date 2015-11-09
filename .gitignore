@@ -61,7 +61,12 @@ data_folder/starinfo20140901.m
 data_folder/lastUsedDir.mat
 
 
+<<<<<<< HEAD
 data_folder/20151103star.mat
 *.mat
 *.ict
 *.ict
+=======
+data_folder/modify_starinfo.m
+data_folder/modify_starinfos_in_dir.m
+>>>>>>> origin/master

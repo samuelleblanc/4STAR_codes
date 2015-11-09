@@ -27,7 +27,7 @@ version_set('v1.0')
 % 
 %  t = [min(ng(:,1)):(1./(24*60)):max(ng(:,2))];
 % tt = unique([t;ng(:,1);ng(:,2)]);
-if ~empty(ng)
+if ~isempty(ng)
 tags = unique(ng(:,3));
 flag_tags = [1  ,2 ,3,10,90,100,200,300];
 flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus','inst_trouble' ,'inst_tests' ,'frost'}

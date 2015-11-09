@@ -93,12 +93,18 @@ toggle.applytempcorr=false;% true is for SEAC4RS data
 toggle.applyforjcorr=false;% true is for data up to 2013, and possibly later
 toggle.gassubtract = true;
 toggle.booleanflagging = true;
-toggle.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle.flagging = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle.doflagging = true; % for running any Yohei style flagging
 toggle.dostarflag = true; 
 toggle.lampcalib  = false; 
 toggle.runwatervapor = true;
 
+if isfield(s, 'toggle')
+   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+   toggle = s.toggle;
+else
+   s.toggle = toggle;
+end
 
 %% check if the toggles are set in the call to starwrapper
 if (~isempty(varargin))
@@ -192,22 +198,35 @@ if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
+infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
-if exist(infofile2)==2;
-    eval(infofile2);
+if exist(infofile_)==2;
+   edit(infofile_) ; % open infofile in case user wants to edit it.
+   infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
+   s = infofnt(s);
+%     s = eval([infofile2,'(s)']);
+elseif exist(infofile2)==2;
+   edit(infofile2) ; % open infofile in case user wants to edit it.
+   infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
+   s = infofnt(s);
+%     s = eval([infofile2,'(s)']);
 elseif exist(infofile)==2;
-    eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
+   open(infofile);
+   run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
+%     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
 else; % copy an existing old starinfo file and run it
     while dayspast<maxdayspast;
         dayspast=dayspast+1;
         infofile_previous=fullfile(starpaths, ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
         if exist(infofile_previous);
             copyfile(infofile_previous, infofile);
-            eval(['edit ' infofile ';']);
-            eval(['run ' infofile ';']);
+            open(infofile);
+            run(infofile);
+%             eval(['edit ' infofile ';']);
+%             eval(['run ' infofile ';']);
             warning([infofile ' has been created from ' ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
             break;
         end;
@@ -889,7 +908,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [s.flags]=starflag(daystr,toggle.flagging,s);
+        [s.flags]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
     end;
     %************************************************************
     
@@ -912,9 +931,6 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     end;
     % The end of "The lines below used to be around here. But recent
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
-    
-    
-    
     
     % fit a polynomial curve to the non-strongly-absorbing wavelengths
     [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
