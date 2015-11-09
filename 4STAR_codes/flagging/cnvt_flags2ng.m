@@ -10,7 +10,7 @@ if ~exist('good','var')
 end
 flag_name = fieldnames(flags);
 for fld = length(flag_name):-1:1
-    if isstruct(flags.(flag_name{fld}))
+    if isstruct(flags.(flag_name{fld}))||~islogical(flags.(flag_name{fld}))
         flags = rmfield(flags,flag_name{fld});
     end
 end
@@ -56,9 +56,9 @@ for fld = 1:length(flag_name)
             flag_tag(fld) = tag;
     end
     tmp = flags.(flag_name{fld}).*(good);
-    starts = find(diff([false,tmp])>0);
-    ends = find(diff([tmp,false])<0);
-    if length(starts)>0
+    starts = find(diff([false;tmp])>0);
+    ends = find(diff([tmp;false])<0);
+    if ~isempty(starts)
         ng_ = [];
         ng_(1,:) = time(starts); ng_(2,:) = time(ends); ng_(3,:) = flag_tag(fld);
         ng = [ng,ng_];

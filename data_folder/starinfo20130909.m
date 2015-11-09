@@ -1,8 +1,33 @@
-function starinfo20130909
+function s = starinfo(s)
 %get variables from caller
-s=evalin('caller','s');
-daystr=evalin('caller','daystr');
+% s=evalin('caller','s');
+if exist('s','var')&&isfield(s,'t')&&~isempty(s.t)
+   daystr = datestr(s.t(1),'yyyymmdd');
+else
+   daystr=evalin('caller','daystr');
+end
 
+toggle.verbose=true;
+toggle.saveadditionalvariables=true;
+toggle.savefigure=false;
+toggle.computeerror=true;
+toggle.inspectresults=false;
+toggle.applynonlinearcorr=false;
+toggle.applytempcorr=false;% true is for SEAC4RS data
+toggle.gassubtract = false;
+toggle.booleanflagging = true;
+toggle.flagging = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle.doflagging = true; % for running any Yohei style flagging
+toggle.dostarflag = true; 
+toggle.lampcalib  = false; 
+toggle.runwatervapor = false;
+
+if isfield(s, 'toggle')
+   s.toggle = catstruct(s.toggle, toggle);
+   toggle = s.toggle;
+else
+   s.toggle = toggle;
+end
 
 flight=[datenum('18:57:25') datenum('25:41:08')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 horilegs=[datenum('19:09:50') datenum('20:11:21');...
@@ -71,9 +96,14 @@ if isfield(s, 'note');
 end;
 
 %push variable to caller
+% Bad coding practice to blind-push variables to the caller.  
+% Creates potential for clobbering and makes collaborative coding more
+% difficult because fields appear in caller memory space undeclared.
 varNames=who();
 for i=1:length(varNames)
+   if ~strcmp(varNames{i},'s')
   assignin('caller',varNames{i},eval(varNames{i}));
+   end
 end;
 end
 
