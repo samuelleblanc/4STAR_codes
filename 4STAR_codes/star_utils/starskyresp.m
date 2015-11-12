@@ -56,12 +56,14 @@
 % Modified (v1.5): Samuel LeBlanc, NASA Ames, 2015-05-12
 %                  Update to ARISE, decision to use pre-cal for entire field
 %                  mission, until 2014-10-24
+% Modified (v1.6): Samuel LeBlanc, NASA Ames, 2015-11-11, happy veteran's day
+%                  Update to NAAMES, put in the pre-NAAMES lab cal
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.5');
+version_set('1.6');
 
 % control the input
 if nargin==0;
@@ -98,12 +100,17 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         daystr = '20140716';
         filesuffix = 'from_20140716_003_VIS_park_with_20140606091700HISS';
         %filesuffix = 'from_20140716_004_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 10 23 0 0 0]);
+    elseif t >= datenum([2014 10 23 0 0 0]) && t < datenum([2015 09 14 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20141024';
         filesuffix = 'from_20141024_005_VIS_park_with_20140606091700HISS';
         %filesuffix = 'from_20141024_009_VIS_park_with_20140606091700HISS';
+    elseif t >= datenum([2015 09 15 0 0 0]);
+        % For using calibration from the pre-NAAMES-2015 large sphere lab
+        % cal
+        daystr = '20150915';
+        filesuffix = 'from_20150915_012_VIS_park_with_20140606091700HISS';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
