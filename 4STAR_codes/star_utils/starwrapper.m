@@ -966,8 +966,11 @@ end;
 %% remove some of the results for a lighter file
 %********************
 if ~toggle.saveadditionalvariables;
-    s=rmfield(s, {'darkstd' 'rate' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' ...
-        'rawmean' 'rawstd' 'sat_ij' });
+    s=rmfield(s, {'darkstd'});
+    if ~isempty(strfind(lower(datatype),'sun'));
+        s=rmfield(s, {'rate' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' ...
+        'rawmean' 'rawstd' 'sat_ij'});
+    end;
     if toggle.computeerror;
         s=rmfield(s, {'tau_aero_err1' 'tau_aero_err2' 'tau_aero_err3' 'tau_aero_err4' 'tau_aero_err5' 'tau_aero_err6' 'tau_aero_err7' 'tau_aero_err8' 'tau_aero_err9' 'tau_aero_err10' 'tau_aero_err11'});
     end;
