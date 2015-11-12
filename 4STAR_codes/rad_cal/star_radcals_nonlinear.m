@@ -83,7 +83,11 @@ for LL = Lamps
                 pin_val = polyval(P,WD_set_point,S);
                 %             hiss_rad.STAR_VIS.(['lamps_',LL]).pin_val(nm_) = interp1(wells, hiss_rad.STAR_VIS.(['lamps_',LL]).resp(ij,nm_),.45,'linear');
             else
-                pin_val =NaN;
+                if isNaN(WD_set_point)
+                    pin_val =NaN;
+                else
+                    pin_val = WD_set_point;
+                end
             end
             nonlin.(lamp_str).(spc).wells(:,nm_) = WD(:,nm_);
             nonlin.(lamp_str).(spc).pin_val(nm_) = pin_val;
@@ -202,7 +206,11 @@ for LL = fliplr(Lamps)
             bot_WD = WD(:,ij(nm_i-1)); bot_WD = bot_WD(bot_good);
             if ~isempty(top_WD)&&~isempty(bot_WD)
                 len = length(bot_WD);half = max([1,floor(len./2)]);
-                top_nr = interp1(top_WD,top_nresp,bot_WD(half:end),'linear');
+                try
+                    top_nr = interp1(top_WD,top_nresp,bot_WD(half:end),'linear');
+                catch
+                    top_nr = bot_WD(half:end)*0.0 + top_WD(1);
+                end
                 len = length(bot_nresp);half = max([1,floor(len./2)]);
                 bot_nr = bot_nresp(half:end);
                 w = madf(top_nr./bot_nr -1, 3);

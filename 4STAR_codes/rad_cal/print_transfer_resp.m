@@ -1,6 +1,7 @@
 %% Details of the function:
 % NAME:
 %   print_transfer_resp
+%   **** DEFUNCT USE small_sphere_cal instead ****
 % 
 % PURPOSE:
 %   Print to file the response function from the secondary cal
@@ -30,12 +31,16 @@
 % Written (v1.0): Samuel LeBlanc, on Hercules C130, lat: 70 lon: -148, September 15th, 2014
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                  - changed startup to startup_plotting
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2015-11-11
+%                  - made indications that this function is now defunct
 %
 % -------------------------------------------------------------------------
 
 %% Start of function
 function print_transfer_resp
-version_set('1.1');
+version_set('1.2');
+
+disp('**** DEFUNCT use small_sphere_cal instead *****')
 
 startup_plotting
 dir='C:\Users\sleblan2\Research\4STAR\cal\';

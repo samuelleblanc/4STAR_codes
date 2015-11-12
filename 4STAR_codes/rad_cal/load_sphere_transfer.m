@@ -46,8 +46,10 @@ end;
 if isnumeric(t);
     if t >= datenum([2014 06 24 0 0 0]) && t < datenum([2014 07 16 0 0 0]);
         daystr='20140624';
-    elseif t >= datenum([2014 07 16 0 0 0]);
+    elseif t >= datenum([2014 07 16 0 0 0]) t < datenum([2015 09 15 0 0 0]);
         daystr='20140716';
+    elseif t >= datenum([2015 09 15 0 0 0]);
+        daystr = '20150915';
     end;
 else; % special collections
     disp('No Special collections yet')
