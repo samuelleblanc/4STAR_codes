@@ -76,7 +76,7 @@ function	s=starwrapper(s, s2, varargin)
 % YS: v2.0, 2015-11-02: slimmed down the output when
 %                       saveadditionalvariables is set to false
 % SL: v2.1, 2015-11-05: using outside function (update_toggle) to set default toggles
-% YS: v2.2, 2015-11-06: added the applyforjcorr toggle 
+% YS: v2.2, 2015-11-06: added the applyforjcorr toggle
 
 version_set('2.2');
 %********************
@@ -87,10 +87,10 @@ version_set('2.2');
 toggle = update_toggle;
 
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
-   toggle = s.toggle;
+    s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+    toggle = s.toggle;
 else
-   s.toggle = toggle;
+    s.toggle = toggle;
 end
 
 %% check if the toggles are set in the call to starwrapper
@@ -155,10 +155,10 @@ end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
-   toggle = s.toggle;
+    s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+    toggle = s.toggle;
 else
-   s.toggle = toggle;
+    s.toggle = toggle;
 end
 
 if toggle.verbose;  disp('In Starwrapper'), end;
@@ -199,19 +199,38 @@ infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functio
 dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
-   edit(infofile_) ; % open infofile in case user wants to edit it.
-   infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
-   s = infofnt(s);
-%     s = eval([infofile2,'(s)']);
+    try
+        edit(infofile_) ; % open infofile in case user wants to edit it.
+    catch me
+        disp(['Problem editing starinfo file. Please open manually: ' infofile_])
+    end
+    infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
+    try
+        s = infofnt(s);
+    catch
+        eval([infofile_(1:end-2),'(s)']);
+        %     s = eval([infofile2,'(s)']);
+    end
 elseif exist(infofile2)==2;
-   edit(infofile2) ; % open infofile in case user wants to edit it.
-   infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
-   s = infofnt(s);
-%     s = eval([infofile2,'(s)']);
+    try
+        edit(infofile2) ; % open infofile in case user wants to edit it.
+    catch me
+        disp(['Problem editing starinfo file. Please open manually: ' infofile_])
+    end
+    try
+        infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
+        s = infofnt(s);
+    catch
+        disp('*Problem with executing as script, converting to starinfo function*')
+        modify_starinfo(which(infofile2));
+        infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
+        s = infofnt(s);
+    end
+    %     s = eval([infofile2,'(s)']);
 elseif exist(infofile)==2;
-   open(infofile);
-   run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
-%     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
+    open(infofile);
+    run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
+    %     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
 else; % copy an existing old starinfo file and run it
     while dayspast<maxdayspast;
         dayspast=dayspast+1;
@@ -220,8 +239,8 @@ else; % copy an existing old starinfo file and run it
             copyfile(infofile_previous, infofile);
             open(infofile);
             run(infofile);
-%             eval(['edit ' infofile ';']);
-%             eval(['run ' infofile ';']);
+            %             eval(['edit ' infofile ';']);
+            %             eval(['run ' infofile ';']);
             warning([infofile ' has been created from ' ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
             break;
         end;
@@ -712,80 +731,80 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     
     % compare rate structures:
     
-%     figure;
-%     plot(s.w,s.tau_O4([9850 9860 9890],:),'-');
-%     
-%     wi = [1084,1109,1213,1439,1503];
-%     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
-%     figure;
-%     for ll=1:length(wi)
-%         subplot(length(wi),1,ll);
-%         plot(serial2Hh(s.t),s.rateaero(:,wi(ll)) - ...
-%              s.ratetot(:,wi(ll)), 'ok','markersize',8);hold on;
-%         
-%          if ll==3
-%          xlabel('time [UTC]');
-%          ylabel('\Delta (rate-aero - rate-aero minus O4)');
-%          end
-%         legend(le{ll,:});
-%         axis([min(serial2Hh(s.t)) max(serial2Hh(s.t)) -0.005 0.005]);
-%         plot(serial2Hh(s.t),zeros(length(serial2Hh(s.t)),1),'-m');hold off;
-%     end
-%     
-%     figure;
-%     plot(s.w,s.rateaero(9850,:) - s.ratetot(9850,:),'-.b');
-%     axis([0.3 1.7 0 10]);
-%     legend('rateaero-ratetot(O4nir sub)')
-%     
-%     figure;
-%     plot(s.w,s.tau_aero_noscreening(9850,:) - ...
-%          s.tau_tot_vertical(9850,:),'-.b');hold on;
-%     
-%     legend('tau-aero-noscreening - tau-aero-minus-nirO4');
-%     axis([0.3 1.7 0 1]);
-%     
-%     figure;
-%     plot(s.w,s.tau_aero_noscreening([9850 9900,9950 9980],:),'-.');hold on;
-%     plot(s.w,s.tau_tot_vertical([9850 9900,9950 9980],:),    ':'); hold on;
-%     plot(s.w,s.dark([9850 9900,9950 9980],:)/10000,'-k');hold on;
-%     legend('tau-aero-noscreening','tau-aero-minus-nirO4');
-%     
-%     figure;
-%     plot(s.UTHh,s.dark(:,1083),'ob');hold on;
-%     plot(s.UTHh,s.dark(:,1085),'og');hold on;
-%     legend('dark at peak (1.018)','dark at valley (1.022)');
-%     
-%     figure;
-%     plot(s.UTHh,s.rate(:,1083),'ob');hold on;
-%     plot(s.UTHh,s.rate(:,1085),'og');hold on;
-%     legend('rate at peak (1.018)','rate at valley (1.022)');
-%     
-%     figure;
-%     plot(s.UTHh,s.ratetot(:,1083),'ob');hold on;
-%     plot(s.UTHh,s.ratetot(:,1085),'og');hold on;
-%     legend('ratetot at peak (1.018)','ratetot at valley (1.022)');
-%     
-%     figure;
-%     plot(s.w,s.c0-s.rateaero(9850,:),'-b');hold on;
-%     plot(s.w,s.c0-s.ratetot(9850,:) ,'-g');hold on;
-%     axis([0.3 1.7 -1 1]);
-%     xlabel('wavelength');ylabel('c0-rate');
-%     legend('rateaero','ratetot');
-%     
-%     figure;
-%     plot(s.w,s.c0,'-b');hold on;
-%     plot(s.w,s.rateaero(9850,:),':g');hold on;
-%     %plot(s.w,s.ratetot(9850,:),':m');hold on;
-%     plot(s.w,smooth(s.c0),'--b','linewidth',2);hold on;
-%     plot(s.w,smooth(s.rateaero(9850,:)),'.-g','linewidth',2);hold on;
-%     %plot(s.w,smooth(s.ratetot(9850,:)), '.-m','linewidth',2);hold on;
-%     legend('c0','rateaero','smooth c0','smooth rateaero');
-%     xlabel('wavelength');ylabel('dark subtracted, corrected counts');
-%     axis([0.3 1.7 0 10]);
-%     
-%     figure;
-%     plot(s.w,s.tau_aero_noscreening([9850:9855],:),'-');
-%     xlabel('wavelength');ylabel('tau-aero-noscreening');title('2014-09-02');
+    %     figure;
+    %     plot(s.w,s.tau_O4([9850 9860 9890],:),'-');
+    %
+    %     wi = [1084,1109,1213,1439,1503];
+    %     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
+    %     figure;
+    %     for ll=1:length(wi)
+    %         subplot(length(wi),1,ll);
+    %         plot(serial2Hh(s.t),s.rateaero(:,wi(ll)) - ...
+    %              s.ratetot(:,wi(ll)), 'ok','markersize',8);hold on;
+    %
+    %          if ll==3
+    %          xlabel('time [UTC]');
+    %          ylabel('\Delta (rate-aero - rate-aero minus O4)');
+    %          end
+    %         legend(le{ll,:});
+    %         axis([min(serial2Hh(s.t)) max(serial2Hh(s.t)) -0.005 0.005]);
+    %         plot(serial2Hh(s.t),zeros(length(serial2Hh(s.t)),1),'-m');hold off;
+    %     end
+    %
+    %     figure;
+    %     plot(s.w,s.rateaero(9850,:) - s.ratetot(9850,:),'-.b');
+    %     axis([0.3 1.7 0 10]);
+    %     legend('rateaero-ratetot(O4nir sub)')
+    %
+    %     figure;
+    %     plot(s.w,s.tau_aero_noscreening(9850,:) - ...
+    %          s.tau_tot_vertical(9850,:),'-.b');hold on;
+    %
+    %     legend('tau-aero-noscreening - tau-aero-minus-nirO4');
+    %     axis([0.3 1.7 0 1]);
+    %
+    %     figure;
+    %     plot(s.w,s.tau_aero_noscreening([9850 9900,9950 9980],:),'-.');hold on;
+    %     plot(s.w,s.tau_tot_vertical([9850 9900,9950 9980],:),    ':'); hold on;
+    %     plot(s.w,s.dark([9850 9900,9950 9980],:)/10000,'-k');hold on;
+    %     legend('tau-aero-noscreening','tau-aero-minus-nirO4');
+    %
+    %     figure;
+    %     plot(s.UTHh,s.dark(:,1083),'ob');hold on;
+    %     plot(s.UTHh,s.dark(:,1085),'og');hold on;
+    %     legend('dark at peak (1.018)','dark at valley (1.022)');
+    %
+    %     figure;
+    %     plot(s.UTHh,s.rate(:,1083),'ob');hold on;
+    %     plot(s.UTHh,s.rate(:,1085),'og');hold on;
+    %     legend('rate at peak (1.018)','rate at valley (1.022)');
+    %
+    %     figure;
+    %     plot(s.UTHh,s.ratetot(:,1083),'ob');hold on;
+    %     plot(s.UTHh,s.ratetot(:,1085),'og');hold on;
+    %     legend('ratetot at peak (1.018)','ratetot at valley (1.022)');
+    %
+    %     figure;
+    %     plot(s.w,s.c0-s.rateaero(9850,:),'-b');hold on;
+    %     plot(s.w,s.c0-s.ratetot(9850,:) ,'-g');hold on;
+    %     axis([0.3 1.7 -1 1]);
+    %     xlabel('wavelength');ylabel('c0-rate');
+    %     legend('rateaero','ratetot');
+    %
+    %     figure;
+    %     plot(s.w,s.c0,'-b');hold on;
+    %     plot(s.w,s.rateaero(9850,:),':g');hold on;
+    %     %plot(s.w,s.ratetot(9850,:),':m');hold on;
+    %     plot(s.w,smooth(s.c0),'--b','linewidth',2);hold on;
+    %     plot(s.w,smooth(s.rateaero(9850,:)),'.-g','linewidth',2);hold on;
+    %     %plot(s.w,smooth(s.ratetot(9850,:)), '.-m','linewidth',2);hold on;
+    %     legend('c0','rateaero','smooth c0','smooth rateaero');
+    %     xlabel('wavelength');ylabel('dark subtracted, corrected counts');
+    %     axis([0.3 1.7 0 10]);
+    %
+    %     figure;
+    %     plot(s.w,s.tau_aero_noscreening([9850:9855],:),'-');
+    %     xlabel('wavelength');ylabel('tau-aero-noscreening');title('2014-09-02');
     
     % apply screening here
     %flags bad_aod, unspecified_clouds and before_and_after_flight
