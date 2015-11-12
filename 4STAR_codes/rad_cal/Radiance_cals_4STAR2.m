@@ -53,11 +53,13 @@
 %          Large sphere lamp number with radiance files
 %          - added daystrin argument for selecting a day from command line,
 %          - added default hiss file based on date values
+% Modified (v2.1): by Samuel LeBlanc, NASA Ames, 2015-11-11
+%          - added default for pre-NAAMES plotting
 % -------------------------------------------------------------------------
 
 %% Start of function
 function hiss_star_cals = Radiance_cals_4STAR2(daystrin)
-version_set('2.0');
+version_set('2.1');
 
 if exist('daystrin','var')
     date = daystrin;
@@ -65,8 +67,9 @@ else
     %date='20131121'
     %date='20130506'
     %date='20140624'
-    date='20140716'
+    %date='20140716'
     %date='20141024'
+    date = '20150915'
 end
 docorrection=true; %do nonlinear correction
 
@@ -76,7 +79,7 @@ else
     disp('Using default cal folder:')
     pname = ['C:\Users\sleblan2\Research\4STAR\cal\' date]
 end
-if date(1:4)=='2014';
+if date(1:4)=='2014'|date(1:4)=='2015';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20140606091700HISS.txt');
 elseif date(1:4)=='2013';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20130605124300HISS.txt');
@@ -171,6 +174,7 @@ for ll = lamps
     for vs = length(vis_tints):-1:1
         cal.(lamp_str).vis.t_ms(vs) = vis_tints(vs);
         cal.(lamp_str).vis.dark(vs,:) = mean(s.dark(s.visTint==vis_tints(vs),1:1044));
+        cal.(lamp_str).vis.light(vs,:) = mean(s.raw(sky&s.visTint==vis_tints(vs),1:1044));
         cal.(lamp_str).vis.rate(vs,:) = mean(s.rate(sky&s.visTint==vis_tints(vs),1:1044));
         cal.(lamp_str).vis.rad = interp1(hiss.nm,hiss.(['lamps_',num2str(ll)]), vis.nm,'linear');
         cal.(lamp_str).vis.resp(vs,:) = cal.(lamp_str).vis.rate(vs,:)./cal.(lamp_str).vis.rad;
@@ -178,6 +182,7 @@ for ll = lamps
     for ns = length(nir_tints):-1:1
         cal.(lamp_str).nir.t_ms(ns) = nir_tints(ns);
         cal.(lamp_str).nir.dark(ns,:) = mean(s.dark(s.nirTint==nir_tints(vs),1045:end));
+        cal.(lamp_str).nir.light(ns,:)= mean(s.raw(sky&s.nirTint==nir_tints(vs),1045:end));
         cal.(lamp_str).nir.rate(ns,:) = mean(s.rate(sky&s.nirTint==nir_tints(vs),1045:end));
         cal.(lamp_str).nir.rad = interp1(hiss.nm,hiss.(['lamps_',num2str(ll)]), nir.nm,'linear');
         cal.(lamp_str).nir.resp(ns,:) = cal.(lamp_str).nir.rate(ns,:)./cal.(lamp_str).nir.rad;

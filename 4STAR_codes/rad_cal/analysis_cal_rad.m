@@ -49,11 +49,12 @@ version_set('1.3');
 [file pname fi]=uigetfile('*.mat','Find calibration files .mat');
 %file='rad_cal.mat'
 %pname='C:\Users\Samuel\Research\4STAR\cal\20131120\2013_11_20.4STAR.NASA_Ames.Flynn\'
-date='20131120'
+%date='20131120'
 %date='20130506';
 %date='20140624';
 %date='20140716';
 %date='20141024';
+date = '20150915'
 
 disp(['Loading the matlab file: ' pname file])
 disp(['for Date: ' date])

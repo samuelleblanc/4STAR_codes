@@ -70,12 +70,14 @@
 % Modified (v1.2): Samuel LeBlanc, NASA Ames, May 6th, 2015
 %                  - bug fix in getfullname_ to getfullname
 %                  - added example
+% Modified (v1.3): Samuel LeBlanc, NASA Ames, November 10th, 2015
+%                  - added dates for pre-NAAMES deployment 
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [fnames,flt,fnamesbak,fltbak,isbackground]=small_sphere_select(daystr,dir)
-version_set('1.2');
+version_set('1.3');
 
 if ~exist('dir','var'); 
     dir=uigetfolder('','Select folder where calibrations are stored');
@@ -146,6 +148,14 @@ switch daystr
         fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_014_VIS_park.dat'];...
                    [dir filesep daystr filesep 'Lamps_0' filesep daystr '_014_NIR_park.dat']};
         fltbak=[[6:13],[21:26]];
+    case '20150915'
+        fnames={[dir filesep daystr filesep 'small_sphere' filesep daystr '_017_VIS_park.dat'];...
+                [dir filesep daystr filesep 'small_sphere' filesep daystr '_017_NIR_park.dat']};
+        flt=[367:396];
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_013_VIS_park.dat'];...
+                   [dir filesep daystr filesep 'Lamps_0' filesep daystr '_013_NIR_park.dat']};
+        fltbak=[1:77];
     otherwise
         warning('daystr not found in small_sphere_select, please manually select:');
         fnames=getfullname('*.dat','Select calibration files');
