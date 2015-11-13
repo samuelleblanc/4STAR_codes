@@ -21,6 +21,11 @@ vertprofs=[datenum('13:50:51') datenum('14:01:44'); ...
     datenum('18:33:05') datenum('19:02:02'); ...
     ]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 
+circles=[horilegs(4,:) ; % one big counterclockwise circle (seen from above); max 6700 m GPS altitude
+    horilegs(5,:); % 3100 m GPS alt
+    horilegs(6,1) datenum('16:53:12')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])]; % two small counterclockwise circle (seen from above); max 6700 m GPS altitude
+% Circles were also made during the vertical profiles between the horizontal legs listed here: vertprofs(5,:); % spiral descent     vertprofs(6,:) ; % spiral ascent, two circles 
+
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
