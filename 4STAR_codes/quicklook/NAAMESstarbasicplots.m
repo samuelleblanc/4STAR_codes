@@ -278,7 +278,7 @@ for k=1:size(colslist,1); % for multiple sets of wavelengths
         yl=[0 max([max(tau_aero(incl(t,tlim),colslist{k,2})) 1])];
     end;
     figure;
-    if ~isfinite(sum(sum(tau_aero(incl(t,tlim),colslist{k,2}))));
+    if all(~isfinite(tau_aero(incl(t,tlim),colslist{k,2})));
         text(mean(t([1 end])), mean(yl), 'No data', 'fontsize', 60, 'horizontalalignment', 'center', 'verticalalignment','middle');
         hold on;
     end;
