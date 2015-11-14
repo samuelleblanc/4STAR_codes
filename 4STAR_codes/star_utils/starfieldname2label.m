@@ -40,14 +40,16 @@ pairs={'t' 'UTC'
     'zen' 'Solar Zenith Angle (from sunae.m)'
     'dAZsmdt' 'dAZ_{sm}/dt (deg/s)'
     'od' 'Total Optical Depth'
+    'rad' 'Zenith Radiance (unit???)'
     'P1' 'P1 Can Pressure (see data sheet)'
     'P2' 'P2 Can RH (see data sheet)'
     'P3' 'P3 Not Connected'
     'P4' 'P4 Not Connected'
     'T1' 'T1 Elevation Motor Temp.'
-    'T2' 'T2 Elevation Skin Temp'
+    'T2' 'T2 Elevation Optical Plate Near Diffuser' ; % updated on 20151111, see 4STAR_DataFields_201508.xlsx
     'T3' 'T3 Can Temperature'
     'T4' 'T4 Azimuth Head Temperature'};
+%     'T2' 'T2 Elevation Skin Temp' removed 20151111
 
 ok=find(strcmp(fieldname,pairs(:,1))==1);
 if isempty(ok);

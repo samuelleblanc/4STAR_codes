@@ -373,11 +373,38 @@ if isequal(funhandle, @plot);
             clear uniB uniI;
         end;
     end;
-    % put a legend
-    lh=legend(h(hidx),lstr);
-    set(lh,'fontsize',12,'interpreter','none','location','best');
-    if numel(xidx)<=1 && numel(yidx)<=1 && numel(lstr)<=1 && numel(datatype)<=1;
-        set(lh,'visible','off');
+    % put a legend or colorbar
+    if exist('lstr0') && isequal(lstr, lstr0); % legend refers to wavelengths only; use a colorbar, Qin's idea
+        clr=NaN(numel(lstr),3);
+        for i=1:numel(lstr);
+            clr(i,:)=get(h(hidx(numel(lstr)+1-i)),'color');
+        end;
+        ax=gca;
+        colormap(clr);
+        ch=colorbar;
+        pos0=get(ax,'position');
+        idxlim=[1 numel(lstr)];
+        set(ch,'ylim',idxlim+[0 1],'ytick',[], ...
+            'position', get(ch,'position')+[0.06 0 0.03 0])
+        axes(ch);
+        for i=idxlim(1):idxlim(2);
+            txt=char(lstr(numel(lstr)+1-i));
+            prec='%0.3f'; % change this if the unit is nm instead of um
+            ws=findstr(txt, ' ');
+            text(0.5, i+0.5, num2str(str2num(txt(1:ws-1)), prec), ...
+                'rotation', 0,'color','w', ...
+                'horizontalalignment','center', ...
+                'fontweight','bold')
+        end;
+        title(['\lambda (' txt(ws+1:end) ')'], 'fontsize', 12);
+        axes(ax);
+        set(ax,'position',pos0+[0 0 0.08 0]);
+    else; % a legend
+        lh=legend(h(hidx),lstr);
+        set(lh,'fontsize',12,'interpreter','none','location','best');
+        if numel(xidx)<=1 && numel(yidx)<=1 && numel(lstr)<=1 && numel(datatype)<=1;
+            set(lh,'visible','off');
+        end;
     end;
     % return filename
     filename=parameters{strcmp('filename', parameters(:,1)),2};
