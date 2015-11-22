@@ -10,5 +10,5 @@
 clear
 close all
 
-[flags]=starflag('20130823',2,[]);
+[flags]=starflag('20151118',2,[]);
 
