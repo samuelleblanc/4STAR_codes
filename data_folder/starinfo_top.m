@@ -7,7 +7,7 @@ end
 
 toggle = update_toggle;
 if isfield(s, 'toggle')
-   toggle = catstruct(s.toggle, toggle);
+   toggle = catstruct(toggle, s.toggle);
 end
 s.toggle = toggle;
 
