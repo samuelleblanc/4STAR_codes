@@ -190,7 +190,7 @@ varNames=who();
 for i=1:length(varNames) 
   assignin('caller',varNames{i},eval(varNames{i})); 
 end; 
-end 
+
 
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  
@@ -206,3 +206,29 @@ end;
 
 return
 
+function toggle_out = update_toggle(toggle_in)
+% toggle_out = update_toggle(toggle_in)
+
+toggle_out.subsetting_Tint = true;
+toggle_out.pca_filter = false;
+toggle_out.verbose=true;
+toggle_out.saveadditionalvariables=true;
+toggle_out.savefigure=false;
+toggle_out.computeerror=true;
+toggle_out.inspectresults=false;
+toggle_out.applynonlinearcorr=true;
+toggle_out.applytempcorr=false;% true is for SEAC4RS data
+toggle_out.gassubtract = false;
+toggle_out.booleanflagging = true;
+toggle_out.flagging = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.doflagging = true; % for running any Yohei style flagging
+toggle_out.dostarflag = true; 
+toggle_out.lampcalib  = false; 
+toggle_out.runwatervapor = false;
+toggle_out.applyforjcorr = true;
+
+if exist('toggle_in', 'var')
+   toggle_out = catstruct(toggle_in, toggle_out);
+end
+
+return
