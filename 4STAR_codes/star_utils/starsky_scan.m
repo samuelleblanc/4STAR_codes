@@ -272,6 +272,7 @@ if star.isPPL
 %     %     % See if the two branches have any overlapping intensity.
 %     %     %
 %     %     subplot(2,1,2);
+miss = 0;
     figure;
     plot(abs(star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)...
         -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-miss), ...
