@@ -119,9 +119,23 @@ if exist('vis_skyp','var')
             s_out = starsky_scan(s); % vis_pix restrictions in here
             %                 [~,fname,~] = fileparts(ss.filename{1});
 %             s_out = ss;
-            save([mat_dir,filesep,out],'-struct','s_out');
-            saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
-            saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
+            save(savematfile, '-struct','s_out')
+%             save([mat_dir,filesep,s_out],'-struct','s_out');
+            
+            fig_out = [imgdir,strrep(out,'.mat','.fig')];
+            if exist(fig_out,'file')
+               delete(fig_out);
+            end
+            saveas(gcf,fig_out);
+            
+            png_out = [imgdir,strrep(out,'.mat','.png')];
+            if exist(png_out,'file')
+               delete(png_out);
+            end
+            saveas(gcf,png_out);
+            
+%             saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
+%             saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
          catch
             save([mat_dir,filesep,out,'.bad'],'-struct','s');
          end
