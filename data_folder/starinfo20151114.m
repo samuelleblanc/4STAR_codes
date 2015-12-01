@@ -1,4 +1,5 @@
 flight=[datenum('10:27:18') datenum('19:44:06')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+
 horilegs=[datenum('10:59:48') datenum('13:24:37'); ...
     datenum('13:41:32') datenum('13:52:23'); ...
     datenum('14:06:20') datenum('14:18:01'); ...
@@ -25,6 +26,7 @@ vertprofs=[datenum('10:27:19') datenum('10:59:48'); ...
 langley=[flight(1,1) horilegs(4,2) % sunrise, various altitudes, under clouds
     horilegs(4,1) flight(end,end)]; % sunset, various altitudes, under clouds
 circles=horilegs([1 4 7 8],:); 
+
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
