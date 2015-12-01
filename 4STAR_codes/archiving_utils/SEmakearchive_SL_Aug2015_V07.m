@@ -61,6 +61,7 @@ elseif isequal(R,'0') | isequal(R,'1') | isequal(R,'2') % post field
     dslist={'20130806' '20130807' '20130808' '20130812' '20130814' '20130816' '20130819' '20130821' '20130823' '20130826' '20130827' '20130828' '20130830' '20130831' '20130902' '20130904' '20130906' '20130907' '20130909' '20130910' '20130911' '20130913' '20130916' '20130917' '20130918' '20130921' '20130923'} ; % put one day string
     %Values of jproc: 1=archive 0=do not archive  JML 4/7/14
     jproc=[         1          0          1          1          1          1          1          1          1          1          1          0          1          0          1          1          1          0          1          0          1          1          1          0          1          1          1]; %set=1 to process    %JML 4/7/14
+    jproc(1:12)=0;!!!
     !!! missing: 20130812_starflag_man_created20141111_1434by_JL.mat, 20130814_starflag_man_created20141107_1648by_JL.mat, 20130918_starflag_man_created20141111_0911by_JL.mat, 20130922 proper star.mat and starinfo
     !!! cleared: several "day #2" starsun.mat files
     %Values of idflag: 1=old flagging,2=new flagging JML 4/7/14   
