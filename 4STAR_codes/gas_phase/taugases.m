@@ -100,7 +100,7 @@ if strcmp(flag_interpOMIno2,'yes')
         nanid = find(isnan(tau_NO2(:,1)));
         % assign tau_NO2 according to aircraft altitude
         tau_NO2(Alt> 3000,:)  = tau_NO2s(Alt> 3000,:);
-        tau_NO2(Alt<=3000,:)  = tau_NO2t(Alt<=3000,:);
+        % assign constant no2 at missing values
         tau_NO2(nanid,:)      = tau_NO2d(nanid,:);
         
     catch
