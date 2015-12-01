@@ -1,26 +1,25 @@
 %% Details of the function:
 %  NAME:
-% appendOMIdata(omidir,daystr,gas)
+% getOMIdataO3(omidir,daystr)
 %----------------------------------
 % PURPOSE:
-%  - appends OMI gas data (O3 or NO2)
-%  - to star.mar file
-%  - in future should be ambedded in
-%  - allstarmat.m
+%  - get OMI gas data (O3)
+%  - for further comparison
+%  - this routine runs manually or within
+%  - a compare function of 4star and OMI
 %    
 %
 % CALLING SEQUENCE:
-%   g=appendOMIdata(daystr,gas)
+%   g=getOMIdataO3(daystr,gas)
 %
 % INPUT:
 %  - omidir is the directory where omi files are stored
 %  - daystr, e.g., '20140911' as string
-%  - gas, i.e, 'o3' or 'no2'
 % 
 % 
 % OUTPUT:
 % 
-% - generates struct and ASCII file output of
+% - generates struct output of
 %   OMI interpolated data along a flight path
 %   locations and times are based on vis_sun
 %
@@ -39,15 +38,15 @@
 %
 %
 % EXAMPLE:
-% g=appendOMIdata('C:\Users\msegalro.NDC\Campaigns\NAAMES\OMIdata\gridded\',...
-%                 '20140911','o3')
+% g=getOMIdata('C:\Users\msegalro.NDC\Campaigns\NAAMES\OMIdata\gridded\',...
+%                 '20140911')
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer (MS), NASA Ames,Nov-25-2015 
-% 
+% Modified: 2015-11-30 based on appendOMIdata for O3 only; compare purposes
 % ---------------------------------------------------------------------------
 %% routine
-function [g] = appendOMIdata(omidir,daystr,gas)
+function [g] = getOMIdataO3(omidir,daystr)
 
 startup_plotting;
    
@@ -57,11 +56,8 @@ startup_plotting;
     day = daystr(5:end);
     year= daystr(1:4);
     
-    if strcmp(gas,'o3')
-        of       = strcat('OMI-Aura_L2G-OMDOAO3G_',year, 'm', day,'*','he5');
-    elseif strcmp(gas,'no2')
-        of       = strcat('OMI-Aura_L2G-OMNO2G_' , year, 'm', day,'*','he5');
-    end
+    
+    of       = strcat('OMI-Aura_L2G-OMDOAO3G_',year, 'm', day,'*','he5');
     
     finfo   = dir([omidir,of]);
     fhdfinfo= hdf5info([omidir,finfo.name]);
@@ -172,36 +168,25 @@ startup_plotting;
  lonmin = min(fl.vis_sun.Lon(fl.vis_sun.Lon~=0));
  lonmax = max(fl.vis_sun.Lon(fl.vis_sun.Lat~=0));
  
- if strcmp(gas,'o3')
-    o3min     = min(o3(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
-    o3max     = max(o3(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
-    plotparam = o3max + 0.01;
- elseif strcmp(gas,'no2')
-    no2min = min(no2(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
-    no2max = max(no2(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
-    plotparam = no2max + 0.01;
- end
+ 
+ o3min     = min(o3(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
+ o3max     = max(o3(lon<=lonmax&lon>=lonmin&lat<=latmax&lat>=latmin));
+ plotparam = o3max + 0.01;
+ 
  
  % plot flight path over OMI data
  figure(1)
  
  % air
- plot3(fl.vis_sun.Lon,fl.vis_sun.Lat,repmat(plotparam,length(fl.vis_sun.Lon),1),...
-       'o','markersize',10,'color','k','markerFaceColor',[0 0 0]);hold on;
+    plot3(fl.vis_sun.Lon,fl.vis_sun.Lat,repmat(plotparam,length(fl.vis_sun.Lon),1),...
+        'o','markersize',10,'color','k','markerFaceColor',[0 0 0]);hold on;
  
- if strcmp(gas,'o3')
-     % omi
+ % omi
     surf(double(lon),double(lat),double(o3),'edgecolor','none');hold on;  
     cb=colorbarlabeled('OMI O_{3} [DU]');
     set(gca,'zlim',[o3min,plotparam]);
     caxis([o3min plotparam]);
- elseif strcmp(gas,'no2')
-     % omi
-    surf(double(lon),double(lat),double(no2),'edgecolor','none');hold on;  
-    cb=colorbarlabeled('OMI NO_{2} [DU]');
-    set(gca,'zlim',[no2min,plotparam]);
-    caxis([no2min plotparam]);
- end
+ 
  
  view(2);
  
@@ -212,28 +197,22 @@ startup_plotting;
  % add labels
  xlabel('Longitude','fontsize',16);
  ylabel('Latitude','fontsize',16);
- title(['OMI ', gas, ' data for ', daystr],'fontsize',16);
+ title(['OMI O_{3} ', ' data for ', daystr],'fontsize',16);
  set(gca,'fontsize',16);
  
  % save figure;
-  fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','4flight_',daystr)];
+  fi1=[strcat(starpaths,'OMIfigs\','omi_o3_','4flight_',daystr)];
   save_fig(1,fi1,false);
   %close(1);
   
  % plot interpolated o3 data on flight path
  
  figure(2);
- scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3omi);
+    scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3omi);
  
- if strcmp(gas,'o3')
     cb=colorbarlabeled('OMI O_{3} [DU]');
     set(gca,'zlim',[o3min,plotparam]);
     caxis([o3min plotparam]);
- elseif strcmp(gas,'no2')
-    cb=colorbarlabeled('OMI NO_{2} [DU]');
-    set(gca,'zlim',[no2min,plotparam]);
-    caxis([no2min plotparam]);
- end
  
  view(2);
  
@@ -244,11 +223,11 @@ startup_plotting;
  % add labels
  xlabel('Longitude','fontsize',16);
  ylabel('Latitude','fontsize',16);
- title(['OMI ', gas, ' data interpolated for flight ', daystr],'fontsize',16);
+ title(['OMI O_{3} ', ' data interpolated for flight ', daystr],'fontsize',16);
  set(gca,'fontsize',16);
  
  % save figure;
-  fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','interpolated4flight_',daystr)];
+  fi1=[strcat(starpaths,'OMIfigs\','omi_o3_,','interpolated4flight_',daystr)];
   save_fig(2,fi1,false);
  %close(2);
   
@@ -259,7 +238,7 @@ startup_plotting;
   g.median = median( g.o3omi);
   g.max    = mean(   g.o3omi+g.o3g);
   
-    
+  return;  
     
     
     

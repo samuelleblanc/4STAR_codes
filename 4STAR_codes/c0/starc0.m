@@ -210,7 +210,7 @@ end;
 
 % return channels used for AOD fitting
 [visc,nirc]=starchannelsatAATS(t);
-cross_sections=taugases(t,'vis',0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
+cross_sections=taugases(t,'vis',0,0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
 visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
 h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
 h2ook=find(isfinite(h2o)==1 & imag(h2o)==0);
@@ -221,7 +221,7 @@ visaerosolcols=find(h2o>0.9997 & cross_sections.o2<1e-27); % Yohei 2013/01/28
 % visaerosolcols1=visaerosolcols1(visaerosolcols1<=1044);
 % visaerosolcols2=[repmat(visc(1:9),3,1)+repmat([-1 0 1]',1,9)];
 % visaerosolcols=union(visaerosolcols1,visaerosolcols2(:));
-cross_sections=taugases(t,'nir',0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
+cross_sections=taugases(t,'nir',0,0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
 h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
 niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01/28
 % niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
