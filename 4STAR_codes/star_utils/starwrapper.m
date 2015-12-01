@@ -506,6 +506,8 @@ end;
 if toggle.verbose; disp('adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
+% set toggle.applyforjcorr to 2 for a two-way correction accounting for
+% the direction of az rotation, 1 for a one-way correction, 0 for no correction.
 if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
     [forj_corr, detail] = get_forj_corr(s.t(1));
     % apply correction on s.rate
@@ -513,6 +515,14 @@ if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't app
     AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
     AZunique = unique(AZ_deg);
     s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
+    if toggle.applyforjcorr==3;
+        dAZdt=diff(s.AZstep/(-50))./diff(s.t)/86400
+        dAZdt=([dAZdt; 0]+[0; dAZdt])/2; % rotation rate
+        positive_rotation=find(dAZdt>0); % data collected during positive rotation
+        negative_rotation=find(dAZdt<0); % data collected during negative rotation
+        s.rate(positive_rotation,:)=s.rate(positive_rotation,:).*repmat(forj_corr.corr_cw(AZ_deg(positive_rotation)+1)',1,qq);
+        s.rate(negative_rotation,:)=s.rate(negative_rotation,:).*repmat(forj_corr.corr_cw(AZ_deg(negative_rotation)+1)',1,qq);
+    end;
 end;
 
 %% apply temp correction to rate structs
@@ -968,7 +978,7 @@ end;
 if ~toggle.saveadditionalvariables;
     s=rmfield(s, {'darkstd'});
     if ~isempty(strfind(lower(datatype),'sun'));
-        s=rmfield(s, {'rate' 'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' ...
+        s=rmfield(s, {'tau_O3' 'tau_O4' 'tau_aero_noscreening' 'tau_ray' ...
         'rawmean' 'rawstd' 'sat_ij'});
     end;
     if toggle.computeerror;
