@@ -2,7 +2,7 @@
 % #1 AOD is large: tau_aero_limit
 % #2 measurement cycles with high standard deviations: sd_crit (only at the longest wavelength)
 % #3 low Angstrom alpha: alpha_min
-% #4 tau_aero_err is large: tau_aero_err_max 
+% #4 tau_aero_err is large: tau_aero_err_max
 % AOD filters #1 to #4 combined
 % H2O filters only #1 and #4
 % Data that fail #1 or #4 are not written
@@ -50,7 +50,7 @@ flag_interpOMIozone='no';%'yes';  'no' for MLO
 flag_adj_V0_tempdepend='no'; %yes for INTEX-B/MILAGRO measurements
 
 if strcmp(flag_adjust_1019_for_temperature,'yes')
-    detTC_mean=0.5*(Temperature(1,:)+Temperature(2,:)); %mean of two detector plate temp sensors 
+    detTC_mean=0.5*(Temperature(1,:)+Temperature(2,:)); %mean of two detector plate temp sensors
     tempcoeff_percentperdeg=0.51+(lambda(11)-1.000)/(1.060-1.00)*(1.51-0.51);
     factor=(1+tempcoeff_percentperdeg/100).^(45-detTC_mean);
     V1019calc=data(11,:).*factor;
@@ -79,10 +79,10 @@ if strcmp(flag_adj_V0_tempdepend,'yes')
     %pfit=[-0.00052	0.01793;	-0.00073	0.02192;	-0.00008	0.00139;	0.00029	-0.00866;	0.00028	-0.00979;...
     %       0.00006	0.00223;	 0.00044   -0.01531;	 0.00016   -0.02420;   -0.00169	 0.06010;   0.0      0.0;...
     %      -0.00050	0.01694;    -0.00055	0.02153;	-0.00130	0.04112;	0.00011	-0.0037];
-%following are from 083106 fits for V0=MLOJanMayinterpolated except V0(605) and V0(778) adjusted from MLOJan06
+    %following are from 083106 fits for V0=MLOJanMayinterpolated except V0(605) and V0(778) adjusted from MLOJan06
     pfit=[-0.00016	0.00611;	-0.00046	0.01542;	 0.00001   -0.00071;	0.00032	-0.01112;	0.00028	-0.00908;...
-          -0.00001 -0.00029;	 0.00033   -0.01216;	 0.00004   -0.00337;   -0.00181	 0.06531;     0.0      0.0;...
-          -0.00063	 0.02111;   -0.00063	0.02275;	-0.00137	0.04641;    0.00013 -0.00464];
+        -0.00001 -0.00029;	 0.00033   -0.01216;	 0.00004   -0.00337;   -0.00181	 0.06531;     0.0      0.0;...
+        -0.00063	 0.02111;   -0.00063	0.02275;	-0.00137	0.04641;    0.00013 -0.00464];
     for iwl=1:14,
         rel_deltaV0(:,iwl)=polyval(pfit(iwl,:),Temperature(3,:)');   %pfit=f(degree,aero_wvl)...but we need for all wvl
     end
@@ -109,7 +109,7 @@ tau_O4=tau_O4(:,L~=0);
 tau_CO2_CH4_N2O=tau_CO2_CH4_N2O(:,L~=0);
 UT=UT(L~=0);
 UTCan=UTCan(L~=0);
-if ~strcmp(source,'Can') 
+if ~strcmp(source,'Can')
     AvePeriod=AvePeriod(L~=0);
 end
 press=press(L~=0);
@@ -134,10 +134,10 @@ Elev_pos=Elev_pos(L~=0);
 Az_pos=Az_pos(L~=0);
 Temperature=Temperature(:,L~=0);
 if strcmp(source,'Laptop_Otter') | strcmp(source,'Can') | strcmp(source,'Jetstream31') | strcmp(source,'NASA_P3')
-     RH=RH(L~=0);
-     %RH_new=RH_new(L~=0);
-     %Tstat_new=Tstat_new(L~=0);
-     H2O_dens_is=H2O_dens_is(L~=0);
+    RH=RH(L~=0);
+    %RH_new=RH_new(L~=0);
+    %Tstat_new=Tstat_new(L~=0);
+    H2O_dens_is=H2O_dens_is(L~=0);
 end
 
 n=size(data');
@@ -188,27 +188,28 @@ for i=1:n(1)
     if ~isempty(x)
         [p,S] = polyfit(x,y,degree);
         switch degree
-          case 1
-             a0(i)=p(2); 
-             alpha(i)=-p(1);
-             gamma(i)=0;
-          case 2  
-             a0(i)=p(3); 
-             alpha(i)=-p(2);
-             gamma(i)=-p(1); 
-        end  
+            case 1
+                a0(i)=p(2);
+                alpha(i)=-p(1);
+                gamma(i)=0;
+            case 2
+                a0(i)=p(3);
+                alpha(i)=-p(2);
+                gamma(i)=-p(1);
+        end
+        x2=log(lambda);
+        [y_fit,delta] = polyval(p,x2,S);
+        tau_aero(wvl_aero==0,i)=exp(y_fit(wvl_aero==0));
     else
         a0(i)=-99.9999;
         alpha(i)=99.9999;
         gamma(i)=99.9999;
-    end    
-    x2=log(lambda);
-    [y_fit,delta] = polyval(p,x2,S);
-    tau_aero(wvl_aero==0,i)=exp(y_fit(wvl_aero==0));
+        tau_aero(wvl_aero==0,i)=NaN;
+    end
 end
 tau_aero_adj(wvl_aero==0,:)=tau_aero(wvl_aero==0,:);
 
-% Water Vapor 
+% Water Vapor
 T =(data.*exp(tau_aero.*(ones(n(2),1)*m_aero)+tau_ray.*(ones(n(2),1)*m_ray)+tau_NO2.*(ones(n(2),1)*m_NO2)+tau_ozone.*(ones(n(2),1)*m_O3)))./(ones(n(1),1)*V0*f)';
 U=(-log(T(wvl_water==1,:))./(ones(n(1),1)*a_H2O(wvl_water==1)')')'...
     .^(1./(ones(n(1),1)*b_H2O(wvl_water==1)'))'./(ones(sum(wvl_water),1)*m_H2O);
@@ -217,29 +218,29 @@ U=(-log(T(wvl_water==1,:))./(ones(n(1),1)*a_H2O(wvl_water==1)')')'...
 nn=size(data);
 
 if strcmp(flag_altitude_dependent_CWV,'yes')
-  path_H2Ocoeff='c:\johnmatlab\data\xsect\';
-  filenameH2O='AATS14_940nm_LBLRTMcoeff_022205.txt';
-  fidH2Ocoeff=fopen([path_H2Ocoeff filenameH2O],'rt');
-  linedum = fgetl(fidH2Ocoeff);		%skip end-of-line character
-  linedum = fgetl(fidH2Ocoeff);		%skip end-of-line character
-  dataH2O=fscanf(fidH2Ocoeff,'%d %f %f %f',[4 inf]);
-  zkm_LBLRTM_calcs=dataH2O(1,:);
-  afit_H2O=dataH2O(2,:);
-  bfit_H2O=dataH2O(3,:);
-  cfit_H2O=dataH2O(4,:);
-  fclose(fidH2Ocoeff);
-
-  for j=1:nn(2),
-      kk=find(GPS_Alt(j)>=zkm_LBLRTM_calcs);
-      if GPS_Alt(j)<0 kk=1; end  %handles GPS alts slightly less than zero
-      kz=kk(end);
-      CWV1=(-log(T(wvl_water==1,j)./cfit_H2O(kz))./afit_H2O(kz)).^(1./bfit_H2O(kz))./m_H2O(j);
-      CWV2=(-log(T(wvl_water==1,j)./cfit_H2O(kz+1))./afit_H2O(kz+1)).^(1./bfit_H2O(kz+1))./m_H2O(j);
-      CWVint_atmcm = CWV1 + (GPS_Alt(j)-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
-      Ucalc(j)=CWVint_atmcm;      
-  end
-  Uold=U;
-  U=Ucalc;
+    path_H2Ocoeff='c:\johnmatlab\data\xsect\';
+    filenameH2O='AATS14_940nm_LBLRTMcoeff_022205.txt';
+    fidH2Ocoeff=fopen([path_H2Ocoeff filenameH2O],'rt');
+    linedum = fgetl(fidH2Ocoeff);		%skip end-of-line character
+    linedum = fgetl(fidH2Ocoeff);		%skip end-of-line character
+    dataH2O=fscanf(fidH2Ocoeff,'%d %f %f %f',[4 inf]);
+    zkm_LBLRTM_calcs=dataH2O(1,:);
+    afit_H2O=dataH2O(2,:);
+    bfit_H2O=dataH2O(3,:);
+    cfit_H2O=dataH2O(4,:);
+    fclose(fidH2Ocoeff);
+    
+    for j=1:nn(2),
+        kk=find(GPS_Alt(j)>=zkm_LBLRTM_calcs);
+        if GPS_Alt(j)<0 kk=1; end  %handles GPS alts slightly less than zero
+        kz=kk(end);
+        CWV1=(-log(T(wvl_water==1,j)./cfit_H2O(kz))./afit_H2O(kz)).^(1./bfit_H2O(kz))./m_H2O(j);
+        CWV2=(-log(T(wvl_water==1,j)./cfit_H2O(kz+1))./afit_H2O(kz+1)).^(1./bfit_H2O(kz+1))./m_H2O(j);
+        CWVint_atmcm = CWV1 + (GPS_Alt(j)-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
+        Ucalc(j)=CWVint_atmcm;
+    end
+    Uold=U;
+    U=Ucalc;
 end
 
 %stopherenow
@@ -248,8 +249,8 @@ end
 %nn=size(data);
 tau_H2O=((ones(nn(2),1)*a1_H2O')'.*(ones(nn(1),1)*(m_H2O.*U))+(ones(nn(2),1)*a2_H2O')'.*(ones(nn(1),1)*(m_H2O.*U).^2))./(ones(nn(1),1)*m_H2O);
 if (strcmp(O3_estimate,'OFF'))
-    tau_aero=tau_aero-tau_H2O.*(ones(n(2),1)*(m_ray./m_aero));   
-    tau_aero_adj=tau_aero_adj-tau_H2O.*(ones(n(2),1)*(m_ray./m_aero));   
+    tau_aero=tau_aero-tau_H2O.*(ones(n(2),1)*(m_ray./m_aero));
+    tau_aero_adj=tau_aero_adj-tau_H2O.*(ones(n(2),1)*(m_ray./m_aero));
 end
 
 %Now recalculate opt depth vs wvl fits
@@ -261,23 +262,24 @@ for i=1:n(1)
     if ~isempty(x)
         [p,S] = polyfit(x,y,degree);
         switch degree
-          case 1
-             a0(i)=p(2); 
-             alpha(i)=-p(1);
-             gamma(i)=0;
-          case 2  
-             a0(i)=p(3); 
-             alpha(i)=-p(2);
-             gamma(i)=-p(1); 
-        end  
+            case 1
+                a0(i)=p(2);
+                alpha(i)=-p(1);
+                gamma(i)=0;
+            case 2
+                a0(i)=p(3);
+                alpha(i)=-p(2);
+                gamma(i)=-p(1);
+        end
+        x2=log(lambda);
+        [y_fit,delta] = polyval(p,x2,S);
+        tau_aero(wvl_aero==0,i)=exp(y_fit(wvl_aero==0));
     else
         a0(i)=-99.9999;
         alpha(i)=99.9999;
         gamma(i)=99.9999;
-    end    
-    x2=log(lambda);
-    [y_fit,delta] = polyval(p,x2,S);
-    tau_aero(wvl_aero==0,i)=exp(y_fit(wvl_aero==0));
+        tau_aero(wvl_aero==0,i)=NaN;
+    end
 end
 tau_aero_adj(wvl_aero==0,:)=tau_aero(wvl_aero==0,:);
 
@@ -300,24 +302,24 @@ m_err=0.01*ones(size(m_ray));
 
 %MUST SET ozone error=0 for call to ozone4_polfit to get reasonable results.
 if (strcmp(O3_estimate,'ON') & strcmp(flag_call_ozone4_polfit,'yes'))
-  tau_O3_err_use=0;
-  tau_aero_err1=tau.*(ones(n(2),1)*m_err);
-  tau_aero_err2=(ones(n(1),1)*V0err)'   ./(ones(n(2),1)*m_aero);
-  tau_aero_err3=(ones(n(1),1)*dV)'./data./(ones(n(2),1)*m_aero);
-  tau_aero_err4=tau_r_err*tau_ray.*   (ones(n(2),1)*(m_ray./m_aero));
-  tau_aero_err5=tau_O3_err_use*tau_ozone.*(ones(n(2),1)*(m_O3./m_aero));  %hence,=0
-  tau_aero_err6=tau_NO2_err*tau_NO2.* (ones(n(2),1)*(m_NO2./m_aero));  
-  tau_aero_err7=tau_O4_err*tau_O4.*   (ones(n(2),1)*(m_ray./m_aero));  
-  tau_aero_err8=tau_H2O_err*tau_H2O.* (ones(n(2),1)*(m_H2O./m_aero));  
-  if strcmp(instrument,'AMES14#1') | strcmp(instrument,'AMES14#1_2000')  | strcmp(instrument,'AMES14#1_2001')  | strcmp(instrument,'AMES14#1_2002')  
-    % take into account tracking error for AATS-14 only
-    track_err=(Elev_err.^2+Az_err.^2).^0.5;
-    tau_aero_err9=(ones(n(1),1)*slope)'.*(ones(n(2),1)*track_err) ./(ones(n(2),1)*m_aero);
-  else
-    tau_aero_err9=0;
-  end
-  tau_aero_err11=tau_CO2_CH4_N2O_abserr.*ones(n(2),1)*(m_ray./m_aero);
-  tau_aero_err=(tau_aero_err1.^2+tau_aero_err2.^2+tau_aero_err3.^2+tau_aero_err4.^2+tau_aero_err5.^2+tau_aero_err6.^2+tau_aero_err7.^2+tau_aero_err8.^2+tau_aero_err9.^2+tau_aero_err11.^2).^0.5;
+    tau_O3_err_use=0;
+    tau_aero_err1=tau.*(ones(n(2),1)*m_err);
+    tau_aero_err2=(ones(n(1),1)*V0err)'   ./(ones(n(2),1)*m_aero);
+    tau_aero_err3=(ones(n(1),1)*dV)'./data./(ones(n(2),1)*m_aero);
+    tau_aero_err4=tau_r_err*tau_ray.*   (ones(n(2),1)*(m_ray./m_aero));
+    tau_aero_err5=tau_O3_err_use*tau_ozone.*(ones(n(2),1)*(m_O3./m_aero));  %hence,=0
+    tau_aero_err6=tau_NO2_err*tau_NO2.* (ones(n(2),1)*(m_NO2./m_aero));
+    tau_aero_err7=tau_O4_err*tau_O4.*   (ones(n(2),1)*(m_ray./m_aero));
+    tau_aero_err8=tau_H2O_err*tau_H2O.* (ones(n(2),1)*(m_H2O./m_aero));
+    if strcmp(instrument,'AMES14#1') | strcmp(instrument,'AMES14#1_2000')  | strcmp(instrument,'AMES14#1_2001')  | strcmp(instrument,'AMES14#1_2002')
+        % take into account tracking error for AATS-14 only
+        track_err=(Elev_err.^2+Az_err.^2).^0.5;
+        tau_aero_err9=(ones(n(1),1)*slope)'.*(ones(n(2),1)*track_err) ./(ones(n(2),1)*m_aero);
+    else
+        tau_aero_err9=0;
+    end
+    tau_aero_err11=tau_CO2_CH4_N2O_abserr.*ones(n(2),1)*(m_ray./m_aero);
+    tau_aero_err=(tau_aero_err1.^2+tau_aero_err2.^2+tau_aero_err3.^2+tau_aero_err4.^2+tau_aero_err5.^2+tau_aero_err6.^2+tau_aero_err7.^2+tau_aero_err8.^2+tau_aero_err9.^2+tau_aero_err11.^2).^0.5;
 end
 
 O3_col_fit=O3_col_start*ones(1,size(tau_aero,2));  %added 12/2002 jml
@@ -325,25 +327,25 @@ O3_col_fit=frac_tauO3.*O3_col_fit;
 %O3guess=round(1000*frac_tauO3*O3_col_start)/1000;  %round guess to nearest DU
 unc_ozone(1:length(UT))=-9.999;
 if (strcmp(O3_estimate,'ON'))
- O3guess=0.200;  %always start here to permit 0.200<=O3_col<=0.500;
- sigmaO3col=0;
-   for i=1:n(1),
+    O3guess=0.200;  %always start here to permit 0.200<=O3_col<=0.500;
+    sigmaO3col=0;
+    for i=1:n(1),
         
-%        [tau_a,tau_2,tau_3,O3_col2,p]=ozone_box(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,...
-%             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3_col_start,degree);
-%         [tau_a,tau_2,tau_3,O3_col,p]= ozone2(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,...
-%             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3_col_start,degree);
-%         [tau_a,tau_2,tau_3,O3_col,p]= ozone3(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
-%             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3guess,degree);
-       if strcmp(flag_call_ozone4_polfit,'yes')
-        [tau_a,tau_2,tau_3,O3_col,sigmaO3col,p]= ozone4_polfit(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
-            m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),tau_CO2_CH4_N2O(:,i),tau_aero_err(:,i),O3guess,degree);%O3_col_start,degree);
-        [UT(i) O3_col SZA_unrefrac(i) SZA(i)]
-       else
-        [tau_a,tau_2,tau_3,O3_col,p]= ozone4(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
-            m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3guess,degree);%O3_col_start,degree);
-        [UT(i) O3_col]
-       end        
+        %        [tau_a,tau_2,tau_3,O3_col2,p]=ozone_box(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,...
+        %             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3_col_start,degree);
+        %         [tau_a,tau_2,tau_3,O3_col,p]= ozone2(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,...
+        %             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3_col_start,degree);
+        %         [tau_a,tau_2,tau_3,O3_col,p]= ozone3(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
+        %             m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3guess,degree);
+        if strcmp(flag_call_ozone4_polfit,'yes')
+            [tau_a,tau_2,tau_3,O3_col,sigmaO3col,p]= ozone4_polfit(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
+                m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),tau_CO2_CH4_N2O(:,i),tau_aero_err(:,i),O3guess,degree);%O3_col_start,degree);
+            [UT(i) O3_col SZA_unrefrac(i) SZA(i)]
+        else
+            [tau_a,tau_2,tau_3,O3_col,p]= ozone4(site,day,month,year,lambda,a_O3,a_NO2,NO2_clima,UT(i),GPS_Alt(i),...
+                m_aero(i),m_ray(i),m_NO2(i),m_O3(i),m_H2O(i),wvl_chapp,wvl_aero,tau(:,i),tau_ray(:,i),tau_O4(:,i),tau_H2O(:,i),O3guess,degree);%O3_col_start,degree);
+            [UT(i) O3_col]
+        end
         
         tau_aero_sav(i,:) =tau_a';
         tau_NO2_sav(i,:)  =tau_2';
@@ -351,15 +353,15 @@ if (strcmp(O3_estimate,'ON'))
         ozone(i)=O3_col;
         unc_ozone(i)=sigmaO3col;
         switch degree
-        case 1
-            a0(i)=p(2);
-            alpha(i)=-p(1);
-            gamma(i)=0;
-        case 2  
-            a0(i)=p(3); 
-            alpha(i)=-p(2);
-            gamma(i)=-p(1); 
-        end   
+            case 1
+                a0(i)=p(2);
+                alpha(i)=-p(1);
+                gamma(i)=0;
+            case 2
+                a0(i)=p(3);
+                alpha(i)=-p(2);
+                gamma(i)=-p(1);
+        end
     end
     clear tau_a
     clear tau_2
@@ -380,16 +382,16 @@ rel_sd=Sd_volts./data;
 
 %following added by JML 7/4/08 to allow different rel_sd screening during different periods of a particular fligh
 if strcmp(flag_relsd_timedep,'yes')
- jt_smoke=find(UT>=UT_smoke(1)&UT<=UT_smoke(2));
- jt_notsmoke=find(UT<UT_smoke(1) | UT>UT_smoke(2));
- L_SD_aero=ones(1,size(rel_sd,2));
- L_SD_H2O=L_SD_aero;
- L_SD_aero(jt_notsmoke)=all(rel_sd(wvl_aero==1,jt_notsmoke)<=sd_crit_aero);
- L_SD_aero(jt_smoke)=all(rel_sd(wvl_aero==1,jt_smoke)<=sd_crit_aero_smoke);
- L_SD_H2O(jt_notsmoke)=all(rel_sd(:,jt_notsmoke)<=sd_crit_H2O);
+    jt_smoke=find(UT>=UT_smoke(1)&UT<=UT_smoke(2));
+    jt_notsmoke=find(UT<UT_smoke(1) | UT>UT_smoke(2));
+    L_SD_aero=ones(1,size(rel_sd,2));
+    L_SD_H2O=L_SD_aero;
+    L_SD_aero(jt_notsmoke)=all(rel_sd(wvl_aero==1,jt_notsmoke)<=sd_crit_aero);
+    L_SD_aero(jt_smoke)=all(rel_sd(wvl_aero==1,jt_smoke)<=sd_crit_aero_smoke);
+    L_SD_H2O(jt_notsmoke)=all(rel_sd(:,jt_notsmoke)<=sd_crit_H2O);
 else  %following two lines are the default
- L_SD_aero=all(rel_sd(wvl_aero==1,:)<=sd_crit_aero); 
- L_SD_H2O=all(rel_sd(:,:)<=sd_crit_H2O);
+    L_SD_aero=all(rel_sd(wvl_aero==1,:)<=sd_crit_aero);
+    L_SD_H2O=all(rel_sd(:,:)<=sd_crit_H2O);
 end
 
 %following added by JML 3/16/06 to handle high alt runs separately
@@ -413,11 +415,11 @@ end
 %Diffuse light correction
 if strcmp(diffuse_corr,'ON') & (strcmp(instrument,'AMES14#1_2001') | strcmp(instrument,'AMES6') | strcmp(instrument,'AMES14#1_2002'))
     if strcmp(instrument,'AMES14#1_2001') | strcmp(instrument,'AMES14#1_2002')
-%         method=2; % method=1 use alpha from 380 to 1020, method=2 use alpha from 1020 to 1558   
+        %         method=2; % method=1 use alpha from 380 to 1020, method=2 use alpha from 1020 to 1558
         [F,runc_F]=diffuse(a0,alpha,gamma,method,xsect_dir);
     end
     if strcmp(instrument,'AMES6')
-        method=1; % method=1 use alpha from 380 to 1020, method=2 use alpha from 1020 to 1558   
+        method=1; % method=1 use alpha from 380 to 1020, method=2 use alpha from 1020 to 1558
         [F,runc_F]=diffuse(a0,alpha,gamma,method,xsect_dir);
         F=F(:,[2 3 5 9 10 11]);
         runc_F=runc_F(:,[2 3 5 9 10 11]);
@@ -431,14 +433,14 @@ if strcmp(diffuse_corr,'ON') & (strcmp(instrument,'AMES14#1_2001') | strcmp(inst
         [p,S] = polyfit(x,y,degree);
         switch degree
             case 1
-                a0(i)=p(2); 
+                a0(i)=p(2);
                 alpha(i)=-p(1);
                 gamma(i)=0;
-            case 2  
-                a0(i)=real(p(3)); 
+            case 2
+                a0(i)=real(p(3));
                 alpha(i)=-p(2);
-                gamma(i)=-p(1); 
-        end   
+                gamma(i)=-p(1);
+        end
         x2=log(lambda);
         [y_fit,delta] = polyval(p,x2,S);
         tau_aero(wvl_aero==0,i)=exp(y_fit(wvl_aero==0));
@@ -459,10 +461,10 @@ tau_aero_err2=(ones(n(1),1)*V0err)'   ./(ones(n(2),1)*m_aero);
 tau_aero_err3=(ones(n(1),1)*dV)'./data./(ones(n(2),1)*m_aero);
 tau_aero_err4=tau_r_err*tau_ray.*   (ones(n(2),1)*(m_ray./m_aero));
 tau_aero_err5=tau_O3_err*tau_ozone.*(ones(n(2),1)*(m_O3./m_aero));
-tau_aero_err6=tau_NO2_err*tau_NO2.* (ones(n(2),1)*(m_NO2./m_aero));  
-tau_aero_err7=tau_O4_err*tau_O4.*   (ones(n(2),1)*(m_ray./m_aero));  
+tau_aero_err6=tau_NO2_err*tau_NO2.* (ones(n(2),1)*(m_NO2./m_aero));
+tau_aero_err7=tau_O4_err*tau_O4.*   (ones(n(2),1)*(m_ray./m_aero));
 tau_aero_err8=tau_H2O_err*tau_H2O.* (ones(n(2),1)*(m_H2O./m_aero));
-if strcmp(instrument,'AMES14#1') | strcmp(instrument,'AMES14#1_2000')  | strcmp(instrument,'AMES14#1_2001')  | strcmp(instrument,'AMES14#1_2002')  
+if strcmp(instrument,'AMES14#1') | strcmp(instrument,'AMES14#1_2000')  | strcmp(instrument,'AMES14#1_2001')  | strcmp(instrument,'AMES14#1_2002')
     % take into account tracking error for AATS-14 only
     track_err=(Elev_err.^2+Az_err.^2).^0.5;
     tau_aero_err9=(ones(n(1),1)*slope)'.*(ones(n(2),1)*track_err) ./(ones(n(2),1)*m_aero);
@@ -474,7 +476,7 @@ if (strcmp(diffuse_corr,'ON'))
     tau_aero_err10=tau_aero.*runc_F';
 else
     tau_aero_err10=0;
-end  
+end
 tau_aero_err11=tau_CO2_CH4_N2O_abserr.*ones(n(2),1)*(m_ray./m_aero);
 
 %rms
@@ -584,7 +586,7 @@ plot(UT(L_cloud==1),tau_aero(wvl_aero==1,L_cloud==1),'.','markersize',8);
 grid on
 set(gca,'xlim',xlimval,'FontSize',14)
 ylabel('AOD screened','fontsize',14);
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
     hleg31=legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
     set(hleg31,'fontsize',10)
@@ -609,7 +611,7 @@ ylabel('Altitude [km]','FontSize',14);
 title(titlestr,'FontSize',14);
 legend('Calibration','Aerosol','Spectroscopy','Model','Total')
 set(gca,'FontSize',14)
-% Convert to absolute error in CWV 
+% Convert to absolute error in CWV
 H2O_err1=H2O_err1.*U/H2O_conv;
 H2O_err2=H2O_err2.*U/H2O_conv;
 H2O_err3=H2O_err3.*U/H2O_conv;
@@ -622,7 +624,7 @@ xlabel('CWV Uncertainty (g/cm²)','FontSize',14);
 ylabel('Altitude [km]','FontSize',14);
 set(gca,'FontSize',14)
 
-%plot aerosol depth 
+%plot aerosol depth
 figure(3)
 subplot(4,1,1)
 plot(UT,tau_aero(wvl_aero==1,:),'.','markersize',6);
@@ -633,15 +635,15 @@ ylabel('Aerosol Optical Depth');
 title(titlestr2);
 grid on
 %set(gca,'ylim',[0 inf])
-%if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000') 
+%if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000')
 %   legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
 %          num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(10)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 %  end
-if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000') 
+if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000')
     legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(10)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
     legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
@@ -687,7 +689,7 @@ set(gca,'xlim',UTlim33,'fontsize',14)
 ylabel('AOD screened','fontsize',14);
 title(titlestr2);
 grid on
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
     legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
@@ -700,7 +702,7 @@ ylabel('H2O Column [cm] - screened','fontsize',14);
 %xlabel('UT');
 grid on
 
-subplot(4,1,3)  
+subplot(4,1,3)
 plot(UT(L_cloud==1),alpha(L_cloud==1),'.',UT(L_cloud==1),gamma(L_cloud==1),'.');
 set(gca,'xlim',UTlim33,'fontsize',14)
 xlabel('UT');
@@ -743,7 +745,7 @@ set(gca,'xlim',UTlim33,'fontsize',14)
 ylabel('CWV [cm] - AOD screened','fontsize',12);
 grid on
 
-subplot(5,1,4)  
+subplot(5,1,4)
 plot(UT(L_cloud==1),alpha(L_cloud==1),'.',UT(L_cloud==1),gamma(L_cloud==1),'.');
 set(gca,'xlim',UTlim33,'fontsize',14)
 xlabel('UT');
@@ -770,7 +772,7 @@ set(gca,'xlim',xlimval,'FontSize',14)
 ylabel('AOD','FontSize',14);
 title(titlestr2);
 grid on
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
     hleg341=legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
     set(hleg341,'fontsize',10)
@@ -784,7 +786,7 @@ ylabel('H2O Column [cm]','FontSize',14);
 %xlabel('UT');
 grid on
 
-subplot(4,1,3)  
+subplot(4,1,3)
 plot(UT(L_cloud==1),alpha(L_cloud==1),'.',UT(L_cloud==1),gamma(L_cloud==1),'.');
 set(gca,'xlim',xlimval,'FontSize',14)
 xlabel('UT','FontSize',14);
@@ -795,26 +797,26 @@ grid on
 
 flag_airmassframe4='no';
 if strcmp(flag_airmassframe4,'yes')
-
-subplot(4,1,4)
-plot(UT,m_O3,'.',UT,m_aero,'.',UT,m_ray,'.','markersize',8)
-xlabel('UT [h]','FontSize',14);
-ylabel('airmass','FontSize',14);
-set(gca,'xlim',xlimval,'ylim',[0 20],'ytick',[0 5 10 15 20],'FontSize',14)
-%set(gca,'ylim',[0 100])
-legend('O_3','Aerosol','Rayleigh')
-grid on
-xlabel('UT');
-
+    
+    subplot(4,1,4)
+    plot(UT,m_O3,'.',UT,m_aero,'.',UT,m_ray,'.','markersize',8)
+    xlabel('UT [h]','FontSize',14);
+    ylabel('airmass','FontSize',14);
+    set(gca,'xlim',xlimval,'ylim',[0 20],'ytick',[0 5 10 15 20],'FontSize',14)
+    %set(gca,'ylim',[0 100])
+    legend('O_3','Aerosol','Rayleigh')
+    grid on
+    xlabel('UT');
+    
 else
-
-ozonelim=[300 320];
-subplot(4,1,4)
-plot(UT(L_cloud==1),ozone(L_cloud==1)*1000,'.')
-xlabel('UT [h]','FontSize',14);
-ylabel('Ozone [DU]','FontSize',14);
-set(gca,'ylim',ozonelim,'xlim',xlimval,'FontSize',14)
-grid on
+    
+    ozonelim=[300 320];
+    subplot(4,1,4)
+    plot(UT(L_cloud==1),ozone(L_cloud==1)*1000,'.')
+    xlabel('UT [h]','FontSize',14);
+    ylabel('Ozone [DU]','FontSize',14);
+    set(gca,'ylim',ozonelim,'xlim',xlimval,'FontSize',14)
+    grid on
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -842,14 +844,14 @@ dely=[0.2 0.1 0.1];
 xlim401=[18.5 23.5];
 figure(401)
 for iwl=1:length(idxwvlp),
-subplot(length(idxwvlp),1,iwl)
-coloruse=colorordsav(mod(idxwvlp(iwl),7),1:3);
-if idxwvlp(iwl)>=10 coloruse=colorordsav(mod(idxwvlp(iwl),7)-1,1:3); end
-plot(UT,data(idxwvlp(iwl),:),'.','color',coloruse)
-set(gca,'xlim',xlim401,'ylim',ylimval(iwl,:),'ytick',[ylimval(iwl,1):dely(iwl):ylimval(iwl,2)],'fontsize',16)
-grid on
-ylabel(sprintf('Voltage (%6.1f nm)',1000*lambda(idxwvlp(iwl))),'fontsize',18)
-if iwl==1 title(titlestr,'fontsize',14); end
+    subplot(length(idxwvlp),1,iwl)
+    coloruse=colorordsav(mod(idxwvlp(iwl),7),1:3);
+    if idxwvlp(iwl)>=10 coloruse=colorordsav(mod(idxwvlp(iwl),7)-1,1:3); end
+    plot(UT,data(idxwvlp(iwl),:),'.','color',coloruse)
+    set(gca,'xlim',xlim401,'ylim',ylimval(iwl,:),'ytick',[ylimval(iwl,1):dely(iwl):ylimval(iwl,2)],'fontsize',16)
+    grid on
+    ylabel(sprintf('Voltage (%6.1f nm)',1000*lambda(idxwvlp(iwl))),'fontsize',18)
+    if iwl==1 title(titlestr,'fontsize',14); end
 end
 xlabel('UT','fontsize',18)
 if strcmp(flag_oplottemp,'yes')
@@ -864,7 +866,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%plot aerosol depth 
+%plot aerosol depth
 figure(303)
 subplot(3,1,1)
 plot(UT(L_cloud==1),tau_aero(wvl_aero==1,L_cloud==1),'.','markersize',6);
@@ -874,7 +876,7 @@ xlabel('UT');
 ylabel('Aerosol Optical Depth','fontsize',14);
 title(titlestr2);
 grid on
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
     legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
         num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
@@ -901,50 +903,50 @@ xlabel('UT');
 %eval(S);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%plot Angstrom exponent 
+%plot Angstrom exponent
 figure(4)
 subplot(2,1,1)
 switch degree
-case 1
-    plot(UT,alpha,'.','markersize',8);
-    xx=get(gca,'xlim');
-    set(gca,'xlim',xx)
-    title(titlestr2,'fontsize',16);
-    ylabel('alpha','fontsize',20);
-    xlabel('UT','fontsize',20);
-    grid on
-    set(gca,'fontsize',16)
-    subplot(2,1,2)  
-    plot(UT(L_cloud==1),alpha(L_cloud==1),'.','markersize',8);
-    set(gca,'xlim',xx)
-    xlabel('UT','fontsize',20);
-    ylabel('Alpha screened','fontsize',20);
-    grid on
-    set(gca,'fontsize',16)
-case 2   
-    plot(UT,alpha,'.',UT,gamma,'.','markersize',8);
-    xx=get(gca,'xlim');
-    set(gca,'xlim',xx)
-    title(titlestr2,'fontsize',16);
-    ylabel('coeff','fontsize',20);
-    xlabel('UT','fontsize',20);
-    legend('alpha','gamma')
-    grid on
-    set(gca,'fontsize',16)
-    subplot(2,1,2)  
-    plot(UT(L_cloud==1),alpha(L_cloud==1),'.',UT(L_cloud==1),gamma(L_cloud==1),'.','markersize',8);
-    set(gca,'xlim',xx)
-    xlabel('UT','fontsize',20);
-    ylabel('coeff screened','fontsize',20);
-    grid on
-    set(gca,'fontsize',16)
+    case 1
+        plot(UT,alpha,'.','markersize',8);
+        xx=get(gca,'xlim');
+        set(gca,'xlim',xx)
+        title(titlestr2,'fontsize',16);
+        ylabel('alpha','fontsize',20);
+        xlabel('UT','fontsize',20);
+        grid on
+        set(gca,'fontsize',16)
+        subplot(2,1,2)
+        plot(UT(L_cloud==1),alpha(L_cloud==1),'.','markersize',8);
+        set(gca,'xlim',xx)
+        xlabel('UT','fontsize',20);
+        ylabel('Alpha screened','fontsize',20);
+        grid on
+        set(gca,'fontsize',16)
+    case 2
+        plot(UT,alpha,'.',UT,gamma,'.','markersize',8);
+        xx=get(gca,'xlim');
+        set(gca,'xlim',xx)
+        title(titlestr2,'fontsize',16);
+        ylabel('coeff','fontsize',20);
+        xlabel('UT','fontsize',20);
+        legend('alpha','gamma')
+        grid on
+        set(gca,'fontsize',16)
+        subplot(2,1,2)
+        plot(UT(L_cloud==1),alpha(L_cloud==1),'.',UT(L_cloud==1),gamma(L_cloud==1),'.','markersize',8);
+        set(gca,'xlim',xx)
+        xlabel('UT','fontsize',20);
+        ylabel('coeff screened','fontsize',20);
+        grid on
+        set(gca,'fontsize',16)
 end
 
 %pfn = strcat('OuputPics/','Lev2-Angstrom','-',num2str(year),num2str(month),num2str(day),'.jpg');
 %S = sprintf('print -djpeg %s',pfn);
 %eval(S);
 
-%plot water vapor 
+%plot water vapor
 xlim5=[16 20];
 figure(5)
 subplot(5,1,1)
@@ -1003,7 +1005,7 @@ ylabel('Aerosol Optical Depth Error');
 set(gca,'xlim',xx)
 grid on
 
-flag_plot_MLOAODspectrum='yes';
+flag_plot_MLOAODspectrum='no'; % 2015/11/13 Yohei, don't know what this clause is about but seems irrelevant to NAAMES ground-based measurements. 'yes';
 if strcmp(flag_plot_MLOAODspectrum,'yes')
     ammin=1.4;
     ammax=12;
@@ -1065,12 +1067,12 @@ if strcmp(flag_plot_MLOAODspectrum,'yes')
     loglog(lambda(wvl_aero==1),tau_a27_mean(wvl_aero==1),'ko','MarkerSize',8);%,'MarkerFaceColor',colorsym);
     set(gca,'FontSize',16)
     set(gca,'ylim',ylim37,'ticklen',[0.015 0.03])
-	set(gca,'xlim',[.30 2.2],'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
+    set(gca,'xlim',[.30 2.2],'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
     xlabel('Wavelength [\mum]','FontSize',20);
-	ylabel('Aerosol Optical Depth','FontSize',20);
+    ylabel('Aerosol Optical Depth','FontSize',20);
     filenamestr=filename_in;
     for ii=1:length(filenamestr),
-     if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
+        if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
     end
     titlestr=sprintf('%s %2i/%2i/%2i   %s   V0:%s  Time:%5.3f-%5.3f UT   m:%6.3f-%6.3f',site,month,day,year,filenamestr,flag_calib,UT(idlim),m_ray(idlim));
     title(titlestr,'fontsize',14)
@@ -1093,11 +1095,11 @@ if strcmp(flag_plot_MLOAODspectrum,'yes')
     end
     hleg27=legend(legst);
     set(hleg27,'fontsize',12,'fontname','Arial')
-
-%pfn = strcat('OuputPics/','Lev2-AODoutputEvol','-',num2str(year),num2str(month),num2str(day),'.jpg');
-%S = sprintf('print -djpeg %s',pfn);
-%eval(S);
-
+    
+    %pfn = strcat('OuputPics/','Lev2-AODoutputEvol','-',num2str(year),num2str(month),num2str(day),'.jpg');
+    %S = sprintf('print -djpeg %s',pfn);
+    %eval(S);
+    
     figure(37)
     subplot(3,1,1)
     loglog(lambda(wvl_aero==1),tau_a27_mean(wvl_aero==1),'ko','MarkerSize',8);%,'MarkerFaceColor',colorsym);
@@ -1105,12 +1107,12 @@ if strcmp(flag_plot_MLOAODspectrum,'yes')
     %ylim27=[0.001 0.05];%[0.01 1];
     %ylim27=[0.01 0.5];
     set(gca,'ylim',ylim37,'ticklen',[0.015 0.03])
-	set(gca,'xlim',[.30 2.2],'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
+    set(gca,'xlim',[.30 2.2],'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
     xlabel('Wavelength [\mum]','FontSize',20);
-	ylabel('AOD','FontSize',20);
+    ylabel('AOD','FontSize',20);
     filenamestr=filename_in;
     for ii=1:length(filenamestr),
-     if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
+        if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
     end
     titlestr=sprintf('%s %2i/%2i/%2i   %s   V0:%s  Time:%5.3f-%5.3f UT   m:%6.3f-%6.3f',site,month,day,year,filenamestr,flag_calib,UT(idlim),m_ray(idlim));
     title(titlestr,'fontsize',14)
@@ -1145,134 +1147,134 @@ if strcmp(flag_plot_MLOAODspectrum,'yes')
     set(gca,'xlim',UTlim37)
     xlabel('UT [hr]','fontsize',20)
     ylabel('CWV [cm]','fontsize',20);
-
     
- %now plot OD contributions of various species    
- tauplus=tau_aero + tau_O4 + tau_CO2_CH4_N2O + tau_H2O;
- figure(28)
- kwp=[11:14];
- for iw=1:length(kwp),
-  kw=kwp(iw);
-  subplot(2,2,iw)
-  semilogy(UT(idxmuse),tau_aero(kw,idxmuse),'.','color',[0.6 0.2 0])
-  hold on
-  semilogy(UT(idxmuse),tau_O4(kw,idxmuse),'r-','linewidth',2)
-  semilogy(UT(idxmuse),tau_CO2_CH4_N2O(kw,idxmuse),'b-','linewidth',2)
-  semilogy(UT(idxmuse),tau_H2O(kw,idxmuse),'g.')
-  semilogy(UT(idxmuse),tauplus(kw,idxmuse),'k.')
-  set(gca,'fontsize',14)
-  set(gca,'ylim',[0.0001 0.1])
-  xlabel('UT (hr)','fontsize',16)
-  ylabel('Optical Depth','fontsize',16)
-  title(sprintf('%6.1f nm',1000*lambda(kw)),'fontsize',14)
-  if iw==1
-    title(sprintf('%s   %6.1f nm  V0:%6.4f',filename_in,1000*lambda(kw),V0(kw)),'fontsize',14)
-    hleg28=legend('aerosol','O2-O2','CO2-CH4-N2O','H2O','sum');
-    set(hleg28,'fontsize',12)
-  elseif iw==2
-    title(sprintf('%6.1f nm  V0:%6.4f  %s',1000*lambda(kw),V0(kw),flag_calib),'fontsize',14)
-  else
-    title(sprintf('%6.1f nm  V0:%6.4f',1000*lambda(kw),V0(kw)),'fontsize',14)
-  end
- end
-%pfn = strcat('OuputPics/','Lev2-ODoutput','-',num2str(year),num2str(month),num2str(day),'.jpg');
-%S = sprintf('print -djpeg %s',pfn);
-%eval(S);
+    
+    %now plot OD contributions of various species
+    tauplus=tau_aero + tau_O4 + tau_CO2_CH4_N2O + tau_H2O;
+    figure(28)
+    kwp=[11:14];
+    for iw=1:length(kwp),
+        kw=kwp(iw);
+        subplot(2,2,iw)
+        semilogy(UT(idxmuse),tau_aero(kw,idxmuse),'.','color',[0.6 0.2 0])
+        hold on
+        semilogy(UT(idxmuse),tau_O4(kw,idxmuse),'r-','linewidth',2)
+        semilogy(UT(idxmuse),tau_CO2_CH4_N2O(kw,idxmuse),'b-','linewidth',2)
+        semilogy(UT(idxmuse),tau_H2O(kw,idxmuse),'g.')
+        semilogy(UT(idxmuse),tauplus(kw,idxmuse),'k.')
+        set(gca,'fontsize',14)
+        set(gca,'ylim',[0.0001 0.1])
+        xlabel('UT (hr)','fontsize',16)
+        ylabel('Optical Depth','fontsize',16)
+        title(sprintf('%6.1f nm',1000*lambda(kw)),'fontsize',14)
+        if iw==1
+            title(sprintf('%s   %6.1f nm  V0:%6.4f',filename_in,1000*lambda(kw),V0(kw)),'fontsize',14)
+            hleg28=legend('aerosol','O2-O2','CO2-CH4-N2O','H2O','sum');
+            set(hleg28,'fontsize',12)
+        elseif iw==2
+            title(sprintf('%6.1f nm  V0:%6.4f  %s',1000*lambda(kw),V0(kw),flag_calib),'fontsize',14)
+        else
+            title(sprintf('%6.1f nm  V0:%6.4f',1000*lambda(kw),V0(kw)),'fontsize',14)
+        end
+    end
+    %pfn = strcat('OuputPics/','Lev2-ODoutput','-',num2str(year),num2str(month),num2str(day),'.jpg');
+    %S = sprintf('print -djpeg %s',pfn);
+    %eval(S);
 end
 
 
 flag_AODspectrum_special='yes';
 if strcmp(flag_AODspectrum_special,'yes')
-%special AOD on log-log...Livingston added
-figure(29)
-UTplim=[16.6 20]; %9/2/08 MLO for m=[11.97 1.8]
-UTplim=[17.5 21.6]; %12/14/12 MLO
-UTplim=[18.301 18.79; 23.62 23.945; 24.003 24.882]; %Ames 26June13
-ylimits=[0.001 0.2];%[0.01 0.5]; %[0.001 0.1];%[0.01 10]; 
-%ylimits=[0.02 0.5];
-colorchoice=['b';'g';'k';'r'];
-%colorchoice=['b';'r'];
-for icase=1:size(UTplim,1),
- colorsym=colorchoice(icase,1);   
- %L_clouduse=(L_cloud==1&UT>=UTpbeg&UT<=UTpend&GPS_Alt>=GPSalt_bot&GPS_Alt<=GPSalt_top);
- %%L_clouduse=(L_cloud==1&UT>=UTplim(icase,1)&UT<=UTplim(icase,2)); %&Press_Alt>=Palt_bot&Press_Alt<=Palt_top);
- L_clouduse=(UT>=UTplim(icase,1)&UT<=UTplim(icase,2)); %&Press_Alt>=Palt_bot&Press_Alt<=Palt_top);
- O3mean=mean(O3_col_start*frac_tauO3(L_clouduse==1));
- O3std=std(O3_col_start*frac_tauO3(1,L_clouduse==1));
- if strcmp(O3_estimate,'ON')
-    O3mean=mean(O3_col_fit(L_clouduse==1));
-    O3std=std(O3_col_fit(L_clouduse==1));
- end
- tau_a_max=max(tau_aero(:,L_clouduse==1)');
- tau_a_min=min(tau_aero(:,L_clouduse==1)');
- tau_a_std=std(tau_aero(:,L_clouduse==1)');
- tau_a_mean=mean(tau_aero(:,L_clouduse==1)');
- tau_a_err=mean(tau_aero_err(:,L_clouduse==1)');
- GPSmean=mean(GPS_Alt(L_clouduse==1));
- GPSstd=std(GPS_Alt(1,L_clouduse==1)');
- zpmean=mean(Press_Alt(L_clouduse==1));
- zpstd=std(Press_Alt(1,L_clouduse==1)');
- alphamean=mean(alpha(L_clouduse==1));
- alphastd=std(alpha(1,L_clouduse==1)');
- mraymin=min(m_ray(L_clouduse==1));
- mraymax=max(m_ray(L_clouduse==1));
- tCmean_FP1=mean(Temperature(3,L_clouduse==1));
- tCstd_FP1=std(Temperature(3,L_clouduse==1)');
- tCmean_FP2=mean(Temperature(10,L_clouduse==1));
- tCstd_FP2=std(Temperature(10,L_clouduse==1)');
- loglog(lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),strcat(colorsym,'o'),'MarkerSize',8);%,'MarkerFaceColor',colorsym);
- %set(gca,'ylim',ylimits,'ytick',[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1])
- %set(gca,'ylim',ylimits,'ytick',[0.005,0.006,0.007,0.008,0.009,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.12,0.15,0.2])
- set(gca,'ylim',ylimits)
- %set(gca,'ytick',[0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0])
- set(gca,'ticklen',[0.015 0.03])
-%tl0=[0.01 0.02 0.03 0.04 0.05 0.1 0.2 0.3 0.4 0.5 1.0];
-%tl=num2str(tl0)
- %set(gca,'yticklabel',tl)
- hold on
- %set(gca,'xlim',[.30 1.6]);
- %set(gca,'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6]);
- if strcmp(instrument,'AMES14#1_2002')
-   set(gca,'xlim',[.30 2.2]);
-   set(gca,'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
- end
- %set(gca,'ytick',[0.0001:0.01:0.1 0.2 0.3]);
- %set(gca,'ytick',[0.02:0.01:0.1 0.2:0.1:0.5]);
- xlabel('Wavelength [\mum]','FontSize',24);
- ylabel('Aerosol Optical Depth','FontSize',24);
- filenamestr=filename_in;
- for ii=1:length(filenamestr),
-    if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
- end
- titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g %s',site,month,day,year,filenamestr,UTplim(1),UTplim(2),'UT');
- if ~isempty(flag_calib)
-    %titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g UT  V0:%s  zGPS:%5.2f-%5.2f km  zGPS:%5.2f+-%5.2f  O3:%3.0f',site,month,day,year,filename,UTpbeg,UTpend,flag_calib,GPSalt_bot,GPSalt_top,GPSmean,GPSstd,1000*O3_col_start)
-    %%titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g UT V0:%s zGPS:%5.2f+-%5.2f km zP:%5.2f+-%5.2f  m:%6.3f-%6.3f O3:%3.0f+-%3.1f',site,month,day,year,filenamestr,UTplim(1),UTplim(2),flag_calib,GPSmean,GPSstd,zpmean,zpstd,mraymin,mraymax,1000*O3mean,1000*O3std)
-    if icase==1 
-        titlestr=sprintf('%s %2i/%2i/%2i   %s V0:%s    O3:%3.0f+-%3.1f',site,month,day,year,filenamestr,flag_calib);%,1000*O3mean,1000*O3std);
-        title(titlestr,'fontsize',14)
+    %special AOD on log-log...Livingston added
+    figure(29)
+    UTplim=[16.6 20]; %9/2/08 MLO for m=[11.97 1.8]
+    UTplim=[17.5 21.6]; %12/14/12 MLO
+    UTplim=[18.301 18.79; 23.62 23.945; 24.003 24.882]; %Ames 26June13
+    ylimits=[0.001 0.2];%[0.01 0.5]; %[0.001 0.1];%[0.01 10];
+    %ylimits=[0.02 0.5];
+    colorchoice=['b';'g';'k';'r'];
+    %colorchoice=['b';'r'];
+    for icase=1:size(UTplim,1),
+        colorsym=colorchoice(icase,1);
+        %L_clouduse=(L_cloud==1&UT>=UTpbeg&UT<=UTpend&GPS_Alt>=GPSalt_bot&GPS_Alt<=GPSalt_top);
+        %%L_clouduse=(L_cloud==1&UT>=UTplim(icase,1)&UT<=UTplim(icase,2)); %&Press_Alt>=Palt_bot&Press_Alt<=Palt_top);
+        L_clouduse=(UT>=UTplim(icase,1)&UT<=UTplim(icase,2)); %&Press_Alt>=Palt_bot&Press_Alt<=Palt_top);
+        O3mean=mean(O3_col_start*frac_tauO3(L_clouduse==1));
+        O3std=std(O3_col_start*frac_tauO3(1,L_clouduse==1));
+        if strcmp(O3_estimate,'ON')
+            O3mean=mean(O3_col_fit(L_clouduse==1));
+            O3std=std(O3_col_fit(L_clouduse==1));
+        end
+        tau_a_max=max(tau_aero(:,L_clouduse==1)');
+        tau_a_min=min(tau_aero(:,L_clouduse==1)');
+        tau_a_std=std(tau_aero(:,L_clouduse==1)');
+        tau_a_mean=mean(tau_aero(:,L_clouduse==1)');
+        tau_a_err=mean(tau_aero_err(:,L_clouduse==1)');
+        GPSmean=mean(GPS_Alt(L_clouduse==1));
+        GPSstd=std(GPS_Alt(1,L_clouduse==1)');
+        zpmean=mean(Press_Alt(L_clouduse==1));
+        zpstd=std(Press_Alt(1,L_clouduse==1)');
+        alphamean=mean(alpha(L_clouduse==1));
+        alphastd=std(alpha(1,L_clouduse==1)');
+        mraymin=min(m_ray(L_clouduse==1));
+        mraymax=max(m_ray(L_clouduse==1));
+        tCmean_FP1=mean(Temperature(3,L_clouduse==1));
+        tCstd_FP1=std(Temperature(3,L_clouduse==1)');
+        tCmean_FP2=mean(Temperature(10,L_clouduse==1));
+        tCstd_FP2=std(Temperature(10,L_clouduse==1)');
+        loglog(lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),strcat(colorsym,'o'),'MarkerSize',8);%,'MarkerFaceColor',colorsym);
+        %set(gca,'ylim',ylimits,'ytick',[0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1])
+        %set(gca,'ylim',ylimits,'ytick',[0.005,0.006,0.007,0.008,0.009,0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.1,0.12,0.15,0.2])
+        set(gca,'ylim',ylimits)
+        %set(gca,'ytick',[0.01 0.02 0.03 0.04 0.05 0.06 0.07 0.08 0.09 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0])
+        set(gca,'ticklen',[0.015 0.03])
+        %tl0=[0.01 0.02 0.03 0.04 0.05 0.1 0.2 0.3 0.4 0.5 1.0];
+        %tl=num2str(tl0)
+        %set(gca,'yticklabel',tl)
+        hold on
+        %set(gca,'xlim',[.30 1.6]);
+        %set(gca,'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6]);
+        if strcmp(instrument,'AMES14#1_2002')
+            set(gca,'xlim',[.30 2.2]);
+            set(gca,'xtick',[0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.2,1.4,1.6, 1.8 2.0 2.2]);
+        end
+        %set(gca,'ytick',[0.0001:0.01:0.1 0.2 0.3]);
+        %set(gca,'ytick',[0.02:0.01:0.1 0.2:0.1:0.5]);
+        xlabel('Wavelength [\mum]','FontSize',24);
+        ylabel('Aerosol Optical Depth','FontSize',24);
+        filenamestr=filename_in;
+        for ii=1:length(filenamestr),
+            if strcmp(filenamestr(ii),'_') filenamestr(ii)='-'; end
+        end
+        titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g %s',site,month,day,year,filenamestr,UTplim(1),UTplim(2),'UT');
+        if ~isempty(flag_calib)
+            %titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g UT  V0:%s  zGPS:%5.2f-%5.2f km  zGPS:%5.2f+-%5.2f  O3:%3.0f',site,month,day,year,filename,UTpbeg,UTpend,flag_calib,GPSalt_bot,GPSalt_top,GPSmean,GPSstd,1000*O3_col_start)
+            %%titlestr=sprintf('%s %2i/%2i/%2i %s %g-%g UT V0:%s zGPS:%5.2f+-%5.2f km zP:%5.2f+-%5.2f  m:%6.3f-%6.3f O3:%3.0f+-%3.1f',site,month,day,year,filenamestr,UTplim(1),UTplim(2),flag_calib,GPSmean,GPSstd,zpmean,zpstd,mraymin,mraymax,1000*O3mean,1000*O3std)
+            if icase==1
+                titlestr=sprintf('%s %2i/%2i/%2i   %s V0:%s    O3:%3.0f+-%3.1f',site,month,day,year,filenamestr,flag_calib);%,1000*O3mean,1000*O3std);
+                title(titlestr,'fontsize',14)
+            end
+        end
+        
+        textstr=sprintf('%7.3f-%7.3f UT zGPS:%5.2f+-%5.2f km zP:%5.2f+-%5.2f  m:%6.3f-%6.3f  tFP1:%6.2f+-%6.2f  tFP2:%6.2f+-%6.2f  O3:%5.3f+-%5.3f',UTplim(icase,1),UTplim(icase,2),GPSmean,GPSstd,zpmean,zpstd,mraymin,mraymax,tCmean_FP1,tCstd_FP1,tCmean_FP2,tCstd_FP2,O3mean,O3std)
+        %if icase==1F
+        %    textstr=sprintf( 'Central CA valley:%7.3f-%7.3f UT    zGPS:%5.2f km    a'':%5.2f',UTplim(icase,1),UTplim(icase,2),GPSmean,alphamean)
+        %elseif icase==2
+        %     textstr=sprintf(' Lake Tahoe basin:%7.3f-%7.3f UT    zGPS:%5.2f km    a'':%5.2f',UTplim(icase,1),UTplim(icase,2),GPSmean,alphamean)
+        %end
+        ht5=text(0.302,0.1-icase*0.02,textstr)
+        set(ht5,'fontsize',13,'color',colorsym)
+        
+        
+        set(gca,'FontSize',20)
+        %yerrorbar('loglog',0.3,2.2, ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_err(wvl_aero==1),strcat(colorsym,'o'))
+        yerrorbar2('loglog',0.3,2.2,ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_err(wvl_aero==1),tau_a_err(wvl_aero==1),'o',0.4,colorsym)
+        yerrorbar2('loglog',0.3,2.2,ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_std(wvl_aero==1),tau_a_std(wvl_aero==1),'o',0.25,colorsym)
+        grid off
     end
-end
-
- textstr=sprintf('%7.3f-%7.3f UT zGPS:%5.2f+-%5.2f km zP:%5.2f+-%5.2f  m:%6.3f-%6.3f  tFP1:%6.2f+-%6.2f  tFP2:%6.2f+-%6.2f  O3:%5.3f+-%5.3f',UTplim(icase,1),UTplim(icase,2),GPSmean,GPSstd,zpmean,zpstd,mraymin,mraymax,tCmean_FP1,tCstd_FP1,tCmean_FP2,tCstd_FP2,O3mean,O3std)
- %if icase==1F
- %    textstr=sprintf( 'Central CA valley:%7.3f-%7.3f UT    zGPS:%5.2f km    a'':%5.2f',UTplim(icase,1),UTplim(icase,2),GPSmean,alphamean)
- %elseif icase==2
- %     textstr=sprintf(' Lake Tahoe basin:%7.3f-%7.3f UT    zGPS:%5.2f km    a'':%5.2f',UTplim(icase,1),UTplim(icase,2),GPSmean,alphamean)
- %end
- ht5=text(0.302,0.1-icase*0.02,textstr)
- set(ht5,'fontsize',13,'color',colorsym)
-
-
- set(gca,'FontSize',20)
- %yerrorbar('loglog',0.3,2.2, ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_err(wvl_aero==1),strcat(colorsym,'o'))
- yerrorbar2('loglog',0.3,2.2,ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_err(wvl_aero==1),tau_a_err(wvl_aero==1),'o',0.4,colorsym)
- yerrorbar2('loglog',0.3,2.2,ylimits(1),ylimits(2),lambda(wvl_aero==1),tau_a_mean(wvl_aero==1),tau_a_std(wvl_aero==1),tau_a_std(wvl_aero==1),'o',0.25,colorsym)
- grid off
-end
-%pfn = strcat('OuputPics/','Lev2-AODoutput','-',num2str(year),num2str(month),num2str(day),'.jpg');
-%S = sprintf('print -djpeg %s',pfn);
-%eval(S);
+    %pfn = strcat('OuputPics/','Lev2-AODoutput','-',num2str(year),num2str(month),num2str(day),'.jpg');
+    %S = sprintf('print -djpeg %s',pfn);
+    %eval(S);
 end
 
 %Altitude profile
@@ -1299,69 +1301,69 @@ xlabel('Pressure[hPa]')
 %Altitude profile
 flag_altprf='yes';
 if strcmp(flag_altprf,'yes')
-figure(91)
-zmin=0; 
-zmax=4.5;
-taulim91=[0.01 0.5];
-flag_direc=['ascent ';'descent';'ascent '];
-%UTbeg_prf=[18.9]; %7/16/04 RB
-%UTend_prf=[19.32]; %7/16/04 RB
-%UTbeg_prf=[20.975 21.6]; %8/2/04
-%UTend_prf=[21.235 22]; %8/2/04 
-%flag_direc='ascent';
-%UTbeg_prf=21.6; %8/2/04 ascent
-%UTend_prf=22; %8/2/04 ascent
-UTbeg_prf=15.34; %8/7 ascent, DC-8 rendezvous
-UTend_prf=15.77; %8/7 ascent, DC-8 rendezvous
-UTbeg_prf=17.52; %8/7 ascent, DC-8 rendezvous
-UTend_prf=17.68; %3/15/06 ascent
-UTbeg_prf=17.55;%ascent out of VER 3/20/2006 with cirrus
-UTend_prf=17.8; %ascent out of VER 3/20/2006 with cirrus
-UTbeg_prf=19.09; %ARCTASsummer test flight...Flt 11...6/22/2008
-UTend_prf=19.62; %ARCTASsummer test flight...Flt 11...6/22/2008
-%UTbeg_prf=[18.97 21.49]; %ARCTASsummer test flight...Flt 12...6/24/2008
-%UTend_prf=[19.42 21.75]; %ARCTASsummer test flight...Flt 12...6/24/2008
-%UTend_prf=21.49;%ARCTASsummer test flight...Flt 12...6/24/2008
-%UTend_prf=21.75;%ARCTASsummer test flight...Flt 12...6/24/2008
-%UTbeg_prf=[16.21 17.28 17.58 18.65]; 
-%UTend_prf=[16.48 17.49 17.90 18.95];
-%UTbeg_prf=[17.82];
-%UTend_prf=[18.12];
-%UTbeg_prf=[17.50 17.665]; %7/9/08 F22
-%UTend_prf=[17.665 17.8]; %7/9/08 F22
-UTbeg_prf=[18.6]; %7/9/08 F22
-UTend_prf=[19.25]; %7/9/08 F22
-wvl_aer_plt=[0 0 0 0 1 0 0 0 0 0 0 0 0 0];
-%wvl_aer_plt=wvl_aero;
-
-for ip=1:size(UTbeg_prf,2);
- %subplot(1,size(UTbeg_prf,2),ip)
- %subplot(2,2,ip)
- jtuse=find(UT>=UTbeg_prf(1,ip)&UT<=UTend_prf(1,ip)&L_cloud==1);
- meanlat=mean(geog_lat(jtuse));
- stdlat=std(geog_lat(jtuse));
- meanlon=mean(geog_long(jtuse));
- stdlon=std(geog_long(jtuse));
- %semilogx(tau_aero(wvl_aer_plt==1,jtuse),r(jtuse),'.')
- plot(tau_aero(wvl_aer_plt==1,jtuse),r(jtuse),'.-')
- titlestr4=sprintf('%s %2i/%2i/%2i %s V0:%s\nUT:%5.2f-%5.2f mean lat:%7.2f+-%5.2f   mean lon:%7.2f+-%5.2f  %s',site,month,day,year,filename_in,flag_calib,UTbeg_prf(ip),UTend_prf(ip),meanlat,stdlat,meanlon,stdlon,flag_direc(ip,:));
- for i=1:length(titlestr4),
-    if strcmp(titlestr4(i),'_') titlestr4(i)='-'; end
- end
- title(titlestr4,'fontsize',12);
- xlabel('Aerosol Optical Depth','fontsize',16)
- ylabel('Altitude [km]','fontsize',16)
- grid on
- set(gca,'ylim',[zmin zmax],'xlim',taulim91,'fontsize',16)
- str91=[];
- for j=1:14,
-  if wvl_aer_plt(j)==1
-      str91=[str91;sprintf('%6.4f',lambda(j))];
-  end
- end
- hleg91=legend(str91);
- set(hleg91,'fontsize',10)
-end
+    figure(91)
+    zmin=0;
+    zmax=4.5;
+    taulim91=[0.01 0.5];
+    flag_direc=['ascent ';'descent';'ascent '];
+    %UTbeg_prf=[18.9]; %7/16/04 RB
+    %UTend_prf=[19.32]; %7/16/04 RB
+    %UTbeg_prf=[20.975 21.6]; %8/2/04
+    %UTend_prf=[21.235 22]; %8/2/04
+    %flag_direc='ascent';
+    %UTbeg_prf=21.6; %8/2/04 ascent
+    %UTend_prf=22; %8/2/04 ascent
+    UTbeg_prf=15.34; %8/7 ascent, DC-8 rendezvous
+    UTend_prf=15.77; %8/7 ascent, DC-8 rendezvous
+    UTbeg_prf=17.52; %8/7 ascent, DC-8 rendezvous
+    UTend_prf=17.68; %3/15/06 ascent
+    UTbeg_prf=17.55;%ascent out of VER 3/20/2006 with cirrus
+    UTend_prf=17.8; %ascent out of VER 3/20/2006 with cirrus
+    UTbeg_prf=19.09; %ARCTASsummer test flight...Flt 11...6/22/2008
+    UTend_prf=19.62; %ARCTASsummer test flight...Flt 11...6/22/2008
+    %UTbeg_prf=[18.97 21.49]; %ARCTASsummer test flight...Flt 12...6/24/2008
+    %UTend_prf=[19.42 21.75]; %ARCTASsummer test flight...Flt 12...6/24/2008
+    %UTend_prf=21.49;%ARCTASsummer test flight...Flt 12...6/24/2008
+    %UTend_prf=21.75;%ARCTASsummer test flight...Flt 12...6/24/2008
+    %UTbeg_prf=[16.21 17.28 17.58 18.65];
+    %UTend_prf=[16.48 17.49 17.90 18.95];
+    %UTbeg_prf=[17.82];
+    %UTend_prf=[18.12];
+    %UTbeg_prf=[17.50 17.665]; %7/9/08 F22
+    %UTend_prf=[17.665 17.8]; %7/9/08 F22
+    UTbeg_prf=[18.6]; %7/9/08 F22
+    UTend_prf=[19.25]; %7/9/08 F22
+    wvl_aer_plt=[0 0 0 0 1 0 0 0 0 0 0 0 0 0];
+    %wvl_aer_plt=wvl_aero;
+    
+    for ip=1:size(UTbeg_prf,2);
+        %subplot(1,size(UTbeg_prf,2),ip)
+        %subplot(2,2,ip)
+        jtuse=find(UT>=UTbeg_prf(1,ip)&UT<=UTend_prf(1,ip)&L_cloud==1);
+        meanlat=mean(geog_lat(jtuse));
+        stdlat=std(geog_lat(jtuse));
+        meanlon=mean(geog_long(jtuse));
+        stdlon=std(geog_long(jtuse));
+        %semilogx(tau_aero(wvl_aer_plt==1,jtuse),r(jtuse),'.')
+        plot(tau_aero(wvl_aer_plt==1,jtuse),r(jtuse),'.-')
+        titlestr4=sprintf('%s %2i/%2i/%2i %s V0:%s\nUT:%5.2f-%5.2f mean lat:%7.2f+-%5.2f   mean lon:%7.2f+-%5.2f  %s',site,month,day,year,filename_in,flag_calib,UTbeg_prf(ip),UTend_prf(ip),meanlat,stdlat,meanlon,stdlon,flag_direc(ip,:));
+        for i=1:length(titlestr4),
+            if strcmp(titlestr4(i),'_') titlestr4(i)='-'; end
+        end
+        title(titlestr4,'fontsize',12);
+        xlabel('Aerosol Optical Depth','fontsize',16)
+        ylabel('Altitude [km]','fontsize',16)
+        grid on
+        set(gca,'ylim',[zmin zmax],'xlim',taulim91,'fontsize',16)
+        str91=[];
+        for j=1:14,
+            if wvl_aer_plt(j)==1
+                str91=[str91;sprintf('%6.4f',lambda(j))];
+            end
+        end
+        hleg91=legend(str91);
+        set(hleg91,'fontsize',10)
+    end
 end
 
 figure(10)
@@ -1428,59 +1430,59 @@ ylabel('AOD');
 if strcmp(frost_filter,'yes')
     flag_filter354='yes';   %used for filtering the 354nm AOD's when we suspect frost
     if strcmp(flag_filter354,'yes')
-     flag_354_frost=find(rel_sd(1,:)>rel_sd(3,:))  %found that rel_sd(354)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     tau_aero(1,flag_354_frost)=-9999;  %set 354-nm AOD=-9999
-     tau_aero_err(1,flag_354_frost)=-9999;  %set 354-nm AOD=-9999
+        flag_354_frost=find(rel_sd(1,:)>rel_sd(3,:))  %found that rel_sd(354)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        tau_aero(1,flag_354_frost)=-9999;  %set 354-nm AOD=-9999
+        tau_aero_err(1,flag_354_frost)=-9999;  %set 354-nm AOD=-9999
     end
-
-    flag_filter499='yes';   %used for filtering the 499nm AOD's when we suspect frost 
+    
+    flag_filter499='yes';   %used for filtering the 499nm AOD's when we suspect frost
     if strcmp(flag_filter499,'yes')
-     flag_499_frost1=find(rel_sd(4,:)>rel_sd(3,:))  %found that rel_sd(499)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     flag_499_frost2=find(tau_aero(4,:)>tau_aero(2,:))
-     tau_aero(4,flag_499_frost1)=-9999;  %set 499-nm AOD=-9999
-     tau_aero(4,flag_499_frost2)=-9999;  %set 499-nm AOD=-9999
-     tau_aero_err(4,flag_499_frost1)=-9999;  %set 499-nm AOD=-9999
-     tau_aero_err(4,flag_499_frost2)=-9999;  %set 499-nm AOD=-9999
+        flag_499_frost1=find(rel_sd(4,:)>rel_sd(3,:))  %found that rel_sd(499)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        flag_499_frost2=find(tau_aero(4,:)>tau_aero(2,:))
+        tau_aero(4,flag_499_frost1)=-9999;  %set 499-nm AOD=-9999
+        tau_aero(4,flag_499_frost2)=-9999;  %set 499-nm AOD=-9999
+        tau_aero_err(4,flag_499_frost1)=-9999;  %set 499-nm AOD=-9999
+        tau_aero_err(4,flag_499_frost2)=-9999;  %set 499-nm AOD=-9999
     end
-
-    flag_filter605='yes';   %used for filtering the 605nm AOD's when we suspect frost 
+    
+    flag_filter605='yes';   %used for filtering the 605nm AOD's when we suspect frost
     if strcmp(flag_filter605,'yes')
-     flag_605_frost1=find(rel_sd(6,:)>rel_sd(3,:)) %found that rel_sd(605)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     flag_605_frost2=find(tau_aero(6,:)>tau_aero(2,:))
-     tau_aero(6,flag_605_frost1)=-9999;  %set 605-nm AOD=-9999
-     tau_aero(6,flag_605_frost2)=-9999;  %set 605-nm AOD=-9999
-     tau_aero_err(6,flag_605_frost1)=-9999;  %set 605-nm AOD=-9999
-     tau_aero_err(6,flag_605_frost2)=-9999;  %set 605-nm AOD=-9999
+        flag_605_frost1=find(rel_sd(6,:)>rel_sd(3,:)) %found that rel_sd(605)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        flag_605_frost2=find(tau_aero(6,:)>tau_aero(2,:))
+        tau_aero(6,flag_605_frost1)=-9999;  %set 605-nm AOD=-9999
+        tau_aero(6,flag_605_frost2)=-9999;  %set 605-nm AOD=-9999
+        tau_aero_err(6,flag_605_frost1)=-9999;  %set 605-nm AOD=-9999
+        tau_aero_err(6,flag_605_frost2)=-9999;  %set 605-nm AOD=-9999
     end
-
-    flag_filter675='yes';   %used for filtering the 675nm AOD's when we suspect frost 
+    
+    flag_filter675='yes';   %used for filtering the 675nm AOD's when we suspect frost
     if strcmp(flag_filter675,'yes')
-     flag_675_frost=find((rel_sd(7,:)>rel_sd(3,:)))%found that rel_sd(675)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     tau_aero(7,flag_675_frost)=-9999;  %set 675-nm AOD=-9999
-     tau_aero_err(7,flag_675_frost)=-9999;  %set 675-nm AOD=-9999
+        flag_675_frost=find((rel_sd(7,:)>rel_sd(3,:)))%found that rel_sd(675)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        tau_aero(7,flag_675_frost)=-9999;  %set 675-nm AOD=-9999
+        tau_aero_err(7,flag_675_frost)=-9999;  %set 675-nm AOD=-9999
     end
-
-    flag_filter779='yes';   %used for filtering the 779nm AOD's when we suspect frost 
+    
+    flag_filter779='yes';   %used for filtering the 779nm AOD's when we suspect frost
     if strcmp(flag_filter779,'yes')
-     flag_779_frost1=find(rel_sd(8,:)>rel_sd(3,:))  %found that rel_sd(779)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     flag_779_frost2=find(tau_aero(8,:)>tau_aero(2,:))
-     tau_aero(8,flag_779_frost1)=-9999;  %set 779-nm AOD=-9999
-     tau_aero(8,flag_779_frost2)=-9999;  %set 779-nm AOD=-9999
-     tau_aero_err(8,flag_779_frost1)=-9999;  %set 779-nm AOD=-9999
-     tau_aero_err(8,flag_779_frost2)=-9999;  %set 779-nm AOD=-9999
+        flag_779_frost1=find(rel_sd(8,:)>rel_sd(3,:))  %found that rel_sd(779)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        flag_779_frost2=find(tau_aero(8,:)>tau_aero(2,:))
+        tau_aero(8,flag_779_frost1)=-9999;  %set 779-nm AOD=-9999
+        tau_aero(8,flag_779_frost2)=-9999;  %set 779-nm AOD=-9999
+        tau_aero_err(8,flag_779_frost1)=-9999;  %set 779-nm AOD=-9999
+        tau_aero_err(8,flag_779_frost2)=-9999;  %set 779-nm AOD=-9999
     end
-
-    flag_filter1241='yes';   %used for filtering the 1241nm AOD's when we suspect frost 
+    
+    flag_filter1241='yes';   %used for filtering the 1241nm AOD's when we suspect frost
     if strcmp(flag_filter1241,'yes')
-     flag_1241_frost=find(rel_sd(12,:)>rel_sd(3,:))  %found that rel_sd(1241)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
-     tau_aero(12,flag_1241_frost)=-9999;  %set 1241-nm AOD=-9999
-     tau_aero_err(12,flag_1241_frost)=-9999;  %set 1241-nm AOD=-9999
+        flag_1241_frost=find(rel_sd(12,:)>rel_sd(3,:))  %found that rel_sd(1241)>rel_sd(452nm) is a sufficient statement to sort out most data points with frost
+        tau_aero(12,flag_1241_frost)=-9999;  %set 1241-nm AOD=-9999
+        tau_aero_err(12,flag_1241_frost)=-9999;  %set 1241-nm AOD=-9999
     end
 end
 
 if strcmp(dirt_filter,'yes')
-     tau_aero(12:14,UT>21.2)=-9999;
-     tau_aero_err(12:14,UT>21.2)=-9999;
+    tau_aero(12:14,UT>21.2)=-9999;
+    tau_aero_err(12:14,UT>21.2)=-9999;
 end
 
 subplot(6,1,4)
@@ -1491,16 +1493,16 @@ set(gca,'xlim',xx)
 xlabel('UT');
 ylabel('AOD screened');
 
-if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000') 
-   %legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
-   %       num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(10)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
+if strcmp(instrument,'AMES14#1') |  strcmp(instrument,'AMES14#1_2000')
+    %legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
+    %       num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(10)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
-if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002') 
-   %legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
-   %       num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
+if strcmp(instrument,'AMES14#1_2001') |  strcmp(instrument,'AMES14#1_2002')
+    %legend(num2str(lambda(1)),num2str(lambda(2)),num2str(lambda(3)),num2str(lambda(4)),num2str(lambda(5)),num2str(lambda(6)),num2str(lambda(7)),...
+    %       num2str(lambda(8)),num2str(lambda(9)),num2str(lambda(11)),num2str(lambda(12)),num2str(lambda(13)),num2str(lambda(14))  );
 end
 if strcmp(instrument,'AMES6')
- legend('380.1','450.9','525.7','864.5','1021.3'	)
+    legend('380.1','450.9','525.7','864.5','1021.3'	)
 end
 
 subplot(6,1,5)
@@ -1743,82 +1745,82 @@ ylabel('Longitude','fontsize',20)
 %Prepare output
 %write to file
 if strcmp(archive_GH,'ON')
- %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Feb05\';
- %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Dec05test\';
- %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Jan05\high altitude with ozone fit\';
- %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_Aug06\'; %AATS14_2006_INTEXBarchive
- if strcmp(flag_use_V0,'MLOJan06')  
-    dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0Jan06noadj\'; %AATS14_2006_INTEXBarchive
- elseif strcmp(flag_use_V0,'MLOMay06')  
-    dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0May06noadj\'; %AATS14_2006_INTEXBarchive
- elseif strcmp(flag_use_V0,'meanMLOJanMay06')
-    dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0meanJanMay06noadj\'; %AATS14_2006_INTEXBarchive
- elseif strcmp(flag_use_V0,'interpMLOJanMay06')
-    %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R0_Sep06\';
-    %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Nov06\';
-    %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Dec06\';
-    dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Jan07\';
- end
- FlightNo=18; %don't know any flight numbers yet
- %[ntimwrt,filename_arc]=archive_AATS14_SOLVE2_GH(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
- %       L_cloud,L_H2O,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,ozone,tau_aero,tau_aero_err,...
- %       O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min);   
- %[ntimwrt,filename_arc]=archive_AATS14_ICARTT(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
-        %L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
-        %O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min,flag_calib,Temperature);   
- %[ntimwrt,filename_arc]=archive_AATS14_INTEXB(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
-        %L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
-        %O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min,flag_calib,Temperature);   
- if strcmp(site,'INTEXB')
-     [ntimwrt,filename_arc]=archive_AATS14_INTEXB(filename_in,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
-        L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
-        O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,sd_crit_aero_highalt,zGPS_highalt_crit,m_aero_max,tau_aero_limit,...
-        tau_aero_err_max,alpha_min,alpha_min_lowalt,flag_calib,Temperature);   
- end
- if strcmp(site(1:6),'ARCTAS')
-     dataarchive_dir='c:\johnmatlab\AATS14_2008_ARCTASsummerarchive_RA_prelim\';
-     
-     if julian(day,month,year,0)==julian(26,6,2008,0) 
-         ireset=find(UT>=16.2895 & UT<=16.2905); %remove bad pressure data point
-         L_H2O(ireset)=0;
-         L_cloud(ireset)=0;
-     elseif julian(day,month,year,0)==julian(30,6,2008,0)
-         ireset=find((UT>=20.993&UT<=20.994) | (UT>=21.379&UT<=21.38) | (UT>=21.381&UT<=21.382) | (UT>=21.656&UT<=21.6575)); %remove bad pressure data point
-         L_H2O(ireset)=0;
-         L_cloud(ireset)=0;         
-     end
-     
-     day_arr = [ julian(25,3,2008,0) julian(27,3,2008,0) julian(31,3,2008,0) julian(1,4,2008,0)  julian(6,4,2008,0)...
-         julian(8,4,2008,0)  julian(9,4,2008,0) julian(13,4,2008,0) julian(15,4,2008,0)  julian(19,4,2008,0)...
-         julian(22,6,2008,0) julian(24,6,2008,0) julian(26,6,2008,0) julian(27,6,2008,0) julian(28,6,2008,0)...
-         julian(29,6,2008,0) julian(30,6,2008,0) julian(2,7,2008,0) julian(3,7,2008,0) julian(6,7,2008,0)...
-         julian(7,7,2008,0) julian(9,7,2008,0) julian(10,7,2008,0) julian(12,7,2008,0)];
-                 
-     FlightNo_arr = [1:length(day_arr)];
+    %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Feb05\';
+    %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Dec05test\';
+    %dataarchive_dir='c:\johnmatlab\AATS14_2004_ICARTTarchive_Jan05\high altitude with ozone fit\';
+    %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_Aug06\'; %AATS14_2006_INTEXBarchive
+    if strcmp(flag_use_V0,'MLOJan06')
+        dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0Jan06noadj\'; %AATS14_2006_INTEXBarchive
+    elseif strcmp(flag_use_V0,'MLOMay06')
+        dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0May06noadj\'; %AATS14_2006_INTEXBarchive
+    elseif strcmp(flag_use_V0,'meanMLOJanMay06')
+        dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_V0meanJanMay06noadj\'; %AATS14_2006_INTEXBarchive
+    elseif strcmp(flag_use_V0,'interpMLOJanMay06')
+        %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R0_Sep06\';
+        %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Nov06\';
+        %dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Dec06\';
+        dataarchive_dir='c:\johnmatlab\AATS14_2006_INTEXBarchive_R1_Jan07\';
+    end
+    FlightNo=18; %don't know any flight numbers yet
+    %[ntimwrt,filename_arc]=archive_AATS14_SOLVE2_GH(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
+    %       L_cloud,L_H2O,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,ozone,tau_aero,tau_aero_err,...
+    %       O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min);
+    %[ntimwrt,filename_arc]=archive_AATS14_ICARTT(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
+    %L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
+    %O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min,flag_calib,Temperature);
+    %[ntimwrt,filename_arc]=archive_AATS14_INTEXB(filename,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
+    %L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
+    %O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,m_aero_max,tau_aero_limit,tau_aero_err_max,alpha_min,flag_calib,Temperature);
+    if strcmp(site,'INTEXB')
+        [ntimwrt,filename_arc]=archive_AATS14_INTEXB(filename_in,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
+            L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
+            O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,sd_crit_aero_highalt,zGPS_highalt_crit,m_aero_max,tau_aero_limit,...
+            tau_aero_err_max,alpha_min,alpha_min_lowalt,flag_calib,Temperature);
+    end
+    if strcmp(site(1:6),'ARCTAS')
+        dataarchive_dir='c:\johnmatlab\AATS14_2008_ARCTASsummerarchive_RA_prelim\';
         
-     FlightNo = FlightNo_arr(find( day_arr == julian(day, month,year,0)))
-     
-     flag_substitute_PDS_GPSAlt='no'; %'yes';  %added JML 07/05/2008 to fix bad GPS_Alt points in serial data stream
-     if strcmp(flag_substitute_PDS_GPSAlt,'yes')
-         substitute_PDS
-     end
-     
-     if strcmp(flag_LH2O_equal_Lcloud,'yes') %for archival purposes, set L_H2O=L_cloud
-        L_H2O=L_cloud;
-     end
-
-     %use following for 7/9/08 data 
-     if strcmp(flag_filterH2O_byAOD865,'yes') %for archival purposes, set L_H2O=0 for cases satisfying AOD(865nm) criterion
-        komit=find(tau_aero(9,:)>tau865crit);
-        L_H2O(komit)=0;
-     end
-     
-     [ntimwrt,filename_arc]=archive_AATS14_ARCTAS(filename_in,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
-        L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
-        O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,sd_crit_aero_highalt,zGPS_highalt_crit,m_aero_max,tau_aero_limit,...
-        tau_aero_err_max,alpha_min,alpha_min_lowalt,flag_calib,Temperature,rel_sd,frost_filter,dirt_filter,UT_smoke,sd_crit_aero_smoke,...
-        flag_interpOMIozone,filename_OMIO3,AvePeriod,UTCan);   
- end
+        if julian(day,month,year,0)==julian(26,6,2008,0)
+            ireset=find(UT>=16.2895 & UT<=16.2905); %remove bad pressure data point
+            L_H2O(ireset)=0;
+            L_cloud(ireset)=0;
+        elseif julian(day,month,year,0)==julian(30,6,2008,0)
+            ireset=find((UT>=20.993&UT<=20.994) | (UT>=21.379&UT<=21.38) | (UT>=21.381&UT<=21.382) | (UT>=21.656&UT<=21.6575)); %remove bad pressure data point
+            L_H2O(ireset)=0;
+            L_cloud(ireset)=0;
+        end
+        
+        day_arr = [ julian(25,3,2008,0) julian(27,3,2008,0) julian(31,3,2008,0) julian(1,4,2008,0)  julian(6,4,2008,0)...
+            julian(8,4,2008,0)  julian(9,4,2008,0) julian(13,4,2008,0) julian(15,4,2008,0)  julian(19,4,2008,0)...
+            julian(22,6,2008,0) julian(24,6,2008,0) julian(26,6,2008,0) julian(27,6,2008,0) julian(28,6,2008,0)...
+            julian(29,6,2008,0) julian(30,6,2008,0) julian(2,7,2008,0) julian(3,7,2008,0) julian(6,7,2008,0)...
+            julian(7,7,2008,0) julian(9,7,2008,0) julian(10,7,2008,0) julian(12,7,2008,0)];
+        
+        FlightNo_arr = [1:length(day_arr)];
+        
+        FlightNo = FlightNo_arr(find( day_arr == julian(day, month,year,0)))
+        
+        flag_substitute_PDS_GPSAlt='no'; %'yes';  %added JML 07/05/2008 to fix bad GPS_Alt points in serial data stream
+        if strcmp(flag_substitute_PDS_GPSAlt,'yes')
+            substitute_PDS
+        end
+        
+        if strcmp(flag_LH2O_equal_Lcloud,'yes') %for archival purposes, set L_H2O=L_cloud
+            L_H2O=L_cloud;
+        end
+        
+        %use following for 7/9/08 data
+        if strcmp(flag_filterH2O_byAOD865,'yes') %for archival purposes, set L_H2O=0 for cases satisfying AOD(865nm) criterion
+            komit=find(tau_aero(9,:)>tau865crit);
+            L_H2O(komit)=0;
+        end
+        
+        [ntimwrt,filename_arc]=archive_AATS14_ARCTAS(filename_in,dataarchive_dir,FlightNo,UT,day,month,year,lambda,V0,NO2_clima,Loschmidt,...
+            L_cloud,L_H2O,SZA,geog_lat,geog_long,GPS_Alt,Press_Alt,press,U/H2O_conv,H2O_err,-gamma,-alpha,a0,O3_col_fit,unc_ozone,tau_aero,tau_aero_err,...
+            O3_estimate,wvl_aero,wvl_water,a_H2O,b_H2O,sd_crit_aero,sd_crit_H2O,sd_crit_aero_highalt,zGPS_highalt_crit,m_aero_max,tau_aero_limit,...
+            tau_aero_err_max,alpha_min,alpha_min_lowalt,flag_calib,Temperature,rel_sd,frost_filter,dirt_filter,UT_smoke,sd_crit_aero_smoke,...
+            flag_interpOMIozone,filename_OMIO3,AvePeriod,UTCan);
+    end
 end
 
 
@@ -1905,7 +1907,7 @@ if strcmp(Result_File,'ON')
             dummy=dummy(:,L_H2O==1);
             fprintf(fid,'%7.5f %7.2f %7.4f %7.4f %g %6.3f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\n',dummy);
             fclose(fid);
-            clear dummy 
+            clear dummy
         elseif strcmp(site,'ACE-Asia')
             FlightNo=05
             resultfile=['AATS6_',filename_in(1:7),'.asc']
@@ -1927,7 +1929,7 @@ if strcmp(Result_File,'ON')
             dummy=dummy(:,L_H2O==1);  %save only cases where water vapor is acceptable
             fprintf(fid,'%8.5f %9.5f %9.5f %7.3f %7.3f %7.2f %7.4f %7.4f %3d %5.2f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f %7.4f\r\n',dummy);
             fclose(fid);
-        else 
+        else
             resultfile=[filename_in '.asc']
             fid=fopen([path resultfile],'w');
             fprintf(fid,'%s\n','NASA Ames Airborne Tracking 6-Channel Sunphotometer, AATS-6');
@@ -1945,7 +1947,7 @@ if strcmp(Result_File,'ON')
     if strcmp(Result_File,'ACE-2') %Writes ACE-2 archive file
         if strcmp(instrument,'AMES14#1')
             archive_AATS14_ACE2(filename_in,path,UT,day,month,year,O3_col_start*1000,NO2_clima*Loschmidt,lambda*1000,V0,darks,...
-                data,geog_lat,geog_long,r,press,U/H2O_conv,H2O_err,tau_aero(wvl_aero==1,:),tau_aero_err(wvl_aero==1,:),DGPS,wvl_aero);   
+                data,geog_lat,geog_long,r,press,U/H2O_conv,H2O_err,tau_aero(wvl_aero==1,:),tau_aero_err(wvl_aero==1,:),DGPS,wvl_aero);
         end
     end
     
