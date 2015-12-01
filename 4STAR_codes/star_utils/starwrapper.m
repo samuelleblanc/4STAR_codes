@@ -77,8 +77,9 @@ function	s=starwrapper(s, s2, varargin)
 %                       saveadditionalvariables is set to false
 % SL: v2.1, 2015-11-05: using outside function (update_toggle) to set default toggles
 % YS: v2.2, 2015-11-06: added the applyforjcorr toggle
+% SL: v2.3, 2015-11-22: fixed bugs in the functional calls of the starinfo files
 
-version_set('2.2');
+version_set('2.3');
 %********************
 %% prepare for processing
 %********************
@@ -204,7 +205,7 @@ if exist(infofile_)==2;
     catch me
         disp(['Problem editing starinfo file. Please open manually: ' infofile_])
     end
-    infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
+    infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
     try
         s = infofnt(s);
     catch
@@ -218,12 +219,12 @@ elseif exist(infofile2)==2;
         disp(['Problem editing starinfo file. Please open manually: ' infofile_])
     end
     try
-        infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
+        infofnt = str2func(infofile2(1:end-2)); % Use function handle instead of eval for compiler compatibility
         s = infofnt(s);
     catch
         disp('*Problem with executing as script, converting to starinfo function*')
         modify_starinfo(which(infofile2));
-        infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
+        infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
         s = infofnt(s);
     end
     %     s = eval([infofile2,'(s)']);
