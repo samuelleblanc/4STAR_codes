@@ -218,11 +218,12 @@ startup_plotting;
  % save figure;
   fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','4flight_',daystr)];
   save_fig(1,fi1,false);
+  %close(1);
   
  % plot interpolated o3 data on flight path
  
  figure(2);
- scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3);
+ scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3omi);
  
  if strcmp(gas,'o3')
     cb=colorbarlabeled('OMI O_{3} [DU]');
@@ -249,13 +250,15 @@ startup_plotting;
  % save figure;
   fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','interpolated4flight_',daystr)];
   save_fig(2,fi1,false);
+ %close(2);
   
-  %% save values and print to screen
+  %% save values 
   
-  g.mean   = nanmean(fl.vis_sun.o3omi);
-  g.std    = nanstd(fl.vis_sun.o3omi);
-  g.median = median(fl.vis_sun.o3omi);
-  g.max    = mean(fl.vis_sun.o3omi+fl.vis_sun.o3g);
+  g.mean   = nanmean(g.o3omi);
+  g.std    = nanstd( g.o3omi);
+  g.median = median( g.o3omi);
+  g.max    = mean(   g.o3omi+g.o3g);
+  
     
     
     
