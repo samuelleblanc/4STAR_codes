@@ -286,8 +286,7 @@ if star.isPPL
 %     %     % See if the two branches have any overlapping intensity.
 %     %     %
 %     %     subplot(2,1,2);
-star.El_miss = 0;
-miss = .85;
+miss = 0;
     figure;
     plot(abs(star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)...
         -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-miss), ...
@@ -298,11 +297,8 @@ miss = .85;
     title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',miss)]);
     ylabel('radiance');legend('Below sun','Above sun')
     xlabel('El shifted - sun El');
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000 
-       star.El_miss = miss;
-    end
-    star.El_true(star.Str==2) = star.El_true(star.Str==2) - star.El_miss;
-    
+    star.El_miss = miss;
+    star.El_true(star.Str==2) = star.El_true(star.Str==2) - miss;
 % %     figout = savefig(gcf,[figdir, fstem,'.ppl_shift.png'],true);
 else
     title_str = {['Almucantar Scan: ',fstem] ; ...
@@ -351,7 +347,7 @@ else
 %     else
 %         miss = 0;
 %     end
-miss = 0.15;
+miss = 0.13;
     star.Az_miss_legA = 0;
     star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
     figure;    
@@ -373,9 +369,8 @@ title(fstem,'interp','none');
     ylabel('radiance');
     xlabel('Az - sun Az');
 %     saveas(gcf,[figdir, fstem,'.alm_legA_shift.png']);
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000 
-       star.Az_miss_legA = miss;
-    end
+
+    star.Az_miss_legA = miss;
     star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
 %     %%
 % 
@@ -430,9 +425,7 @@ title(fstem,'interp','none');
     ylabel('radiance');
     xlabel('Az - sun Az','interp','none');
     
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000
-       star.Az_miss_legB = miss;
-    end
+    star.Az_miss_legB = miss;
     star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
 %     saveas(gcf,[figdir, fstem,'.alm_legB_shift.png']);    
 %     % If both miss legA and miss legB ==0, don't shift either leg.

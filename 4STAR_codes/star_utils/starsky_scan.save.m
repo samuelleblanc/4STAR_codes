@@ -18,19 +18,13 @@ disp('Double check this logic in starsky_scan around line 18 ff') % catch errone
 star.Az_offset_sun = mean(star.Headng(star.Str==1&star.Zn==0&star.Headng~=0)+  ...
     star.Az_deg(star.Str==1 & star.Zn==0 & star.Headng~=0) - star.sunaz(star.Str==1 & star.Zn==0 & star.Headng~=0));
 star.El_offset_sun = mean(star.El_deg(star.Str==1 & star.Zn==0 & star.Headng~=0) - star.sunel(star.Str==1 & star.Zn==0 & star.Headng~=0));
-if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000
-   % If on ground, incorporate the offsets above as truth
-   star.Az_true = mod(star.Headng+ star.Az_deg - star.Az_offset_sun,360);
-   star.Az_true = star.Headng+ star.Az_deg - star.Az_offset_sun;
-   star.El_true = star.El_deg- star.El_offset_sun;
-else
-   % If in air, don't use the offsets above, instead we'll use Euler angle
-   % rotations to yield _gnd referenced values.
-   star.Az_true = star.Az_deg;
-   star.El_true = star.El_deg;
-end
 
-star.El_true(star.Str==2) = star.El_true(star.Str==2) - star.sun_sky_El_offset;
+star.Az_true = mod(star.Headng+ star.Az_deg - star.Az_offset_sun,360);
+star.Az_true = star.Az_deg;
+star.El_true = star.El_deg- star.El_offset_sun;
+star.El_true = star.El_deg;
+
+star.El_true(star.Str==2) = star.El_deg(star.Str==2) - star.sun_sky_El_offset;
 star.isPPL = std(star.El_true)>std(star.Az_true);
 %%
 figdir = ['D:\data\4STAR\yohei\img\'];
@@ -142,21 +136,15 @@ end
 % Could include a check on the quad voltages to make sure we're really tracking.
 
 
-% % Maybe move this section down, after manual offsets have been applied
-% %Now convert 4STAR Az/El geometry (that permits El from horizon to horizon)
-% %to AERONET geometry with El from 0 to 90 and Az adjusted by 180 when El is
-% %on oppposite side of zenith from sun.
-% over_top = star.El_true>90;
-% star.El_true(over_top) = 180-star.El_true(over_top);
-% star.Az_true(over_top) = mod(star.Az_true(over_top)+180,360);
-% %(az_deg, el_deg, heading_deg, pitch_deg, roll_deg)
-% if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))>1000
-%    [star.Az_gnd, star.El_gnd] = ac_to_gnd_SEACRS(star.Az_true, star.El_true, star.Headng,  star.pitch, star.roll );
-% else
-%    [star.Az_gnd, star.El_gnd] = ac_to_gnd_SEACRS(star.Az_true, star.El_true, star.Headng,  star.pitch, star.roll );
-% end
-% star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
 
+%Now convert 4STAR Az/El geometry (that permits El from horizon to horizon)
+%to AERONET geometry with El from 0 to 90 and Az adjusted by 180 when El is
+%on oppposite side of zenith from sun.
+over_top = star.El_true>90;
+star.El_true(over_top) = 180-star.El_true(over_top);
+star.Az_true(over_top) = mod(star.Az_true(over_top)+180,360);
+%(az_deg, el_deg, heading_deg, pitch_deg, roll_deg)
+[star.Az_gnd, star.El_gnd] = ac_to_gnd_SEACRS(star.Az_true, star.El_true, star.Headng,  star.pitch, star.roll );
 
 %  star.aeronetcols = [332, 624,880,1040];
 vis_pix = find(star.aeronetcols);
@@ -169,7 +157,7 @@ star.vis_pix = vis_pix;
 % Use zone==0 and Str==1 to define the actual sun position and the
 % angular offsets.
 % star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
-
+star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
 
 % recs = (1:length(star.time));
 
@@ -286,8 +274,7 @@ if star.isPPL
 %     %     % See if the two branches have any overlapping intensity.
 %     %     %
 %     %     subplot(2,1,2);
-star.El_miss = 0;
-miss = .85;
+miss = 0;
     figure;
     plot(abs(star.El_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)...
         -star.sunel(((abs(star.Zn)==4)|(abs(star.Zn)==3))&below_orb)-miss), ...
@@ -298,11 +285,8 @@ miss = .85;
     title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',miss)]);
     ylabel('radiance');legend('Below sun','Above sun')
     xlabel('El shifted - sun El');
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000 
-       star.El_miss = miss;
-    end
-    star.El_true(star.Str==2) = star.El_true(star.Str==2) - star.El_miss;
-    
+    star.El_miss = miss;
+    star.El_true(star.Str==2) = star.El_true(star.Str==2) - miss;
 % %     figout = savefig(gcf,[figdir, fstem,'.ppl_shift.png'],true);
 else
     title_str = {['Almucantar Scan: ',fstem] ; ...
@@ -351,32 +335,27 @@ else
 %     else
 %         miss = 0;
 %     end
-miss = 0.15;
-    star.Az_miss_legA = 0;
-    star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
+%     star.Az_miss_legA = miss;
+%     star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
     figure;    
     subplot(2,1,1);
     plot(star.Az_true(((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_A)...
-        -star.sunaz(((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_A)-miss, ...
+        -star.sunaz(((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_A), ...
         star.skyrad(((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_A,star.aeronetcols(vis_pix(end))),'.',...
-        star.Az_true(before)-star.sunaz(before)-miss, ...
+        star.Az_true(before)-star.sunaz(before), ...
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'o',...
-        star.Az_true(after)-star.sunaz(after)-miss, ...
+        star.Az_true(after)-star.sunaz(after), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'x');
 title(fstem,'interp','none');
     subplot(2,1,2);
-    plot(    abs(star.Az_true(before)-star.sunaz(before)-miss), ...
+    plot(    abs(star.Az_true(before)-star.sunaz(before)), ...
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'-o',...
-        abs(star.Az_true(after)-star.sunaz(after)-miss), ...
+        abs(star.Az_true(after)-star.sunaz(after)), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'-x');
     title(['Near-sun ALM Leg A sky zone']);
     ylabel('radiance');
     xlabel('Az - sun Az');
 %     saveas(gcf,[figdir, fstem,'.alm_legA_shift.png']);
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000 
-       star.Az_miss_legA = miss;
-    end
-    star.Az_true(leg_A&star.Str==2) = star.Az_true(leg_A&star.Str==2) - star.Az_miss_legA;
 %     %%
 % 
     before = ((abs(star.Zn)==4)|(abs(star.Zn)==3))&leg_B&(star.Az_true<star.sunaz);
@@ -408,32 +387,26 @@ title(fstem,'interp','none');
 %     else
 %         miss = 0;
 %     end
-    miss = 0.25;
-    star.Az_miss_legB = 0;
-    star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
+%     star.Az_miss_legB = miss;
+%     star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
         figure;
     subplot(2,1,1);
     plot(star.Az_true(before|after)...
-        -star.sunaz(before|after)-miss, ...
+        -star.sunaz(before|after), ...
         star.skyrad(before|after,star.aeronetcols(vis_pix(end))),'.',...
-        star.Az_true(before)-star.sunaz(before)-miss, ...
+        star.Az_true(before)-star.sunaz(before), ...
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'o',...
-        star.Az_true(after)-star.sunaz(after)-miss, ...
+        star.Az_true(after)-star.sunaz(after), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'x');
     title(fstem,'interp','none');
     subplot(2,1,2);
-    plot(    abs(star.Az_true(before)-star.sunaz(before)-miss), ...
+    plot(    abs(star.Az_true(before)-star.sunaz(before)), ...
         star.skyrad(before,star.aeronetcols(vis_pix(end))),'-o',...
-        abs(star.Az_true(after)-star.sunaz(after)-miss), ...
+        abs(star.Az_true(after)-star.sunaz(after)), ...
         star.skyrad(after,star.aeronetcols(vis_pix(end))),'-x');
     title(['Near-sun ALM leg B ']);
     ylabel('radiance');
     xlabel('Az - sun Az','interp','none');
-    
-    if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))<1000
-       star.Az_miss_legB = miss;
-    end
-    star.Az_true(leg_B&star.Str==2) = star.Az_true(leg_B&star.Str==2) - star.Az_miss_legB;
 %     saveas(gcf,[figdir, fstem,'.alm_legB_shift.png']);    
 %     % If both miss legA and miss legB ==0, don't shift either leg.
 %     % If only one is zero, shift that leg to match the other. 
@@ -445,21 +418,8 @@ title(fstem,'interp','none');
 %        
 end
 
-% Maybe move this section down, after manual offsets have been applied
-%Now convert 4STAR Az/El geometry (that permits El from horizon to horizon)
-%to AERONET geometry with El from 0 to 90 and Az adjusted by 180 when El is
-%on oppposite side of zenith from sun.
-over_top = star.El_true>90;
-star.El_true(over_top) = 180-star.El_true(over_top);
-star.Az_true(over_top) = mod(star.Az_true(over_top)+180,360);
-%(az_deg, el_deg, heading_deg, pitch_deg, roll_deg)
-if geodist(star.Lat(1), star.Lon(1),star.Lat(end), star.Lon(end))>1000
-   [star.Az_gnd, star.El_gnd] = ac_to_gnd_SEACRS(star.Az_true, star.El_true, star.Headng,  star.pitch, star.roll );
-else
-   star.Az_gnd = star.Az_true;
-   star.El_gnd = star.El_true;
-end
-star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
+
+% star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
 
 % star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_true), star.Az_true);
 % if star.isPPL
@@ -473,20 +433,20 @@ star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
 % leg_A(1:(legx-1)) = true;
 % leg_B = ~leg_A;
 %%
-% figure;
-% subplot(2,1,1); plot([1:length(star.time)], star.Az_true-star.sunaz,'.',[1:length(star.time)], star.SA./cos(star.sunel.*pi./180),'o');
-% title({[fstem];['Top plot agrees for ALM']},'interp','none');
-% legend('Az-SAZ','SA*cos(sunel)','location','northwest')
-% subplot(2,1,2); plot([1:length(star.time)], star.El_true-star.sunel,'.',[1:length(star.time)], star.SA,'o');
-% title('Bottom plot agrees for PPL but diverges after zenith.')
-% legend('El-sunel','SA','location','northwest')
-% xlabel('record number');
-% 
-% figure; plot(star.SA(star.Str==2&star.SA>0), ...
-%     star.visTint(star.Str==2&star.SA>0),'-o');
-% title({[fstem];['Scattering angle vs Vis Tint(ms)']},'interp','none');
-% xlabel('Scattering angle');
-% ylabel('Vis Tint [ms]');
+figure;
+subplot(2,1,1); plot([1:length(star.time)], star.Az_true-star.sunaz,'.',[1:length(star.time)], star.SA./cos(star.sunel.*pi./180),'o');
+title({[fstem];['Top plot agrees for ALM']},'interp','none');
+legend('Az-SAZ','SA*cos(sunel)','location','northwest')
+subplot(2,1,2); plot([1:length(star.time)], star.El_true-star.sunel,'.',[1:length(star.time)], star.SA,'o');
+title('Bottom plot agrees for PPL but diverges after zenith.')
+legend('El-sunel','SA','location','northwest')
+xlabel('record number');
+
+figure; plot(star.SA(star.Str==2&star.SA>0), ...
+    star.visTint(star.Str==2&star.SA>0),'-o');
+title({[fstem];['Scattering angle vs Vis Tint(ms)']},'interp','none');
+xlabel('Scattering angle');
+ylabel('Vis Tint [ms]');
 
 % Would like to distinguish the portion of the PPL below the sun EL
 % from the rest, and would also like to distinguish the half-ALM acquired on one side
