@@ -68,3 +68,4 @@ data_folder/????????starsun*.mat
 
 data_folder/temporary_startupbusiness.mat
 *.mat
+General_codes/file_utils/datapath/lastpath.mat
