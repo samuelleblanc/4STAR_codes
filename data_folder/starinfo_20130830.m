@@ -184,14 +184,6 @@ if isfield(s, 'note');
 end; 
  
  
- 
-%push variable to caller 
-varNames=who(); 
-for i=1:length(varNames) 
-  assignin('caller',varNames{i},eval(varNames{i})); 
-end; 
-
-
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  
 % Creates potential for clobbering and makes collaborative coding more

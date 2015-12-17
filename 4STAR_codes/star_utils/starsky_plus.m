@@ -20,7 +20,18 @@ end
 if ~exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
 end
+% Determine if on ground or airborne
+if geodist(s.Lat(1),s.Lon(1),s.Lat(end),s.Lon(end)) > 1000
+   % We are in the air so use ssfr or MODIS if no SSFR and below ???km
 [s.sfc_alb, time_out] = get_ssfr_flight_albedo(mean(s.t), s.w);
+else 
+   % Eventually pass in time or doy, but for now hardcode for SEACRS
+   % s.brdf = get_modis_brdf(s.Lat(1),s.Lon(1),doy);
+   s.brdf = get_modis_brdf(s.Lat(1),s.Lon(1));
+   [wl, wl_ii] = sort(s.brdf(:,1));
+   s.brdf = s.brdf(wl_ii,:);
+   % We are on ground so use supplied or MODIS
+end
 
 sunfile = (getfullname_([datestr(s.t(1),'yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
 if ~isempty(sunfile)
