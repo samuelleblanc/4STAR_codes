@@ -64,4 +64,8 @@ data_folder/lastUsedDir.mat
 data_folder/20151103star.mat
 data_folder/????????star.mat
 data_folder/????????starsun*.mat
+data_folder/*star.mat
 *.ict
+
+*.mat
+data_folder/NAAMES1stats.txt

@@ -4,6 +4,7 @@ cleaning=[datenum('19:13:40') datenum('19:21:55') % pre-cleaning; the cleaning f
     -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 langley=[datenum('11:36:22') datenum('13:50:51')] ... % ground-based 
     -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+groundcomparison=[langley; flight(1,2) datenum('20:00:00')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])];
 
 horilegs=[datenum('14:01:44') datenum('14:17:07'); ...
     datenum('14:18:52') datenum('14:43:43'); ...

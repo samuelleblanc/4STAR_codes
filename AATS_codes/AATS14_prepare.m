@@ -84,7 +84,7 @@ if strcmp(instrument,'AMES14#1_2002')  % AATS-14 after August 1, 2002, when we u
     fid=fopen([xsect_dir CrossSec_name]);
     
     %MK-Cross section file for absorption coefficients for gases
-keyboard;    fgetl(fid);
+    fgetl(fid);
     fgetl(fid);
     xsect=fscanf(fid,'%f',[11,inf]);
     xsect=xsect';

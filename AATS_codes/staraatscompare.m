@@ -5,6 +5,7 @@ corstr='';
 
 stardir=['C:\Users\Samuel\Research\4STAR\roof\' daystr '\'];
 stardir=['C:\Users\sleblan2\Research\4STAR\roof\' daystr ''];
+stardir=starpaths;
 % load 4STAR
 fp = fullfile(stardir, [daystr 'starsun' corstr '.mat']);
 if ~exist(fp)
@@ -24,6 +25,7 @@ end;
 % load AATS
 aatsdir='C:\Users\Samuel\Research\AATS\data\ames\';
 aatsdir='C:\Users\sleblan2\Research\AATS\data\ames\';
+aatsdir=starpaths;
 fpa = fullfile(aatsdir, [daystr 'aats.mat']);
 if ~exist(fpa)
     [fna,pna] = uigetfile(starpaths,[daystr 'aats.mat']);

@@ -76,7 +76,25 @@ end
 if ~isempty(s)
     t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
     viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
-    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;rawrelstd=s.rawrelstd;Md=s.Md;
+    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;Md=s.Md;
+    try;
+        rawrelstd=s.rawrelstd;
+    catch;
+        ti=9/86400;
+        cc=[408 169+1044];
+        pp=numel(s.t);
+        s.rawstd=NaN(pp, numel(cc));
+        s.rawmean=NaN(pp, numel(cc));
+        for i=1:pp;
+            rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 s.Str>0
+            if numel(rows)>0;
+                s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+            end;
+        end;
+        s.rawrelstd=s.rawstd./s.rawmean;
+        rawrelstd=s.rawrelstd;
+    end;
     Str=s.Str;raw=s.raw;dark=s.dark;
     if isfield(s,'tau_aero_noscreening')
        tau_aero_noscreening=s.tau_aero_noscreening;
@@ -480,7 +498,7 @@ if (Mode==2);
             disp('no dust selected');
         end
         
-        [flag_cirrus, flag_names_cirus, flag_tag_cirrus] = cnvt_flags2ng(t, flags,flags.cirrus);
+        [flag_cirrus, flag_names_cirrus, flag_tag_cirrus] = cnvt_flags2ng(t, flags,flags.cirrus);
         if ~isempty(flag_cirrus)
             cirrus_str = write_starflags_marks_file(flag_cirrus,flag_names_cirrus,flag_tag_cirrus,daystr,'cirrus', op_name_str);
         else
