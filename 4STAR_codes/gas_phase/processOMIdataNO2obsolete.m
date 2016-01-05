@@ -1,27 +1,25 @@
 %% Details of the function:
 %  NAME:
-% appendOMIdata(omidir,daystr,gas)
+% processOMIdataNO2(Lat,Lon,daystr)
+% this is obsolete
 %----------------------------------
 % PURPOSE:
-%  - appends OMI gas data (O3 or NO2)
-%  - to star.mar file
-%  - in future should be ambedded in
-%  - allstarmat.m
+%  - interpolates OMI gas data (NO2)
+%  - to Lat/Lon in star.mar file
 %    
 %
 % CALLING SEQUENCE:
-%   g=appendOMIdata(daystr,gas)
+%   g=processOMIdataNO2(Lat,Lon,daystr)
 %
 % INPUT:
+%  - s is struct that includes sun Lat/Lon/Alt data
 %  - omidir is the directory where omi files are stored
 %  - daystr, e.g., '20140911' as string
-%  - gas, i.e, 'o3' or 'no2'
 % 
 % 
 % OUTPUT:
 % 
-% - generates struct and ASCII file output of
-%   OMI interpolated data along a flight path
+% - generates OMI interpolated data along a flight path
 %   locations and times are based on vis_sun
 %
 %
@@ -30,8 +28,8 @@
 % - save_fig
 %
 % NEEDED FILES/INPUT:
-% - currently need to have star.mat file for the flight date
-%   later this will be generated within allstarmat
+% - currently need to have star.mat/s file for the flight date
+% - this is a function within taugases, so data comes from starwrapper.m
 % - OMI gridded files of NO2/O3, e.g., OMI-Aura_L2G-OMDOAO3G_2015m1123_v003-2015m1124t061518.he5
 %   or OMI-Aura_L2G-OMNO2G_2015m1123_v003-2015m1124t180119.he5
 %   from website: http://avdc.gsfc.nasa.gov/index.php?site=2045907950
@@ -39,62 +37,72 @@
 %
 %
 % EXAMPLE:
-% g=appendOMIdata('C:\Users\msegalro.NDC\Campaigns\NAAMES\OMIdata\gridded\',...
-%                 '20140911','o3')
+% g=processOMIdataNO2(Lat,Lon,'20140911')
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer (MS), NASA Ames,Nov-25-2015 
-% 
+% MS, 2015-11-30, modified from appendOMIdata to be embedded in taugases
 % ---------------------------------------------------------------------------
 %% routine
-function [g] = appendOMIdata(omidir,daystr,gas)
+function [g] = processOMIdataNO2(Lat,Lon,daystr)
 
 startup_plotting;
-   
+plotting = 0;
 
 %% load OMI data file
-    
+
+    %  - omidir is the directory where omi files are stored, under
+    %    starpaths
+    omidir = 'OMIdata\';   
+
     day = daystr(5:end);
     year= daystr(1:4);
     
-    if strcmp(gas,'o3')
-        of       = strcat('OMI-Aura_L2G-OMDOAO3G_',year, 'm', day,'*','he5');
-    elseif strcmp(gas,'no2')
-        of       = strcat('OMI-Aura_L2G-OMNO2G_' , year, 'm', day,'*','he5');
-    end
+    
+    of       = strcat('OMI-Aura_L2G-OMNO2G_' , year, 'm', day,'*','he5');
     
     finfo   = dir([omidir,of]);
     fhdfinfo= hdf5info([omidir,finfo.name]);
     
      % read missing value
     
-        lat_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Latitude/MissingValue');
-        lon_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Longitude/MissingValue');
-        amf_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/AirMassFactor/MissingValue');
-        cf_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/CloudFraction/MissingValue');
-        cp_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/CloudPressure/MissingValue');
-        o3_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ColumnAmountO3/MissingValue');
-        o3p_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ColumnAmountO3Precision/MissingValue');
-        o3g_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/GhostColumnAmountO3/MissingValue');
-        qa_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ProcessingQualityFlags/MissingValue');
-        rms_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/RootMeanSquareErrorOfFit/MissingValue');
-        sza_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/SolarZenithAngle/MissingValue');
-        time_m = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Time/MissingValue');
+        lat_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Latitude/MissingValue');
+        lon_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Longitude/MissingValue');
+        
+        cf_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudFraction/MissingValue');
+        cp_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudPressure/MissingValue');
+        
+        no2_m        = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2/MissingValue');
+        no2s_m       = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Std/MissingValue');
+        no2strat_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Strat/MissingValue');
+        no2stratS_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2StratStd/MissingValue');
+        no2trop_m    = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Trop/MissingValue');
+        no2tropS_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2TropStd/MissingValue');
+        
+        qa_m   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/VcdQualityFlags/MissingValue');
+        
+        sza_m  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/SolarZenithAngle/MissingValue');
+        time_m = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Time/MissingValue');
     
     % read Fill value
     
-        lat_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Latitude/_FillValue');
-        lon_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Longitude/_FillValue');
-        amf_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/AirMassFactor/_FillValue');
-        cf_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/CloudFraction/_FillValue');
-        cp_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/CloudPressure/_FillValue');
-        o3_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ColumnAmountO3/_FillValue');
-        o3p_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ColumnAmountO3Precision/_FillValue');
-        o3g_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/GhostColumnAmountO3/_FillValue');
-        qa_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/ProcessingQualityFlags/_FillValue');
-        rms_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/RootMeanSquareErrorOfFit/_FillValue');
-        sza_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/SolarZenithAngle/_FillValue');
-        time_f = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/Time/_FillValue');
+        lat_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Latitude/_FillValue');
+        lon_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Longitude/_FillValue');
+        
+        cf_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudFraction/_FillValue');
+        cp_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/CloudPressure/_FillValue');
+        
+        no2_f        = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2/MissingValue');
+        no2s_f       = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Std/MissingValue');
+        no2strat_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Strat/MissingValue');
+        no2stratS_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2StratStd/MissingValue');
+        no2trop_f    = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2Trop/MissingValue');
+        no2tropS_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ColumnAmountNO2TropStd/MissingValue');
+     
+        qa_f   = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/ProcessingQualityFlags/_FillValue');
+        
+        sza_f  = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/SolarZenithAngle/_FillValue');
+        time_f = hdf5read([omidir,finfo.name],'/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/Time/_FillValue');
     
     %  read data fields
     
@@ -218,11 +226,12 @@ startup_plotting;
  % save figure;
   fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','4flight_',daystr)];
   save_fig(1,fi1,false);
+  %close(1);
   
  % plot interpolated o3 data on flight path
  
  figure(2);
- scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3);
+ scatter3(fl.vis_sun.Lon,fl.vis_sun.Lat,g.o3omi,8,g.o3omi);
  
  if strcmp(gas,'o3')
     cb=colorbarlabeled('OMI O_{3} [DU]');
@@ -249,13 +258,15 @@ startup_plotting;
  % save figure;
   fi1=[strcat(starpaths,'OMIfigs\','omi_',gas,'_','interpolated4flight_',daystr)];
   save_fig(2,fi1,false);
+ %close(2);
   
-  %% save values and print to screen
+  %% save values 
   
-  g.mean   = nanmean(fl.vis_sun.o3omi);
-  g.std    = nanstd(fl.vis_sun.o3omi);
-  g.median = median(fl.vis_sun.o3omi);
-  g.max    = mean(fl.vis_sun.o3omi+fl.vis_sun.o3g);
+  g.mean   = nanmean(g.o3omi);
+  g.std    = nanstd( g.o3omi);
+  g.median = median( g.o3omi);
+  g.max    = mean(   g.o3omi+g.o3g);
+  
     
     
     
