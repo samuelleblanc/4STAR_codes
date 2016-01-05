@@ -78,8 +78,9 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v2.1, 2015-11-05: using outside function (update_toggle) to set default toggles
 % YS: v2.2, 2015-11-06: added the applyforjcorr toggle
 % SL: v2.3, 2015-11-22: fixed bugs in the functional calls of the starinfo files
+% MS: v2.4, 2015-11-30: added variables to taugases, for reading OMI o3/no2 data
 
-version_set('2.3');
+version_set('2.4');
 %********************
 %% prepare for processing
 %********************
@@ -693,7 +694,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % derive optical depths by the traditional method
     [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
     [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
-    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Lat, s.O3col, s.NO2col); % gases
+    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Lat, s.Lon, s.O3col, s.NO2col); % gases
     % cjf: Alternative with tr
     %     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
     %         s.skyrad = s.rate./repmat(s.skyresp,pp,1);
