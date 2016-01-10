@@ -12,10 +12,11 @@ function NAAMESstarbasicplots(daystr, platform, savefigure);
 %     % create a starsun.mat file unless it already exists.
 %     daystr='20151104'; 
 %     allstarmat; % create a star.mat; after this, put the 'flight' [take-off landing] times in starinfo....m, run figure;spvis(daystr,'t','Alt','.');
-%     starsun(fullfile(starpaths, [daystr 'star.mat']),fullfile(starpaths, [daystr 'starsun.mat'])); % create a starsun.mat
+%     toggle.saveadditionalvariables=0;toggle.savefigure=0;toggle.computeerror=0;toggle.inspectresults=0;toggle.applynonlinearcorr=1;toggle.applytempcorr=0;toggle.dostarflag=0;toggle.doflagging=0;toggle.flagging=0;
+%     starsun(fullfile(starpaths, [daystr 'star.mat']),fullfile(starpaths, [daystr 'starsun.mat']), toggle); % create a starsun.mat
 %     % generate routine figures.
-%     SEstarbasicplots(daystr, 'flight', 1); % a ppt file created and saved; add manually flight notes, pictures, additional figures, etc.
-%     SEstarbasicplots(daystr, 'ground', 1); % a ppt file created and saved; add manually pictures, additional figures, etc.
+%     NAAMESstarbasicplots(daystr, 'flight', 1); % a ppt file created and saved; add manually flight notes, pictures, additional figures, etc.
+%     NAAMESstarbasicplots(daystr, 'ground', 1); % a ppt file created and saved; add manually pictures, additional figures, etc.
 %
 % See NAAMESquickplots.m for plots for multiple days, ad hoc analyses, etc. See
 % also NAAMES starbasicplots.m and SEstarbasicplots.m.

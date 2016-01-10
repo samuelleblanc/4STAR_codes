@@ -28,6 +28,7 @@ function [flags, flagfile] = starflag(s, Mode)
 %                       inclusion of starinfo flags, considerable rebuilding
 % MS, 2015-02-17,corrected a bug in line 74; definition of outputfile
 %                corrected bug in lines 31,37 (disp function)
+% CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
 %
 version_set('1.2');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of

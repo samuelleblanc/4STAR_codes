@@ -79,8 +79,14 @@ function	s=starwrapper(s, s2, varargin)
 % YS: v2.2, 2015-11-06: added the applyforjcorr toggle
 % SL: v2.3, 2015-11-22: fixed bugs in the functional calls of the starinfo files
 % MS: v2.4, 2015-11-30: added variables to taugases, for reading OMI o3/no2 data
+% MS: v2.5, 2016-01-09: changed starwrapper manually according to Yohei
+%                       starwrapper version from Jan-05-2016
+%                       changed s.tau_aero_err6 calculation to avoid
+%                       dimension mistmatch bug
+%                       changed flags.aerosol_init_auto to flags.bad_aod to
+%                       make it compatible with starflag
 
-version_set('2.4');
+version_set('2.5');
 %********************
 %% prepare for processing
 %********************
@@ -137,7 +143,10 @@ if (~isempty(varargin))
                     c=c+1;
                     toggle.applytempcorr=varargin{c};
                     disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
-                    % (continued)
+                case {'applyforjcorr'}
+                    c=c+1;
+                    toggle.applytempcorr=varargin{c};
+                    disp(['applyforjcorr set to ' num2str(toggle.applyforjcorr)])
                 otherwise
                     error(['Invalid optional argument, ', ...
                         varargin{c}]);
@@ -201,6 +210,7 @@ infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functio
 dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
+        if toggle.dostarflag
     try
         edit(infofile_) ; % open infofile in case user wants to edit it.
     catch me
@@ -213,6 +223,9 @@ if exist(infofile_)==2;
         eval([infofile_(1:end-2),'(s)']);
         %     s = eval([infofile2,'(s)']);
     end
+        else
+            run(infofile);
+        end;
 elseif exist(infofile2)==2;
     try
         edit(infofile2) ; % open infofile in case user wants to edit it.
@@ -232,7 +245,7 @@ elseif exist(infofile2)==2;
 elseif exist(infofile)==2;
     open(infofile);
     run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
-    %     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
+    %         eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
 else; % copy an existing old starinfo file and run it
     while dayspast<maxdayspast;
         dayspast=dayspast+1;
@@ -517,7 +530,7 @@ if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't app
     AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
     AZunique = unique(AZ_deg);
     s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
-    if toggle.applyforjcorr==3;
+    if toggle.applyforjcorr==2;
         dAZdt=diff(s.AZstep/(-50))./diff(s.t)/86400
         dAZdt=([dAZdt; 0]+[0; dAZdt])/2; % rotation rate
         positive_rotation=find(dAZdt>0); % data collected during positive rotation
@@ -695,6 +708,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
     [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
     [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Lat, s.Lon, s.O3col, s.NO2col); % gases
+ 
     % cjf: Alternative with tr
     %     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
     %         s.skyrad = s.rate./repmat(s.skyresp,pp,1);
@@ -911,7 +925,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         s.tau_aero_err3=s.darkstd./(s.raw-s.dark)./repmat(s.m_aero,1,qq); % be sure to subtract dark, as it can be negative.
         s.tau_aero_err4=repmat(s.m_ray./s.m_aero,1,qq)*s.tau_r_err.*s.tau_ray;
         s.tau_aero_err5=repmat(s.m_O3./s.m_aero,1,qq)*s.tau_O3_err.*s.tau_O3;
-        s.tau_aero_err6=s.m_NO2./s.m_aero*s.tau_NO2_err*s.tau_NO2;
+        s.tau_aero_err6=repmat(s.m_NO2./s.m_aero,1,qq)*s.tau_NO2_err.*s.tau_NO2;
+        %s.tau_aero_err6=s.m_NO2./s.m_aero*s.tau_NO2_err*s.tau_NO2;
         s.tau_aero_err7=repmat(s.m_ray./s.m_aero,1,qq).*s.tau_O4_err.*s.tau_O4;
         s.tau_aero_err8=0; % legacy from the AATS code; reserve this variable for future H2O error estimate; % tau_aero_err8=tau_H2O_err*s.tau_H2O.* (ones(n(2),1)*(m_H2O./m_aero));
         s.responsivityFOV=starresponsivityFOV(s.t,'SUN',s.QdVlr,s.QdVtb,s.QdVtot);
@@ -941,7 +956,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %% apply flags to the calculated tau_aero_noscreening
     s.tau_aero=s.tau_aero_noscreening;
     if toggle.dostarflag && toggle.flagging==1;
-        s.tau_aero(~s.flags.aerosol_init_auto,:)=NaN;
+        s.tau_aero(s.flags.bad_aod,:)=NaN;
     end;
     % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
     % 2014/07/18.
