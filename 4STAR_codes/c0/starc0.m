@@ -18,8 +18,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 %                 from Yohei sent on 20150720, new c0 from 20130708
 % MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0 
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
+% MS, v1.4, 2016-01-10, updated MLO c0
 
-version_set('1.3');
+version_set('1.4');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -33,7 +34,15 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
+    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
+        if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160119';
+            filesuffix='refined_Langley_MLO_mean'; % MLO-Jan-2016 mean
+        elseif now>=datenum([2016 1 9 0 0 0]);
+            daystr='20160109';
+            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+        end;  
+    elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2015 11 23 0 0 0]);
             daystr='20151118';
             filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % ground-based sunrise measurements at WFF

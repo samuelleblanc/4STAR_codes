@@ -18,8 +18,11 @@ datenum('16:53:48') datenum('17:30:55'); ...
 datenum('17:52:56') datenum('18:05:18'); ...
  ]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 
-langley=[horilegs(1,1) datenum('14:23:00')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]) % sunrise, various altitudes, under clouds
-    horilegs(6,1) datenum('18:19:38')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])]; % sunset, various altitudes, under clouds
+%langley=[horilegs(1,1) datenum('14:23:00')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]) % sunrise, various altitudes, under clouds
+%    horilegs(6,1) datenum('18:19:38')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])]; % sunset, various altitudes, under clouds
+
+langley=[datenum('11:30:12') datenum('14:23:00');datenum('18:05:18') datenum('18:19:38')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]) % sunrise, various altitudes, under clouds
+
 
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
