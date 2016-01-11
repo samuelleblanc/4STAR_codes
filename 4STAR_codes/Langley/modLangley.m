@@ -139,8 +139,8 @@ for ichan=1:length(channels)
  U_modlang(ichan)=(-p(1)/a_H2O(channels(ichan)))^(1/b_H2O(channels(ichan)))/1244;
  RSD(ichan)=std(a);
 
-%   mH2Ocalc=exp(log(3)/b_H2O(ichan));    % parameter to use in plot
-%   
+  mH2Ocalc=exp(log(3)/b_H2O(ichan));    % parameter to use in plot
+  
 %        figure(101)
 %        subplot(2,1,1)
 %        plot(x,y,'.',x,y_fit);

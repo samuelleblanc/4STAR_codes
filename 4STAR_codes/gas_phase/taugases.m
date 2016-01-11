@@ -7,12 +7,13 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 
 % load cross section data
 % all options are commented since new cross section version is unified
-% MS, modified, 2015-11-30, added and option to read OMI data and use
+% MS, modified, 2015-11-30, added an option to read OMI data and use
 %                           seperate value for each t, unlike O3col
 %                           and NO2col from starinfo, which is constant
 %                           separated functionallity whether called
 %                           from starc0 or starwrapper
 %                           now has 7 nargin
+% MS, modified, 2016-01-09  fixed bug in tau_NO2 final dimensions
 %----------------------------------------------------------------------
 
 % set functionallity
@@ -105,7 +106,8 @@ if strcmp(flag_interpOMIno2,'yes')
         
     catch
         tau_NO2=NO2col/Loschmidt*cross_sections.no2;
-        %tau_O3=(frac_tauO3.*go3.o3omi)*cross_sections.o3;
+        % adjust struct size
+        tau_NO2=repmat(tau_NO2,length(t),1);
     end
 else
     tau_NO2=NO2col/Loschmidt*cross_sections.no2;

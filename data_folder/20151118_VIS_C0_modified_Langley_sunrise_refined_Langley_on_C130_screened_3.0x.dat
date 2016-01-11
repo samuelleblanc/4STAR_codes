@@ -1,0 +1,3 @@
+% C0 (TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from 20151118starsun.mat and recorded on 2016-01-10 16:14:52.
+% Modified Langley processed for 0.8823-0.9945 micron region
+Pix Wavelength C0 C0err

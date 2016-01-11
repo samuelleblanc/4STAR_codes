@@ -53,7 +53,8 @@
 %           - fixed bug related to newmatlab
 % Modified, Michal segal, October, 10, 2015
 %           - added new 20141002 ARISE c0mod
-%
+% Modified, Michal Segal, Jan, 10, 2016, added NAAMES and MLO modified
+%                                        Langleys
 % -------------------------------------------------------------------------
 %% function routine
 function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
@@ -76,7 +77,23 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2014 7 1 0 0 0]); % ARISE;
+    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
+        if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160119';
+            filesuffix='modified_Langley_MLO_mean'; % MLO-Jan-2016 mean
+            model_atmosphere=1; %(Tropical-MLO)
+        elseif now>=datenum([2016 1 9 0 0 0]);
+            daystr='20160109';
+            filesuffix='modified_Langley_MLO'; % adjust date for each of the calibration days
+            model_atmosphere=1; %(Tropical-MLO)
+        end;  
+    elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
+        if now>=datenum([2015 11 23 0 0 0]);
+            daystr='20151118';
+            filesuffix='modified_Langley_sunrise_refined_Langley_on_C130_screened_3.0'; 
+            model_atmosphere=3; %(MidLAt-winter)
+        end; 
+    elseif t>=datenum([2014 7 1 0 0 0]); % ARISE;
         if now>=datenum([2014 8 1 0 0 0]);
             daystr='20141002';
             %filesuffix='modified_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';

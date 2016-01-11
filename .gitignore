@@ -75,3 +75,9 @@ General_codes/file_utils/datapath/lastpath.mat
 *.mat
 data_folder/NAAMES1stats.txt
 >>>>>>> origin/master
+
+4STAR_codes/FORJ_correction/get_forj_corrOriginal.m
+4STAR_codes/quicklook/NAAMESstarbasicplotsOriginal.m
+4STAR_codes/star_utils/starwrapperOriginal.m
+4STAR_codes/star_utils/starwrapperOriginalModifiedByMichal20160109.m
+4STAR_codes/star_utils/starwrapperYohei.m

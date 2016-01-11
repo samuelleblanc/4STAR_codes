@@ -12,6 +12,7 @@
 % Michal, 2015-10-20, added options for the new Oct 2015 re-run of ARISE c0
 %                     added NIR wavelengths in cols for plots
 % Michal, 2015-10-28, tweaked to adjust ARISE unc to 0.03
+% Michal, 2016-01-09, tweaked to accomodate MLO, Jan-2016 Langleys
 %--------------------------------------------------------------------------
 
 version_set('1.1');
@@ -19,7 +20,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20141002';
+daystr='20160110';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -178,6 +179,9 @@ elseif isequal(daystr, '20141002'); % ARISE Oct 2014
     %unc=1.5/100; % 1.5% this if for the range of min-max values due to changing aerosol in the scene.
     unc=3.0/100; % 3.0% this if for the range of min-max values due to changing aerosol in the scene and temperature effect
     c0unc=c0new.*unc';
+else
+    unc=3.0/100; % 3.0% this if for the range of min-max values due to changing aerosol in the scene and temperature effect
+    c0unc=c0new.*unc';
 end;
 
 %********************
@@ -260,7 +264,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix='refined_Langley
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
-    filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
+    % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
+    filesuffix = 'refined_Langley_MLO';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
