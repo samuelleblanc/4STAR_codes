@@ -13,6 +13,9 @@ sourcefile='';
 contents={};
 
 % source 
+if nargin<1 || isempty(datatype)
+   datatype = '';
+end
 if nargin<2 || isempty(source)
     source='ask';
 end;
