@@ -20,7 +20,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160110';
+daystr='20160114';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -62,6 +62,8 @@ if isequal(daystr, '20141002')
     ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
 elseif isequal(daystr, '20140917')
     ok = ok(m_aero(ok)>=4);
+elseif isequal(daystr, '20160113')
+    ok = ok(m_aero(ok)>=2.8);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
@@ -73,6 +75,7 @@ for k=1:numel(stdev_mult);
     h0=plot(m_aero(ok), rateaero(ok,cols), '.','color',[.5 .5 .5]);
     chi=get(gca,'children');
     set(gca,'children',flipud(chi));
+    
     ylabel('Count Rate (/ms) for Aerosols');
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);

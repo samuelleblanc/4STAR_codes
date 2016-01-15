@@ -269,7 +269,9 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
    
 %% LS for O3
- basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];
+ basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
+ % not necessary to use no2 here
+
  %basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
  ccoefo3=[];
    RRo3=[];
@@ -296,7 +298,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    MSEo3DU = real((1000*(1/length(wln))*sum(o3Err.^2))');                 % convert from atm cm to DU
    RMSEo3  = real(sqrt(real(MSEo3DU)));
    
-   gas.o3Inv    = o3vcd_smooth;
+   gas.o3Inv    = o3VCD;%o3vcd_smooth is the default output;
    gas.o3resiInv= RMSEo3;
    
 %    figure;subplot(211);plot(tplot,o3VCD,'.r');hold on;
@@ -482,8 +484,8 @@ end
 %      end
 
    % no2OD is the spectrum portion to subtract
-%    gas.no2  = no2vcdpca_smooth;%NO2conc;%in [DU]
-%    gas.no2resi= RMSEno2;%sqrt(NO2resi);
+    gas.no2Inv    = no2vcdpca_smooth;%NO2conc;%in [DU]
+    gas.no2resiInv= RMSEno2;%sqrt(NO2resi);
    
    gas.no2  = NO2conc;%in [DU]
    gas.no2resi= NO2resi;

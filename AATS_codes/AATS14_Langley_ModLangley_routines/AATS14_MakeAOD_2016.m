@@ -1979,7 +1979,7 @@ end
 
 
 % save all to workspace
-savefilename = strcat('C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\mat_files\','20160110','aats.mat');
+savefilename = strcat('C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\mat_files\','20160114','aats.mat');
 save(savefilename);
 %variable_name=whos; % will store all the variables in the workspace
 %fieldnames(variable_names);

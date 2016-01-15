@@ -323,9 +323,9 @@ DefineV0Input
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             press=ones(n,1)*678.5;      %DEFAULT VALUE -MK
             %O3_col_start=.282;         %DEFAULT VALUE -MK
-            %O3_col_start=.243;         %DEFAULT VALUE JML Dec 2012 MLO
+            O3_col_start=.243;          %DEFAULT VALUE JML Dec 2012 MLO
             
-            DefineO3AndPress_MLO_2016
+            %DefineO3AndPress_MLO_2016
             
 %-------------------------------------------------------------------------%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

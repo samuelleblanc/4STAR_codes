@@ -26,6 +26,7 @@ end;
 aatsdir='C:\Users\Samuel\Research\AATS\data\ames\';
 aatsdir='C:\Users\sleblan2\Research\AATS\data\ames\';
 aatsdir=starpaths;
+aatsdir='C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\mat_files\';
 fpa = fullfile(aatsdir, [daystr 'aats.mat']);
 if ~exist(fpa)
     [fna,pna] = uigetfile(starpaths,[daystr 'aats.mat']);

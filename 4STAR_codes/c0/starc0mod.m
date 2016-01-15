@@ -77,16 +77,16 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
+    if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+         if now>=datenum([2016 1 19 0 0 0]);
             daystr='20160119';
             filesuffix='modified_Langley_MLO_mean'; % MLO-Jan-2016 mean
-            model_atmosphere=1; %(Tropical-MLO)
-        elseif now>=datenum([2016 1 9 0 0 0]);
-            daystr='20160109';
+            model_atmosphere=1; % MLO
+        elseif now>=datenum([2016 1 14 0 0 0]);
+            daystr='20160114';
             filesuffix='modified_Langley_MLO'; % adjust date for each of the calibration days
-            model_atmosphere=1; %(Tropical-MLO)
-        end;  
+            model_atmosphere=1; % MLO
+        end; 
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2015 11 23 0 0 0]);
             daystr='20151118';
