@@ -6,13 +6,22 @@ if (julian(day, month,year,12) == julian(24,8,2008,12))
                 O3_col_start=.253;  %8/1 OMI
             elseif (julian(day, month,year,12) == julian(10,1,2016,12))
                 press=ones(n,1)*681;
-                O3_col_start=.278; 
+                O3_col_start=.253; 
             elseif (julian(day, month,year,12) == julian(11,1,2016,12))
                 press=ones(n,1)*681;
-                O3_col_start=.2732;
+                O3_col_start=.253;
             elseif (julian(day,month,year,12) == julian(12,1,2016,12))
                 press=ones(n,1)*681.3;
-                O3_col_start=.285;
+                O3_col_start=.253;
+            elseif (julian(day,month,year,12) == julian(13,1,2016,12))
+                press=ones(n,1)*681.3;
+                O3_col_start=.253;
+            elseif (julian(day,month,year,12) == julian(14,1,2016,12))
+                press=ones(n,1)*681.3;
+                O3_col_start=.253;
+            elseif (julian(day,month,year,12) == julian(15,1,2016,12))
+                press=ones(n,1)*681.3;
+                O3_col_start=.253;
             elseif (julian(day,month,year,12) == julian(29,5,2012,12))
                 press=ones(n,1)*681.3;
                 O3_col_start=.281;

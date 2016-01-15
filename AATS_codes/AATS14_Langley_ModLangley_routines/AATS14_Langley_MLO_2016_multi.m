@@ -1,4 +1,5 @@
-%AATS14_Langley_MLO_2012_multi.m
+%AATS14_Langley_MLO_2016_multi.m
+% based on %AATS14_Langley_MLO_2012_multi.m
 
 %langley3_AATS14_air.m   %formerly
 %performs Langley plots for atmospheric window and UV/ozone wavelenths (preliminary).
@@ -59,8 +60,12 @@ stdev_mat=[3 3 3 3 3 3 3];
 % amass_min_mat=[1.6 1.7 1.8];
 % amass_max_mat=[ 12 12 12];
 % 
- amass_min_mat=[1.4];
- amass_max_mat=[12];
+amass_min_mat=[1.4];
+amass_max_mat=[12];
+
+% amass_min_mat=[1.4];
+% amass_max_mat=[12];
+
 
 stdev_mat=1.8*ones(size(amass_min_mat));
 

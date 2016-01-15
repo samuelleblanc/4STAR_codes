@@ -18,7 +18,7 @@ close all
 
 %dateCWV='20130712';
 % need to change date for each calibration day
-dateCWV='20160110';
+dateCWV='20160114';
 
 fileload=strcat('C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\mat_files\',dateCWV,'aats.mat');
 load(fileload);
