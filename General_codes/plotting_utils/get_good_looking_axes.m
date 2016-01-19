@@ -9,7 +9,8 @@ for i=1:length(ax);
     if pos==[0.1300    0.1100    0.7750    0.8150]
         set(gca, 'position', [0.1500    0.1500    0.7550    0.7750]);
     end;
-    set(gca, 'fontsize', 16, 'linewidth', 1, 'color', 'none');
+    set(gca, 'fontsize', 16, 'linewidth', 1); % cjf: 2016-01-12
+%     set(gca, 'fontsize', 16, 'linewidth', 1, 'color', 'none');
     ti=get(gca,'title');
     xl=get(gca,'xlabel');
     yl=get(gca,'ylabel');

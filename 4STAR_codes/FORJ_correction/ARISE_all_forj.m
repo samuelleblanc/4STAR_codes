@@ -45,7 +45,7 @@ for f = 1:length(files)
         
         disp(['Bad file? ', [fname, ext]])
     end
-    close('all')
+%     close('all')
 end
 %%
 bad_time = (sum(isNaN(forj_out.corr'))>0);
