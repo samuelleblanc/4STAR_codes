@@ -4,7 +4,9 @@
 % Yohei, 2014/12/23
 
 % load VIS_FORJ, NIR_FORJ
-load(fullfile(starpaths, [daystr 'starforj.mat'])); % run starforj.m first.
+load(getfullname('*starforj.mat','forjmat'));
+daystr = datestr(t(1),'yyyymmdd');
+% load(fullfile(starpaths, [daystr 'starforj.mat'])); % run starforj.m first.
 
 % take dAZ/dt and related variables
 dAZdt=[diff(AZstep/(-50))./diff(t)/86400; 0]; % rotation rate
