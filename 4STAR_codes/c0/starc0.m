@@ -35,12 +35,15 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
-            daystr='20160119';
-            filesuffix='refined_Langley_MLO_mean'; % MLO-Jan-2016 mean
-        elseif now>=datenum([2016 1 14 0 0 0]);
-            daystr='20160114';
-            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+        if now>=datenum([2017 1 19 0 0 0]);
+            daystr='20160109';
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+        elseif now>=datenum([2016 1 16 0 0 0]);
+            daystr='20160109';
+            %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
+            %filesuffix='refined_Langley_MLOwFORJcorrection1';
+            %filesuffix='refined_Langley_MLO_wstraylightcorr';
         end;  
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2015 11 23 0 0 0]);

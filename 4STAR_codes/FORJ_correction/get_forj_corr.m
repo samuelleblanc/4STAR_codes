@@ -1,7 +1,8 @@
 function [forj_corr, detail] = get_forj_corr(time)
 % forj_corr = get_forj_corr(time)
 % Returns the 
-forj_all = load([starpaths,filesep,'forj_all.mat']);
+%forj_all = load([starpaths,filesep,'forj_all.mat']);
+forj_all = load([starpaths,filesep,'20160113forj_all.mat']);
 lower = max([1, find(forj_all.time<time,1,'last')]);
 upper = min([length(forj_all.time), find(forj_all.time>time,1,'first')]);
 forj_corr.Az_deg = forj_all.Az_deg(1,:);
