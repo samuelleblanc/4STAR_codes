@@ -35,7 +35,7 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2017 1 19 0 0 0]);
+        if now>=datenum([2016 1 19 0 0 0]);
             daystr='20160109';
             filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
         elseif now>=datenum([2016 1 16 0 0 0]);
