@@ -183,11 +183,12 @@ bar = mod(forj_vis.t.Az_deg,360);
 bar = bar<1 | bar>359;
 tots_bar = tots_v(bar,:);
 tots_v(bar,:) = NaN;
-fig2 = figure; plot(mod(forj_vis.t.Az_deg(good&~dark&CW),360), 100.*(tots_v(good&~dark&CW,9)./(ones([sum(good&~dark&CW),1])*mean_tots_v_CW(9))),'-b.',...
-    mod(forj_vis.t.Az_deg((good&~dark)&CCW),360), 100.*(tots_v(good&~dark&CCW,9)./(ones([sum(good&~dark&CCW),1])*mean_tots_v_CCW(9))),'-r.');
+fig2 = figure; these = plot(mod(forj_vis.t.Az_deg(good&~dark&CW),360), (tots_v(good&~dark&CW,9)./(ones([sum(good&~dark&CW),1])*mean_tots_v_CW(9))),'-b.',...
+    mod(forj_vis.t.Az_deg((good&~dark)&CCW),360), (tots_v(good&~dark&CCW,9)./(ones([sum(good&~dark&CCW),1])*mean_tots_v_CCW(9))),'-r.');
+set(these(1),'color',.8.*[0,191./255,191./255]);set(these(2), 'color',.8.*[1,153./255, 200./255]);
 legend('CW','CCW');
 title({'Total LED signal dependence on Azimuth axis (FORJ).';forj_vis.fname},'interp','none')
-ylabel('%')
+ylabel('normalized')
 xlabel('Az degrees (zero is toward nose)');
 tots_v(bar,:) = tots_bar;
 %%
@@ -238,7 +239,7 @@ forj_vis_out.time = forj_vis.time(1);
 figure; 
 set(gcf,'position',[460    34   809   618]);
 ax(1) = subplot(2,1,1);
-plot(forj_vis_out.Az_deg, forj_vis_out.corr_cw,'r-',forj_vis_out.Az_deg, forj_vis_out.corr_ccw,'b-',  forj_vis_out.Az_deg, forj_vis_out.corr,'k-');
+plot(forj_vis_out.Az_deg, forj_vis_out.corr_cw,'b-',forj_vis_out.Az_deg, forj_vis_out.corr_ccw,'r-',  forj_vis_out.Az_deg, forj_vis_out.corr,'k-');
 legend('CW','CCW','mean','location','southwest');
 title({'FORJ correction factor vs Azimuth axis: ';forj_vis.fname},'interp','none')
 ylabel('correction')
