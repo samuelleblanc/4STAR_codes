@@ -1,4 +1,4 @@
-% C0 (TOA Count Rate, /ms) for 4STAR NIR spectrometer (512 channels) derived from 20160111starsun.mat and recorded on 2016-01-12 13:21:43.
+% C0 (TOA Count Rate, /ms) for 4STAR NIR spectrometer (512 channels) derived from 20160111starsun.mat and recorded on 2016-01-20 12:58:05.
 % Data outside 2.0x the STD of 501 nm Langley residuals were screened out.
 Pix Wavelength C0 C0err
 511 949.79 5.09407910e+00 1.52822373e-01 

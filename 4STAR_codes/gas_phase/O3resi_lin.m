@@ -26,9 +26,10 @@ Idat=meas(:,2);
 %---------------------------------
 
 I_meas  = log(Idat) + o3_coef.*x0(:,1)+ o4_coef.*x0(:,2) + h2o_coef.*x0(:,3) + x0(:,4)*ones(length(Xdat),1) + x0(:,5)*(Xdat) + x0(:,6)*(Xdat).^2 + x0(:,7)*(Xdat).^3;
+%I_meas  = log(Idat) -( o3_coef.*x0(:,1)+ o4_coef.*x0(:,2) + h2o_coef.*x0(:,3) + x0(:,4)*ones(length(Xdat),1) + x0(:,5)*(Xdat) + x0(:,6)*(Xdat).^2);
 I_model = log(c0);%o3_coef.*x0(:,1)+ o4_coef.*x0(:,2) + h2o_coef.*x0(:,3) + x0(:,4)*ones(length(Xdat),1) + x0(:,5)*log(Xdat);
 
-% test figure
+%test figure
 % figure(101);
 % plot(Xdat,I_model,'-b');hold on;
 % plot(Xdat,log(Idat),'-k'); hold on;

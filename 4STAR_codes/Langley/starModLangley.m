@@ -13,7 +13,7 @@
 %********************
 % set parameters
 %********************
-daystr='20160114';
+daystr='20160118';
 %daystr='20130712';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed

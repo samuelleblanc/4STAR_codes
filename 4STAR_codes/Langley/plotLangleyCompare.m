@@ -29,16 +29,39 @@ function plotLangleyCompare(filelist,band)
 % filelist = {'20151118_VIS_C0_sunrise_modified_Langley_on_C130_screened','20160109_VIS_C0_modified_Langley_MLO','20160110_VIS_C0_modified_Langley_MLO','20160111_VIS_C0_modified_Langley_MLO','20160112_VIS_C0_modified_Langley_MLO','20160113_VIS_C0_modified_Langley_MLO','20160114_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO'};
 % filelist = {'20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO','20160117_VIS_C0_refined_Langley_MLOalldata','20160117_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO','20160117_NIR_C0_refined_Langley_MLOalldata','20160117_NIR_C0_refined_Langley_MLO'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO','20160117_VIS_C0_refined_Langley_MLOalldata','20160117_VIS_C0_refined_Langley_MLO','20160118_VIS_C0_refined_Langley_MLO_alldata','20160118_VIS_C0_refined_Langley_MLO_nodata_between_airmass_2_3','20160118_VIS_C0_refined_Langley_MLO_nodata_below_3','20160118_VIS_C0_refined_Langley_MLO_nodata_below_4'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO','20160117_NIR_C0_refined_Langley_MLOalldata','20160117_NIR_C0_refined_Langley_MLO','20160117_NIR_C0_refined_Langley_MLO_alldata','20160118_NIR_C0_refined_Langley_MLO_nodata_between_airmass_2_3','20160118_NIR_C0_refined_Langley_MLO_nodata_below_3','20160118_NIR_C0_refined_Langley_MLO_nodata_below_4'};
+% these are "optimized" for best FORJ locations
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO','20160117_VIS_C0_refined_Langley_MLOalldata','20160117_VIS_C0_refined_Langley_MLO','20160118_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO','20160117_NIR_C0_refined_Langley_MLOalldata','20160117_NIR_C0_refined_Langley_MLO','20160118_NIR_C0_refined_Langley_MLO'};
+
+% these are NOT "optimized" for best FORJ locations
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO_original','20160110_VIS_C0_refined_Langley_MLO_original','20160111_VIS_C0_refined_Langley_MLO_original','20160112_VIS_C0_refined_Langley_MLO_original','20160113_VIS_C0_refined_Langley_MLO_original','20160114_VIS_C0_refined_Langley_MLO_original','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO','20160117_VIS_C0_refined_Langley_MLOalldata','20160117_VIS_C0_refined_Langley_MLO','20160118_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO_original','20160110_NIR_C0_refined_Langley_MLO_original','20160111_NIR_C0_refined_Langley_MLO_original','20160112_NIR_C0_refined_Langley_MLO_original','20160113_NIR_C0_refined_Langley_MLO_original','20160114_NIR_C0_refined_Langley_MLO_original','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO','20160117_NIR_C0_refined_Langley_MLOalldata','20160117_NIR_C0_refined_Langley_MLO','20160118_NIR_C0_refined_Langley_MLO'};
+
+
 % filelist = {'20160109_VIS_C0_refined_Langley_MLO','20160109_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160110_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160111_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160112_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160113_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_modified_Langley_MLO'};
 % filelist = {'20160114_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_modified_Langley_MLO'};
+% filelist = {'20160115_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_modified_Langley_MLO'};
+% filelist = {'20160116_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_modified_Langley_MLO'};
+% filelist = {'20160117_VIS_C0_refined_Langley_MLO','20160117_VIS_C0_modified_Langley_MLO'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened','20150916_VIS_C0_compared_with_AATS_at_Ames'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20150916_NIR_C0_compared_with_AATS_at_Ames'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened','20150916_VIS_C0_compared_with_AATS_at_Ames','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20150916_NIR_C0_compared_with_AATS_at_Ames','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
+
 
 % prepare for plotting
-colorlist_ = varycolor(90);
-colorlist  = colorlist_(90:-10:1,:);
+colorlist_ = varycolor(120);
+colorlist  = colorlist_(120:-10:1,:);
 
 for i=1:length(filelist)
     
@@ -60,7 +83,7 @@ end
                 title('Langley comparison');
                 
                 if strcmp(band,'vis')
-                    xlim([300 1000]);
+                    xlim([320 1000]);
                 elseif strcmp(band,'nir')
                     xlim([1000 1700]);
                 else
@@ -84,7 +107,7 @@ end
                 title('Langley comparison');
                 
                 if strcmp(band,'vis')
-                    xlim([300 1000]);
+                    xlim([340 1000]);
                 elseif strcmp(band,'nir')
                     xlim([1000 1700]);
                 else
@@ -128,6 +151,39 @@ end
 
             fi=[strcat(starpaths, 'figs\', 'avg_and_std_',filelist{:,2}, 'through_', filelist{:,end})];
             save_fig(3,fi,false);
+            
+            % signal strength with time
+            
+            %wln = [411 425 500 880 1020 1050 1650];
+            if strcmp(band,'vis')
+                ind = [297 314 407 888];
+                str = 'vis_';
+                wlnstr = {'411 nm','425 nm','500 nm','880 nm'};
+            elseif strcmp(band,'nir')
+                ind = [40 57 467];% nir
+                str = 'nir_';
+                wlnstr = {'1020 nm','1050 nm','1650 nm'};
+            end
+            
+            marksize = [4 6 8 10];
+            legendall={};
+            % order in ordinal date
+            % filelist = {'20150916_VIS_C0_compared_with_AATS_at_Ames','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened','20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO'};
+            % filelist = {'20150916_NIR_C0_compared_with_AATS_at_Ames','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
+
+            figure(4);
+            for ii=1:length(ind)
+                for i=1:length(filelist)
+                        plot(i,lang.(strcat('c0_',filelist{:,i}))(ind(ii)),'o','color',colorlist(i,:),'markersize',marksize(ii));hold on;
+                end
+                legendall = {legendall wlnstr{ii}};
+            end
+            xlabel('measurement #');
+            ylabel('c0 value');
+
+            legend(legendall{:});
+            fi=[strcat(starpaths, 'figs\', filelist{:,1}, str,'_variability_', filelist{:,end})];
+            save_fig(4,fi,false);
         
 
 

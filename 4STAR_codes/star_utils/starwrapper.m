@@ -484,7 +484,11 @@ end
 
 %% adjust for spectral interference (stray light)
 % TO BE DEVELOPED.
-
+if toggle.applystraycorr
+    % this is constant correction (time dependent only)
+    corr=straylightcorrection(serial2Hh(s.t),s.rate,s.w);
+    s.rate  = s.rate - repmat(corr,1,qq);
+end
 
 %% get solar zenith angle, airmass, temperatures, etc.
 v=datevec(s.t);

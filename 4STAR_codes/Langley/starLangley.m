@@ -13,6 +13,7 @@
 %                     added NIR wavelengths in cols for plots
 % Michal, 2015-10-28, tweaked to adjust ARISE unc to 0.03
 % Michal, 2016-01-09, tweaked to accomodate MLO, Jan-2016 Langleys
+% Michal, 2016-01-21, updated to include MLO-Jan-2016 airmass constraints
 %--------------------------------------------------------------------------
 
 version_set('1.1');
@@ -20,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160114';
+daystr='20160115';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -37,8 +38,12 @@ elseif isequal(daystr, '20141002')
     %source='20141002starsun.mat';% this was using most accurate c0 wFORJ
     %(before Oct 2015)
     %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
+% elseif isequal(daystr, '20160112')
+%     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
+% elseif isequal(daystr, '20160113')
+%     source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
 else
-    source=[daystr 'starsun.mat'];
+    source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
     % source='20140917starsunLangley.mat';% this is the original file made
     % in field
 end;
@@ -62,8 +67,24 @@ if isequal(daystr, '20141002')
     ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
 elseif isequal(daystr, '20140917')
     ok = ok(m_aero(ok)>=4);
+elseif isequal(daystr, '20160109')
+    ok = ok(m_aero(ok)>=2.5);
+elseif isequal(daystr, '20160110')
+    ok = ok(m_aero(ok)>=2.7);
+elseif isequal(daystr, '20160112')
+    ok1 = ok(m_aero(ok)>=2.5);
+    ok2 = [];%ok(m_aero(ok)<=1.5);
+    ok  = [ok1;ok2];
 elseif isequal(daystr, '20160113')
     ok = ok(m_aero(ok)>=2.8);
+elseif isequal(daystr, '20160114')
+    ok = ok(m_aero(ok)>=2.9);
+elseif isequal(daystr, '20160117')
+    ok = ok(m_aero(ok)>=2.9);
+elseif isequal(daystr, '20160118')
+    ok1 = ok(m_aero(ok)>=4);
+    ok2 = ok(m_aero(ok)<=2);
+    ok  = [ok1;ok2];
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
@@ -269,6 +290,9 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
     filesuffix = 'refined_Langley_MLO';
+    %filesuffix = 'refined_Langley_MLOwFORJcorrection1';
+    filesuffix = 'refined_Langley_MLO_wstraylightcorr';
+    filesuffix = 'refined_Langley_MLO_wFORJcorr';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';

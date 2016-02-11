@@ -5,7 +5,7 @@ s.sd_aero_crit=0.01;
 
 % Ozone and other gases
 s.O3h=21;
-s.O3col=0.253;    % OMI overpass Jan-8
+s.O3col=0.236;    % MLO DB
 s.NO2col=2.64e15; % OMI overpass Jan-8
 
 % other tweaks
