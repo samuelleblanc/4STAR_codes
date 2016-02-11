@@ -2,11 +2,13 @@
 % changing over to new 4STAR code now...
 
 spc = rd_spc_F4_v2;
+nir = rd_spc_F4_v2;
 
 % figure; plot(serial2hs(spc.time), spc.spectra(:,532),'-')
 % figure; plot(serial2hs(spc.time(xl_pi)), spc.raw.spectra(xl_pi,532),'ro')
 time_hs = serial2hs(spc.time);
 pix_cts = spc.raw.spectra(:,532);
+figure; plot(time_hs, pix_cts,'o');
 done = false;
 sun = 1;
 while ~done
@@ -63,7 +65,7 @@ figure; these = plot(spc.nm, 100.*std(direct(4:6,:))./mean(direct(4:6,:)),'-'); 
 % Correct for earth-sun distance squared, and so on to get Do. Then divide
 % this by ESR to get Responsivity
 
-
+save('D:\data\4STAR\yohei\MLO_2016_Jan\20160112_MLO_Day4\2016_01_12_dirn_shady.mat')
 
 
 %%
