@@ -15,26 +15,17 @@ datenum('18:26:49') datenum('18:43:22'); ...
 
 flight=[datenum('10:08:28') datenum('18:43:23')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 
-% manual masking
-s.ng=[datenum('10:13:45') datenum('10:30:00') 1  % bogus calculated airmass, before sunrise
-datenum('14:30:00') datenum('14:31:00') 10  % "The sky looks hazy from the side window. Shortwave radiances from clouds below make it difficult to tell if what’s above is thin clouds or aerosols."
-datenum('14:43:30') datenum('14:53:15') 90 % "1442 Thin clouds above. 1445 Increasing amount of clouds above us, as we descend. "
-datenum('15:43:00') datenum('15:55:00') 90 % the plane was above the boundary layer clouds but saw high clouds above, sometimes 4STAR tracking through them
-datenum('16:08:00') datenum('16:20:00') 90 
-datenum('16:20:00') datenum('16:26:00') 10 % the flight notes are mixed: "some thin clouds" , "no visible clouds"  
-datenum('16:33:00') datenum('16:36:00') 10];
-s.ng(:,1:2) = s.ng(:,1:2) - datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+% % % % manual masking
+% % % s.ng=[datenum('10:13:45') datenum('10:30:00')] ... % bogus calculated airmass, before sunrise
+% % %     -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
 
 % STD-based cloud screening for direct Sun measurements
 s.sd_aero_crit=0.01;
 
 % Ozone and other gases
 s.O3h=21;
-% s.O3col=0.300;  % Yohei's guess, to be updated
-% s.NO2col=5e15; % Yohei's guess, to be updated
-s.O3col=0.2657; %OMI mean
-
-s.NO2col=2.52e+15; %OMI mean
+s.O3col=0.300;  % Yohei's guess, to be updated
+s.NO2col=5e15; % Yohei's guess, to be updated
 
 % other tweaks
 if isfield(s, 'Pst');
