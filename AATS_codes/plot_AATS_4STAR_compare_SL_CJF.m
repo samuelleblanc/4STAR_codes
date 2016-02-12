@@ -13,15 +13,12 @@ dateprocstr='20150113';
 dateprocstr='20150916';
 %dateprocstr='20150114';
 %dateprocstr='20130708';
-% MLO
-dateprocstr='20160112';
 stardir=['D:\data\4STAR\yohei\4star_data\NASA_Ames_roof\' dateprocstr '\'];
-stardir=starpaths;
+
 
 %ratlim=[0.018,0.022];
-% dir for saving figures
+
 dd='D:\data\4STAR\yohei\4star_data\NASA_Ames_roof\';%'~/AATS/figs/';
-dd='C:\Users\msegalro.NDC\Campaigns\MLO2016\compareFigs\';
 
 %[vis_sun, nir_sun, aats]=staraatscompare_John(dateprocstr)
 if ~exist('vis_sun');

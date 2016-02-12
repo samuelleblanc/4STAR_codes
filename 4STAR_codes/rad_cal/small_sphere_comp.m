@@ -36,9 +36,6 @@
 %                 - change startup to startup_plotting
 %                 - added plot of change in resp function at different
 %                 pixels (wavelength).
-% Modified (v1.3): by Samuel LeBlanc, NASA Ames, 2015-11-11
-%                  - updates for comparing the small sphere calibrations
-%                  from NAAMES
 %
 % -------------------------------------------------------------------------
 
@@ -51,13 +48,8 @@ ll='\';
 
 
 %% setup the files to load and load them
-%ARISE setup 
 dates=['20140624';'20140716';'20140804';'20140825';'20140914';'20140920';'20140926';'20141024'];
 ref=4;
-
-% NAAMES setup
-dates=['20150915';'20151111'];
-ref=1;
 num=length(dates(:,1));
 %files=[dir dates(1,:) '_small_sphere_rad.mat';...
 %       dir dates(2,:) '_small_sphere_rad.mat';...

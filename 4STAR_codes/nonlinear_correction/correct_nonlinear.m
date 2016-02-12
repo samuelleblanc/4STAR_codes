@@ -57,7 +57,7 @@ date='20130507';
 pname=starpaths; %'C:\Users\sleblan2\Research\4STAR\cal\20130506';
 if verbose, disp(['loading correction file:' pname date '_resp_corr.mat']), end;
 % load([pname date '_resp_corr.mat']);
-load(fullfile(pname, [date '_resp_corr.mat']));
+load(which([date '_resp_corr.mat']));
 
 %% Calculate well depth
 if isvis 

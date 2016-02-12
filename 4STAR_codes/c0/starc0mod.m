@@ -77,16 +77,16 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
-         if now>=datenum([2016 1 19 0 0 0]);
+    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
+        if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160119';
+            filesuffix='modified_Langley_MLO_mean'; % MLO-Jan-2016 mean
+            model_atmosphere=1; %(Tropical-MLO)
+        elseif now>=datenum([2016 1 9 0 0 0]);
             daystr='20160109';
-            filesuffix='modified_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            model_atmosphere=1; % MLO
-        elseif now>=datenum([2016 1 12 0 0 0]);
-            daystr='20160112';
             filesuffix='modified_Langley_MLO'; % adjust date for each of the calibration days
-            model_atmosphere=1; % MLO
-        end; 
+            model_atmosphere=1; %(Tropical-MLO)
+        end;  
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2015 11 23 0 0 0]);
             daystr='20151118';
@@ -199,10 +199,10 @@ if ~exist('visc0')
             if newmatlab;
 %                 a=load(fullfile(starpaths,visfilename));
 %                 visc0mod(i,:)=a(:,3);% test
-                a=importdata(fullfile(starpaths,visfilename));
+                a=importdata(which(visfilename));
                 visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             else;
-                a=importdata(fullfile(starpaths,visfilename));
+                a=importdata(which(visfilename));
                 visc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
                 %visc0mod(i,:)=a(:,3)';
             end;
@@ -223,7 +223,7 @@ if ~exist('visc0')
             visc0mod(visc0mod==-1)=NaN;
             visc0moderr(visc0moderr==-1)=NaN;
         else
-            visc0mod(i,:)=load(fullfile(starpaths,visfilename));
+            visc0mod(i,:)=load(which(visfilename));
             visc0moderr(i,:)=NaN(1,size(visc0mod,2));
         end;
         visnote=[visnote visfilename ', '];
@@ -233,10 +233,10 @@ if ~exist('visc0')
             if newmatlab;
 %                 a=load(fullfile(starpaths,nirfilename));
 %                 nirc0mod(i,:)=a(:,3);
-                a=importdata(fullfile(starpaths,nirfilename));
+                a=importdata(which(nirfilename));
                 nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             else;
-                a=importdata(fullfile(starpaths,nirfilename));
+                a=importdata(which(nirfilename));
                 nirc0mod(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
                 %nirc0mod(i,:)=a(:,3)';
             end;
@@ -253,7 +253,7 @@ if ~exist('visc0')
             nirc0mod(nirc0mod==-1)=NaN;
             nirc0moderr(nirc0moderr==-1)=NaN;
         else
-            nirc0mod(i,:)=load(fullfile(starpaths,nirfilename));
+            nirc0mod(i,:)=load(which(nirfilename));
             nirc0moderr(i,:)=NaN(1,size(nirc0mod,2));
         end;
         nirnote=[nirnote nirfilename ', '];
@@ -313,9 +313,9 @@ if 1==2; % never executed, just for record keeping
         filesuffix(1)={'refined_Langley_on_G1'};
     end;
     % until 2012/05/23, V0 from standard Langley plots
-    visc0mod=load(fullfile(starpaths,'20120420_VIS_C0_standard_Langley_on_G1.dat'));
+    visc0mod=load(which('20120420_VIS_C0_standard_Langley_on_G1.dat'));
     visnote='C0 from 20120420 airborne Langley on G1.';
-    nirc0mod=load(fullfile(starpaths,'20120420_NIR_C0_standard_Langley_on_G1.dat'));
+    nirc0mod=load(which('20120420_NIR_C0_standard_Langley_on_G1.dat'));
     nirnote='C0 from 20120420 airborne Langley on G1.';
 end;
 

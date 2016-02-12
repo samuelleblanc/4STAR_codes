@@ -38,7 +38,7 @@ for idx_model_atm=1:6;
     end
     
     %filename='Tropical.asc';
-    fid=fopen(fullfile(starpaths,filename),'r');
+    fid=fopen(which(filename),'r');
     fgetl(fid);
     data=fscanf(fid,'%f',[4 inf]);
     Altitude=data(1,:)*1000; % convert km to meters

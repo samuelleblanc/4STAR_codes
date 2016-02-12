@@ -1,6 +1,5 @@
-function aats = aats2matx
-% was aatsmat
-% was function aats = aatsmat(aats);
+function aats = aatsmat(aats);
+
 %prepares data for retrievals
 
 %Filter #1, Apply time boundaries UT_start, UT_end
@@ -61,9 +60,7 @@ daystr = '20150908';
 % %%data_dir='c:\johnmatlab\AATS14_data_2011\Mauna Loa\'
 % data_dir='c:\johnmatlab\AATS14_data_2011\COAST\';  %use for COAST
 % data_dir='c:\johnmatlab\AATS14_data_2012\Ames\';   %use for Ames rooftop measurements 2012
-%xsect_dir='D:\case_studies\AATS\xsect\'; % CJF
-%data_dir = ['D:\data\4STAR\yohei\4star_data\NASA_Ames_roof\',daystr,'\Ames\'];
-xsect_dir='C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\AATS_Calib\'; % MSR
+xsect_dir='D:\case_studies\AATS\xsect\'; % CJF
 data_dir = ['D:\data\4STAR\yohei\4star_data\NASA_Ames_roof\',daystr,'\Ames\'];
 Loschmidt=2.686763e19; %molecules/cm2
 H2O_conv=1244.12; %converts cm-atm in pr cm or g/cm2.  This has units of [cm^3/g].
@@ -74,14 +71,9 @@ if ~exist('infile','var')
    pname = [pname, filesep]; fname = [fname, ext];
 end
 
-% this looks like old version
-% [day,month,year,Time_Laptop,Time_Can,airmass,Temperature,geog_lat,geog_long,Press_Alt,press,Heading,data,...
-%                     Sd_volts,Az_err,Elev_err,Az_pos,Elev_pos,Voltref,ScanFreq,AvePeriod,RecInterval,site,...
-%                     filename,RH,GPS_Alt,T_stat,flight_no]=AATS14_Laptop_DC8_SOLVE2(pname,fname);
-                
- [day,month,year,Time_Laptop,Time_Can,airmass,Temperature,geog_lat,geog_long,Press_Alt,press,Heading,data,...
-                Sd_volts,Az_err,Elev_err,Az_pos,Elev_pos,Voltref,ScanFreq,AvePeriod,RecInterval,site,...
-                pathname_in,filename_in,RH,GPS_Alt,T_stat,flight_no]=AATS14_Laptop_DC8_SOLVE2(pathname_in,filename_in,iconf);
+[day,month,year,Time_Laptop,Time_Can,airmass,Temperature,geog_lat,geog_long,Press_Alt,press,Heading,data,...
+                    Sd_volts,Az_err,Elev_err,Az_pos,Elev_pos,Voltref,ScanFreq,AvePeriod,RecInterval,site,...
+                    filename,RH,GPS_Alt,T_stat,flight_no]=AATS14_Laptop_DC8_SOLVE2(pname,fname);
 % [day,month,year,UT_Laptop,UT_Can,Airmass,Temperature,Latitude,Longitude,Press_Alt,Pressure,Heading,...
 %       Mean_volts,Sd_volts,Az_err,Elev_err,Az_pos,Elev_pos,Voltref,ScanFreq,AvePeriod,RecInterval,site,filename,...
 %       RH,GPS_Alt,T_stat,flight_no]=AATS14_Laptop_DC8_SOLVE2(pname,fname);

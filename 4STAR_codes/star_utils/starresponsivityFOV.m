@@ -24,7 +24,7 @@ elseif now>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking
 end;
 
 % load FOV data
-load(fullfile(starpaths, [daystr 'starfov.mat']));
+load(which( [daystr 'starfov.mat']));
 
 version_set('1.0');
 
