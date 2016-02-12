@@ -6,9 +6,9 @@
 
 varNames=who();
 for i=1:length(varNames)
-   if ~strcmp(varNames{i},'s')
-  assignin('caller',varNames{i},eval(varNames{i}));
-   end
+    if ~strcmp(varNames{i},'s')
+        assignin('caller',varNames{i},eval(varNames{i}));
+    end
 end;
 
 return
