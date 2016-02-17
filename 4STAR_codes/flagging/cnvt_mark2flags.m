@@ -40,14 +40,11 @@ for flag = 1:length(flag_info.flag_names)
     flags.(flag_info.flag_names{flag}) = false(size(t));
 end
 
-
 for N = 1:size(marked.intervals,1)
     flag_tag = marked.intervals(N,3);
     tag_ii = find(flag_info.flag_tags==flag_tag);
     t_ = t>=marked.intervals(N,1) & t<=marked.intervals(N,2);
     flags.(flag_info.flag_names{tag_ii})(t_) = true;
 end
-% agricultural smoke [datenum('18:57:45') datenum('18:58:25')] is masked by
-% the STD-based screening. A limitation of the automation.
 
 return                    

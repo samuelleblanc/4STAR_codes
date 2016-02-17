@@ -270,7 +270,9 @@ end;
 if isempty(s.NO2col);
     warning(['Enter nitric dioxide column density in starinfo' daystr '.m.']);
 end;
-
+if isfield(s,'toggle')
+    toggle = s.toggle;
+end
 %********************
 %% add related variables, derive count rate and combine structures
 %********************
@@ -949,7 +951,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [s.flags]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        [s.flags, good]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
     end;
     %************************************************************
     
