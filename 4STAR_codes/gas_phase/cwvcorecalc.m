@@ -47,7 +47,6 @@
 %                 subtracted water vapor from 
 %                 line 607: used starsun.tau_aero_tot (O2-O2 NIR
 %                 subtracted) with water vapor subtraction
-% MS: 2016-01-10  fixed some bugs related to cwv retrieval for model atm=1
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(starsun,modc0,model_atmosphere)
@@ -228,20 +227,13 @@ end
  % calculate water vapor
  %---------------------------------------
  
- if model_atmosphere==1 % MLO
+ if model_atmosphere==1
       H2O_conv=1244.12; %converts cm-atm in pr cm or g/cm2.  the conversion factor has units of [cm^3/g]. 
       
       U1=(1./repmat(starsun.m_H2O,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(starsun.t)))))'.*...
          (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(starsun.t))))'); 
       Ufinal  = U1/H2O_conv;
       avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
-      std_U1 = abs(real((nanstd(Ufinal(:,ind),[],2)))); 
-      % add cross section parameters to be used in best fit retrieval
-      zkm_LBLRTM_calcs=[3.4];
-      afit_H2O=[H2Oa];
-      bfit_H2O=[H2Ob];
-      cfit_H2O=ones(length(xs.wavelen),length(zkm_LBLRTM_calcs));
-      
  elseif model_atmosphere==3 % TCAP winter/ARISE
      % load altitude dependent coef.
      alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
@@ -435,7 +427,6 @@ wv_residual = [];
 
 for i = 1:length(starsun.t)
  % choose right altitude coef
- if model_atmosphere~=1
         if ~isNaN(starsun.Alt(i))
               kk=find(starsun.Alt(i)/1000>=zkm_LBLRTM_calcs);
               if starsun.Alt(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
@@ -444,7 +435,6 @@ for i = 1:length(starsun.t)
         else 
              kz=1; 
         end
- end
        % !!! can use co2/ch4/o2 xs altitude dependance similarly
        %
        %  x0 = [300 10000 10000 0.75 0.8 -2 -0.1]; % this is initial guess
@@ -464,15 +454,9 @@ for i = 1:length(starsun.t)
 %        end
        meas = [starsun.w(wln)' y'];
        Xdat = meas(:,1);
-       if model_atmosphere==1
-           ac = real(afit_H2O(wln)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
-           bc = real(bfit_H2O(wln)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
-           PAR  = [ac bc];
-       else
-           ac = real(afit_H2O(wln,kz)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
-           bc = real(bfit_H2O(wln,kz)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
-           PAR  = [ac bc];
-       end
+       ac = real(afit_H2O(wln,kz)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
+       bc = real(bfit_H2O(wln,kz)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
+       PAR  = [ac bc];
        
        % Set Options
        options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
@@ -570,15 +554,9 @@ for i = 1:length(starsun.t)
                    yopt  = real(-log(yopt_));
                    ysub  = -log(exp(-afit_H2O(wln,kz).*(real(U_(1))).^bfit_H2O(wln,kz)).*exp(-(ch4coef(wln).*real(U_(2)))).*exp(-(co2coef(wln).*real(U_(3)))).*exp(-(o4coef(wln).*real(U_(4)))));
                else
-                   if model_atmosphere==1
-                       %yopt_ =  exp(-afit_H2O(wln).*(real(U_(1))).^bfit_H2O(wln)).*exp(-(real(U_(2)) + real(U_(3))*Xdat + real(U_(4))*Xdat.^2));
-                       %yopt  = (-log(yopt_));
-                       %ysub  = real(-log(exp(-afit_H2O(wln).*(real(U_(1))).^bfit_H2O(wln))));
-                   else
-                       yopt_ =  exp(-afit_H2O(wln,kz).*(real(U_(1))).^bfit_H2O(wln,kz)).*exp(-(real(U_(2)) + real(U_(3))*Xdat + real(U_(4))*Xdat.^2));
-                       yopt  = (-log(yopt_));
-                       ysub  = real(-log(exp(-afit_H2O(wln,kz).*(real(U_(1))).^bfit_H2O(wln,kz))));
-                   end
+                   yopt_ =  exp(-afit_H2O(wln,kz).*(real(U_(1))).^bfit_H2O(wln,kz)).*exp(-(real(U_(2)) + real(U_(3))*Xdat + real(U_(4))*Xdat.^2));
+                   yopt  = (-log(yopt_));
+                   ysub  = real(-log(exp(-afit_H2O(wln,kz).*(real(U_(1))).^bfit_H2O(wln,kz))));
                end
                % assign fitted spectrum to subtract
                %tau_aero_fitsubtract(i,wln) = ysub;
@@ -620,13 +598,9 @@ for i = 1:length(starsun.t)
 %------------------------------------------------------------
     if wrange==1
     % subtract water vapor for all but o3 region
-    if model_atmosphere==1
-        afit_H2Os = afit_H2O'; afit_H2Os(isNaN(afit_H2Os)) = 0; afit_H2Os(afit_H2Os<0) = 0; afit_H2Os(isinf(afit_H2Os)) = 0;
-        bfit_H2Os = bfit_H2O'; bfit_H2Os(isNaN(bfit_H2Os)) = 0; bfit_H2Os(bfit_H2Os<0) = 0; bfit_H2Os(isinf(bfit_H2Os)) = 0;
-    else
-        afit_H2Os = afit_H2O(:,kz); afit_H2Os(isNaN(afit_H2Os)) = 0; afit_H2Os(afit_H2Os<0) = 0; afit_H2Os(isinf(afit_H2Os)) = 0;
-        bfit_H2Os = bfit_H2O(:,kz); bfit_H2Os(isNaN(bfit_H2Os)) = 0; bfit_H2Os(bfit_H2Os<0) = 0; bfit_H2Os(isinf(bfit_H2Os)) = 0;
-    end
+
+    afit_H2Os = afit_H2O(:,kz); afit_H2Os(isNaN(afit_H2Os)) = 0; afit_H2Os(afit_H2Os<0) = 0; afit_H2Os(isinf(afit_H2Os)) = 0;
+    bfit_H2Os = bfit_H2O(:,kz); bfit_H2Os(isNaN(bfit_H2Os)) = 0; bfit_H2Os(bfit_H2Os<0) = 0; bfit_H2Os(isinf(bfit_H2Os)) = 0;
 
     afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));

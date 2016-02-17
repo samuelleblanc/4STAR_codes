@@ -85,9 +85,6 @@ function	s=starwrapper(s, s2, varargin)
 %                       dimension mistmatch bug
 %                       changed flags.aerosol_init_auto to flags.bad_aod to
 %                       make it compatible with starflag
-% MS: v 2.5,2016-01-13, changed the time compatability between vis and nir
-%                       spectrometers to be 100 msec (0.1) instead of 20
-%                       msec (0.02) in line 419
 
 version_set('2.5');
 %********************
@@ -273,7 +270,9 @@ end;
 if isempty(s.NO2col);
     warning(['Enter nitric dioxide column density in starinfo' daystr '.m.']);
 end;
-
+if isfield(s,'toggle')
+    toggle = s.toggle;
+end
 %********************
 %% add related variables, derive count rate and combine structures
 %********************
@@ -415,7 +414,6 @@ if nargin>=2+nnarg
     pp=numel(s.t);
     qq=size(s.raw,2);
     ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
-    %ngap=numel(find(abs(s.t-s2.t)*86400>0.1));
     if ngap==0;
     elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
         warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
@@ -480,14 +478,6 @@ if nargin>=2+nnarg
     qq=qq+qq2;
     clear qq2 s2;
     [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
-end
-
-%% adjust for spectral interference (stray light)
-% TO BE DEVELOPED.
-if toggle.applystraycorr
-    % this is constant correction (time dependent only)
-    corr=straylightcorrection(serial2Hh(s.t),s.rate,s.w);
-    s.rate  = s.rate - repmat(corr,1,qq);
 end
 
 %% get solar zenith angle, airmass, temperatures, etc.
@@ -557,6 +547,9 @@ if toggle.applytempcorr
     corr=startemperaturecorrection(daystr, s.t);
     s.rate  = s.rate.*repmat(corr,1,qq);
 end
+
+% adjust for spectral interference (stray light)
+% TO BE DEVELOPED.
 
 %********************
 %% screen data
@@ -958,7 +951,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [s.flags]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        [s.flags, good]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
     end;
     %************************************************************
     

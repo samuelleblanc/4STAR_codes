@@ -223,15 +223,6 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
     
    % retrieve o3
    wln = wln_vis6;
-   
-   
-   % load TOA solar spectrum
-     kurvis = importdata(fullfile(starpaths,'MChKur4star_air_vis.ref'));%kur2star_vis.ref
-     kur.visnm     = kurvis.data(:,1);
-     kur.visIrad   = kurvis.data(:,2);
-     % interpolate to wln
-     s.kurO3 = interp1(kur.visnm/1000, kur.visIrad, s.w(wln),'pchip','extrap');
-   
    O3conc=[];H2Oconc=[];O4conc=[];O3resi=[];o3OD=[];
    [O3conc H2Oconc O4conc O3resi o3OD varall_lin] = o3corecalc_lin(s,o3coef,o4coef,h2ocoef,wln,tau_OD);
    
@@ -278,10 +269,9 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
    
 %% LS for O3
- basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
- % not necessary to use no2 here
-
-   ccoefo3=[];
+ basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];
+ %basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
+ ccoefo3=[];
    RRo3=[];
    for k=1:pp;
         meas = log(s.c0(wln)'./s.ratetot(k,(wln))');
@@ -296,16 +286,9 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    o3VCD = real((((ccoefo3(1,:))*1000))')./s.m_O3;
    % create smooth o3 time-series
    xts = 60/3600;   %60 sec in decimal time
-   tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+   %tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
    [o3VCDsmooth, sn] = boxxfilt(tplot, o3VCD, xts);
    o3vcd_smooth = real(o3VCDsmooth);
-   
-   x0=[ccoefo3(1,:)' ccoefo3(2,:)' ccoefo3(4,:)' ccoefo3(5,:)' ccoefo3(6,:)' ccoefo3(7,:)' ccoefo3(8,:)'];
-   
-   O3concnew=[];H2Oconc=[];O4conc=[];O3resinew=[];o3OD=[];
-   [O3concnew H2Oconc O4conc O3resinew o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
-   
-   
    
    % calculate error
    % no2Err   = (tau_pca_mRay(:,(wln))'-RRno2pca(:,:))./repmat((no2coef(wln)),1,pp);    % in atm cm
@@ -313,7 +296,7 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    MSEo3DU = real((1000*(1/length(wln))*sum(o3Err.^2))');                 % convert from atm cm to DU
    RMSEo3  = real(sqrt(real(MSEo3DU)));
    
-   gas.o3Inv    = o3VCD;%o3vcd_smooth is the default output;
+   gas.o3Inv    = o3vcd_smooth;
    gas.o3resiInv= RMSEo3;
    
 %    figure;subplot(211);plot(tplot,o3VCD,'.r');hold on;
@@ -328,12 +311,12 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
           
    % prepare to plot spectrum OD and o3 cross section
    
-   o3spectrum     = tau_OD(:,wln);%-RRo3' + ccoefo3(1,:)'*basiso3(:,1)';
+   o3spectrum     = tau_OD(:,wln)-RRo3' + ccoefo3(1,:)'*basiso3(:,1)';
    o3fit          = ccoefo3(1,:)'*basiso3(:,1)';
    o3residual     = tau_OD(:,wln)-RRo3';
    
-%      plot fitted and "measured" o3 spectrum
-%      for i=1:1000:length(s.t)
+%      plot fitted and "measured" no2 spectrum
+%      for i=1:100:length(s.t)
 %          figure(888);
 %          plot(wvis((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
 %          plot(wvis((wln)),o3fit(i,:),'-r','linewidth',2);hold on;
@@ -499,25 +482,11 @@ end
 %      end
 
    % no2OD is the spectrum portion to subtract
-    gas.no2Inv    = no2vcdpca_smooth;%NO2conc;%in [DU]
-    gas.no2resiInv= RMSEno2;%sqrt(NO2resi);
+%    gas.no2  = no2vcdpca_smooth;%NO2conc;%in [DU]
+%    gas.no2resi= RMSEno2;%sqrt(NO2resi);
    
    gas.no2  = NO2conc;%in [DU]
    gas.no2resi= NO2resi;
-   
-   
-   % save gas data to .txt file
-   Loschmidt=2.686763e19; %molecules/cm2
-   no2_molec_cm2    = no2vcdpca_smooth*(Loschmidt/1000);
-   no2err_molec_cm2 = RMSEno2*(Loschmidt/1000);
-   
-   
-   dat2sav = [serial2Hh(s.t) s.sza s.m_aero s.tau_aero(:,407) s.m_O3 O3concnew O3resinew o3VCD o3vcd_smooth...
-              RMSEo3 NO2conc NO2resi no2VCDpca no2vcdpca_smooth RMSEno2 no2_molec_cm2 no2err_molec_cm2...
-              s.cwv.cwv940m1 s.cwv.cwv940m1std s.cwv.cwv940m2 s.cwv.cwv940m2resi];
-   
-   fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary_wFORJcorr.dat');
-   save(fi,'-ASCII','dat2sav');
    
    %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
    %no2amount = (NO2conc)*no2coef';

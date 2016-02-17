@@ -4,6 +4,10 @@ function [ng, flag_name, flag_tag] = cnvt_flags2ng(time, flags,good)
 % Modification history:
 % SL (v1.0): 2014-11-12: added versioning, and ng=3 for tracking errors
 version_set('v1.0')
+if isstruct(time)&&isfield(time, 'time')
+    flags = time;
+    time = time.time.t;
+end
 
 if ~exist('good','var')
     good = true(size(time));

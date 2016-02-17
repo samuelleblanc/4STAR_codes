@@ -111,7 +111,6 @@ if ~isempty(col_for_plot);
     end;
     set(lh,'fontsize',12,'location','southwest');
     ggla;
-    xlabel('airmass');ylabel('Count Rate (/ms) for Aerosols');
     grid on;
     hold off;
 end;

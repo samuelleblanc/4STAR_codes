@@ -1,5 +1,4 @@
 function [vis_sun, nir_sun, aats]=staraatscompare(daystr, noonrow)
-% MS, 2016-01-14, added read for aats.mat files instead of raw
 
 % load 4STAR
 try
@@ -15,7 +14,6 @@ s.rate_nonray = s.rate ./ tr(s.m_ray, s.tau_ray);
 
 % load(fullfile(starpaths, [daystr 'aats.mat'])); % from prepare_COAST_Oct2011.m    %     load(fullfile(paths,'4star\data\v1mat', 'AATSdata_05Jan12AA_V02.mat'));
 % aat = load(getfullname('*aats*.mat','aats_mats'));
-%aats = load(getfullname('*aats*.mat','aats_mats'));
 aats = aats2matx;
 aats = cataats(aats,aats2matx);
 if ~exist('aats','var') 

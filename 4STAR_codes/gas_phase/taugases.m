@@ -28,7 +28,7 @@ else
 end
 
 if t>=datenum([2012 7 3 0 0 0]);
-    cross_sections=load(fullfile(starpaths, 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
+    cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
     fn=fieldnames(cross_sections);
     for ff=1:length(fn);
         orig=cross_sections.(fn{ff});
@@ -43,14 +43,14 @@ else; % legacy cross sections that were separate between VIS and NIR; record kee
     if isequal(lower(datatype(1:3)), 'vis') || isequal(lower(datatype(1:3)), 'sun');
         visw=starwavelengths(t);
         if t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012
-            cross_sections=load(fullfile(starpaths, 'cross_sections_visnew.mat'));
+            cross_sections=load(which( 'cross_sections_visnew.mat'));
             cross_sections.wln=cross_sections.wln';
             cross_sections.no2=cross_sections.no2';
             visw0=Lambda_MCS_fit3(1:1044)/1000;
             cross_sections.h2oa=interp1(visw0(180:end), cross_sections.h2oa, visw); % until the H2O data are given for the new wavelengths
             cross_sections.h2ob=interp1(visw0(180:end), cross_sections.h2ob, visw); % until the H2O data are given for the new wavelengths
         else
-            cross_sections=load(fullfile(starpaths, 'cross_sections_vis.mat'));
+            cross_sections=load(which( 'cross_sections_vis.mat'));
             [c,ia,ib]=intersect(visw,cross_sections.wln/1000);
             fn=fieldnames(cross_sections);
             for ff=1:length(fn);
@@ -61,7 +61,7 @@ else; % legacy cross sections that were separate between VIS and NIR; record kee
             clear orig;
         end;
     elseif isequal(lower(datatype(1:3)), 'nir');
-        cross_sections=load(fullfile(starpaths, 'cross_sections_nir.mat'));
+        cross_sections=load(which( 'cross_sections_nir.mat'));
         cross_sections.no2=zeros(size(cross_sections.wln));
         cross_sections.o3=zeros(size(cross_sections.wln));
         cross_sections.o2=zeros(size(cross_sections.wln));
@@ -69,7 +69,7 @@ else; % legacy cross sections that were separate between VIS and NIR; record kee
         error('Spectrometer?');
     end;
     if isequal(lower(datatype(1:3)), 'sun'); % VIS+NIR
-        cross_sections_nir=load(fullfile(starpaths, 'cross_sections_nir.mat'));
+        cross_sections_nir=load(which( 'cross_sections_nir.mat'));
         cross_sections_nir.no2=zeros(size(cross_sections_nir.wln));
         cross_sections_nir.o3=zeros(size(cross_sections_nir.wln));
         cross_sections_nir.o2=zeros(size(cross_sections_nir.wln));

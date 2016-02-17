@@ -5,9 +5,9 @@ else
    daystr=evalin('caller','daystr');
 end
 
-toggle = update_toggle;
 if isfield(s, 'toggle')
-   toggle = catstruct(toggle, s.toggle);
+    s.toggle = update_toggle(s.toggle);
+else
+    s.toggle = update_toggle;
 end
-s.toggle = toggle;
 
