@@ -38,6 +38,15 @@ datenum('16:20:00') datenum('16:26:00') 10 % the flight notes are mixed: "some t
 datenum('16:33:00') datenum('16:36:00') 10]; 
 s.ng(:,1:2) = s.ng(:,1:2) - datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
  
+% or load flags from file as follows:
+% 1. Call the function by name as in:
+s.ng_new = starflags_20151117_CF_marks_ALL_20160217_0302;
+% 2. Call the function by handle (better for running on compiler)
+marks_fnt  = str2func('starflags_20151117_CF_marks_ALL_20160217_0302'); 
+s.ng_newer = marks_fnt();
+% 3. Load the mat file and convert to 'ng'
+% s.ng_mat = cnvt_flags2ng(load(['E:\data\4STAR\yohei\mat\20151117_starflag_man_created20160212_1438by_CF.mat']));
+
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
  
@@ -82,3 +91,32 @@ end;
 
 return
 
+function toggle_out = update_toggle(toggle_in)
+% toggle_out = update_toggle(toggle_in)
+% Merge the optional "toggle_in" with user-supplied values in toggle_out
+% Frequently this instance will be shadowed by the internal function
+% of the same name defined beneath starinfo files.
+
+toggle_out.subsetting_Tint = true;
+toggle_out.pca_filter = false;
+toggle_out.verbose=true;
+toggle_out.saveadditionalvariables=true;
+toggle_out.savefigure=false;
+toggle_out.computeerror=true;
+toggle_out.inspectresults=false;
+toggle_out.applynonlinearcorr=true;
+toggle_out.applytempcorr=false;% true is for SEAC4RS data
+toggle_out.gassubtract = false;
+toggle_out.booleanflagging = true;
+toggle_out.flagging = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.doflagging = true; % for running any Yohei style flagging
+toggle_out.dostarflag = true; 
+toggle_out.lampcalib  = false; 
+toggle_out.runwatervapor = false;
+toggle_out.applyforjcorr = false;
+
+if exist('toggle_in', 'var')
+   toggle_out = catstruct(toggle_in, toggle_out);
+end
+
+return

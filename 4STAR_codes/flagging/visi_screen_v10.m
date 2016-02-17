@@ -18,8 +18,8 @@ function [flags,screened,good,figs] = visi_screen(time, tau, varargin)
 %       number and position to be provided.  This is also a return field.
 % returns:
 %   flags: struct of logicals (from flags inarg) of length(time)
-%   screened: bitwise mapping of flags fields into uint32.
-%   good: logical OR of flags from flag_list
+%   screened: bitwise mapping of flags not in flag_list into uint32.
+%   good: good = screened==0
 %   figs: output of figure numbers and positions to preserve figure layout
 % 
 % Visually screen times for whether certain events are true or false.

@@ -22,7 +22,7 @@ if nargin==0;
 end;
 if t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012
     if now>=datenum([2013 6 5 0 0 0]); % update for VIS spectrometer 
-        s=importdata(fullfile(starpaths, 'wl_20130605.txt'), ' ', 7);
+        s=importdata(which( 'wl_20130605.txt'), ' ', 7);
         visw=s.data(:,5)';
         visfwhm=s.data(:,6)'/1000;
         clear s;
@@ -57,12 +57,12 @@ if nargout>2;
             visnote=[visnote ' VIS FWHM to be updated.'];
         end;
         fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
-        load(fullfile(starpaths,fwhmfile));
+        load(which(fwhmfile));
         nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
         nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
     else
         fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
-        load(fullfile(starpaths,fwhmfile));
+        load(which(fwhmfile));
         visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
         visnote=[visnote ' FWHM from ' fwhmfile '.'];
         nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
