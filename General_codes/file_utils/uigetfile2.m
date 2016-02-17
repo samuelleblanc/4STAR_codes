@@ -11,6 +11,9 @@ function [filename, pathname, filterindex] = uigetfile2(varargin)
 %   selections update the folder remembered.  If the user cancels the file
 %   dialog box then the remembered path is left the same.
 %
+%   Modified to save last directory file in userpath which users typically 
+%   have write access to.
+%
 %   Usage is the same as UIGETFILE.
 %
 %
@@ -19,9 +22,17 @@ function [filename, pathname, filterindex] = uigetfile2(varargin)
 %   Written by Chris J Cannell and Aditya Gadre
 %   Contact ccannell@mindspring.com for questions or comments.
 %   12/05/2005
+%  2016/02/12 CJF Modified to use userpath
 
 % name of mat file to save last used directory information
-lastDirMat = 'lastUsedDir.mat';
+pname = strrep(userpath,';',filesep);
+pathdir = [pname, 'filepaths',filesep];
+if ~exist(pathdir,'dir')
+    mkdir(pname, 'filepaths');
+end
+% pathdir = [pathdir,filesep];
+
+lastDirMat = [pathdir, 'lastUsedDir.mat'];
 
 % save the present working directory
 savePath = pwd;

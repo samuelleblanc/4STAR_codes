@@ -136,10 +136,10 @@ if ~exist('visresp')
         visfilename=[daystr{i} '_VIS_SKY_Resp_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            if not(exist(fullfile(starpaths,visfilename)));
-                warning(['*** File not found:' fullfile(starpaths,visfilename)])
+            if not(exist(which(visfilename)));
+                warning(['*** File not found:' which(visfilename)])
             end;
-            a=importdata(fullfile(starpaths,visfilename));
+            a=importdata(which(visfilename));
             visresp(i,:)=a.data(:,strcmp(lower(a.colheaders), 'resp'))';
             if sum(strcmp(lower(a.colheaders), 'resperr'))>0;
                 visresperr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'resperr'))';
@@ -147,14 +147,14 @@ if ~exist('visresp')
                 visresperr(i,:)=NaN(1,size(visresp,2));
             end;
         else
-            visresp(i,:)=load(fullfile(starpaths,visfilename));
+            visresp(i,:)=load(which(visfilename));
             visresperr(i,:)=NaN(1,size(visresp,2));
         end;
         visnote=[visnote visfilename ', '];
         vislstr(i)={visfilename};
         nirfilename=strrep(visfilename,'VIS','NIR');
         if isequal(orientation,'vertical');
-            a=importdata(fullfile(starpaths,nirfilename));
+            a=importdata(which(nirfilename));
             nirresp(i,:)=a.data(:,strcmp(lower(a.colheaders), 'resp'))';
             if sum(strcmp(lower(a.colheaders), 'resperr'))>0;
             nirresperr(i,:)=a.data(:,strcmp(lower(a.colheaders), 'resperr'))';
@@ -162,7 +162,7 @@ if ~exist('visresp')
             nirresperr(i,:)=NaN(1,size(nirresp,2));
         end;
         else
-            nirresp(i,:)=load(fullfile(starpaths,nirfilename));
+            nirresp(i,:)=load(which(nirfilename));
             nirresperr(i,:)=NaN(1,size(nirresp,2));
         end;
         nirnote=[nirnote nirfilename ', '];
@@ -206,9 +206,9 @@ if 1==2; % never executed, just for record keeping
         filesuffix(1)={'refined_Langley_on_G1'};
     end;
     % until 2012/05/23, V0 from standard Langley plots
-    visresp=load(fullfile(starpaths,'20120420_VIS_C0_standard_Langley_on_G1.dat'));
+    visresp=load(which('20120420_VIS_C0_standard_Langley_on_G1.dat'));
     visnote='C0 from 20120420 airborne Langley on G1.';
-    nirresp=load(fullfile(starpaths,'20120420_NIR_C0_standard_Langley_on_G1.dat'));
+    nirresp=load(which('20120420_NIR_C0_standard_Langley_on_G1.dat'));
     nirnote='C0 from 20120420 airborne Langley on G1.';
 end;
 

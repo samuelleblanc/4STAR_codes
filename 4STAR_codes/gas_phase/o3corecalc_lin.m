@@ -29,19 +29,16 @@ for i = 1:length(s.t)
     meas = [s.w(wln)' y'];
     lm = meas(:,1);
     PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 s.c0(wln)'];
-    %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 300*s.kurO3'];
     
        % Set Options
        
        %options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-12,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
         options = optimset('Algorithm','interior-point','LargeScale','off','TolFun',1e-3,'Display','notify-detailed','TolX',1e-3,'MaxFunEvals',1000);
-        %options = optimset('Algorithm','levenberg-marquardt');
        
      
        % boundary conditions for slant path
          lb = [0 0 0 0 -1 -1 -1];
          ub = [5 50 10 5 0 1 1];% 3rd order
-         
          %ub = [5 50 10 5 0 2 2];% 3rd order
          %ub = [10 50 10 5 0 2 2];% 3rd order
  
@@ -51,12 +48,6 @@ for i = 1:length(s.t)
             signal=logical(y<=10);
             if sum(signal)<10
                     [U_,fval,exitflag,output]  = fmincon('O3resi_lin',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
-%                     % testing nonlinear option
-%                     x0 = [x0,0,0];
-%                     
-%                     [U_,fval,exitflag,output]  = fmincon('O3resi_nonlin',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
-%                     [U_,fval,resnorm,exitflag,output] = lsqcurvefit(@(x0)O3resi_lin_LM(x0,meas,PAR),x0,lm,y',[],[],options); 
-                         
             %end
             
                 if ~isreal(U_(1)) || U_(1)<0 %|| (exist(exitflag) && exitflag~=1)
@@ -75,8 +66,7 @@ for i = 1:length(s.t)
                
                % plot fitted figure
              
-                   yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
-                   %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
+                   yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;      
                    ymeas = log(s.c0(wln))-log(y);
                   
                    

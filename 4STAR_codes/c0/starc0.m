@@ -34,16 +34,13 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
         if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160119';
+            filesuffix='refined_Langley_MLO_mean'; % MLO-Jan-2016 mean
+        elseif now>=datenum([2016 1 9 0 0 0]);
             daystr='20160109';
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-        elseif now>=datenum([2016 1 16 0 0 0]);
-            daystr='20160109';
-            %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
-            %filesuffix='refined_Langley_MLOwFORJcorrection1';
-            %filesuffix='refined_Langley_MLO_wstraylightcorr';
+            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
         end;  
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2015 11 23 0 0 0]);
@@ -176,7 +173,8 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            a=importdata(fullfile(starpaths,visfilename));
+            a=importdata(which(visfilename));
+%             a=importdata(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -191,14 +189,14 @@ if ~exist('visc0')
             visc0(visc0==-1)=NaN;
             visc0err(visc0err==-1)=NaN;
         else
-            visc0(i,:)=load(fullfile(starpaths,visfilename));
+            visc0(i,:)=load(which(visfilename));
             visc0err(i,:)=NaN(1,size(visc0,2));
         end;
         visnote=[visnote visfilename ', '];
         vislstr(i)={visfilename};
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
-            a=importdata(fullfile(starpaths,nirfilename));
+            a=importdata(which(nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -213,7 +211,7 @@ if ~exist('visc0')
             nirc0(nirc0==-1)=NaN;
             nirc0err(nirc0err==-1)=NaN;
         else
-            nirc0(i,:)=load(fullfile(starpaths,nirfilename));
+            nirc0(i,:)=load(which(nirfilename));
             nirc0err(i,:)=NaN(1,size(nirc0,2));
         end;
         nirnote=[nirnote nirfilename ', '];
@@ -273,9 +271,9 @@ if 1==2; % never executed, just for record keeping
         filesuffix(1)={'refined_Langley_on_G1'};
     end;
     % until 2012/05/23, V0 from standard Langley plots
-    visc0=load(fullfile(starpaths,'20120420_VIS_C0_standard_Langley_on_G1.dat'));
+    visc0=load(which('20120420_VIS_C0_standard_Langley_on_G1.dat'));
     visnote='C0 from 20120420 airborne Langley on G1.';
-    nirc0=load(fullfile(starpaths,'20120420_NIR_C0_standard_Langley_on_G1.dat'));
+    nirc0=load(which('20120420_NIR_C0_standard_Langley_on_G1.dat'));
     nirnote='C0 from 20120420 airborne Langley on G1.';
 end;
 
