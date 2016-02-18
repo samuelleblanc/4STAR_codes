@@ -1,10 +1,9 @@
-function marks = starflags_20151117_CF_marks_NOT_GOOD_AEROSOL_20160217_0354  
- % starflags file for 20151117 created by CF on 20160217_0354 to mark NOT_GOOD_AEROSOL conditions 
+function marks = starflags_20151117_CF_marks_NOT_GOOD_AEROSOL_20160217_1644  
+ % starflags file for 20151117 created by CF on 20160217_1644 to mark NOT_GOOD_AEROSOL conditions 
+ version_set('20160217_1644'); 
  daystr = '20151117';  
  % tag = 1: unknown 
  % tag = 10: unspecified_clouds 
- % tag = 90: cirrus 
- % tag = 400: low_cloud 
  % tag = 700: bad_aod 
  marks=[ 
  datenum('10:13:45') datenum('10:29:59') 01 
@@ -114,25 +113,17 @@ datenum('18:47:27') datenum('18:47:30') 10
 datenum('18:47:32') datenum('18:47:37') 10 
 datenum('18:47:39') datenum('18:49:15') 10 
 datenum('18:49:18') datenum('18:49:49') 10 
-datenum('12:17:49') datenum('12:17:50') 90 
-datenum('12:18:11') datenum('12:18:11') 90 
-datenum('12:21:01') datenum('12:21:01') 90 
-datenum('12:31:32') datenum('12:31:32') 90 
-datenum('12:31:34') datenum('12:31:34') 90 
 datenum('10:13:45') datenum('11:00:45') 700 
 datenum('11:07:09') datenum('11:11:16') 700 
 datenum('11:29:32') datenum('11:29:36') 700 
 datenum('11:47:52') datenum('11:47:57') 700 
 datenum('12:06:13') datenum('12:06:17') 700 
-datenum('12:17:49') datenum('12:17:50') 700 
 datenum('12:18:37') datenum('12:19:34') 700 
-datenum('12:21:01') datenum('12:21:01') 700 
 datenum('12:24:59') datenum('12:25:04') 700 
 datenum('12:43:20') datenum('12:43:24') 700 
 datenum('13:01:40') datenum('13:01:44') 700 
 datenum('13:20:00') datenum('13:20:04') 700 
 datenum('13:30:51') datenum('13:34:00') 700 
-datenum('13:46:08') datenum('13:46:08') 700 
 datenum('13:52:16') datenum('13:52:20') 700 
 datenum('14:00:07') datenum('14:03:09') 700 
 datenum('14:21:25') datenum('14:21:30') 700 
@@ -163,11 +154,6 @@ datenum('18:32:57') datenum('18:33:01') 700
 datenum('18:40:09') datenum('18:40:09') 700 
 datenum('18:40:18') datenum('18:40:20') 700 
 datenum('18:41:25') datenum('18:49:49') 700 
-datenum('14:53:09') datenum('15:12:54') 400 
-datenum('15:43:54') datenum('15:44:18') 400 
-datenum('16:10:37') datenum('16:10:43') 400 
-datenum('16:13:13') datenum('16:13:21') 400 
-datenum('16:19:51') datenum('16:20:06') 400 
 ];  
 marks(:,1:2)=marks(:,1:2)-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
 return
