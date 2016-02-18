@@ -21,7 +21,9 @@ function [savematfile, contents]=starsun(varargin)
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
 % Samuel, v1.1, 2015/07/22, added control of input toggles for specifying
 %                           exact properties of runs. Similar to starzen
-version_set('1.1');
+% Samuel, v1.2, 2016/02/17, made the program version be concatenation of
+%                           saved mat files and new version_set values.
+version_set('1.2');
 %********************
 % regulate input and read source
 %********************
@@ -48,6 +50,7 @@ if numel(contents0)==1;
 elseif ~isequal(sort(contents0), sort([{'vis_sun'};{'nir_sun'}]))
     error('vis_sun and nir_sun must be the sole contents for starsun.m.');
 end;
+
 load(sourcefile,contents0{:},'program_version');
 
 % add variables and make adjustments common among all data types. Also
@@ -58,7 +61,7 @@ s=starwrapper(vis_sun, nir_sun,toggle);
 % save
 %********************
 if exist('program_version','var');
-   s.program_version = program_version;
+   s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
 disp(['Saving: ',savematfile])
 save(savematfile, '-struct', 's', '-mat'); 
