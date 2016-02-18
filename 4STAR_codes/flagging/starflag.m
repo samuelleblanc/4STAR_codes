@@ -29,8 +29,9 @@ function [flags, good, flagfile] = starflag(s, Mode)
 % MS, 2015-02-17,corrected a bug in line 74; definition of outputfile
 %                corrected bug in lines 31,37 (disp function)
 % CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
+% CJF, 2016-01-17, added more write_starflags_mark_file examples
 %
-version_set('1.2');
+version_set('1.3');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];

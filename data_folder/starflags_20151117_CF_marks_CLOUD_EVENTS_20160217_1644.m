@@ -1,11 +1,35 @@
-function marks = starflags_20151117_CF_marks_NOT_GOOD_AEROSOL_20160217_0338  
- % starflags file for 20151117 created by CF on 20160217_0338 to mark NOT_GOOD_AEROSOL conditions 
+function marks = starflags_20151117_CF_marks_CLOUD_EVENTS_20160217_1644  
+ % starflags file for 20151117 created by CF on 20160217_1644 to mark CLOUD_EVENTS conditions 
+ version_set('20160217_1644'); 
  daystr = '20151117';  
  % tag = 1: unknown 
  % tag = 10: unspecified_clouds 
  % tag = 700: bad_aod 
  marks=[ 
- datenum('10:13:45') datenum('10:29:59') 01 
+ datenum('10:15:19') datenum('10:15:21') 01 
+datenum('10:15:23') datenum('10:15:24') 01 
+datenum('10:15:33') datenum('10:15:59') 01 
+datenum('10:16:01') datenum('10:16:02') 01 
+datenum('10:16:13') datenum('10:16:40') 01 
+datenum('10:17:02') datenum('10:17:22') 01 
+datenum('10:17:24') datenum('10:17:27') 01 
+datenum('10:17:32') datenum('10:18:11') 01 
+datenum('10:18:13') datenum('10:18:31') 01 
+datenum('10:18:38') datenum('10:19:02') 01 
+datenum('10:19:08') datenum('10:19:25') 01 
+datenum('10:19:30') datenum('10:19:30') 01 
+datenum('10:19:32') datenum('10:20:47') 01 
+datenum('10:20:50') datenum('10:27:26') 01 
+datenum('10:27:29') datenum('10:27:32') 01 
+datenum('10:27:34') datenum('10:28:15') 01 
+datenum('10:28:17') datenum('10:28:30') 01 
+datenum('10:28:32') datenum('10:28:40') 01 
+datenum('10:28:46') datenum('10:28:46') 01 
+datenum('10:28:51') datenum('10:29:05') 01 
+datenum('10:29:07') datenum('10:29:08') 01 
+datenum('10:29:10') datenum('10:29:31') 01 
+datenum('10:29:39') datenum('10:29:39') 01 
+datenum('10:29:51') datenum('10:29:55') 01 
 datenum('10:15:19') datenum('10:15:21') 10 
 datenum('10:15:23') datenum('10:15:24') 10 
 datenum('10:15:33') datenum('10:15:59') 10 
@@ -112,27 +136,55 @@ datenum('18:47:27') datenum('18:47:30') 10
 datenum('18:47:32') datenum('18:47:37') 10 
 datenum('18:47:39') datenum('18:49:15') 10 
 datenum('18:49:18') datenum('18:49:49') 10 
-datenum('10:13:45') datenum('11:00:45') 700 
-datenum('11:07:09') datenum('11:11:16') 700 
-datenum('11:29:32') datenum('11:29:36') 700 
-datenum('11:47:52') datenum('11:47:57') 700 
-datenum('12:06:13') datenum('12:06:17') 700 
+datenum('10:15:19') datenum('10:15:21') 700 
+datenum('10:15:23') datenum('10:15:24') 700 
+datenum('10:15:33') datenum('10:15:59') 700 
+datenum('10:16:01') datenum('10:16:02') 700 
+datenum('10:16:13') datenum('10:16:40') 700 
+datenum('10:17:02') datenum('10:17:22') 700 
+datenum('10:17:24') datenum('10:17:27') 700 
+datenum('10:17:32') datenum('10:18:11') 700 
+datenum('10:18:13') datenum('10:18:31') 700 
+datenum('10:18:38') datenum('10:19:02') 700 
+datenum('10:19:08') datenum('10:19:25') 700 
+datenum('10:19:30') datenum('10:19:30') 700 
+datenum('10:19:32') datenum('10:20:47') 700 
+datenum('10:20:50') datenum('10:27:26') 700 
+datenum('10:27:29') datenum('10:27:32') 700 
+datenum('10:27:34') datenum('10:28:15') 700 
+datenum('10:28:17') datenum('10:28:30') 700 
+datenum('10:28:32') datenum('10:28:40') 700 
+datenum('10:28:46') datenum('10:28:46') 700 
+datenum('10:28:51') datenum('10:29:05') 700 
+datenum('10:29:07') datenum('10:29:08') 700 
+datenum('10:29:10') datenum('10:29:31') 700 
+datenum('10:29:39') datenum('10:29:39') 700 
+datenum('10:29:51') datenum('10:29:55') 700 
+datenum('10:30:08') datenum('10:31:01') 700 
+datenum('10:31:03') datenum('10:31:14') 700 
+datenum('10:31:17') datenum('10:31:18') 700 
+datenum('10:31:23') datenum('10:31:39') 700 
+datenum('10:31:41') datenum('10:32:14') 700 
+datenum('10:32:18') datenum('10:32:55') 700 
+datenum('10:32:57') datenum('10:33:10') 700 
+datenum('10:33:12') datenum('10:33:37') 700 
+datenum('10:33:41') datenum('10:36:21') 700 
+datenum('10:36:24') datenum('10:37:44') 700 
+datenum('10:37:46') datenum('10:40:20') 700 
+datenum('10:40:22') datenum('10:42:57') 700 
+datenum('10:43:00') datenum('10:46:47') 700 
+datenum('10:46:50') datenum('10:49:52') 700 
+datenum('10:49:54') datenum('10:51:54') 700 
+datenum('10:51:56') datenum('11:00:38') 700 
+datenum('11:00:45') datenum('11:00:45') 700 
+datenum('11:07:09') datenum('11:07:12') 700 
 datenum('12:18:37') datenum('12:19:34') 700 
-datenum('12:24:59') datenum('12:25:04') 700 
-datenum('12:43:20') datenum('12:43:24') 700 
-datenum('13:01:40') datenum('13:01:44') 700 
-datenum('13:20:00') datenum('13:20:04') 700 
-datenum('13:30:51') datenum('13:34:00') 700 
-datenum('13:52:16') datenum('13:52:20') 700 
-datenum('14:00:07') datenum('14:03:09') 700 
-datenum('14:21:25') datenum('14:21:30') 700 
-datenum('14:39:46') datenum('14:39:50') 700 
 datenum('14:53:21') datenum('15:43:34') 700 
 datenum('15:43:54') datenum('15:45:39') 700 
 datenum('15:46:04') datenum('15:46:14') 700 
 datenum('15:49:02') datenum('15:49:14') 700 
 datenum('15:49:23') datenum('15:50:59') 700 
-datenum('15:51:31') datenum('15:51:36') 700 
+datenum('15:51:31') datenum('15:51:35') 700 
 datenum('15:54:17') datenum('15:54:20') 700 
 datenum('15:54:53') datenum('15:54:55') 700 
 datenum('16:08:56') datenum('16:08:56') 700 
@@ -141,18 +193,26 @@ datenum('16:10:41') datenum('16:10:50') 700
 datenum('16:13:21') datenum('16:13:25') 700 
 datenum('16:20:01') datenum('16:20:08') 700 
 datenum('16:24:28') datenum('16:24:33') 700 
-datenum('16:42:48') datenum('16:42:53') 700 
-datenum('17:01:09') datenum('17:01:13') 700 
 datenum('17:09:15') datenum('17:09:15') 700 
 datenum('17:09:23') datenum('17:09:26') 700 
-datenum('17:19:36') datenum('17:19:40') 700 
-datenum('17:37:56') datenum('17:38:00') 700 
-datenum('17:56:16') datenum('17:56:21') 700 
-datenum('18:14:36') datenum('18:14:41') 700 
-datenum('18:32:57') datenum('18:33:01') 700 
 datenum('18:40:09') datenum('18:40:09') 700 
 datenum('18:40:18') datenum('18:40:20') 700 
-datenum('18:41:25') datenum('18:49:49') 700 
+datenum('18:41:25') datenum('18:41:50') 700 
+datenum('18:41:54') datenum('18:42:40') 700 
+datenum('18:42:43') datenum('18:43:15') 700 
+datenum('18:43:18') datenum('18:43:56') 700 
+datenum('18:43:58') datenum('18:44:14') 700 
+datenum('18:44:16') datenum('18:44:21') 700 
+datenum('18:44:24') datenum('18:44:34') 700 
+datenum('18:44:37') datenum('18:45:26') 700 
+datenum('18:45:28') datenum('18:45:28') 700 
+datenum('18:45:31') datenum('18:46:13') 700 
+datenum('18:46:16') datenum('18:47:01') 700 
+datenum('18:47:03') datenum('18:47:25') 700 
+datenum('18:47:27') datenum('18:47:30') 700 
+datenum('18:47:32') datenum('18:47:37') 700 
+datenum('18:47:39') datenum('18:49:15') 700 
+datenum('18:49:18') datenum('18:49:49') 700 
 ];  
 marks(:,1:2)=marks(:,1:2)-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
 return

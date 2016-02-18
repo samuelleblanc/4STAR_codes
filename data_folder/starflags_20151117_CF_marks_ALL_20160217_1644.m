@@ -1,12 +1,9 @@
-function marks = starflags_20151117_CF_marks_ALL_20160217_0406  
- % starflags file for 20151117 created by CF on 20160217_0406 to mark ALL conditions 
+function marks = starflags_20151117_CF_marks_ALL_20160217_1644  
+ % starflags file for 20151117 created by CF on 20160217_1644 to mark ALL conditions 
+ version_set('20160217_1644'); 
  daystr = '20151117';  
  % tag = 1: unknown 
  % tag = 10: unspecified_clouds 
- % tag = 90: cirrus 
- % tag = 400: low_cloud 
- % tag = 500: hor_legs 
- % tag = 600: vert_legs 
  % tag = 700: bad_aod 
  marks=[ 
  datenum('10:13:45') datenum('10:29:59') 01 
@@ -116,10 +113,6 @@ datenum('18:47:27') datenum('18:47:30') 10
 datenum('18:47:32') datenum('18:47:37') 10 
 datenum('18:47:39') datenum('18:49:15') 10 
 datenum('18:49:18') datenum('18:49:49') 10 
-datenum('12:17:49') datenum('12:17:50') 90 
-datenum('12:21:01') datenum('12:21:01') 90 
-datenum('12:31:32') datenum('12:31:32') 90 
-datenum('12:31:34') datenum('12:31:34') 90 
 datenum('10:13:45') datenum('11:00:45') 700 
 datenum('11:07:09') datenum('11:11:16') 700 
 datenum('11:29:32') datenum('11:29:36') 700 
@@ -161,9 +154,6 @@ datenum('18:32:57') datenum('18:33:01') 700
 datenum('18:40:09') datenum('18:40:09') 700 
 datenum('18:40:18') datenum('18:40:20') 700 
 datenum('18:41:25') datenum('18:49:49') 700 
-datenum('15:12:30') datenum('15:12:54') 400 
-datenum('10:35:15') datenum('14:26:07') 500 
-datenum('14:42:13') datenum('14:52:58') 600 
 ];  
 marks(:,1:2)=marks(:,1:2)-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
 return
