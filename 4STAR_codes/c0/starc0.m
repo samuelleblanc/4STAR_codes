@@ -19,8 +19,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0 
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
 % MS, v1.4, 2016-01-10, updated MLO c0
+% SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
 
-version_set('1.4');
+version_set('1.5');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -35,7 +36,10 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
+        if now>=datenum([2016 2 1 0 0 0]); % after MLO
+            daystr='20160109';
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
+        elseif now>=datenum([2016 1 19 0 0 0]);
             daystr='20160119';
             filesuffix='refined_Langley_MLO_mean'; % MLO-Jan-2016 mean
         elseif now>=datenum([2016 1 9 0 0 0]);
