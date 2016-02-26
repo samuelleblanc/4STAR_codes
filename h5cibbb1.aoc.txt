@@ -1,0 +1,108 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch and 'origin/master' have diverged,
+# and have 1 and 4 different commits each, respectively.
+#   (use "git pull" to merge the remote branch into yours)
+#
+# Changes to be committed:
+#	modified:   ../General_codes/plotting_utils/get_good_looking_axes.m
+#	deleted:    ../data_folder/NAAMES-4STAR-AOD_C130_yyyymmdd_RA.ict
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1104_v003-2015m1105t054135.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1109_v003-2015m1110t091357.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1112_v003-2015m1113t063226.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1114_v003-2015m1116t170744.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1117_v003-2015m1118t064730.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1118_v003-2015m1119t060112.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMDOAO3G_2015m1123_v003-2015m1124t061518.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1104_v003-2015m1105t191959.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1109_v003-2015m1110t174726.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1112_v003-2015m1113t164629.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1114_v003-2015m1116t172917.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1117_v003-2015m1118t184232.he5
+#	deleted:    ../data_folder/OMIdata/OMI-Aura_L2G-OMNO2G_2015m1123_v003-2015m1124t180119.he5
+#	deleted:    ../data_folder/SEAC4RS-4STAR-AOD-CWV_DC8_yyyymmdd_R2_Yohei.ict
+#	deleted:    ../data_folder/forj_all.mat
+#	deleted:    ../data_folder/starinfo20140901.m
+#	deleted:    ../data_folder/tau_4STARtempcorr_10degoffset.mat
+#
+# Untracked files:
+#	../data_folder/20160109_starflag_auto_created20160109_1954.mat
+#	../data_folder/20160109_starflag_auto_created20160111_0032.mat
+#	../data_folder/20160109_starflag_auto_created20160112_1421.mat
+#	../data_folder/20160109_starflag_auto_created20160113_1343.mat
+#	../data_folder/20160109_starflag_auto_created20160129_1701.mat
+#	../data_folder/20160109_starflag_auto_created20160129_1919.mat
+#	../data_folder/20160109_starflag_auto_created20160131_1405.mat
+#	../data_folder/20160110_starflag_auto_created20160110_1915.mat
+#	../data_folder/20160110_starflag_auto_created20160110_1947.mat
+#	../data_folder/20160110_starflag_auto_created20160111_0144.mat
+#	../data_folder/20160110_starflag_auto_created20160111_1303.mat
+#	../data_folder/20160110_starflag_auto_created20160111_1351.mat
+#	../data_folder/20160110_starflag_auto_created20160112_1355.mat
+#	../data_folder/20160110_starflag_auto_created20160113_1403.mat
+#	../data_folder/20160110_starflag_auto_created20160129_1852.mat
+#	../data_folder/20160110_starflag_auto_created20160129_1923.mat
+#	../data_folder/20160110_starflag_auto_created20160131_1556.mat
+#	../data_folder/20160110_starflag_man_created20160111_1307by_CF.mat
+#	../data_folder/20160111_starflag_auto_created20160112_1258.mat
+#	../data_folder/20160111_starflag_auto_created20160113_1412.mat
+#	../data_folder/20160111_starflag_auto_created20160129_1857.mat
+#	../data_folder/20160111_starflag_auto_created20160129_1928.mat
+#	../data_folder/20160111_starflag_auto_created20160131_1734.mat
+#	../data_folder/20160112_starflag_auto_created20160112_1720.mat
+#	../data_folder/20160112_starflag_auto_created20160113_1148.mat
+#	../data_folder/20160112_starflag_auto_created20160113_1421.mat
+#	../data_folder/20160112_starflag_auto_created20160113_1426.mat
+#	../data_folder/20160112_starflag_auto_created20160122_1138.mat
+#	../data_folder/20160112_starflag_auto_created20160127_0909.mat
+#	../data_folder/20160112_starflag_auto_created20160127_0937.mat
+#	../data_folder/20160112_starflag_auto_created20160127_1147.mat
+#	../data_folder/20160112_starflag_auto_created20160127_1159.mat
+#	../data_folder/20160112_starflag_auto_created20160127_1305.mat
+#	../data_folder/20160112_starflag_auto_created20160129_1933.mat
+#	../data_folder/20160112_starflag_auto_created20160131_1851.mat
+#	../data_folder/20160112starAllFiles.mat
+#	../data_folder/20160113_starflag_auto_created20160113_1911.mat
+#	../data_folder/20160113_starflag_auto_created20160113_2024.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1148.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1302.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1311.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1331.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1413.mat
+#	../data_folder/20160113_starflag_auto_created20160122_1431.mat
+#	../data_folder/20160113_starflag_auto_created20160129_1937.mat
+#	../data_folder/20160113_starflag_auto_created20160131_2013.mat
+#	../data_folder/20160113forj_all.mat
+#	../data_folder/20160114_starflag_auto_created20160115_1133.mat
+#	../data_folder/20160114_starflag_auto_created20160115_1208.mat
+#	../data_folder/20160114_starflag_auto_created20160122_1204.mat
+#	../data_folder/20160114_starflag_auto_created20160201_1141.mat
+#	../data_folder/20160114_starflag_auto_created20160201_1254.mat
+#	../data_folder/20160115_starflag_auto_created20160116_0808.mat
+#	../data_folder/20160115_starflag_auto_created20160116_0948.mat
+#	../data_folder/20160115_starflag_auto_created20160201_1622.mat
+#	../data_folder/20160115_starflag_auto_created20160201_2331.mat
+#	../data_folder/20160116_starflag_auto_created20160117_1003.mat
+#	../data_folder/20160116_starflag_auto_created20160117_1054.mat
+#	../data_folder/20160116_starflag_auto_created20160202_0121.mat
+#	../data_folder/20160117_starflag_auto_created20160117_2246.mat
+#	../data_folder/20160117_starflag_auto_created20160118_1011.mat
+#	../data_folder/20160117_starflag_auto_created20160118_1255.mat
+#	../data_folder/20160117_starflag_auto_created20160122_1226.mat
+#	../data_folder/20160118_starflag_auto_created20160118_1301.mat
+#	../data_folder/20160118_starflag_auto_created20160118_1402.mat
+#	../data_folder/20160118_starflag_auto_created20160122_1117.mat
+#	../data_folder/MLO2016_aats_mat/
+#	../data_folder/MLO2016star_mat/
+#	../data_folder/forj_all - Copy.mat
+#	../data_folder/forj_all_up2ARISE.mat
+#	../data_folder/starinfo20160204.m
+#	../data_folder/starinfo20160208.m
+#	../data_folder/starinfo_20151110.m
+#	../data_folder/starinfo_20151113.m
+#	../data_folder/starinfo_20160204.m
+#	../data_folder/starinfo_20160208.m
+#
+

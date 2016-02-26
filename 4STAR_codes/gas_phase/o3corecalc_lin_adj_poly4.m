@@ -1,4 +1,4 @@
-function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0)
+function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj_poly4(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0)
 % retrieve o3 and derive fitted spectrum for subtraction
 % x0 is initial guess from linear inversion
 %
@@ -59,7 +59,7 @@ for i = 1:length(s.t)
             if sum(signal)<10
                                 if isreal(x0(i,:))
 
-                                    [U_,fval,exitflag,output]  = fmincon('O3resi_lin',x0(i,:),[],[],[],[],lb,ub, [], options, meas,PAR);
+                                    [U_,fval,exitflag,output]  = fmincon('O3resi_lin_poly4',x0(i,:),[],[],[],[],lb,ub, [], options, meas,PAR);
                 %                     % testing nonlinear option
                 %                     x0 = [x0,0,0];
                 %                     
@@ -84,7 +84,7 @@ for i = 1:length(s.t)
 
                                % plot fitted figure
 
-                                   yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
+                                   yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3 + U_(8)*(lm).^4;    
                                    %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
                                    ymeas = log(s.c0(wln))-log(y);
                                   
@@ -92,7 +92,7 @@ for i = 1:length(s.t)
                                    yo3subtract   =  (o3coef(wln).*real(U_(1)));
                                    yo4subtract   =  (o4coef(wln).*real(U_(2)));
                                    yh2osubtract  =  (h2ocoef(wln).*real(U_(3)));
-                                   polysubtract  =  U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;
+                                   polysubtract  =  U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3 + U_(8)*(lm).^4;
                                    yo3subtractall=  yo3subtract + yo4subtract + yh2osubtract;
                                
                                 % assign fitted spectrum
@@ -126,14 +126,14 @@ for i = 1:length(s.t)
 
                              else
 
-                               U_ = [NaN NaN NaN NaN NaN NaN NaN];
+                               U_ = [NaN NaN NaN NaN NaN NaN NaN NaN];
                                sc = [sc; U_];
                                sc_residual = [sc_residual;NaN];
                                o3_DU = [o3_DU;NaN];
 
                              end % if isreal x0   
             else
-               U_ = [NaN NaN NaN NaN NaN NaN NaN];
+               U_ = [NaN NaN NaN NaN NaN NaN NaN NaN];
                sc = [sc; U_];
                sc_residual = [sc_residual;NaN];
                o3_DU = [o3_DU;NaN];
@@ -142,7 +142,7 @@ for i = 1:length(s.t)
            
        else
           
-               U_ = [NaN NaN NaN NaN NaN NaN NaN];
+               U_ = [NaN NaN NaN NaN NaN NaN NaN NaN];
                sc = [sc; U_];
                sc_residual = [sc_residual;NaN];
                o3_DU = [o3_DU;NaN];

@@ -47,6 +47,7 @@
 %                 subtracted water vapor from 
 %                 line 607: used starsun.tau_aero_tot (O2-O2 NIR
 %                 subtracted) with water vapor subtraction
+% MS: 2016-02-23: re-editing changes that were made after MLO and deleted
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(starsun,modc0,model_atmosphere)
@@ -219,6 +220,8 @@ end
  H2Oa(isnan(H2Oa)==1)=0;
  % transform H2Oa inf to zero
  H2Oa(isinf(H2Oa)==1)=0;
+ % transform H2Oa imaginary to zero
+ H2Oa(~isreal(H2Oa)==1)=0;
  % transform H2Oa negative to zero
  H2Oa(H2Oa<0)=0;
  % transform H2Ob to zero if H2Oa is zero
@@ -233,7 +236,11 @@ end
       U1=(1./repmat(starsun.m_H2O,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(starsun.t)))))'.*...
          (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(starsun.t))))'); 
       Ufinal  = U1/H2O_conv;
-      avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
+      avg_U1 = nanmean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
+      std_U1 = nanstd(Ufinal(:,ind),[],2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
+      afit_H2O = H2Oa';
+      bfit_H2O = H2Ob';
+      cfit_H2O=ones(length(xs.wavelen),1);
  elseif model_atmosphere==3 % TCAP winter/ARISE
      % load altitude dependent coef.
      alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
@@ -427,7 +434,7 @@ wv_residual = [];
 
 for i = 1:length(starsun.t)
  % choose right altitude coef
-        if ~isNaN(starsun.Alt(i))
+        if ~isNaN(starsun.Alt(i)) && model_atmosphere~=1
               kk=find(starsun.Alt(i)/1000>=zkm_LBLRTM_calcs);
               if starsun.Alt(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
               kz=kk(end);
