@@ -27,9 +27,9 @@ for i = 1:length(s.t)
     %x0 = [0.3 1 0.5 0.1 0 0.1 0]; 
     
     % counts measured (slant total minus Ray)
-    y = s.ratetot(i,wln);
+    %y = s.ratetot(i,wln);
     % counts measured (slant total)
-    %y = s.rateslant(i,wln);
+    y = s.rateslant(i,wln);
     meas = [s.w(wln)' y'];
     lm = meas(:,1);
     %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 s.c0(wln)'];
@@ -84,45 +84,45 @@ for i = 1:length(s.t)
 
                                % plot fitted figure
 
-                %                    yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
-                %                    %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
-                %                    ymeas = log(s.c0(wln))-log(y);
-                %                   
-                %                    
-                %                    yo3subtract   =  (o3coef(wln).*real(U_(1)));
-                %                    yo4subtract   =  (o4coef(wln).*real(U_(2)));
-                %                    yh2osubtract  =  (h2ocoef(wln).*real(U_(3)));
-                %                    polysubtract  =  U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;
-                %                    yo3subtractall=  yo3subtract + yo4subtract + yh2osubtract;
-                %                
-                %                 % assign fitted spectrum
-                %                 ODfit(i,wln) = yfit;
-                %                 % save spectrum to subtract
-                %                 tau_o3o4h2o_subtract(i,wln) = yo3subtractall/s.m_O3(i);
-                %                 %% plot measured and computed fit
-                %                        figure(444);
-                %                        ax(1)=subplot(211);
-                %                        plot(s.w(wln),ymeas,'-b');hold on;
-                %                        plot(s.w(wln),yfit,'--r');hold on;
-                %                        plot(s.w(wln),yo3subtract,'--g');hold on;
-                %                        plot(s.w(wln),yo4subtract,'--c');hold on;
-                %                        plot(s.w(wln),yh2osubtract,'--m');hold on;
-                %                        plot(s.w(wln),polysubtract,'-k');hold on;
-                %                        plot(s.w(wln),ymeas'-yo3subtractall,':k');hold off;
-                %                        xlabel('wavelength','fontsize',12);ylabel('total slant OD','fontsize',12);
-                %                        legend('measured','calculated (fit)','o3 spectrum to subtract','o4 spectrum to subtract','h2o spectrum to subtract','aerosol baseline','subtracted spectrum');
-                %                        title([datestr(s.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(s.Alt(i)) 'm' ' VCD O3= ' num2str(o3_DU_round) '[DU]' ' RMS fit = ' num2str(sqrt(fval))]);
-                %                        ymax = yfit + 0.2;
-                %                        axis([min(s.w(wln)) max(s.w(wln)) 0 max(ymax)]);
-                % 
-                %                        ax(2)=subplot(212);
-                %                        plot(s.w(wln),ymeas'-yo4subtract-yh2osubtract-polysubtract,'-b');hold on;% o3 measured
-                %                        plot(s.w(wln),yo3subtract,'--r');hold on;                               % o3 retrieved
-                %                        plot(s.w(wln),ymeas'-yo4subtract-yh2osubtract-yo3subtract-polysubtract,':k');hold off;% o3 residual
-                %                        xlabel('wavelength','fontsize',12);ylabel('SC O_{3} OD','fontsize',12);
-                %                        legend('O_{3} measured','O_{3} fitted','residual','orientation','horizontal');
-                %                        axis([min(s.w(wln)) max(s.w(wln)) -0.02 0.15]);
-                %                        pause(0.0001);
+                                   yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
+                                   %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
+                                   ymeas = log(s.c0(wln))-log(y);
+                                  
+                                   
+                                   yo3subtract   =  (o3coef(wln).*real(U_(1)));
+                                   yo4subtract   =  (o4coef(wln).*real(U_(2)));
+                                   yh2osubtract  =  (h2ocoef(wln).*real(U_(3)));
+                                   polysubtract  =  U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;
+                                   yo3subtractall=  yo3subtract + yo4subtract + yh2osubtract;
+                               
+                                % assign fitted spectrum
+                                ODfit(i,wln) = yfit;
+                                % save spectrum to subtract
+                                tau_o3o4h2o_subtract(i,wln) = yo3subtractall/s.m_O3(i);
+                                %% plot measured and computed fit
+%                                        figure(444);
+%                                        ax(1)=subplot(211);
+%                                        plot(s.w(wln),ymeas,'-b');hold on;
+%                                        plot(s.w(wln),yfit,'--r');hold on;
+%                                        plot(s.w(wln),yo3subtract,'--g');hold on;
+%                                        plot(s.w(wln),yo4subtract,'--c');hold on;
+%                                        plot(s.w(wln),yh2osubtract,'--m');hold on;
+%                                        plot(s.w(wln),polysubtract,'-k');hold on;
+%                                        plot(s.w(wln),ymeas'-yo3subtractall,':k');hold off;
+%                                        xlabel('wavelength','fontsize',12);ylabel('total slant OD','fontsize',12);
+%                                        legend('measured','calculated (fit)','o3 spectrum to subtract','o4 spectrum to subtract','h2o spectrum to subtract','aerosol baseline','subtracted spectrum');
+%                                        title([datestr(s.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(s.Alt(i)) 'm' ' VCD O3= ' num2str(o3_DU_round) '[DU]' ' RMS fit = ' num2str(sqrt(fval))]);
+%                                        ymax = yfit + 0.2;
+%                                        axis([min(s.w(wln)) max(s.w(wln)) 0 max(ymax)]);
+%                 
+%                                        ax(2)=subplot(212);
+%                                        plot(s.w(wln),ymeas'-yo4subtract-yh2osubtract-polysubtract,'-b');hold on;% o3 measured
+%                                        plot(s.w(wln),yo3subtract,'--r');hold on;                               % o3 retrieved
+%                                        plot(s.w(wln),ymeas'-yo4subtract-yh2osubtract-yo3subtract-polysubtract,':k');hold off;% o3 residual
+%                                        xlabel('wavelength','fontsize',12);ylabel('SC O_{3} OD','fontsize',12);
+%                                        legend('O_{3} measured','O_{3} fitted','residual','orientation','horizontal');
+%                                        axis([min(s.w(wln)) max(s.w(wln)) -0.02 0.15]);
+%                                        pause(0.0001);
 
                              else
 
