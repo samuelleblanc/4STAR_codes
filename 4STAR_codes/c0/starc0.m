@@ -19,8 +19,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0 
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
 % MS, v1.4, 2016-01-10, updated MLO c0
+% SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
 
-version_set('1.4');
+version_set('1.5');
 if ~exist('verbose','var')
     verbose=true;
 end;

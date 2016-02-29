@@ -1,8 +1,7 @@
 function [ng_str, marks_fname] = write_starflag_marks_file(ng,flags_names,flag_tag,daystr, marks,by, now_str)
 % ng_str = write_starflag_marks_file(ng,flags_names,flag_tag,daystr, marks,by, now_str)
+version_set('2016-02-17 16:30');
 
-% Modifying to correct typo (left "ng" in place of "intervals") and to
-% generate a proper function instead of an m-file script.
 if ~exist('marks','var')
     marks = 'ALL';
 end
@@ -29,6 +28,7 @@ marks_fname = ['starflags_',daystr,'_',by,marks,now_str];
 ng_str = ['function marks = ',marks_fname];
 comment_str = ['% starflags file for ',daystr,' created by ', by(1:end-1), ' on ', now_str, ' to mark ',marks(7:end-1), ' conditions'];
 ng_str = [sprintf('%s  \n ',ng_str), sprintf('%s \n ',comment_str)];
+ng_str = [ng_str, sprintf('%s \n ', ['version_set(''', now_str ''');'])];
     
 ng_str = [ng_str, sprintf('%s  \n ',['daystr = ''',daystr,''';'])];
 tags = unique(ng(3,:));
@@ -47,9 +47,11 @@ ng_str = [ng_str, sprintf('%s \n', ']; ')];
 
 ng_str = [sprintf('%s \n', ng_str),'return'];    
 % mark_fname = [daystr,'_starflags_man',marks,'_created_',datestr(now,'yyyymmdd_hhMM_'),by,'.m'];    
+disp(['Writing marks file: ', marks_fname])
 f1=fopen([pname, marks_fname,'.m'],'w');
 
 fprintf(f1,'%s', ng_str);
 fclose(f1);
-
+pause(.05)
+% disp(which(marks_fname))
 return
