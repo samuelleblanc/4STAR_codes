@@ -85,8 +85,9 @@ function	s=starwrapper(s, s2, varargin)
 %                       dimension mistmatch bug
 %                       changed flags.aerosol_init_auto to flags.bad_aod to
 %                       make it compatible with starflag
+% MS: v2.6, 2015-02-29: added recent changes after MLO of constant stray light correction
 
-version_set('2.5');
+version_set('2.6');  
 %********************
 %% prepare for processing
 %********************
@@ -480,15 +481,6 @@ if nargin>=2+nnarg
     [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
 end
 
-%% adjust for spectral interference (stray light)
-% TO BE DEVELOPED.
-if toggle.applystraycorr
-    % this is constant correction (time dependent only)
-    corr=straylightcorrection(serial2Hh(s.t),s.rate,s.w);
-    s.rate  = s.rate - repmat(corr,1,qq);
-end
-
-
 %% get solar zenith angle, airmass, temperatures, etc.
 v=datevec(s.t);
 [s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
@@ -557,8 +549,13 @@ if toggle.applytempcorr
     s.rate  = s.rate.*repmat(corr,1,qq);
 end
 
-% adjust for spectral interference (stray light)
+%% adjust for spectral interference (stray light)
 % TO BE DEVELOPED.
+if toggle.applystraycorr
+    % this is constant correction (time dependent only)
+    corr=straylightcorrection(serial2Hh(s.t),s.rate,s.w);
+    s.rate  = s.rate - repmat(corr,1,qq);
+end
 
 %********************
 %% screen data
