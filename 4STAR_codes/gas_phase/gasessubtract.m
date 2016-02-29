@@ -258,13 +258,13 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %           xlabel('time');ylabel('o3 RMSE [DU]');
 %           title([datestr(s.t(1),'yyyy-mm-dd'), 'best fit']);
    
-   o3amount = -log(exp(-(real(O3conc/1000)*o3coef')));%(O3conc/1000)*o3coef';
-   o4coefVIS = zeros(qq,1); o4coefVIS(1:1044) = o4coef(1:1044);
-   o4amount = -log(exp(-(real(O4conc)*o4coef')));%O4conc*o4coef';
-   h2ocoefVIS = zeros(qq,1); h2ocoefVIS(wln_vis6) = h2ocoef(wln_vis6);
-   h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';
-   %tau_OD_fitsubtract = tau_ODslant - o3amount - o4amount -h2oamount;
-   tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - real(o3amount) - real(o4amount) -real(h2oamount);% subtraction of remaining gases in o3 region
+%    o3amount = -log(exp(-(real(O3conc/1000)*o3coef')));%(O3conc/1000)*o3coef';
+%    o4coefVIS = zeros(qq,1); o4coefVIS(1:1044) = o4coef(1:1044);
+%    o4amount = -log(exp(-(real(O4conc)*o4coef')));%O4conc*o4coef';
+%    h2ocoefVIS = zeros(qq,1); h2ocoefVIS(wln_vis6) = h2ocoef(wln_vis6);
+%    h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';
+%    %tau_OD_fitsubtract = tau_ODslant - o3amount - o4amount -h2oamount;
+%    tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - real(o3amount) - real(o4amount) -real(h2oamount);% subtraction of remaining gases in o3 region
 %    figure;
 %    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
 %    plot(starsun.w,tau_ODslant(end-500,:)-o3amount(end-500,:),'--r');xlabel('wavelength');ylabel('OD');
@@ -315,7 +315,11 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    
    [O3conc H2Oconc O4conc O3resi o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
    
-   gas.o3 = O3conc;
+   
+   [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);
+   O3conc_smooth = real(O3conc_s);
+   % archive smooth values
+   gas.o3 = O3conc_smooth;
    gas.o3resi = (O3resi);
    gas.o4  = O4conc;% already converted in routine./s.m_ray; % slant converted to vertical
    gas.h2o = H2Oconc;% already converted in routine./s.m_H2O;% slant converted to vertical
@@ -329,9 +333,6 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';
    %tau_OD_fitsubtract = tau_ODslant - o3amount - o4amount -h2oamount;
    tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - real(o3amount) - real(o4amount) -real(h2oamount);% subtraction of remaining gases in o3 region
-   
-   [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);
-   O3conc_smooth = real(O3conc_s);
    
     
 %    % calculate error
