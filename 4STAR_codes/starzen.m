@@ -57,11 +57,13 @@
 %                 - added dependence to catstruct and parse_struct 
 % Modified (v1.4): Samuel LeBlanc, NASA Ames, 2015-11-05
 %                 - added using the default toggles defined in outside file
+% Modified (v1.5): Samuel LeBlanc, NASA Ames, 2015-02-17
+%                 - added a catstruct to program version 
 % -------------------------------------------------------------------------
 
 
 function [savematfile, contents]=starzen(varargin)
-version_set('1.4');
+version_set('1.5');
 
 toggle = update_toggle; % use the default toggles that are set
 
@@ -113,7 +115,7 @@ end;
 % [mat_dir, fname, ext] = fileparts(savematfile);
 % star_light_fname = [mat_dir,filesep,datestr(star.t(1),'yyyymmdd'),'starsun_LIGHT.mat'];
 if exist('program_version','var');
-    s.program_version = program_version;
+   s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
 if ~exist(savematfile,'file')
     save(savematfile, '-struct', 's', '-mat');

@@ -81,7 +81,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         if now>=datenum([2016 1 19 0 0 0]);
             daystr='20160109';
             filesuffix='modified_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            model_atmosphere=1; %(Tropical-MLO)
+            model_atmosphere=1; %Tropical-MLO
         elseif now>=datenum([2016 1 9 0 0 0]);
             daystr='20160109';
             filesuffix='modified_Langley_MLO'; % adjust date for each of the calibration days
