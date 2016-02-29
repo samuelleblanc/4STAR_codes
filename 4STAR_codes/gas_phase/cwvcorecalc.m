@@ -635,7 +635,7 @@ for i = 1:length(starsun.t)
     afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
-    cwv.tau_OD_wvsubtract(i,:) = starsun.tau_tot_slant(i,:)-wvamount';% this is a structure with o2-o2 NIR subtracted
+    cwv.tau_OD_wvsubtract(i,:) = starsun.tau_tot_slant(i,:)-wvamount;% this is a structure with o2-o2 NIR subtracted
     end
     
     % QA plot of tau_OD_wvsubtract vs.tau_ODslant
