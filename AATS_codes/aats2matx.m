@@ -60,6 +60,7 @@ daystr = '20150908';
 % %%data_dir='c:\johnmatlab\AATS14_data_2011\Mauna Loa\'
 % data_dir='c:\johnmatlab\AATS14_data_2011\COAST\';  %use for COAST
 % data_dir='c:\johnmatlab\AATS14_data_2012\Ames\';   %use for Ames rooftop measurements 2012
+% xsect_dir='C:\Users\msegalro.NDC\Campaigns\MLO2016\AATS\AATS_Calib\'; % MSR
 xsect_dir='D:\case_studies\AATS\xsect\'; % CJF
 data_dir = ['D:\data\4STAR\yohei\4star_data\NASA_Ames_roof\',daystr,'\Ames\'];
 Loschmidt=2.686763e19; %molecules/cm2
