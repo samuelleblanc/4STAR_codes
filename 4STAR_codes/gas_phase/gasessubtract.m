@@ -233,8 +233,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
      % interpolate to wln
      s.kurO3 = interp1(kur.visnm/1000, kur.visIrad, s.w(wln),'pchip','extrap');
    
-   O3conc=[];H2Oconc=[];O4conc=[];O3resi=[];o3OD=[];
-   [O3conc H2Oconc O4conc O3resi o3OD varall_lin] = o3corecalc_lin(s,o3coef,o4coef,h2ocoef,wln,tau_OD);
+   %O3conc=[];H2Oconc=[];O4conc=[];O3resi=[];o3OD=[];
+   %[O3conc H2Oconc O4conc O3resi o3OD varall_lin] = o3corecalc_lin(s,o3coef,o4coef,h2ocoef,wln,tau_OD);
    
    %[O3conc H2Oconc O4conc O3resi o3OD varall] = o3corecalc_nonlin(s,o3coef,o4coef,h2ocoef,wln,tau_OD,varall_lin);
    
@@ -242,12 +242,13 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %    O3conc=[];H2Oconc=[];O4conc=[];O3resi=[];o3OD=[];
 %   [O3conc H2Oconc O4conc NO2conc O3resi o3OD varall] = o3corecalc_lin_wno2(s,o3coef,o4coef,h2ocoef,no2coef,wln,tau_OD);
 %    
-   gas.o3 = O3conc;
-   gas.o3resi = (O3resi);
-   gas.o4  = O4conc;% already converted in routine./s.m_ray; % slant converted to vertical
-   gas.h2o = H2Oconc;% already converted in routine./s.m_H2O;% slant converted to vertical
-   gas.o3OD  = o3OD;          % this is to be subtracted from slant path this is slant
-   tplot = serial2hs(s.t);
+   %gas.o3 = O3conc;
+   %gas.o3resi = (O3resi);
+   %gas.o4  = O4conc;% already converted in routine./s.m_ray; % slant converted to vertical
+   %gas.h2o = H2Oconc;% already converted in routine./s.m_H2O;% slant converted to vertical
+   %gas.o3OD  = o3OD;          % this is to be subtracted from slant path this is slant
+   %tplot = serial2hs(s.t);
+   
 %    figure;subplot(211);plot(tplot,O3conc,'.r');hold on;
 %           axis([tplot(1) tplot(end) 250 350]);
 %           xlabel('time');ylabel('o3 [DU]');
@@ -277,7 +278,8 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
 %    
    %tau_aero_fitsubtract(:,wln_vis6) = tau_ODslant(:,wln_vis6) - o3subtract;
    %spec_subtract(:,wln_vis6)        = o3subtract(:,wln_vis6);
-   
+
+%% retrieve by doing linear inversion first and then fit   
 %% LS for O3
  
  basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
@@ -309,12 +311,27 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    
    x0=[ccoefo3(1,:)' ccoefo3(2,:)' ccoefo3(4,:)' ccoefo3(5,:)' ccoefo3(6,:)' ccoefo3(7,:)' ccoefo3(8,:)'];
    
-   O3concnew=[];H2Oconc=[];O4conc=[];O2conc=[];O3resinew=[];o3OD=[];
+   O3conc=[];H2Oconc=[];O4conc=[];O2conc=[];O3resi=[];o3OD=[];
    
-   [O3concnew H2Oconc O4conc O3resinew o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
+   [O3conc H2Oconc O4conc O3resi o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
    
-   [O3concnew_s, sn] = boxxfilt(tplot, O3concnew, xts);
-   O3concnew_smooth = real(O3concnew_s);
+   gas.o3 = O3conc;
+   gas.o3resi = (O3resi);
+   gas.o4  = O4conc;% already converted in routine./s.m_ray; % slant converted to vertical
+   gas.h2o = H2Oconc;% already converted in routine./s.m_H2O;% slant converted to vertical
+   gas.o3OD  = o3OD;          % this is to be subtracted from slant path this is slant
+   tplot = serial2hs(s.t);
+   
+   o3amount = -log(exp(-(real(O3conc/1000)*o3coef')));%(O3conc/1000)*o3coef';
+   o4coefVIS = zeros(qq,1); o4coefVIS(1:1044) = o4coef(1:1044);
+   o4amount = -log(exp(-(real(O4conc)*o4coef')));%O4conc*o4coef';
+   h2ocoefVIS = zeros(qq,1); h2ocoefVIS(wln_vis6) = h2ocoef(wln_vis6);
+   h2oamount= -log(exp(-(real(H2Oconc)*h2ocoefVIS')));%H2Oconc*h2ocoefVIS';
+   %tau_OD_fitsubtract = tau_ODslant - o3amount - o4amount -h2oamount;
+   tau_OD_fitsubtract4 = tau_OD_fitsubtract3 - real(o3amount) - real(o4amount) -real(h2oamount);% subtraction of remaining gases in o3 region
+   
+   [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);
+   O3conc_smooth = real(O3conc_s);
    
     
 %    % calculate error
@@ -524,7 +541,7 @@ end
    no2err_molec_cm2 = RMSEno2*(Loschmidt/1000);
    
    
-   dat2sav = [real(serial2Hh(s.t)) real(s.sza) real(s.m_aero) real(s.tau_aero(:,407)) real(s.m_O3) real(O3concnew) real(O3resinew) real(O3concnew_smooth) real(o3vcd_smooth)...
+   dat2sav = [real(serial2Hh(s.t)) real(s.sza) real(s.m_aero) real(s.tau_aero(:,407)) real(s.m_O3) real(O3conc) real(O3resi) real(O3conc_smooth) real(o3vcd_smooth)...
               real(RMSEo3) real(NO2conc) real(NO2resi) real(no2VCDpca) real(no2vcdpca_smooth) real(RMSEno2) real(no2_molec_cm2) real(no2err_molec_cm2)...
               real(s.cwv.cwv940m1) real(s.cwv.cwv940m1std) real(s.cwv.cwv940m2) real(s.cwv.cwv940m2resi)];
    
