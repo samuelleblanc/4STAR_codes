@@ -20,7 +20,7 @@ toggle_out.doflagging = true; % for running any Yohei style flagging
 toggle_out.dostarflag = true; 
 toggle_out.lampcalib  = false; 
 toggle_out.runwatervapor = true;
-toggle_out.applyforjcorr = false;
+toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 
 if exist('toggle_in', 'var')
