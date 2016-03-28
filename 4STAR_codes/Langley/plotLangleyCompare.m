@@ -61,13 +61,13 @@ function plotLangleyCompare(filelist,band)
 % filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20150916_NIR_C0_compared_with_AATS_at_Ames','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
 
 % order in ordinal date
-% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20150916_VIS_C0_compared_with_AATS_at_Ames','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO'};
-% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20150916_NIR_C0_compared_with_AATS_at_Ames','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
+% filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20130708_VIS_C0_modified_Langley_at_MLO_screened_2std_averagethru20130711','20130708_VIS_C0_refined_Langley_at_MLO_screened_averagethru20130712_scaled3p20141013','20150916_VIS_C0_compared_with_AATS_at_Ames','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO','20160112_VIS_C0_refined_Langley_MLO','20160113_VIS_C0_refined_Langley_MLO','20160114_VIS_C0_refined_Langley_MLO','20160115_VIS_C0_refined_Langley_MLO','20160116_VIS_C0_refined_Langley_MLO'};
+% filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20130708_NIR_C0_modified_Langley_at_MLO_screened_2std_averagethru20130711','20130708_NIR_C0_refined_Langley_at_MLO_screened_averagethru20130712_scaled3p20141013','20150916_NIR_C0_compared_with_AATS_at_Ames','20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO','20160112_NIR_C0_refined_Langley_MLO','20160113_NIR_C0_refined_Langley_MLO','20160114_NIR_C0_refined_Langley_MLO','20160115_NIR_C0_refined_Langley_MLO','20160116_NIR_C0_refined_Langley_MLO'};
 
-
+% 20130708_NIR_C0_refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013
 % prepare for plotting
-colorlist_ = varycolor(120);
-colorlist  = colorlist_(120:-10:1,:);
+colorlist_ = varycolor(140);
+colorlist  = colorlist_(140:-10:1,:);
 
 for i=1:length(filelist)
     

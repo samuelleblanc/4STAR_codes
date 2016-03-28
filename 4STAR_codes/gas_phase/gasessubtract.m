@@ -284,9 +284,10 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
  
  basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
  % not necessary to use no2 here
+ %basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1) ((wvis(wln)').^4).*ones(length(wln),1)];% this seem to yield good O3 for MLO
  
  % adding O2 cross section
- % basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) o2coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
+ %basiso3=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln) o2coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1) ((wvis(wln)').^2).*ones(length(wln),1) ((wvis(wln)').^3).*ones(length(wln),1)];% this seem to yield good O3 for MLO
  % not necessary to use no2 here
 
    ccoefo3=[];
@@ -310,10 +311,13 @@ tau_OD_fitsubtract3 = tau_OD_fitsubtract2;% - o2amount;% o2 subtraction
    o3vcd_smooth = real(o3VCDsmooth);
    
    x0=[ccoefo3(1,:)' ccoefo3(2,:)' ccoefo3(4,:)' ccoefo3(5,:)' ccoefo3(6,:)' ccoefo3(7,:)' ccoefo3(8,:)'];
+   %x0=[ccoefo3(1,:)' ccoefo3(2,:)' ccoefo3(4,:)' ccoefo3(5,:)' ccoefo3(6,:)' ccoefo3(7,:)' ccoefo3(8,:)' ccoefo3(9,:)'];
    
    O3conc=[];H2Oconc=[];O4conc=[];O2conc=[];O3resi=[];o3OD=[];
    
-   [O3conc H2Oconc O4conc O3resi o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
+  %[O3conc H2Oconc O4conc O3resi o3ODnew varall_lin] = o3corecalc_lin_adj_poly4(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
+   
+  [O3conc H2Oconc O4conc O3resi o3ODnew varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0);
    
    
    [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);
@@ -546,7 +550,7 @@ end
               real(RMSEo3) real(NO2conc) real(NO2resi) real(no2VCDpca) real(no2vcdpca_smooth) real(RMSEno2) real(no2_molec_cm2) real(no2err_molec_cm2)...
               real(s.cwv.cwv940m1) real(s.cwv.cwv940m1std) real(s.cwv.cwv940m2) real(s.cwv.cwv940m2resi)];
    
-   fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary_wFORJcorr_meanc0_rateslant.dat');
+   fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary_meanc0_rateslantPoly4noFORJcorr.dat');
    save(['C:\Users\msegalro.NDC\Documents\R\4STAR_analysis\data\' fi],'-ASCII','dat2sav');
    
    %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
