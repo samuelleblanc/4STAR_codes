@@ -54,10 +54,12 @@
 %                    corrected a bug to subtract o4 only in vis 
 % 2016-02-22,    MS: reverted back to 2016-01-29 changes that were deleted!
 %                    by recent merge
+% 2016-04-06,    MS: chnaged back to original output after editing some
+%                    things for MLO DB comparisons
 % -------------------------------------------------------------------------
 %% function routine
 
-function [tau_sub gas] = gasessubtract(s)
+function [tau_sub , gas] = gasessubtract(s)
 %----------------------------------------------------------------------
  version_set('1.0');
  showfigure = 0;
@@ -546,12 +548,12 @@ end
    no2err_molec_cm2 = RMSEno2*(Loschmidt/1000);
    
    
-   dat2sav = [real(serial2Hh(s.t)) real(s.sza) real(s.m_aero) real(s.tau_aero(:,407)) real(s.m_O3) real(O3conc) real(O3resi) real(O3conc_smooth) real(o3vcd_smooth)...
-              real(RMSEo3) real(NO2conc) real(NO2resi) real(no2VCDpca) real(no2vcdpca_smooth) real(RMSEno2) real(no2_molec_cm2) real(no2err_molec_cm2)...
-              real(s.cwv.cwv940m1) real(s.cwv.cwv940m1std) real(s.cwv.cwv940m2) real(s.cwv.cwv940m2resi)];
-   
-   fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary_meanc0_rateslantPoly4noFORJcorr.dat');
-   save(['C:\Users\msegalro.NDC\Documents\R\4STAR_analysis\data\' fi],'-ASCII','dat2sav');
+%    dat2sav = [real(serial2Hh(s.t)) real(s.sza) real(s.m_aero) real(s.tau_aero(:,407)) real(s.m_O3) real(O3conc) real(O3resi) real(O3conc_smooth) real(o3vcd_smooth)...
+%               real(RMSEo3) real(NO2conc) real(NO2resi) real(no2VCDpca) real(no2vcdpca_smooth) real(RMSEno2) real(no2_molec_cm2) real(no2err_molec_cm2)...
+%               real(s.cwv.cwv940m1) real(s.cwv.cwv940m1std) real(s.cwv.cwv940m2) real(s.cwv.cwv940m2resi)];
+%    
+%    fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary_meanc0_rateslantPoly4noFORJcorr.dat');
+%    save(['C:\Users\msegalro.NDC\Documents\R\4STAR_analysis\data\' fi],'-ASCII','dat2sav');
    
    %gas.no2OD  = no2OD;% this is to be subtracted from total OD;
    %no2amount = (NO2conc)*no2coef';
@@ -559,13 +561,13 @@ end
    no2amount = (NO2conc/1000)*no2coef';
    %no2amount = (1.86e-4)*repmat(no2coef',pp,1);  % constant value
    
-   % commented for running purposes
-   %tau_OD_fitsubtract5 = tau_OD_fitsubtract4 - real(no2amount);
-   %tau_sub = tau_OD_fitsubtract5;%tau_OD_fitsubtract4;
+   
+   tau_OD_fitsubtract5 = tau_OD_fitsubtract4 - real(no2amount);
+   tau_sub = tau_OD_fitsubtract5;%tau_OD_fitsubtract4;
    
    
-   %tau_sub(:,1:nm_0490) = starsun.tau_a_avg(:,1:nm_0490);
-   %tau_sub(:,1:nm_0470) = s.tau_aero(:,1:nm_0470);
+   
+   tau_sub(:,1:nm_0470) = s.tau_aero(:,1:nm_0470);
 %    figure;
 %    plot(starsun.w,tau_ODslant(end-500,:),'-b');hold on;
 %    plot(starsun.w,tau_ODslant(end-500,:)-no2amount(end-500,:),'--y');xlabel('wavelength');ylabel('OD');

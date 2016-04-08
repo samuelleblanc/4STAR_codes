@@ -1,4 +1,4 @@
-function forj_vis_out = TCAPII_forj_az(vis)
+function forj_vis_out = TCAPII_forj_az_v2(vis)
 % v2 attempt to clean up darks and lights, added "lights" boolean
 if ~exist('vis','var')||~exist(vis,'file');
     vis = getfullname('*_VIS_FORJ.dat','forj','Select a forj data file.');

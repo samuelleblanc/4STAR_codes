@@ -24,7 +24,7 @@ s.NO2col=2.64e15; % OMI overpass Jan-8
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=1013; 
+    s.Pst(find(s.Pst<10))=680; %MLO
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 

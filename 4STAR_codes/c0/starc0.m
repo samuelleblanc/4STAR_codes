@@ -20,8 +20,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
 % MS, v1.4, 2016-01-10, updated MLO c0
 % SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
+% MS, v1.6, 2016-04-06, update latest c0 to WFF 20151104, which seems like our best bet.
 
-version_set('1.5');
+version_set('1.6');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -37,9 +38,11 @@ end;
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
         if now>=datenum([2016 1 19 0 0 0]);
-            daystr='20160109';
+            %daystr='20160109';
+            daystr='20151104';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF is our best bet for KORUS
         elseif now>=datenum([2016 1 9 0 0 0]);
             daystr='20160109';
             filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
