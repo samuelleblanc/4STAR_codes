@@ -11,20 +11,20 @@ if isfield(s, 'toggle')
 end
 s.toggle = toggle;
 
-ground =[datenum('17:33:00') datenum('22:09')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);  
-langley=[datenum('17:33:00') datenum('22:09')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);  
+ground =[datenum('18:57:00') datenum('26:00')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);  
+%langley=[datenum('17:33:00') datenum('22:09')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);  
  
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
  
 % Ozone and other gases 
 s.O3h=21; 
-s.O3col=0.249;    % BD at MLO 
-s.NO2col=2.64e15; % OMI overpass Jan-8 
+s.O3col=0.290;    % guess at Ames roof
+s.NO2col=2.64e15; % guess at Ames roof 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=680; %MLO
+    s.Pst(find(s.Pst<10))=1013; 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 

@@ -865,6 +865,10 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.runwatervapor;
         if toggle.verbose; disp('water vapor retrieval start'), end;
         [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+        
+        % subtract 940 nm water vapor from AOD (this is nir-o2-o2 sub)
+        % s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
+         
         % subtract water vapor from tau_aero
         if toggle.verbose; disp('water vapor retrieval end'), end;
         % gases subtractions and o3/no2 conc [in DU] from fit
@@ -872,6 +876,9 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         if toggle.gassubtract
             if toggle.verbose; disp('gases subtractions start'), end;
             %[s.tau_aero_fitsubtract s.gas] = gasesretrieve(s);
+            % o3
+            %[s.tau_aero_fitsubtract s.gas] = gasretrieve(s,gas,wln1,wln2);
+            % no2
             [s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;

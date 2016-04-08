@@ -19,10 +19,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0 
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
 % MS, v1.4, 2016-01-10, updated MLO c0
-% SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
-% MS, v1.6, 2016-04-06, update latest c0 to WFF 20151104, which seems like our best bet.
 
-version_set('1.6');
+version_set('1.4');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -36,21 +34,32 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
-            %daystr='20160109';
-            daystr='20151104';
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF is our best bet for KORUS
-        elseif now>=datenum([2016 1 9 0 0 0]);
+    if t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
+        if now>=datenum([2016 3 19 0 0 0]);
+            daystr='20160317';
+            filesuffix='compared_with_AATS_at_Ames'; % rooftop comparison with AATS, the local noon value
+        elseif now>=datenum([2016 3 18 8 45 0]) && now<=datenum([2016 3 18 9 45 0]); % just to make initial starsun files
             daystr='20160109';
-            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+        end;
+    elseif t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+        if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160109';
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+        elseif now>=datenum([2016 1 16 0 0 0]);
+            daystr='20160109';
+            %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
+            %filesuffix='refined_Langley_MLOwFORJcorrection1';
+            %filesuffix='refined_Langley_MLO_wstraylightcorr';
         end;  
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
-        if now>=datenum([2015 11 23 0 0 0]);
+        if now>=datenum([2016 2 16 14 0 0]); % preliminary uncertainty values (2%) added
             daystr='20151118';
-            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % ground-based sunrise measurements at WFF
+            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc'; % ground-based sunrise measurements at WFF % WRONG NIR FORMATTING CORRECTED ON 2016/02/22
+        elseif now>=datenum([2015 11 23 0 0 0]);
+            daystr='20151118';
+            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % WRONG NIR FORMATTING % ground-based sunrise measurements at WFF
         elseif now>=datenum([2015 11 6 0 0 0]);
             daystr='20151104';
             filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
@@ -178,8 +187,7 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            a=importdata(which(visfilename));
-%             a=importdata(fullfile(starpaths,visfilename));
+            a=importdata(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -194,14 +202,14 @@ if ~exist('visc0')
             visc0(visc0==-1)=NaN;
             visc0err(visc0err==-1)=NaN;
         else
-            visc0(i,:)=load(which(visfilename));
+            visc0(i,:)=load(fullfile(starpaths,visfilename));
             visc0err(i,:)=NaN(1,size(visc0,2));
         end;
         visnote=[visnote visfilename ', '];
         vislstr(i)={visfilename};
         nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
         if isequal(orientation,'vertical');
-            a=importdata(which(nirfilename));
+            a=importdata(fullfile(starpaths,nirfilename));
             nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -216,7 +224,7 @@ if ~exist('visc0')
             nirc0(nirc0==-1)=NaN;
             nirc0err(nirc0err==-1)=NaN;
         else
-            nirc0(i,:)=load(which(nirfilename));
+            nirc0(i,:)=load(fullfile(starpaths,nirfilename));
             nirc0err(i,:)=NaN(1,size(nirc0,2));
         end;
         nirnote=[nirnote nirfilename ', '];
@@ -276,9 +284,9 @@ if 1==2; % never executed, just for record keeping
         filesuffix(1)={'refined_Langley_on_G1'};
     end;
     % until 2012/05/23, V0 from standard Langley plots
-    visc0=load(which('20120420_VIS_C0_standard_Langley_on_G1.dat'));
+    visc0=load(fullfile(starpaths,'20120420_VIS_C0_standard_Langley_on_G1.dat'));
     visnote='C0 from 20120420 airborne Langley on G1.';
-    nirc0=load(which('20120420_NIR_C0_standard_Langley_on_G1.dat'));
+    nirc0=load(fullfile(starpaths,'20120420_NIR_C0_standard_Langley_on_G1.dat'));
     nirnote='C0 from 20120420 airborne Langley on G1.';
 end;
 
@@ -286,4 +294,3 @@ end;
 % visc0=visc0*NaN;nirc0=nirc0*NaN;
 % visnotec0='VIS C0 turned off';
 % nirnotec0='NIR C0 turned off';
-
