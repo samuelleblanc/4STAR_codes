@@ -105,6 +105,18 @@ for uu=1:length(tintu); % for each integration time
                 index=[];
             end;
             note='over nearest (before and after) dark measurement blocks.';
+            % check if the darks are too large
+            if length(s.w)==512; % it is the nir spectrometer
+              if any(dark(rowsu,200) > 2000); 
+                  dark(rowsu(dark(rowsu,200)>2000),:)=NaN; 
+                  note=[note ' Dark too high, therefore ignored.'];
+              end;
+            else % for the VIS spectrometer
+              if any(dark(rowsu,500) > 1000); 
+                  dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+                  note=[note ' Dark too high, therefore ignored.'];
+              end;
+            end;
         elseif isstr(bounds)
             error([bounds ' is not an option.']);
         elseif numel(bounds)==1; % assume a time interval (in day) is given
