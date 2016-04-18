@@ -20,7 +20,7 @@ s.sd_aero_crit=0.01;
 % Ozone and other gases 
 s.O3h=21; 
 s.O3col=0.243;    % MLO DB 
-s.NO2col=2.64e15; % OMI overpass Jan-8 
+s.NO2col=2.64e15; % OMI overpass Jan-8 % need to check, maybe decrease?
  
 % other tweaks 
 if isfield(s, 'Pst'); 

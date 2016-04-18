@@ -13,7 +13,7 @@
 %********************
 % set parameters
 %********************
-daystr='20160110';
+daystr='20151104';
 %daystr='20130712';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
@@ -45,12 +45,13 @@ eval(s1{:});
 ok=incl(t,langley);
 % load water vapor coef
 % load H2O a and b parameters
-% watvapcoef =load('C:\MatlabCodes\data\cross_sections_uv_vis_swir_all.mat');  % 3.4km MidLatSummer
-watvapcoef =load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));         % 3.4km Tropical MLO
-% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');     % 6.85km MidLatWinter for 20130214
-% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');         % 6.0km MidLatWinter for 20130212
-% watvapcoef =load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);         % 6.0km MidLatWinter for 20130212
-% watvapcoef =load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat');   % 6.0km-3coef. MidLatwinter
+% watvapcoef   = load(strcat(starpaths,'cross_sections_uv_vis_swir_all.mat'));                                % 3.4km MidLatSummer-old FWHM
+  watvapcoef   = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));          % Alt=0km MidLatSummer 
+% watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));        % 3.4km Tropical MLO
+% watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');   % 6.85km MidLatWinter for 20130214
+% watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');      % 6.0km MidLatWinter for 20130212
+% watvapcoef = load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);              % 6.0km MidLatWinter for 20130212
+% watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat'); % 6.0km-3coef. MidLatwinter
 
  
  % interpolate H2O parameters to whole wln grid
@@ -78,6 +79,9 @@ watvapcoef =load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tro
 if strcmp(daystr,'20141002')
     ok = ok(tau_aero(ok,407)<=0.02+0.0005&tau_aero(ok,407)>=0.02-0.0005);
     am = m_H2O(ok);
+elseif strcmp(daystr,'20151106')
+    % adjust values for NAAMES ground 20151104
+     am = [min(m_H2O(ok)) 7.2]; 
 else
     am = [min(m_H2O(ok)) max(m_H2O(ok))];
     % adjust values for MLO 2013
@@ -176,7 +180,15 @@ elseif strcmp(daystr,'20151118')  % NAAMES
     c0=importdata(fullfile(starpaths,  '20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened_3.0x.dat'));
     c0vis = c0.data(:,3);
     c0mod = c0vis;
+    c0mod(iwln) = c0_mod;
     filesuffix='modified_Langley_sunrise_refined_Langley_on_C130_screened_3.0';
+    visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
+elseif strcmp(daystr,'20151104')  % NAAMES ground
+    c0=importdata(fullfile(starpaths,  '20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened_3correctO3.dat'));
+    c0vis = c0.data(:,3);
+    c0mod = c0vis;
+    c0mod(iwln) = c0_mod;
+    filesuffix='modified_Langley_at_WFF_Ground_screened_3correctO3';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');

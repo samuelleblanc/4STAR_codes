@@ -2,8 +2,13 @@ flight=[datenum('13:50:51') datenum('19:02:19')] -datenum('00:00:00')+datenum([d
 cleaning=[datenum('19:13:40') datenum('19:21:55') % pre-cleaning; the cleaning for this day was not done as a part of the FORJ test routine, hence the need to manually determine the time periods
     datenum('19:32:55') datenum('19:42:55')] ... % post-cleaning
     -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-langley=[datenum('11:36:22') datenum('13:50:51')] ... % ground-based 
-    -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+    
+%langley=[datenum('11:36:22') datenum('13:50:51')] ... 
+%    -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);% ground-based 
+    
+langley=[datenum('11:36:22') datenum('13:50:51')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]) % ground based
+
+
 groundcomparison=[langley; flight(1,2) datenum('20:00:00')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])];
 
 horilegs=[datenum('14:01:44') datenum('14:17:07'); ...
@@ -32,8 +37,8 @@ s.sd_aero_crit=0.01;
 
 % Ozone and other gases
 s.O3h=21;
-s.O3col=0.300;  % Yohei's guess, to be updated
-s.NO2col=5e15; % Yohei's guess, to be updated
+s.O3col=0.244;  % OMI overpass Wallops
+s.NO2col=2e15;  % defailt value
 
 % other tweaks
 if isfield(s, 'Pst');

@@ -459,7 +459,8 @@ else
    %[ss NO2conc NO2resi no2OD tau_aero_subtract] = no2corecalc_wss(s,no2coef,o4coef,o3coef,wln,tau_OD,nm_startpca,nm_endpca);
    % perform linear inversion
    % all coef are in [atm x cm]
-   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) log(wvis(wln))'.*ones(length(wln),1)];
+   % basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) log(wvis(wln))'.*ones(length(wln),1)];
+   basisno2=[no2coef(wln), o4coef(wln), o3coef(wln) ones(length(wln),1) wvis(wln)'.*ones(length(wln),1)];
 
 end
 

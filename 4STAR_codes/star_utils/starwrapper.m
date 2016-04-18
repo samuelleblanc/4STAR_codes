@@ -755,13 +755,13 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     s.tau_aero=s.tau_aero_noscreening;
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    if toggle.gassubtract
+    % if toggle.gassubtract
         tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
         s.rateslant        = real(s.rate./repmat(s.f,1,qq));
         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-    end;
+    % end;
     
     % compare rate structures:
     
@@ -866,20 +866,26 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         if toggle.verbose; disp('water vapor retrieval start'), end;
         [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
         
-        % subtract 940 nm water vapor from AOD (this is nir-o2-o2 sub)
-        % s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
-         
-        % subtract water vapor from tau_aero
+        % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
+        s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
+        
         if toggle.verbose; disp('water vapor retrieval end'), end;
         % gases subtractions and o3/no2 conc [in DU] from fit
         %-----------------------------------------------------
         if toggle.gassubtract
             if toggle.verbose; disp('gases subtractions start'), end;
-            %[s.tau_aero_fitsubtract s.gas] = gasesretrieve(s);
-            % o3
-            %[s.tau_aero_fitsubtract s.gas] = gasretrieve(s,gas,wln1,wln2);
-            % no2
-            [s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
+            
+            % this is old routine
+            %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
+            
+            % this is new routine
+            [s.gas] = retrieveGases(s);
+            
+            % subtract derived gasess
+            
+            s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
+                                                         - s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.co2OD;
+            
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
         end;

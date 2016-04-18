@@ -18,7 +18,7 @@ co2_coef = PAR(:,2);
 Xdat=meas(:,1);
 Ydat=meas(:,2);
 
-% water vapor transmittance model
+% transmittance model
 %---------------------------------
 Tmodel =  exp(-(ch4_coef.*x0(:,1))).*exp(-(co2_coef.*x0(:,2))).*exp(-(x0(:,3) + x0(:,4)*Xdat + x0(:,5)*Xdat.^2));
 % adjust objective function if ==zero

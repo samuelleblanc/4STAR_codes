@@ -58,7 +58,7 @@ else;
 end;
 clear i;
 slsun(daystr, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
-    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot'); % sun data and nav data associated with them
+    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas'); % sun data and nav data associated with them
 [visc,nirc,viscrange,nircrange]=starchannelsatAATS(t);
 c=[visc(1:10) nirc(11:13)+1044];
 colslist={'' c 1:13
@@ -297,16 +297,34 @@ end;
 if exist('cwv');
     
         figure;
-        [h,filename]=spsun(daystr, 't', tau_aero_noscreening, '.', vars.Alt1e4{:}, mods{:}, ...
-            'cols', colslist{k,2}, 'ylabel', 'tau_aero_noscreening', ...
-            'filename', ['star' daystr platform 'tau_aero_noscreeningtseries' colslist{k,1}]);
+        [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
+            'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
+            'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 end;
 
 
 % O3
 
+if exist('gas');
+    
+        figure;
+        [h,filename]=spsun(daystr, 't', gas.o3.o3DU, '.', vars.Alt1e4{:}, mods{:}, ...
+            'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
+            'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
+        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+end;
+
 % NO2
+
+if exist('gas');
+    
+        figure;
+        [h,filename]=spsun(daystr, 't', gas.no2.no2DU, '.', vars.Alt1e4{:}, mods{:}, ...
+            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
+            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+end;
 
 % tau aero after correction based on AATS
 if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']))==2;
