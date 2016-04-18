@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160110';
+daystr='20151104';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -289,7 +289,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
-    filesuffix = 'refined_Langley_MLO';
+    %filesuffix = 'refined_Langley_MLO';
+    filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
     %filesuffix = 'refined_Langley_MLOwFORJcorrection1';
     %filesuffix = 'refined_Langley_MLO_wstraylightcorr';
     %filesuffix = 'refined_Langley_MLO_wFORJcorr';

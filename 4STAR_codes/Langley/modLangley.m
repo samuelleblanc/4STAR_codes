@@ -15,7 +15,9 @@ function [c0_mod,RSD]=modLangley(am,iwln,wvis,data,tau_aero,tau_ray,tau_O4,tau_O
 
 flag_write_results='no'; %'yes'
 flag_restrict_altitude='no';
-flag_screen_method='mH2Oidx';%'mH2O^b';%'mH2O';'mH2Oidx'
+flag_screen_method='mH2Oidx';%'mH2O^b';%'mH2O';'mH2Oidx'% used usually
+
+%flag_screen_method='mH2O^b';%'mH2O^b';%'mH2O';'mH2Oidx'5 use for 20151104
 
 % restrict airmass range
 min_m_H2O=am(1);                    % to decide check min values of m_H2O

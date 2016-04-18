@@ -19,6 +19,7 @@ function plotLangleyCompare(filelist,band)
 % filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO'};
 % filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO'};
 % filelist = {'20160110_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_modified_Langley_MLO'};
+% filelist = {'20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened_3correctO3','20151104_VIS_C0_modified_Langley_at_WFF_Ground_screened_3correctO3'};
 
 % filelist = {'20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_MLO','20160110_VIS_C0_refined_Langley_MLO','20160111_VIS_C0_refined_Langley_MLO'};
 % filelist = {'20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_MLO','20160110_NIR_C0_refined_Langley_MLO','20160111_NIR_C0_refined_Langley_MLO'};

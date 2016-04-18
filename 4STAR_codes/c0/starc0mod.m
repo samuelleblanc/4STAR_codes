@@ -55,10 +55,12 @@
 %           - added new 20141002 ARISE c0mod
 % Modified, Michal Segal, Jan, 10, 2016, added NAAMES and MLO modified
 %                                        Langleys
+% Modified, Michal Segal, Apr-07-2016, updating modc0 for KORUS, based on
+%                                      NAAMES ground Langley
 % -------------------------------------------------------------------------
 %% function routine
 function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
-version_set('1.3');
+version_set('1.4');
 
 % control the input
 if nargin==0;
@@ -77,8 +79,15 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 1 9 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
+    if t>=datenum([2015 9 16 0 0 0]); %
+        if now>=datenum([2016 3 17 0 0 0]); % use NAAMES c0 for KORUS-AQ
+            daystr='20151104';
+            filesuffix='modified_Langley_at_WFF_Ground_screened_3correctO3'; % NAAMES ground with correct O3
+            %daystr='20160109';
+            %filesuffix='modified_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            %model_atmosphere=1; %Tropical-MLO
+            model_atmosphere=2; %use MidLat summer for KORUS
+        elseif now>=datenum([2016 1 19 0 0 0]);
             daystr='20160109';
             filesuffix='modified_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
             model_atmosphere=1; %Tropical-MLO
