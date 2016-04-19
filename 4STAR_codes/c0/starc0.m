@@ -41,9 +41,9 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20151104';
             %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';       % ground-based sunrise measurements at WFF is our best bet for KORUS
             filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
-            daystr='20160109';
+            %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
         elseif now>=datenum([2016 1 19 0 0 0]);
             daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
