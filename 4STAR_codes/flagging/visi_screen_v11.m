@@ -1,7 +1,11 @@
-function [flags,screened,good,figs] = visi_screen_v10(time, tau, varargin)
-% [flags,screened,good,figs] = visi_screen(time, tau, varargin)
-% 'time' should be in Matlab serial date
-% 'tau' is a placeholder for whatever you'd like to see the screen applied to
+function [flags,screened,good,figs] = visi_screen_v11(main, varargin)
+% [flags,screened,good,figs] = visi_screen_v11(main varargin)
+% I have an idea how to extend this so that each plotted quantity has it's
+% own time, but I'll implement this later.  For now, focussion on ACME-V
+% data archival so will merely match nearest times and use existing
+% visi_screen_v10.
+
+% 'main' is a struct with  .t and .'user'.  t is a Matlab serial date
 % Many optional arguments:
 % 'time_choice', time_str: time_str = 'HH:MM:SS','HH.hh', or 'day of year'
 % if no time choice provided, you will be prompted for a choice
@@ -63,13 +67,13 @@ while isempty(find([1,2,3],time_choice))
 end
 switch time_choice
     case 1
-        t = serial2hs(time);
+        t = serial2hs(main.t);
         t_str = 'time [HH:MM:SS]';
     case 2
-        t = serial2hs(time);
+        t = serial2hs(main.t);
         t_str = 'time [HH.hh]';
     otherwise
-        t = serial2doys(time);
+        t = serial2doys(main.t);
         t_str = 'time (day of year)';
 end
 
