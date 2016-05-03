@@ -139,7 +139,7 @@ if (Mode==3);
 end;
 %define operator for manual screening mode (mode=2)
 if (Mode==2)
-    op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer','Meloe Kacenelenbogen','Samuel LeBlanc');
+    op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer','Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann');
     op_name_str = '?';
     switch op_name
         case 1
@@ -154,6 +154,8 @@ if (Mode==2)
             op_name_str = 'MK';
         case 6
             op_name_str = 'SL';
+        case 7
+            op_name_str = 'JR';
     end
 end
 
