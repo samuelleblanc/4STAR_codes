@@ -13,6 +13,8 @@ end
 
 flight=[datenum(2016,5,1,23,57,0) datenum(2016,5,2,6,55,0)]; 
  
+s.sd_aero_crit = 0.01;
+
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
 s.O3col=0.327; % Yohei's guess     
