@@ -13,6 +13,7 @@ end
 
 flight=[datenum(2016,4,26,12,33,54) datenum(2016,4,26,29,14,0)]; 
 s.sd_aero_crit = 0.01;
+s.flagfile = '20160426_starflag_man_created20160505_1153by_SL.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
@@ -67,13 +68,13 @@ toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = false;
+toggle_out.gassubtract = true;
 toggle_out.booleanflagging = false;
 toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = false;
+toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
 
