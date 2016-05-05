@@ -11,9 +11,9 @@ else
     s.toggle = update_toggle;
 end
 
-spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
-datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
- 
+flight=[datenum(2016,4,26,12,33,54) datenum(2016,4,26,29,14,0)]; 
+s.sd_aero_crit = 0.01;
+
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
 s.O3col=0.300; % Yohei's guess     
@@ -50,3 +50,35 @@ end;
 
 return
 
+
+
+function toggle_out = update_toggle(toggle_in)
+% toggle_out = update_toggle(toggle_in)
+% Merge the optional "toggle_in" with user-supplied values in toggle_out
+% Frequently this instance will be shadowed by the internal function
+% of the same name defined beneath starinfo files.
+
+toggle_out.subsetting_Tint = true;
+toggle_out.pca_filter = false;
+toggle_out.verbose=true;
+toggle_out.saveadditionalvariables=true;
+toggle_out.savefigure=false;
+toggle_out.computeerror=false;
+toggle_out.inspectresults=false;
+toggle_out.applynonlinearcorr=true;
+toggle_out.applytempcorr=false;% true is for SEAC4RS data
+toggle_out.gassubtract = false;
+toggle_out.booleanflagging = false;
+toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.doflagging = false; % for running any Yohei style flagging
+toggle_out.dostarflag = false; 
+toggle_out.lampcalib  = false; 
+toggle_out.runwatervapor = false;
+toggle_out.applyforjcorr = false;
+toggle_out.applystraycorr = false;
+
+if exist('toggle_in', 'var')
+   toggle_out = catstruct(toggle_in, toggle_out);
+end
+
+return
