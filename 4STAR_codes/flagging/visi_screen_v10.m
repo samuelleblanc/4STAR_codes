@@ -30,7 +30,8 @@ function [flags,screened,good,figs] = visi_screen_v10(time, tau, varargin)
 % If the user doesn't provide a list of flags then just assume we want to
 % flag "good" or "not good". clouds are clear or not clear.
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
-version_set('1.0');
+% SL, v1.1, 2015/05/04, added special function button for rerunning some automated screening
+version_set('1.1');
 if rem(nargin,2)~=0
     error('Problem with number of nargins.')
 end
@@ -234,7 +235,7 @@ if subs>0
             flds = fieldnames(sub.(sprintf('panel_%d',sb)));
             hold('on');
             for fd = 1:length(flds)
-                plot([t(screened==0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened==0);NaN]),syms(rem(fd,12)),'color',aux_color(fd,:));
+                h.(flds{fd}) = plot([t(screened==0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened==0);NaN]),syms(rem(fd,12)),'color',aux_color(fd,:));
                 grid on
                 sub.(sprintf('leg_str%d',sb)) = [sub.(sprintf('leg_str%d',sb)), {strrep(flds{fd},'_',' ')}];
             end
@@ -243,6 +244,7 @@ if subs>0
             for fd = 1:length(flds)
                 plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey);
                 grid on
+                uistack(h.(flds{fd}),'top')
             end
             hold('off');
             xlabel(t_str);
@@ -308,12 +310,13 @@ set(leg_ax,'visible','off');
 hold('off')
 %%
 figure(tau_fig);
-plot([t(~screen);t(end)], real([tau(~screen);NaN]), 'k.'); yl = ylim; hold('on');
+h.col = plot([t(~screen);t(end)], real([tau(~screen);NaN]), 'k.'); yl = ylim; hold('on');
 ax(end+1) = gca;
 for bit = 1:nflags
     test = logical(bitget(screen,bit));
     plot([t(test);t(end)],real([tau(test);NaN]),syms(rem(bit,12)+1),'color',color(bit,:));
 end
+uistack(h.col,'top')
 if isfield(ylims,'tau_fig')
     ylim(ylims.tau_fig);
 end
@@ -345,7 +348,7 @@ figure(tau2_fig);
     plot([t(screened==0);t(end)], real([tau(screened==0);NaN]), 'g.','markersize',8); yl = ylim;
 plot([t(screened>0);t(end)], real([tau(screened>0);NaN]), '.','color',grey,'markersize',8);
 hold('on');
-plot([t(screened==0);t(end)], real([tau(screened==0);NaN]), '.','color',[0,.75,0],'markersize',12);
+plot([t(screened==0);t(end)], real([tau(screened==0);NaN]), '.','color',[0,.75,0]);
     grid on %added by jml
 legend('bad','good');
 hold('off');
@@ -373,9 +376,33 @@ end
 end
 % zoom('on');
 
-while button <= nflags+1
+if isfield(varin,'special_fn_name')
+    extra_buttons = {varin.special_fn_name,'CLEAR','DONE'};
+    varin = rmfield(varin,'special_fn_name');
+    spc_fn = true;
+    n_spc_fn = 1; % set to ony one special button for now
+    % 'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit'
     
-    button =menu('Condition: ',{flag_names{:},'CLEAR','DONE'});
+    % import the variables from the caller written into the special fn
+    spfn_var_list = strsplit(varin.special_fn_flag_str,{' ','>','|','<','&','(',')'});
+    for n_sp=1:length(spfn_var_list)
+        try; 
+            eval([spfn_var_list{n_sp} '=' 'evalin(''caller'',' '''' spfn_var_list{n_sp} '''' ');']);  
+        catch me;
+            %disp(me)
+            %disp(['problem with variable or item:' spfn_var_list{n_sp}])
+            continue; 
+        end;
+    end
+else
+    extra_buttons = {'CLEAR','DONE'};
+    spc_fn = false;
+    n_spc_fn = 0;
+end
+
+while button <= nflags+1+n_spc_fn
+    
+    button =menu('Condition: ',{flag_names{:},extra_buttons{:}});
     back_ax = gca;
     v_ = axis(back_ax);
     flag_ax = find(ax==back_ax);
@@ -394,6 +421,52 @@ while button <= nflags+1
         end
         screen(t_) = bitset(screen(t_), button, ~bitget(screen(t_),button));
         screened = bitand(screen, gray_flags);
+    elseif spc_fn
+        if button == nflags+1+n_spc_fn
+            if isempty(flag_ax) || flag_ax > subpanes(3) || ~exist('sub','var')
+                t_ = t>= v_(1) & t<= v_(2)& tau>v_(3)&tau<v_(4);
+            else
+                flds = fieldnames(sub.(sprintf('panel_%d',flag_ax)));
+                t_ = false(size(t));
+                for fld = 1:length(flds)
+                    t_ = t_ | t>= v_(1) & t<= v_(2) & ...
+                        sub.(sprintf('panel_%d',flag_ax)).(flds{fld})>v_(3) & ...
+                        sub.(sprintf('panel_%d',flag_ax)).(flds{fld})<v_(4);
+                end
+            end
+            screen(t_) = 0;
+            screened = bitand(screen, gray_flags);
+            
+        elseif button == nflags+n_spc_fn
+            %% do the special button part
+            % 'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit'
+            val = inputdlg(['Enter new value of ' varin.special_fn_flag_var],'Change auto screening values',[1 50]);
+            eval([varin.special_fn_flag_var '=' val{:} ';']);
+            all_or_flt=menu('Reset auto flag','For all points','For selection only');
+            if all_or_flt==1
+                t_ = eval(varin.special_fn_flag_str);  
+            elseif all_or_flt==2
+                new_auto = eval([varin.special_fn_flag_str ';']);
+                if isempty(flag_ax) || flag_ax > subpanes(3) || ~exist('sub','var')
+                    t_0 = t>= v_(1) & t<= v_(2)& tau>v_(3)& tau<v_(4);
+                else
+                    flds = fieldnames(sub.(sprintf('panel_%d',flag_ax)));
+                    t_0 = false(size(t));
+                    for fld = 1:length(flds)
+                        t_0 = t_0 | t>= v_(1) & t<= v_(2) & ...
+                            sub.(sprintf('panel_%d',flag_ax)).(flds{fld})>v_(3) & ...
+                            sub.(sprintf('panel_%d',flag_ax)).(flds{fld})<v_(4);
+                    end
+                end
+                t_ = new_auto & t_0;
+            end
+            ib = strfind(flag_names,varin.special_fn_flag_name);
+            i_b = find(not(cellfun('isempty',ib)));
+            screen(t_) = bitset(screen(t_), i_b, ~bitget(screen(t_),i_b));
+            screened = bitand(screen, gray_flags);
+                    screen(t_) = bitset(screen(t_), button, ~bitget(screen(t_),button));
+        screened = bitand(screen, gray_flags);
+        end
     elseif button == nflags+1
         if isempty(flag_ax) || flag_ax > subpanes(3) || ~exist('sub','var')
             t_ = t>= v_(1) & t<= v_(2)& tau>v_(3)&tau<v_(4);
@@ -420,6 +493,7 @@ while button <= nflags+1
         plot([t(test);t(end)],real([tau(test);NaN]),syms(rem(bit,12)+1),'color',color(bit,:));
         
     end
+    plot([t(~screen);t(end)], real([tau(~screen);NaN]), 'ko','MarkerFaceColor','k');
     if isfield(ylims,'tau_fig')
         yl=ylims.tau_fig;
     end
@@ -464,6 +538,7 @@ while button <= nflags+1
                 for fd = 1:length(flds)
                     plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey);
                     grid on
+                    plot([t(screened==0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened==0);NaN]),syms(rem(fd,12)),'color',aux_color(fd,:))
                 end
                 if sb == subpanes(3)
                     xlabel(t_str);
