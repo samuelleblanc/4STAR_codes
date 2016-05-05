@@ -30,8 +30,8 @@ function [flags, good, flagfile] = starflag(s, Mode)
 %                corrected bug in lines 31,37 (disp function)
 % CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
-%
-version_set('1.3');
+% SL, 2016-05-04, added special function buttons to visi_screen
+version_set('1.4');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -139,7 +139,8 @@ if (Mode==3);
 end;
 %define operator for manual screening mode (mode=2)
 if (Mode==2)
-    op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer','Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann');
+    op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
+        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
     op_name_str = '?';
     switch op_name
         case 1
@@ -156,6 +157,8 @@ if (Mode==2)
             op_name_str = 'SL';
         case 7
             op_name_str = 'JR';
+        case 8
+            op_name_str = 'KP';
     end
 end
 
@@ -315,7 +318,7 @@ if (Mode==2)
             %Users need to modify what's below:
             clear('flags')
             flags_str.before_or_after_flight = '(t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>.01';
+            flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
             if exist('darkstd','var')
                 flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
             else
@@ -448,7 +451,8 @@ if (Mode==2)
     screen_bad_list = F_t(~test_good);
     
     [flags, screen, good, figs] = visi_screen_v10(t,aod_500nm,'time_choice',2,'flags',flags,'no_mask',no_mask,'figs',figs,...
-        'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims,'time_choice',1, 'figs',figs);
+        'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims,'time_choice',1, 'figs',figs,...
+        'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
     % returns:
     %   flags: struct of logicals (from flags inarg) of length(time)
     %           Also contains time, and settings in "manual_flags", and
