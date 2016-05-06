@@ -1,4 +1,4 @@
-function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0)
+function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0,c0)
 % retrieve o3 and derive fitted spectrum for subtraction
 % x0 is initial guess from linear inversion
 %
@@ -12,6 +12,7 @@ function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coe
 % MS, 2015-10-21, converted O4 and H2O to be in vertical amount
 % MS, 2016-01-29, adjusted routine takes input the linear inversion
 %                 values and subtracts baseline
+% MS, 2016-05-05, adding c0gases
 %------------------------------------------------------------------
 ODfit = zeros(length(s.t),length(s.w));
 tau_o3o4h2o_subtract = tau_OD;
@@ -33,8 +34,13 @@ for i = 1:length(s.t)
     meas = [s.w(wln)' y'];
     lm = meas(:,1);
     %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 s.c0(wln)'];
-    PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) s.c0(wln)'];
+    
     %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 300*s.kurO3'];
+    %PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) s.c0(wln)'];
+    
+    % apply c0gases
+    % PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) s.c0(wln)'];
+    PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) c0'];
     
        % Set Options
        
@@ -86,7 +92,8 @@ for i = 1:length(s.t)
 
                                    yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
                                    %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
-                                   ymeas = log(s.c0(wln))-log(y);
+                                   %ymeas = log(s.c0(wln))-log(y);
+                                   ymeas = log(c0)-log(y);
                                   
                                    
                                    yo3subtract   =  (o3coef(wln).*real(U_(1)));

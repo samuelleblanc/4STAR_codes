@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20151104';
+daystr='20160426';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -41,7 +41,10 @@ elseif isequal(daystr, '20141002')
 % elseif isequal(daystr, '20160112')
 %     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
 % elseif isequal(daystr, '20160113')
-%     source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
+% 
+source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
+% elseif isequal(daystr, '20160426')
+%     source = '20160426starsun_constO3.mat';
 else
     source=[daystr 'starsun.mat'];
     %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
@@ -49,11 +52,11 @@ else
     % in field
 end;
 file=fullfile(starpaths, source);
-load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero');
+load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero','tau_aero_noscreening');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
-starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
+starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 %s1=s(strmatch('langley',s));
 s1=s(strncmp('langley',s,1));
@@ -86,6 +89,8 @@ elseif isequal(daystr, '20160118')
     ok1 = ok(m_aero(ok)>=4);
     ok2 = ok(m_aero(ok)<=2);
     ok  = [ok1;ok2];
+elseif isequal(daystr, '20160426')   
+    ok = ok(m_aero(ok)>=4);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
@@ -294,6 +299,9 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     %filesuffix = 'refined_Langley_MLOwFORJcorrection1';
     %filesuffix = 'refined_Langley_MLO_wstraylightcorr';
     %filesuffix = 'refined_Langley_MLO_wFORJcorr';
+    %filesuffix='refined_Langley_korusaq_transit1_v1';constant omi data 
+    %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
+    filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';

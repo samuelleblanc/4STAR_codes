@@ -16,9 +16,9 @@ flight=[datenum(2016,4,18,19,17,0) datenum(2016,4,18,22,42,30)]; !!! to be updat
 circles = [datenum(2016,4,18,20,08,48) datenum(2016,4,18,20,16,41) 
     datenum(2016,4,18,20,16,41) datenum(2016,4,18,20,25,30)]; 
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.300; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21;      % 
+s.O3col=0.300;   % OMI gridded     
+s.NO2col=2.0e15; % OMI gridded  
  
 % other tweaks 
 if isfield(s, 'Pst'); 

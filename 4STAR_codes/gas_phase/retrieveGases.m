@@ -48,11 +48,12 @@ function [gas] = retrieveGases(s)
 
 %% retrieve NO2
 
- [gas.no2] = retrieveNO2(s,0.430,0.490);
+ %[gas.no2] = retrieveNO2(s,0.450,0.490,1);
 
 %% retrieve O3
 
- [gas.o3]  = retrieveO3(s,0.490,0.682);
+ [gas.o3]  = retrieveO3(s,0.490,0.682,1);
+ 
 %----------------------------------------------------------------------
 %% retrieve CO2
 
@@ -67,10 +68,10 @@ function [gas] = retrieveGases(s)
 %% save gas data to .mat file
 
    Loschmidt          = 2.686763e19; %molecules/cm2
-   d.no2_molec_cm2    = gas.no2.no2DU*(Loschmidt/1000);
-   d.no2err_molec_cm2 = gas.no2.no2resiDU*(Loschmidt/1000);
-   d.no2DU            = gas.no2.no2DU;
-   d.no2resiDU        = gas.no2.no2resiDU;
+   d.no2_molec_cm2    = gas.no2.no2_molec_cm2;%gas.no2.no2DU*(Loschmidt/1000);
+   d.no2err_molec_cm2 = gas.no2.no2resi;%gas.no2.no2resiDU*(Loschmidt/1000);
+   d.no2DU            = d.no2_molec_cm2/(Loschmidt/1000);
+   %d.no2resiDU       = gas.no2.no2resiDU;
    d.o3DU             = gas.o3.o3DU;
    d.o3resiDU         = gas.o3.o3resiDU;
    d.cwv              = s.cwv.cwv940m1;
