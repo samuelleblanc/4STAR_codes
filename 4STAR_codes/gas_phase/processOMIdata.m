@@ -32,6 +32,7 @@
 %   or OMI-Aura_L2G-OMNO2G_2015m1123_v003-2015m1124t180119.he5
 %   from website: http://avdc.gsfc.nasa.gov/index.php?site=2045907950
 %   OMNO2-L2G or OMDOASO3-L2G
+%   testing: OMI-Aura_L2G-OMTO3G_2016m0418_v003-2016m0419t064510
 %
 %
 % EXAMPLE:

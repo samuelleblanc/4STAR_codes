@@ -69,6 +69,12 @@ function plotLangleyCompare(filelist,band)
 
 % compare MLO 2016 and WFF c0
 % filelist = {'20160109_VIS_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113','20160109_VIS_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113_wFORJcorr','20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened_3correctO3'};
+% filelist = {'20151104_VIS_C0_refined_Langley_at_WFF_Ground_screened_3correctO3','20151118_VIS_C0_sunrise_refined_Langley_on_C130_screened','20160109_VIS_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113','20160426_VIS_C0_refined_Langley_korusaq_transit1_v1'};
+% filelist = {'20151104_NIR_C0_refined_Langley_at_WFF_Ground_screened_3correctO3','20151118_NIR_C0_sunrise_refined_Langley_on_C130_screened','20160109_NIR_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113','20160426_NIR_C0_refined_Langley_korusaq_transit1_v1'};
+% filelist = {'20160426_VIS_C0_refined_Langley_korusaq_transit1_v1','20160426_VIS_C0_modified_Langley_korusaq_transit1_v1'};
+% filelist = {'20160426_VIS_C0_refined_Langley_korusaq_transit1_v1','20160426_VIS_C0_refined_Langley_korusaq_transit1_v2'};
+% filelist = {'20160426_VIS_C0_refined_Langley_korusaq_transit1_v2','20160109_VIS_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113'};
+
 
 % prepare for plotting
 colorlist_ = varycolor(140);

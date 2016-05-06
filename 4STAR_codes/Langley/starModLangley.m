@@ -13,7 +13,7 @@
 %********************
 % set parameters
 %********************
-daystr='20151104';
+daystr='20160426';
 %daystr='20130712';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
@@ -189,6 +189,13 @@ elseif strcmp(daystr,'20151104')  % NAAMES ground
     c0mod = c0vis;
     c0mod(iwln) = c0_mod;
     filesuffix='modified_Langley_at_WFF_Ground_screened_3correctO3';
+    visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
+elseif strcmp(daystr,'20160426')  % KORUS transit 1
+    c0=importdata(fullfile(starpaths,  '20160426_VIS_C0_refined_Langley_korusaq_transit1_v1.dat'));
+    c0vis = c0.data(:,3);
+    c0mod = c0vis;
+    c0mod(iwln) = c0_mod;
+    filesuffix='modified_Langley_korusaq_transit1_v1'; 
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');

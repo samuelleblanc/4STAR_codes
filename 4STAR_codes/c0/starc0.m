@@ -21,6 +21,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.4, 2016-01-10, updated MLO c0
 % SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
 % MS, v1.6, 2016-04-07, update latest c0 to WFF 20151104, which seems like our best bet.
+% MS, v1.7, 2016-05-01, updated c0 from korus-aq transit flight 1
+% MS, v1.7, 2016-05-02, updated c0 from korus-aq transit 1, o3 corrected
 
 version_set('1.6');
 if ~exist('verbose','var')
@@ -36,26 +38,78 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2015 9 16 0 0 0]);
-        if now>=datenum([2016 3 17 0 0 0]);
-            daystr='20151104';
+    if t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
+        if now>=datenum([2016 4 7 0 0 0]);
+            %daystr='20151104';
             %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';      % ground-based sunrise measurements at WFF is our best bet for KORUS
-            filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
+            %filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
             %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            daystr='20160426';
+            %korus-aq transit section 1
+            filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
         elseif now>=datenum([2016 1 19 0 0 0]);
-            daystr='20160109';
+            %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
         elseif now>=datenum([2016 1 9 0 0 0]);
             daystr='20160109';
             filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
         end;  
+        % transferred from Yohei's laptop, for record keeping
+        if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
+            daystr='20160317';
+            filesuffix='compared_with_AATS_at_Ames'; % rooftop comparison with AATS, the local noon value
+        elseif now>=datenum([2016 3 18 8 45 0]) && now<=datenum([2016 3 18 9 45 0]); % just to make initial starsun files
+            daystr='20160109';
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+        end;
+        % end of transferred from Yohei's laptop, for record keeping
+    elseif t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+        if now>=datenum([2016 1 19 0 0 0]);
+            daystr='20160109';
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+        elseif now>=datenum([2016 1 16 0 0 0]);
+            daystr='20160109';
+            %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
+            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
+            %filesuffix='refined_Langley_MLOwFORJcorrection1';
+            %filesuffix='refined_Langley_MLO_wstraylightcorr';
+        end;  
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
-        if now>=datenum([2015 11 23 0 0 0]);
+        if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
+            if t>datenum([2015 11 23 0 0 0])
+                daystr='20151123';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            elseif t>datenum([2015 11 18 0 0 0])
+                daystr='20151118';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            elseif t>datenum([2015 11 17 0 0 0])
+                daystr='20151117';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            elseif t>datenum([2015 11 14 0 0 0])
+                daystr='20151114';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            elseif t>datenum([2015 11 12 0 0 0])
+                daystr='20151112';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            elseif t>datenum([2015 11 09 0 0 0])
+                daystr='20151109';
+                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+            else
+                daystr='20151104';
+                filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
+            end;
+        elseif now>=datenum([2016 4 14 0 0 0]); % preliminary uncertainty values (2%) added
             daystr='20151118';
-            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % ground-based sunrise measurements at WFF
+            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc_varyingO3'; % ground-based sunrise measurements at WFF
+        elseif now>=datenum([2016 2 16 14 0 0]); % preliminary uncertainty values (2%) added
+            daystr='20151118';
+            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc'; % ground-based sunrise measurements at WFF % WRONG NIR FORMATTING CORRECTED ON 2016/02/22
+        elseif now>=datenum([2015 11 23 0 0 0]);
+            daystr='20151118';
+            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % WRONG NIR FORMATTING % ground-based sunrise measurements at WFF
         elseif now>=datenum([2015 11 6 0 0 0]);
             daystr='20151104';
             filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
