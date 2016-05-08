@@ -317,14 +317,14 @@ end;
 
 % NO2
 
-if exist('gas');
-    
-        figure;
-        [h,filename]=spsun(daystr, 't', gas.no2.no2DU, '.', vars.Alt1e4{:}, mods{:}, ...
-            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
-            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-end;
+% if exist('gas');
+%     
+%         figure;
+%         [h,filename]=spsun(daystr, 't', gas.no2.no2_molec_cm2, '.', vars.Alt1e4{:}, mods{:}, ...
+%             'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
+%             'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+%         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+% end;
 
 % tau aero after correction based on AATS
 if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']))==2;

@@ -7,17 +7,24 @@ function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivi
 % responsivity was noisy. How can we fix this?
 % MS: 2014-08-22: added SEAC4RS FOV dates
 % SL: v1.0, 2014-10-13: added version control of this m-script via version_set
+% MS: v1.1, added Yohei's FOV updates
 
 % specify FOV data source
-if now>datenum([2013 7 16 0 0 0]);
+if t>datenum([2013 7 16 0 0 0]); % SEAC4RS. NAAMES #1 data processing relies on this FOV too. More notes below.
     daystr='20130805';
     fova_filen=13; % file number for almucantar FOV
     fovp_filen=12; % file number for principal plane FOV
-elseif now>datenum([2013 1 16 0 0 0]);
+    % NAAMES #1 did not yield a good FOV test, due primarily to the short
+    % days and unfavorable sky conditions. For post-experiment data
+    % processing, time periods of failed tracking were identified by manual
+    % data inspection. The tracking error in computed AOD for other time
+    % periods is estimated to be smaller than the error due to c0
+    % uncertainty, etc.
+elseif t>datenum([2013 1 16 0 0 0]);
     daystr='20130213';
     fova_filen=23; % file number for almucantar FOV
     fovp_filen=21; % file number for principal plane FOV
-elseif now>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking error analysis based on FOV tests
+elseif t>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking error analysis based on FOV tests
     daystr='20120715';
     fova_filen=18; % file number for almucantar FOV
     fovp_filen=17; % file number for principal plane FOV
@@ -26,7 +33,7 @@ end;
 % load FOV data
 load(which( [daystr 'starfov.mat']));
 
-version_set('1.0');
+version_set('1.1');
 
 if isequal(lower(datatype(1:3)), 'vis') || isequal(lower(datatype(1:3)), 'sun');
     if strcmp(daystr,'20130805')

@@ -1,4 +1,4 @@
-function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr]=taugases(t, datatype, Alt, Lat, Lon, O3col, NO2col)
+function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr]=taugases(t, datatype, Alt, Pst, Lat, Lon, O3col, NO2col)
 
 % development
 % NO2, O3 concentrations should be input from starinfo or OMI gridded file
@@ -14,6 +14,9 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 %                           from starc0 or starwrapper
 %                           now has 7 nargin
 % MS, modified, 2016-01-09  fixed bug in tau_NO2 final dimensions
+% MS, modified, 2016-05-03  adjusted o3 vertical correction for omi
+% MS, modified, 2016-05-06  chnaged default flag_interpOMIno2='yes' to
+%                           'no' for KORUS-AQ
 %----------------------------------------------------------------------
 
 % set functionallity
@@ -21,10 +24,28 @@ if length(Lat)==1
      % this is being called from starc0
      flag_interpOMIno2  = 'no';% use default
      flag_interpOMIo3   = 'no';% use default
+     % default value; might want to adjust
+     coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
+     frac_tauO3 = polyval(coeff_polyfit_tauO3model,Alt/1000);
+     
+elseif strcmp(datestr(t(1),'yyyymmdd'),'20160426')
+    % check if this is Langley; don't apply
+    flag_interpOMIno2  = 'no';% use default
+    flag_interpOMIo3   = 'no';% use default
+    
+    % apply appropriate o3 scaling polynomial
+    % this is for April, Lat bin 45
+    coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
 else
-     % all other cases
-     flag_interpOMIno2  = 'yes';% this is new no2 interpolation, from L2 gridded product
-     flag_interpOMIo3   = 'yes';% this is new o3 interpolation, from L2 gridded product
+     
+      % all other cases - yes, KORUS-AQ, 'no' OMI seems to be over-cloaded
+     flag_interpOMIno2  = 'no';% this is new no2 interpolation, from L2 gridded product
+     flag_interpOMIo3   = 'no';% this is new o3 interpolation, from L2 gridded product
+     
+     % mid-lat July
+     % coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
+     % this is for April, Lat bin 45
+     coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
 end
 
 if t>=datenum([2012 7 3 0 0 0]);
@@ -83,10 +104,11 @@ end;
 
 %% get NO2 optical depth
 
-Loschmidt=2.686763e19; %molecules/cm2
-if nargin<7 || isempty(NO2col);
-    NO2col=2.0e15; % atm-cm
-end;
+Loschmidt=2.686763e19; %molecules/cm3xatm
+if nargin<8 || isempty(NO2col);
+    NO2col=2.0e15; % molec/cm2
+    O3col =0.250;  % atm x cm
+end
 
 % calculate from OMI or from default value
 if strcmp(flag_interpOMIno2,'yes')
@@ -105,12 +127,14 @@ if strcmp(flag_interpOMIno2,'yes')
         tau_NO2(nanid,:)      = tau_NO2d(nanid,:);
         
     catch
-        tau_NO2=NO2col/Loschmidt*cross_sections.no2;
+        tau_NO2=(NO2col/Loschmidt)*cross_sections.no2;
         % adjust struct size
         tau_NO2=repmat(tau_NO2,length(t),1);
     end
 else
-    tau_NO2=NO2col/Loschmidt*cross_sections.no2;
+    tau_NO2=(NO2col/Loschmidt)*cross_sections.no2;
+    % adjust struct size
+    tau_NO2=repmat(tau_NO2,length(t),1);
 end
 
 %% get O4 optical depths
@@ -128,9 +152,15 @@ tau_CO2_CH4_N2O=zeros(size(cross_sections.wln)); % legacy from AATS's 14th chann
 %following added by Livingston 12/19/2002 to account for altitude in columnar ozone correction
 %use previously calculated (Livingston program ozonemdlcalc.m) 5th order polynomial fit to ozone model
 %to calculate fraction of total column ozone above each altitude
-coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
-frac_tauO3 = polyval(coeff_polyfit_tauO3model,Alt/1000); % Livingston used GPS_Alt
+% coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
+% frac_tauO3 = polyval(coeff_polyfit_tauO3model,Alt/1000); % Livingston used GPS_Alt
 % if strcmp(flag_adj_ozone_foraltitude,'no') frac_tauO3=1*ones(1,n(1)); end
+
+% correction is based on zstar altitude so calculate
+if length(Lat)>1
+    zstar = 16*log10(1013./Pst);
+    frac_tauO3 = polyval(coeff_polyfit_tauO3model,zstar);
+end
 
 flag_interpOMIozone='no';%'yes';  'no' for MLO; this is John's heritage code
 
@@ -157,9 +187,8 @@ elseif strcmp(flag_interpOMIo3,'yes')
         % calculate o3OD
         tau_O3=(frac_tauO3.*(g.omi/1000))*cross_sections.o3;
         % fill-in with mean values
-        tau_O3d=(repmat(O3col,length(g.omi),1))*cross_sections.o3;% d is for default
-        nanid = find(isnan(tau_O3(:,1)));
-        tau_O3(nanid,:) = tau_O3d(nanid,:);
+        nanid = find(isnan(tau_O3(:,407)));
+        tau_O3(nanid,:) = (frac_tauO3(nanid)*O3col)*cross_sections.o3;
     
     catch
         % if OMI data files are missing

@@ -4,6 +4,8 @@
 function [Q,R] = gram_schmidt(A)
 [m,n] = size(A);
 % compute QR using Gram-Schmidt
+% m is number of wavelengths
+% n is number of components (last is the gas)
 for j = 1:n
    v = A(:,j);
    for i=1:j-1
