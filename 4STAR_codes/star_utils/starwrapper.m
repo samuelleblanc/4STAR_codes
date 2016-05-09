@@ -96,7 +96,7 @@ version_set('2.6');
 toggle = update_toggle;
 
 if isfield(s, 'toggle')
-    s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+    s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
     toggle = s.toggle;
 else
     s.toggle = toggle;
@@ -167,7 +167,7 @@ end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 if isfield(s, 'toggle')
-    s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+    s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
     toggle = s.toggle;
 else
     s.toggle = toggle;
@@ -274,6 +274,7 @@ end;
 if isfield(s,'toggle')
     toggle = s.toggle;
 end
+
 %********************
 %% add related variables, derive count rate and combine structures
 %********************

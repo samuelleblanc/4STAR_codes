@@ -17,7 +17,7 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
     end;
 else; % ask for a full path
     if ~isempty(which('starpaths')); % look into pre-set path
-        defaultsavefolder=starpaths;
+        defaultsavefolder=get_last_used_path();
         defaultsourcefolder=fullfile(defaultsavefolder, 'raw');
     else
         defaultsavefolder='';
@@ -28,3 +28,32 @@ else; % ask for a full path
         savematfile=fullfile(defaultsavefolder,savematfile);
     end;
 end;
+
+function lastDir = get_last_used_path()
+
+% name of mat file to save last used directory information
+pname = strrep(userpath,';',filesep);
+pathdir = [pname, 'filepaths',filesep];
+if ~exist(pathdir,'dir')
+    mkdir(pname, 'filepaths');
+end
+% pathdir = [pathdir,filesep];
+
+lastDirMat = [pathdir, 'lastUsedDir.mat'];
+
+% save the present working directory
+savePath = pwd;
+% set default dialog open directory to the present working directory
+lastDir = savePath;
+% load last data directory
+if exist(lastDirMat, 'file') ~= 0
+    % lastDirMat mat file exists, load it
+    load('-mat', lastDirMat)
+    % check if lastDataDir variable exists and contains a valid path
+    if (exist('lastUsedDir', 'var') == 1) && ...
+            (exist(lastUsedDir, 'dir') == 7)
+        % set default dialog open directory
+        lastDir = lastUsedDir;
+    end
+end;
+return
