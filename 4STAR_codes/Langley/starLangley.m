@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20151104';
+daystr='20160426';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -53,7 +53,8 @@ load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero')
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
-starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
+%starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
+starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 %s1=s(strmatch('langley',s));
 s1=s(strncmp('langley',s,1));
@@ -86,6 +87,8 @@ elseif isequal(daystr, '20160118')
     ok1 = ok(m_aero(ok)>=4);
     ok2 = ok(m_aero(ok)<=2);
     ok  = [ok1;ok2];
+% elseif isequal(daystr, '20160426')   
+%     ok = ok(m_aero(ok)>=4);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
 for k=1:numel(stdev_mult);
