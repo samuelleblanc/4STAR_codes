@@ -1,0 +1,110 @@
+function marks = starflags_20160503_MS_marks_CLOUD_EVENTS_20160509_0026  
+ % starflags file for 20160503 created by MS on 20160509_0026 to mark CLOUD_EVENTS conditions 
+ version_set('20160509_0026'); 
+ daystr = '20160503';  
+ % tag = 90: cirrus 
+ % tag = 400: low_cloud 
+ marks=[ 
+ datenum('06:27:16') datenum('06:27:16') 90 
+datenum('06:27:26') datenum('06:27:43') 90 
+datenum('06:29:27') datenum('06:29:44') 90 
+datenum('06:30:13') datenum('06:30:17') 90 
+datenum('06:31:06') datenum('06:31:06') 90 
+datenum('06:32:39') datenum('06:32:42') 90 
+datenum('07:22:15') datenum('07:22:18') 90 
+datenum('02:26:57') datenum('02:34:46') 400 
+datenum('02:47:14') datenum('02:47:17') 400 
+datenum('02:55:11') datenum('02:55:11') 400 
+datenum('02:55:15') datenum('02:55:15') 400 
+datenum('02:55:46') datenum('02:55:48') 400 
+datenum('02:55:54') datenum('02:55:54') 400 
+datenum('02:56:10') datenum('02:56:11') 400 
+datenum('02:56:14') datenum('02:56:14') 400 
+datenum('02:56:17') datenum('02:56:18') 400 
+datenum('02:56:21') datenum('02:56:23') 400 
+datenum('02:56:27') datenum('02:56:28') 400 
+datenum('02:56:40') datenum('02:56:46') 400 
+datenum('02:56:51') datenum('02:57:05') 400 
+datenum('02:57:10') datenum('02:57:33') 400 
+datenum('02:57:36') datenum('02:57:39') 400 
+datenum('02:57:49') datenum('02:57:49') 400 
+datenum('02:57:51') datenum('02:58:04') 400 
+datenum('02:58:57') datenum('02:58:57') 400 
+datenum('02:59:27') datenum('02:59:29') 400 
+datenum('02:59:31') datenum('02:59:31') 400 
+datenum('02:59:33') datenum('02:59:34') 400 
+datenum('02:59:40') datenum('02:59:41') 400 
+datenum('02:59:45') datenum('02:59:54') 400 
+datenum('02:59:58') datenum('03:00:00') 400 
+datenum('03:00:26') datenum('03:00:28') 400 
+datenum('03:00:35') datenum('03:00:37') 400 
+datenum('03:00:47') datenum('03:00:47') 400 
+datenum('03:00:49') datenum('03:00:49') 400 
+datenum('03:01:28') datenum('03:01:30') 400 
+datenum('03:01:32') datenum('03:01:32') 400 
+datenum('03:01:34') datenum('03:01:34') 400 
+datenum('03:01:48') datenum('03:01:49') 400 
+datenum('03:02:00') datenum('03:02:00') 400 
+datenum('03:02:03') datenum('03:02:03') 400 
+datenum('03:02:17') datenum('03:02:17') 400 
+datenum('03:02:48') datenum('03:02:48') 400 
+datenum('03:02:51') datenum('03:02:51') 400 
+datenum('03:03:06') datenum('03:03:06') 400 
+datenum('03:03:30') datenum('03:03:30') 400 
+datenum('03:03:33') datenum('03:03:34') 400 
+datenum('03:03:37') datenum('03:03:37') 400 
+datenum('03:03:39') datenum('03:03:39') 400 
+datenum('03:03:42') datenum('03:03:42') 400 
+datenum('03:03:44') datenum('03:03:48') 400 
+datenum('03:03:50') datenum('03:03:54') 400 
+datenum('03:03:56') datenum('03:03:56') 400 
+datenum('03:04:01') datenum('03:04:01') 400 
+datenum('03:04:57') datenum('03:05:01') 400 
+datenum('03:05:35') datenum('03:05:35') 400 
+datenum('03:05:57') datenum('03:05:57') 400 
+datenum('03:06:16') datenum('03:06:16') 400 
+datenum('03:06:23') datenum('03:06:23') 400 
+datenum('03:06:33') datenum('03:06:33') 400 
+datenum('03:06:40') datenum('03:06:40') 400 
+datenum('03:06:51') datenum('03:06:52') 400 
+datenum('03:07:06') datenum('03:07:07') 400 
+datenum('03:07:16') datenum('03:07:16') 400 
+datenum('03:07:40') datenum('03:07:40') 400 
+datenum('03:08:00') datenum('03:08:00') 400 
+datenum('03:09:48') datenum('03:09:48') 400 
+datenum('03:10:31') datenum('03:10:31') 400 
+datenum('03:11:10') datenum('03:11:13') 400 
+datenum('03:11:15') datenum('03:11:15') 400 
+datenum('03:11:17') datenum('03:11:17') 400 
+datenum('03:11:32') datenum('03:11:32') 400 
+datenum('03:11:54') datenum('03:11:56') 400 
+datenum('03:12:02') datenum('03:12:04') 400 
+datenum('03:12:16') datenum('03:12:16') 400 
+datenum('03:12:20') datenum('03:12:20') 400 
+datenum('03:12:57') datenum('03:12:57') 400 
+datenum('03:12:59') datenum('03:13:00') 400 
+datenum('03:13:03') datenum('03:13:04') 400 
+datenum('03:13:18') datenum('03:13:18') 400 
+datenum('03:13:33') datenum('03:13:33') 400 
+datenum('03:14:56') datenum('03:14:58') 400 
+datenum('03:15:10') datenum('03:15:10') 400 
+datenum('03:16:13') datenum('03:16:17') 400 
+datenum('03:16:24') datenum('03:16:29') 400 
+datenum('03:17:38') datenum('03:17:44') 400 
+datenum('03:17:48') datenum('03:17:55') 400 
+datenum('03:18:39') datenum('03:18:46') 400 
+datenum('03:25:42') datenum('03:25:43') 400 
+datenum('04:04:05') datenum('04:04:10') 400 
+datenum('04:09:08') datenum('04:09:12') 400 
+datenum('04:09:19') datenum('04:09:23') 400 
+datenum('04:11:52') datenum('04:11:52') 400 
+datenum('04:13:39') datenum('04:13:39') 400 
+datenum('04:13:42') datenum('04:13:42') 400 
+datenum('04:48:18') datenum('04:48:18') 400 
+datenum('04:53:40') datenum('04:53:40') 400 
+datenum('04:54:46') datenum('04:54:49') 400 
+datenum('04:54:51') datenum('04:54:52') 400 
+datenum('04:54:54') datenum('04:55:05') 400 
+];  
+marks(:,1:2)=marks(:,1:2)-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
+return
