@@ -166,16 +166,6 @@ loadCrossSections_global;
               subplot(212);plot(tplot,RMSEo3,'.r');hold on;
               axis([tplot(1) tplot(end) 0 5]);
               xlabel('time');ylabel('o3 RMSE [DU]');
-              
-   end
-          
-   % prepare to plot spectrum OD and o3 cross section
-   
-              %legend('inversion','inversion smooth','constrained inversion smooth');
-              legend('inversion');
-              subplot(212);plot(tplot,RMSEo3,'.r');hold on;
-              axis([tplot(1) tplot(end) 0 5]);
-              xlabel('time');ylabel('o3 RMSE [DU]');
               title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
   end
    
