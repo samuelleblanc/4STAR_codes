@@ -34,7 +34,7 @@
 %  - *.xs under data_folder
 %
 % EXAMPLE:
-%  - [hcoh] = retrieveHCOH(s,0.430,0.490);
+%  - [hcoh] = retrieveHCOH(s,0.335,0.359);
 %
 %
 % MODIFICATION HISTORY:

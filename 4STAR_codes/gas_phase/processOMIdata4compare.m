@@ -52,19 +52,19 @@ function [g] = processOMIdata4compare(daystr,gas)
 
     %  - omidir is the directory where omi files are stored, under
     %    starpaths
-    omidir = 'OMIdata\';
+    omidir = 'C:\matlab\OMIdata\';
     day = daystr(5:end);
     year= daystr(1:4);
     
     if strcmp(gas,'O3')
             of      = strcat('OMI-Aura_L2G-OMDOAO3G_',year, 'm', day,'*','he5');
-            finfo   = dir([starpaths,omidir,of]);
-            prefix  = [starpaths,omidir,finfo.name];
+            finfo   = dir([omidir,of]);
+            prefix  = [omidir,finfo.name];
             path    = '/HDFEOS/GRIDS/ColumnAmountO3/Data Fields/';
     elseif strcmp(gas,'NO2')
             of      = strcat('OMI-Aura_L2G-OMNO2G_' , year, 'm', day,'*','he5');
-            finfo   = dir([starpaths,omidir,of]);
-            prefix  = [starpaths,omidir,finfo.name];
+            finfo   = dir([omidir,of]);
+            prefix  = [omidir,finfo.name];
             path    = '/HDFEOS/GRIDS/ColumnAmountNO2/Data Fields/';
     end
     
