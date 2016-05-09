@@ -31,6 +31,7 @@
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer (MSR), based on gasessubtract,
 % Apr-2016, Auckland, NZ
+% May-5-2016, KORUS-AQ,Osan,Korea, added functionality
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -48,12 +49,13 @@ function [gas] = retrieveGases(s)
 
 %% retrieve NO2
 
- %[gas.no2] = retrieveNO2(s,0.450,0.490,1);
+
+ [gas.no2] = retrieveNO2(s,0.450,0.490,1);
 
 %% retrieve O3
 
  [gas.o3]  = retrieveO3(s,0.490,0.682,1);
- 
+
 %----------------------------------------------------------------------
 %% retrieve CO2
 

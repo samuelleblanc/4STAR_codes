@@ -106,7 +106,7 @@
      % no2-298K
      no2_298Kcoef = ([no2_298.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      % no2diff (298-220)
-     no2coefdiff = no2_298Kcoef - no2_220Kcoef;% - no2_298Kcoef;
+     no2coefdiff = no2_298Kcoef - no2_220Kcoef;
      % no2
      no2coef = ([no2.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      % o3

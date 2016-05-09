@@ -64,6 +64,22 @@ loadCrossSections_global;
  
 %% retrieve by doing linear inversion first and then fit   
 %% linear inversion
+
+ % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
+ % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
+ % c0  = c0_.data(wln,3);
+ 
+ % apply specified O3 gas c0
+ % decide which c0 to use
+ % mode = 1;%0-MLO c0; 1-MLO ref spec
+  
+  [c0]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode);
+  
+  if mode==0
+      % when mode==0 need to choose wln
+      c0 = c0(wln)';
+  end
+ 
  
  % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
@@ -90,7 +106,7 @@ loadCrossSections_global;
    for k=1:length(s.t);
         %meas = log(s.c0(wln)'./s.rateslant(k,(wln))');
         meas = log(c0'./s.rateslant(k,(wln))');
-       
+
         % invert
         coef=basis\meas;
         %coefo3=basiso3\tau_OD(k,(wln))';
@@ -125,13 +141,20 @@ loadCrossSections_global;
    tau_OD  = s.tau_tot_slant;%s.tau_tot_vertical;% need to also check tau_tot_slant;
    o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
    MSEo3DU = real(((1/length(wln)-8)*sum(o3Err.^2))');                         
+   
+   %license('test', 'optim_toolbox') 
+
+   % calculate error
+   tau_OD  = s.tau_tot_slant;%s.tau_tot_vertical;% need to also check tau_tot_slant;
+   o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
+   MSEo3DU = real(((1/length(wln))*sum(o3Err.^2))');                         
    RMSEo3  = real(sqrt(real(MSEo3DU)))./s.m_O3;                                % convert to DU vertical
    
 %    gas.o3Inv    = o3VCD;%o3vcd_smooth is the default output;
 %    gas.o3Inv    = o3vcd_smooth;
 %    gas.o3resiInv= RMSEo3;
 
-   if plotting
+  if plotting
        figure;subplot(211);%plot(tplot,o3VCD,'.r');hold on;
               plot(tplot,o3vcd_smooth,'.g');hold on;
               %plot(tplot,O3conc_smooth,'.r');hold on;
@@ -148,13 +171,23 @@ loadCrossSections_global;
           
    % prepare to plot spectrum OD and o3 cross section
    
+              %legend('inversion','inversion smooth','constrained inversion smooth');
+              legend('inversion');
+              subplot(212);plot(tplot,RMSEo3,'.r');hold on;
+              axis([tplot(1) tplot(end) 0 5]);
+              xlabel('time');ylabel('o3 RMSE [DU]');
+              title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
+  end
+   
+    % prepare to plot spectrum OD and o3 cross section
    %tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
    tau_OD = log(repmat(c0,length(s.t),1)./s.rateslant(:,(wln)));
    o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
    o3fit          = ccoef(1,:)'*basis(:,1)';
    o3residual     = tau_OD-RR';
-   %RMSEo3_new     = sqrt((o3residual.^2)/(length(wln)-8));
 
+   %RMSEo3_new     = sqrt(sum(sum((o3residual.^2)))/(length(wln)-8));
+   
    if plotting
 %      plot fitted and "measured" o3 spectrum
          for i=1:1000:length(s.t)
@@ -172,9 +205,10 @@ loadCrossSections_global;
    
    
    if linear==0
-           % save linear inversion coefficients as input to constrained retrieval
-
-           x0=[ccoef(1,:)' ccoef(2,:)' ccoef(4,:)' ccoef(5,:)' ccoef(6,:)' ccoef(7,:)' ccoef(8,:)'];
+ 
+   % save linear inversion coefficients as input to constrained retrieval
+   
+   x0=[ccoef(1,:)' ccoef(2,:)' ccoef(4,:)' ccoef(5,:)' ccoef(6,:)' ccoef(7,:)' ccoef(8,:)'];
 
            O3conc=[];H2Oconc=[];O4conc=[];O2conc=[];O3resi=[];o3OD=[];
 
@@ -207,8 +241,8 @@ loadCrossSections_global;
 
             o3.o4      = O4conc;
             o3.h2o     = H2Oconc;
-           
-   elseif linear==1
+  
+    elseif linear==1
            % this is vertical
            o3amount  = -log(exp(-(real(o3vcd_smooth/1000)*o3coef')));%(O3conc/1000)*o3coef';VCD
            o4coefVIS = zeros(length(s.w),1); o4coefVIS(1:1044) = o4coef(1:1044);
@@ -227,8 +261,9 @@ loadCrossSections_global;
    end   
    
    
-    % save OD amount
-    
+
+   % save OD amount
+
     o3.o3OD    = o3amount;%(O3conc/1000)*o3coef';
     o3.o4OD    = o4amount;
     o3.h2oOD   = h2oamount;

@@ -89,7 +89,6 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20160426';
             %korus-aq transit section 1
             filesuffix='modified_Langley_korusaq_transit1_v1'; % korus-aq transit 1
-            
             model_atmosphere=2; %use MidLat summer for KORUS
         elseif now>=datenum([2016 1 19 0 0 0]);
             daystr='20160109';
