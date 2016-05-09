@@ -3,6 +3,7 @@ function toggle_out = update_toggle(toggle_in)
 % Merge the optional "toggle_in" with user-supplied values in toggle_out
 % Frequently this instance will be shadowed by the internal function
 % of the same name defined beneath starinfo files.
+% test commit michal 2016-05-08
 
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
