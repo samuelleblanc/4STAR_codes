@@ -107,9 +107,9 @@ end;
 
 Loschmidt=2.686763e19; %molecules/cm3xatm
 if nargin<8 || isempty(NO2col);
-    NO2col=1.97e15; % molec/cm2
-    O3col =0.230;  % atm x cm
-end;
+    NO2col=2.0e15; % molec/cm2
+    O3col =0.250;  % atm x cm
+end
 
 % calculate from OMI or from default value
 if strcmp(flag_interpOMIno2,'yes')
@@ -153,8 +153,8 @@ tau_CO2_CH4_N2O=zeros(size(cross_sections.wln)); % legacy from AATS's 14th chann
 %following added by Livingston 12/19/2002 to account for altitude in columnar ozone correction
 %use previously calculated (Livingston program ozonemdlcalc.m) 5th order polynomial fit to ozone model
 %to calculate fraction of total column ozone above each altitude
-%coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
-%frac_tauO3 = polyval(coeff_polyfit_tauO3model,Alt/1000); % Livingston used GPS_Alt
+% coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
+% frac_tauO3 = polyval(coeff_polyfit_tauO3model,Alt/1000); % Livingston used GPS_Alt
 % if strcmp(flag_adj_ozone_foraltitude,'no') frac_tauO3=1*ones(1,n(1)); end
 
 % correction is based on zstar altitude so calculate

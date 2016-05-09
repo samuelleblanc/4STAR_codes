@@ -34,7 +34,7 @@ for i = 1:length(s.t)
     meas = [s.w(wln)' y'];
     lm = meas(:,1);
     %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 s.c0(wln)'];
-    
+    PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) c0'];
     %PAR  = [o3coef(wln) o4coef(wln)*10000 h2ocoef(wln)*10000 300*s.kurO3'];
     %PAR  = [o3coef(wln) o4coef(wln) h2ocoef(wln) s.c0(wln)'];
     
@@ -92,7 +92,7 @@ for i = 1:length(s.t)
 
                                    yfit = o3coef(wln).*U_(1)+ o4coef(wln).*U_(2) + h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2 + U_(7)*(lm).^3;    
                                    %yfit = o3coef(wln).*U_(1)+ 10000*o4coef(wln).*U_(2) + 10000*h2ocoef(wln).*U_(3) + U_(4)*ones(length(lm),1) + U_(5)*(lm) + U_(6)*(lm).^2;
-                                   %ymeas = log(s.c0(wln))-log(y);
+
                                    ymeas = log(c0)-log(y);
                                   
                                    

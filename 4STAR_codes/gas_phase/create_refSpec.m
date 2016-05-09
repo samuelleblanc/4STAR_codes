@@ -62,19 +62,20 @@ if strcmp(gas,'O3')
     ref_spec.mean_m = nanmean(s.m_O3(ind));
     % from DB instrument at MLO - DS mode
     ref_spec.o3scdref = 243*ref_spec.mean_m;% in [DU]
-    %ref_spec.o3scdref;
+    ref_spec.o3scdref = 335;
+    save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     
 elseif strcmp(gas,'NO2')
     
     wind   = [0.450 0.490];
     
     % find good index around solar noon to create averga espectrum
-    % ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
-    ind = find((min(s.m_NO2)));
-    ref_spec.mean_m = nanmean(s.m_NO2(ind-3:ind+3));
+    ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
+    ref_spec.mean_m = nanmean(s.m_NO2(ind));
     % from OMI station overpass at MLO [molec/cm2]
     ref_spec.no2scdref = 2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
-    %ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
+    ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
+    save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     
 end
 
@@ -111,7 +112,7 @@ dat3 = load([starpaths,'20160113starsun.mat'],'t','w','m_aero','rateslant','m_O3
 
 if strcmp(gas,'O3')
     ref_spec.o3refspec = meanspec;
-    save([starpaths,'20160113O3refspec.mat'],'-struct','ref_spec');
+    save([starpaths, daystr,'O3refspec.mat'],'-struct','ref_spec');
     % retrieve O3
     [o3_1] = retrieveO3(dat1,wind(1),wind(2),1);
     [o3_2] = retrieveO3(dat2,wind(1),wind(2),1);
@@ -119,7 +120,7 @@ if strcmp(gas,'O3')
     
 elseif strcmp(gas,'NO2')
     ref_spec.no2refspec = meanspec;
-    save([starpaths,'20160113NO2refspec.mat'],'-struct','ref_spec');
+    save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     % retrieve NO2
     [no2_1] = retrieveNO2(dat1,wind(1),wind(2),1);
     [no2_2] = retrieveNO2(dat2,wind(1),wind(2),1);
@@ -190,7 +191,7 @@ elseif strcmp(gas,'NO2')
         % find lower 2% in each bin
         for i=1:length(n)-1
             pnts = y(x<=binEdge(i+1)&x>=binEdge(i));
-            p2(i) = quantile(pnts,0.50);
+            p2(i) = quantile(pnts,0.02);
         end
         figure(22)
         hold on;
@@ -209,8 +210,8 @@ end
 %% save parameters to struct .mat file
 if strcmp(gas,'O3')
     ref_spec.o3scdref=abs(Sf(2));%313.5DU
-    save([starpaths,'20160113O3refspec.mat'],'-struct','ref_spec');
+    save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
-    save([starpaths,'20160113NO2refspec.mat'],'-struct','ref_spec');
+    save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
 end

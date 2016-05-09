@@ -326,6 +326,7 @@ if exist('gas');
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 end;
 
+
 % tau aero after correction based on AATS
 if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']))==2;
     c0corrfactor=load(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']));

@@ -30,13 +30,14 @@
 %  - *.xs under data_folder
 %
 % EXAMPLE:
-%  - [no2] = retrieveNO2(s,0.430,0.490,1);
+
+%  - [no2] = retrieveNO2(s,0.450,0.490,1);
 %
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer, 2016-04 based on former versions
 % Modified from retrieveNO2_20160505
-% 
+% MS, 2016-05-05, added usage of reference spectrum
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode)
@@ -52,7 +53,8 @@ loadCrossSections_global;
  
  wln = find(s.w<=s.w(iend)&s.w>=s.w(istart)); 
  
- % select NO2 absorbing band to plot residuals for
+
+  % select NO2 absorbing band to plot residuals for
  ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
  
  % apply specified NO2 gas c0
@@ -66,10 +68,11 @@ loadCrossSections_global;
       c0 = c0(wln)';
   end
   
- % calculate residual spectrum (Rayleigh subtracted)
- eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
  
- if plotting
+ % calculate residual spectrum (Rayleigh subtracted)
+eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+
+if plotting
 % plot residual to fit (ind 12 in wln, which is 459nm).
         figure;
         plot(s.m_aero,1000*eta(:,ires),'.','color',[0.8,0.8,0.8],'markersize',8);
@@ -78,7 +81,6 @@ end
 
 % do linear retrieval first (no wavelength shift) 
 
-  
 
     % this is end member array (original cross sections)
     
@@ -91,13 +93,13 @@ end
     RR_d=[];
     
     for k=1:length(s.t);
+
         coef=real(basis\eta(k,:)');
         % coef=real(Abasis\spectrum_sub(k,:)');
         % scale coef back
         scoef = coef;%./scale;
-                
+
         % reconstruct spectrum
-        %recon=Abasis*scoef;
         recon=basis*scoef;
         RR_d=[RR_d recon];
         ccoef_d=[ccoef_d scoef];
@@ -106,11 +108,9 @@ end
     % to get back to regular cross section:
     % test_spec=qno2*rno2;
     
-    % calculate no2 scd and vcd
-    
-    % create smooth o3 time-series
+   % calculate no2 scd and vcd
+   % create smooth no2 time-series
    xts = 60/3600;   %60 sec in decimal time
-   
    if mode==0
         % covert from atm x cm to molec/cm^2
        no2_amount =  ccoef_d(1,:);
@@ -135,7 +135,6 @@ end
    RMSEno2  = real(sqrt(real(MSEno2DU)))./s.m_NO2; % convert to vertical
           
    % prepare to plot spectrum OD and no2 cross section
-   
    no2spectrum     = eta-RR_d' + (ccoef_d(1,:))'*basis(:,1)';
    no2fit          = (ccoef_d(1,:))'*basis(:,1)';
    no2residual     = eta-RR_d';
@@ -144,6 +143,7 @@ end
 %    no2fit      = exp(-(ccoef_d(1,:)')*basis(:,1)');
 %    no2residual = spectrum_sub - exp(-(ccoef_d(1,:)')*basis(:,1)' - (ccoef_d(2,:)')*basis(:,2)' - (ccoef_d(3,:)')*basis(:,3)' - ccoef_d(4,:)'*basis(:,4)' - ccoef_d(5,:)'*basis(:,5)');
 %    
+
    if plotting
    % plot fitted and "measured" no2 spectrum
          for i=1:100:length(s.t)
@@ -165,7 +165,7 @@ end
    end
    
    
-    if plotting
+   if plotting
        figure;subplot(211);%plot(tplot,no2VCD,'.r');hold on;
               plot(tplot,no2vcd_smooth,'.g');hold on;
               axis([tplot(1) tplot(end) 0 5e15]);
@@ -186,4 +186,3 @@ end
 
 
 return;
-    

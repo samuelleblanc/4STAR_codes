@@ -56,6 +56,7 @@ load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero',
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
+%starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 s=importdata(starinfofile);
 %s1=s(strmatch('langley',s));
