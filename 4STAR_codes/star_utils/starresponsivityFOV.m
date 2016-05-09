@@ -7,6 +7,7 @@ function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivi
 % responsivity was noisy. How can we fix this?
 % MS: 2014-08-22: added SEAC4RS FOV dates
 % SL: v1.0, 2014-10-13: added version control of this m-script via version_set
+% MS: v1.1, added Yohei's FOV updates
 
 % specify FOV data source
 if t>datenum([2013 7 16 0 0 0]); % SEAC4RS. NAAMES #1 data processing relies on this FOV too. More notes below.
@@ -32,7 +33,7 @@ end;
 % load FOV data
 load(which( [daystr 'starfov.mat']));
 
-version_set('1.0');
+version_set('1.1');
 
 if isequal(lower(datatype(1:3)), 'vis') || isequal(lower(datatype(1:3)), 'sun');
     if strcmp(daystr,'20130805')

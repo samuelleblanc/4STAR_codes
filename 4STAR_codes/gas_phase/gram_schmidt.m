@@ -6,6 +6,8 @@ function [Q,R] = gram_schmidt(A)
 % m is number of wavelengths
 % n is number of components (last is the gas)
 % compute QR using Gram-Schmidt
+% m is number of wavelengths
+% n is number of components (last is the gas)
 for j = 1:n
    v = A(:,j);
    for i=1:j-1
