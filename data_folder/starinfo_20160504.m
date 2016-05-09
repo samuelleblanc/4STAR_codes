@@ -11,7 +11,7 @@ else
     s.toggle = update_toggle;
 end
 
-flight=[datenum(2016,5,3,23,3,8) datenum(2016,5,4,7,17,30)]; 
+flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
  
 s.sd_aero_crit = 0.01;
 
@@ -51,4 +51,34 @@ end;
 
 return
 
+function toggle_out = update_toggle(toggle_in)
+% toggle_out = update_toggle(toggle_in)
+% Merge the optional "toggle_in" with user-supplied values in toggle_out
+% Frequently this instance will be shadowed by the internal function
+% of the same name defined beneath starinfo files.
+
+toggle_out.subsetting_Tint = true;
+toggle_out.pca_filter = false;
+toggle_out.verbose=true;
+toggle_out.saveadditionalvariables=true;
+toggle_out.savefigure=false;
+toggle_out.computeerror=false;
+toggle_out.inspectresults=false;
+toggle_out.applynonlinearcorr=true;
+toggle_out.applytempcorr=false;% true is for SEAC4RS data
+toggle_out.gassubtract = false;
+toggle_out.booleanflagging = false;
+toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.doflagging = false; % for running any Yohei style flagging
+toggle_out.dostarflag = true; 
+toggle_out.lampcalib  = false; 
+toggle_out.runwatervapor = false;
+toggle_out.applyforjcorr = false;
+toggle_out.applystraycorr = false;
+
+if exist('toggle_in', 'var')
+   toggle_out = catstruct(toggle_in, toggle_out);
+end
+
+return
 
