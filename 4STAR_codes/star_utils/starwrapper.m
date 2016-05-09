@@ -885,7 +885,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             % subtract derived gasess
             
             s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-                                                         - s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.co2OD;
+                                                         - s.gas.no2.no2OD - s.gas.co2.co2OD;
             
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
