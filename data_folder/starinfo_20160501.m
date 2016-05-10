@@ -11,11 +11,14 @@ else
     s.toggle = update_toggle;
 end
 
-s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);   
+s.flight =[datenum(2016,5,1,22,30,00) datenum(2016,5,2,6,55,17)];  
+s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
+    
  
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
-s.flagfilename = '20160501_starflag_man_created20160503_2330by_JR.mat';
+s.flagfilename    = '20160501_starflag_man_created20160503_2330by_JR.mat';
+s.flagfilenameO3  = '20160501_starflag_O3_man_created20160510_0438by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 

@@ -39,9 +39,9 @@
 function SEmakearchive_KORUS_AOD
 version_set('v1.0')
 %% set variables
-ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\';
-starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';
+ICTdir = 'E:\KORUS-AQ\aod_ict\';
+starinfo_path = 'E:\KORUS-AQ\starinfo\';
+starsun_path = 'E:\KORUS-AQ\starsun\';
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
@@ -122,7 +122,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' } ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          0          0          0          0   ] ; %set=1 to process
+jproc=[         0          1          0          0          0   ] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -130,7 +130,7 @@ for i=idx_file_proc
     %% get the flight time period
     daystr=dslist{i};
     disp(['on day:' daystr])
-    infofile_ = ['starinfo_' daystr '.m'];
+    infofile_ = [starpaths 'starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
     s.dummy = '';
     try
