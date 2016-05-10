@@ -44,7 +44,7 @@ daystr = datestr(s.t(1),'yyyymmdd');
 
 % load gas file
 
-gas = load([starpaths,daystr,'_gas_summary.mat']);
+gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
 
 if ~isfield(s,'sd_aero_crit') % read starinfo file
     daystr = datestr(s.t(1),'yyyymmdd');
@@ -443,7 +443,7 @@ if (Mode==2)
     %We define several fields to plot in the auxiliary panels
     panel_1.aod_500nm = aod_500nm;
     panel_1.aod_865nm = aod_865nm;
-    panel_2.o3 = input_param;
+    panel_2.param = input_param;
     %panel_2.std_ang = sliding_std(ang_noscreening,10)';
     panel_3.rawrelstd = rawrelstd(:,1);
     panel_4.Alt = Alt;

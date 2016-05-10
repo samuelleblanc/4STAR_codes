@@ -11,7 +11,7 @@ else
     s.toggle = update_toggle;
 end
 
-flight=[datenum(2016,5,6,22,59,19) datenum(2016,5,7,7,02,31)]; !!! to be updated 
+s.flight=[datenum(2016,5,6,22,59,19) datenum(2016,5,7,7,02,31)]; !!! to be updated 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
  
@@ -19,6 +19,11 @@ flight=[datenum(2016,5,6,22,59,19) datenum(2016,5,7,7,02,31)]; !!! to be updated
 s.O3h=21; % Yohei's guess 
 s.O3col=0.300; % Yohei's guess     
 s.NO2col=2.0e15; % Yohei's guess  
+
+% STD-based cloud screening for direct Sun measurements 
+s.sd_aero_crit=0.01; 
+s.flagfilename    = '20160506_starflag_man_created20160509_0102by_MS.mat';
+s.flagfilenameO3  = '20160506_starflag_O3_man_created20160510_0512by_MS.mat';
  
  
 % other tweaks 

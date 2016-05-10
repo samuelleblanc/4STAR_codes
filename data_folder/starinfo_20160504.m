@@ -11,7 +11,7 @@ else
     s.toggle = update_toggle;
 end
 
-flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
+s.flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
  
 s.sd_aero_crit = 0.01;
 
@@ -19,6 +19,11 @@ s.sd_aero_crit = 0.01;
 s.O3h=21; % Yohei's guess 
 s.O3col=0.327; % Yohei's guess     
 s.NO2col=2.0e15; % Yohei's guess  
+
+% STD-based cloud screening for direct Sun measurements 
+s.sd_aero_crit=0.01; 
+s.flagfilename    = '20160503_starflag_man_created20160509_0026by_MS.mat';
+s.flagfilenameO3  = '20160503_starflag_O3_man_created20160510_0128by_MS.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
