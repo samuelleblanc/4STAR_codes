@@ -265,7 +265,7 @@ loadCrossSections_global;
     sd_o3_crit = 5e-3;
     % 0 is good data, 1 is bad data
     
-    ti=9/86400;
+    ti=60/86400;
             for i=1:length(s.t);
                 rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2);
                 if numel(rows)>0;

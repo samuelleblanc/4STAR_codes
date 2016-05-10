@@ -262,11 +262,13 @@ function [g] = processOMIdata4compare(daystr,gas)
                %pst=star.pst;
                zstar = star.alt/1000;%16*log10(1013./presuseo3);% zstar needs to be in km
                frac_o3_star = polyval(coeff_polyfit_tauO3modelz,zstar);
-               o3star_scaled=star.o3DU;%./frac_o3_star;
+               o3star_scaled=star.o3DU./frac_o3_star;
                 
                % omi compare
+               % 124.4531, 32.8711, 130.6055, 38.9355
                figure(333);
-               scatter3(g.omi(star.sza<=60),o3star_scaled(star.sza<=60),star.alt(star.sza<=60)/1000,20,star.alt(star.sza<=60)/1000,'fill');
+               %scatter3(g.omi(star.sza<=60),o3star_scaled(star.sza<=60),star.alt(star.sza<=60)/1000,20,star.alt(star.sza<=60)/1000,'fill');%for 20160426
+               scatter3(g.omi(star.alt<=1000),o3star_scaled(star.alt<=1000),star.alt(star.alt<=1000)/1000,20,star.alt(star.alt<=1000)/1000,'fill');
                xlabel('OMI O3 interpolated to flight path [DU]');ylabel('4STAR O_{3} [DU] scaled');zlabel('Altitude [km]');
                axis([220 300 220 300 0 11]);
                colorbarlabeled('km');
@@ -281,12 +283,13 @@ function [g] = processOMIdata4compare(daystr,gas)
                    tplot = star.tUTC;
                    tplot(tplot<10) = tplot(tplot<10)+24;
                end
+               tplot = star.tUTC;
                subplot(211);
                plot(tplot,star.o3DU,'or','markerfacecolor',[0.2 0.7 0.3],'markersize',6);hold on;
                %plot(star.tUTC,star.alt/100,'.k','linewidth',2);
                legend('O_{3} [DU]','Altitude/100 [meters]');
                ylabel('VCD');
-               axis([min(tplot) max(tplot) 220 300]);
+               axis([min(tplot) max(tplot) min(star.o3DU) max(star.o3DU)]);
                subplot(212);
                plot(tplot,star.o3resiDU,'or','markerfacecolor',[0.2 0.7 0.3],'markersize',6);hold on;
                ylabel('residual');xlabel('time [UTC]');
@@ -372,7 +375,7 @@ function [g] = processOMIdata4compare(daystr,gas)
 
              path_param = param(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
              path_paramG= paramG(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
-             path_paramS= paramS(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
+             %path_paramS= paramS(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
              
              
              pmin     = min(param(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin));
@@ -383,11 +386,11 @@ function [g] = processOMIdata4compare(daystr,gas)
              latgrid_cont = latgrid(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
              param_cont   = paramgrid(longrid<=lonmax&longrid>=lonmin&latgrid<=latmax&latgrid>=latmin);
              
-%              figure;
-%              hp=scatter2Pcolor(double(longrid_cont),double(latgrid_cont),double(param_cont));
-%              set(hp,'edgecolor','none');
-%              hold on;
-%              scatter(star.lon,star.lat,20,star.o3DU,'linewidth',0.1);
+             figure;
+             hp=scatter2Pcolor(double(longrid_cont),double(latgrid_cont),double(param_cont));
+             set(hp,'edgecolor','none');
+             hold on;
+             scatter(star.lon,star.lat,60,star.o3DU,'linewidth',0.1);
 
             if strcmp(gas,'O3')
                 
