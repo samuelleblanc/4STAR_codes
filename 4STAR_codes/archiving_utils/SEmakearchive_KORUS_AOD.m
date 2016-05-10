@@ -130,7 +130,9 @@ for i=idx_file_proc
     %% get the flight time period
     daystr=dslist{i};
     disp(['on day:' daystr])
-    infofile_ = [starinfo_path 'starinfo_' daystr '.m'];
+    %cd starinfo_path
+    %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
+    infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
     s.dummy = '';
     try
