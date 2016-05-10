@@ -1,18 +1,18 @@
 %% Details of the program:
 % NAME:
-%   SEmakearchive_KORUS_AOD
+%   SEmakearchive_KORUS_GAS
 %
 % PURPOSE:
-%  To generate AOD archive files for use wih KORUS-AQ
+%  To generate GAS archive files for use wih KORUS-AQ
 %
 % CALLING SEQUENCE:
-%   SEmakearchive_KORUS_AOD
+%   SEmakearchive_KORUS_GAS
 %
 % INPUT:
 %  none
 %
 % OUTPUT:
-%  plots and ict file
+%  ict files
 %
 % DEPENDENCIES:
 %  - version_set.m
@@ -31,18 +31,18 @@
 %  none
 %
 % MODIFICATION HISTORY:
-% Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 7th, 2016
-%                 ported over from SEmakearchive_ARISE_starzen.m
+% Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 10th, 2016
+%                 ported over from SEmakearchive_KORUS_AOD.m
 %
 % -------------------------------------------------------------------------
 
-function SEmakearchive_KORUS_AOD
+function SEmakearchive_KORUS_GAS
 version_set('v1.0')
 %% set variables
-ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\';
+ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\gas_ict\';
 starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';
-prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+prefix='korusaq-4STAR-GASES'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
@@ -65,8 +65,8 @@ NormalComments = {...
     'LOCATION: based in Osan Air Force Base in South Korea, Exact aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research';...
-    'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
-    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent, for in-field archiving can be up to 0.03';...
+    'DATA_INFO: measurements represent total column gas content above the aircraft at measurement time nearest to Start_UTC.';...
+    'UNCERTAINTY: included';...
     'ULOD_FLAG: -7777';...
     'ULOD_VALUE: N/A';...
     'LLOD_FLAG: -8888';...
@@ -78,55 +78,53 @@ NormalComments = {...
     };
 
 revComments = {...
-    'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
+    'RA: First in-field data archival. Calibration coefficients are not final. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
 
+
 %% Prepare details of which variables to save
-%info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
 info.Latitude  = 'deg, Aircraft latitude (deg) at the indicated time';
 info.Longitude = 'deg, Aircraft longitude (deg) at the indicated time';
 info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
-info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
-info.amass_aer = 'unitless, aerosol optical airmass';
 
-info.AOD0380 = 'unitless, Aerosol optical depth at 380.0 nm';
-info.AOD0452 = 'unitless, Aerosol optical depth at 451.7 nm';
-info.AOD0501 = 'unitless, Aerosol optical depth at 500.7 nm';
-info.AOD0520 = 'unitless, Aerosol optical depth at 520.0 nm';
-info.AOD0532 = 'unitless, Aerosol optical depth at 532.0 nm';
-info.AOD0550 = 'unitless, Aerosol optical depth at 550.3 nm';
-info.AOD0606 = 'unitless, Aerosol optical depth at 605.5 nm';
-info.AOD0620 = 'unitless, Aerosol optical depth at 619.7 nm';
-info.AOD0675 = 'unitless, Aerosol optical depth at 675.2 nm';
-info.AOD0781 = 'unitless, Aerosol optical depth at 780.6 nm';
-info.AOD0865 = 'unitless, Aerosol optical depth at 864.6 nm';
-info.AOD1020 = 'unitless, Aerosol optical depth at 1019.9 nm';
-info.AOD1040 = 'unitless, Aerosol optical depth at 1039.6 nm';
-info.AOD1064 = 'unitless, Aerosol optical depth at 1064.2 nm';
-info.AOD1236 = 'unitless, Aerosol optical depth at 1235.8 nm';
-info.AOD1559 = 'unitless, Aerosol optical depth at 1558.7 nm';
-info.AOD1627 = 'unitless, Aerosol optical depth at 1626.6 nm';
+info.amass_O3 = 'unitless, ozone optical airmass';
+info.amass_NO2 = 'unitless, NO2 optical airmass';
 
-save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6];
-iradstart = 6; % the start of the field names related to wavelengths
+info.CWV       = 'g/cm^2, column water vapor calculated as average of values retrieved in 940-960 nm band';
+info.std_CWV   = 'g/cm^2, standard deviation of CWV';
+info.QA_CWV    = 'unitless, quality of retrieved CWV: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.VCD_O3    = 'DU, ozone vetical column content retrieved from best fit over the Chappuis spectral band';
+info.resid_O3  = 'DU, O3 rms difference between fitted and measured spectra';
+info.QA_O3     = 'unitless, quality of retrieved O3: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.VCD_NO2   = 'DU, nitrogen dioxide vertical column content retrieved from best fit over the 450-490 nm spectral band';
+info.resid_NO2 = 'DU, VCD_NO2 rms difference between fitted and measured spectra';
+info.QA_NO2    = 'unitless, quality of retrieved NO2: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+
 
 %set the format of each field
 form = info;
 names = fieldnames(info);
-for ll=1:length(names); form.(names{ll}) = '%2.3f'; end;
+for ll=1:length(names); form.(names{ll}) = '%3.2f'; end;
 form.GPS_Alt = '%7.1f';
 form.Latitude = '%3.7f';
 form.Longitude = '%4.7f';
-form.qual_flag = '%1.0f';
+form.QA_CWV = '%1.0f';
+form.QA_O3 = '%1.0f';
+form.QA_NO2 = '%1.0f';
+form.CWV = '%2.3f';
+form.std_CWV = '%2.3f';
+
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' } ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          0          0          0          0   ] ; %set=1 to process
 
+
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
 for i=idx_file_proc
+    
     %% get the flight time period
     daystr=dslist{i};
     disp(['on day:' daystr])
@@ -141,10 +139,12 @@ for i=idx_file_proc
     UTCflight=t2utch(s.flight);
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
     
+    
     %% build the Start_UTC time array, spaced at one second each
     Start_UTCs = [UTCflight(1)*3600:UTCflight(2)*3600];
     UTC = Start_UTCs/3600.;
     num = length(Start_UTCs);
+    
     
     %% get the special comments
     switch daystr
@@ -156,10 +156,11 @@ for i=idx_file_proc
             specComments = {};
     end
     
+    
     %% read file to be saved
     starfile = fullfile(starsun_path, [daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
-    load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
+    load(starfile, 't','gas','Lat','Lon','Alt','m_O3','note','m_NO2','cwv');
     
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
@@ -170,11 +171,13 @@ for i=idx_file_proc
         end
     end
     
+    
     %% fill with NaN the data structure, with appropriate sizes
     disp('initializing the data fields')
     for n=1:length(names)
         data.(names{n}) = NaN(num,1);
     end
+    
     
     %% fill up some of the data and interpolate for proper filling
     tutc = t2utch(t);
@@ -184,53 +187,72 @@ for i=idx_file_proc
     [nnutc,iiutc] = unique(tutc);
     data.Latitude = interp1(nnutc,Lat(iiutc),UTC);
     data.Longitude = interp1(nnutc,Lon(iiutc),UTC);
-    data.amass_aer = interp1(nnutc,m_aero(iiutc),UTC);    
+    data.amass_O3 = interp1(nnutc,m_O3(iiutc),UTC);  
+    data.amass_NO2 = interp1(nnutc,m_NO2(iiutc),UTC);  
     
-    %% Load the flag file
-    if isfield(s, 'flagfilename');
-        disp(['Loading flag file: ' s.flagfilename])
-        flag = load(s.flagfilename); 
-    else
-        [flagfilename, pathname] = uigetfile2('*.mat', ...
-            ['Pick starflag file for day:' daystr]);
-        disp(['Loading flag file: ' s.flagfilename])
-        flag = load([pathname flagfilename]);
-    end
+
+     %% Load the flag file
+%     if isfield(s, 'flagfilename');
+%         disp(['Loading flag file: ' s.flagfilename])
+%         flag = load(s.flagfilename); 
+%     else
+%         [flagfilename, pathname] = uigetfile2('*.mat', ...
+%             ['Pick starflag file for day:' daystr]);
+%         disp(['Loading flag file: ' s.flagfilename])
+%         flag = load([pathname flagfilename]);
+%     end
+%     
+
+     %% Combine the flag values
+     disp('Setting the flags to default to 0 to start')
+     data.QA_CWV = Start_UTCs*0;
+     data.QA_O3 = Start_UTCs*0;
+     data.QA_NO2 = Start_UTCs*0;
+%     if isfield(flag,'manual_flags');
+%         qual_flag = flag.manual_flags.screen;
+%     else
+%         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
+%         qual_flag = bitor(qual_flag,flag.cirrus);
+%         qual_flag = bitor(qual_flag,flag.frost);
+%         qual_flag = bitor(qual_flag,flag.low_cloud);
+%         qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+%     end
+%     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
+%     flag.utc = t2utch(flag.time.t);
+%     [ii,dt] = knnsearch(flag.utc,UTC');
+%     idd = dt<1.0/3600.0; % Distance no greater than one second.
+%     data.qual_flag(idd) = qual_flag(ii(idd));
     
-    %% Combine the flag values
-    disp('Setting the flags')
-    if isfield(flag,'manual_flags');
-        qual_flag = flag.manual_flags.screen;
-    else
-        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        qual_flag = bitor(qual_flag,flag.cirrus);
-        qual_flag = bitor(qual_flag,flag.frost);
-        qual_flag = bitor(qual_flag,flag.low_cloud);
-        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
-    end
-    data.qual_flag = Start_UTCs*0+1; % sets the default to 1
-    flag.utc = t2utch(flag.time.t);
-    [ii,dt] = knnsearch(flag.utc,UTC');
-    idd = dt<1.0/3600.0; % Distance no greater than one second.
-    data.qual_flag(idd) = qual_flag(ii(idd));
-    
+
     %% Now go through the times of radiances, and fill up the related variables
     disp('filing up the data')
-    for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
-    for nn=iradstart:length(names)
-        ii = nn-iradstart+1;
-        % make sure to only have unique values
-        [tutc_unique,itutc_unique] = unique(tutc);
-        data.(names{nn}) = interp1(tutc_unique,tau_aero_noscreening(itutc_unique,save_iwvls(ii)),UTC,'nearest');
-    end;
+    % get the indices for the proper times
+    [iig,dtg] = knnsearch(tutc,UTC');
+    iddg = dtg<1.0/3600.0; % Distance no greater than one second.
+    
+    data.CWV(iddg)      = cwv.cwv940m1(iig(iddg));
+    data.std_CWV(iddg)  = cwv.cwv940m1std(iig(iddg));
+    data.VCD_O3(iddg)   = gas.o3.o3DU(iig(iddg));
+    data.resid_O3(iddg) = gas.o3.o3resiDU(iig(iddg));
+    
+    if isfield(gas.no2,'no2resiDU')
+        data.VCD_NO2(iddg)  = gas.no2.no2DU;
+        data.resid_NO2(iddg)= gas.no2.no2resiDU;
+    else
+        disp('Applying Loschmidt to convert NO2 from molecules to DU')
+        Loschmidt           = 2.686763e19; %molecules/cm2
+        data.VCD_NO2(iddg)  = gas.no2.no2_molec_cm2/(Loschmidt/1000);
+        data.resid_NO2(iddg)= gas.no2.no2resi/(Loschmidt/1000);
+    end
+    
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.AOD0501));
-    %data.UTC(inans) = NaN;
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;
     data.Longitude(inans) = NaN;
-    data.amass_aer(inans) = NaN;
+    data.amass_O3(inans) = NaN;
+    data.amass_NO2(inans) = NaN;
     for i=iradstart:length(names)
         data.(names{i})(inans) = NaN;
     end
