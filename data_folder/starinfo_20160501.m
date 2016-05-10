@@ -18,7 +18,7 @@ s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160501_starflag_man_created20160503_2330by_JR.mat';
-s.flagfilenameO3  = '20160501_starflag_O3_man_created20160510_0438by_MS.mat';
+s.flagfilenameO3  = '20160501_starflag_O3_man_created20160510_0648by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 

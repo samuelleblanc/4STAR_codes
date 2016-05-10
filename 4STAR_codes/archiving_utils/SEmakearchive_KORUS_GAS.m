@@ -33,7 +33,7 @@
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 10th, 2016
 %                 ported over from SEmakearchive_KORUS_AOD.m
-%
+% MS, 2016-05-10, adjusted routine to archive gases
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_GAS
@@ -100,6 +100,7 @@ info.QA_O3     = 'unitless, quality of retrieved O3: 0=good; 1=poor, due to clou
 info.VCD_NO2   = 'DU, nitrogen dioxide vertical column content retrieved from best fit over the 450-490 nm spectral band';
 info.resid_NO2 = 'DU, VCD_NO2 rms difference between fitted and measured spectra';
 info.QA_NO2    = 'unitless, quality of retrieved NO2: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.qual_flag = 'unitless, quality of retrieved gases: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability; not final';
 
 
 %set the format of each field
@@ -114,12 +115,13 @@ form.QA_O3 = '%1.0f';
 form.QA_NO2 = '%1.0f';
 form.CWV = '%2.3f';
 form.std_CWV = '%2.3f';
+form.qual_flag = '%1.0f';
 
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' } ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          1          0          0          0   ] ; %set=1 to process
+jproc=[         0          0          0          1          0   ] ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -129,6 +131,8 @@ for i=idx_file_proc
     %% get the flight time period
     daystr=dslist{i};
     disp(['on day:' daystr])
+    %cd starinfo_path
+    %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
     infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
     s.dummy = '';
@@ -162,7 +166,8 @@ for i=idx_file_proc
     starfile = fullfile(starsun_path, [daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','gas','Lat','Lon','Alt','m_O3','note','m_NO2','cwv');
-    gasfile = fullfile(starsun_path, [daystr 'starsun.mat']);
+    gasfile = fullfile(gasfile_path, [daystr '_gas_summary.mat']);
+    load(gasfile);
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
         temp_cells = strfind(note,'C0');
@@ -192,37 +197,38 @@ for i=idx_file_proc
     data.amass_NO2 = interp1(nnutc,m_NO2(iiutc),UTC);  
     
 
-     %% Load the flag file
-%     if isfield(s, 'flagfilename');
-%         disp(['Loading flag file: ' s.flagfilename])
-%         flag = load(s.flagfilename); 
-%     else
-%         [flagfilename, pathname] = uigetfile2('*.mat', ...
-%             ['Pick starflag file for day:' daystr]);
-%         disp(['Loading flag file: ' s.flagfilename])
-%         flag = load([pathname flagfilename]);
-%     end
-%     
+ %% Load the flag file
+ % need to add additional flags for NO2 and CWV
+    if isfield(s, 'flagfilename');
+        disp(['Loading flag file: ' s.flagfilenameO3])
+        flag = load(s.flagfilenameO3); 
+    else
+        [flagfilename, pathname] = uigetfile2('*.mat', ...
+            ['Pick starflag file for day:' daystr]);
+        disp(['Loading flag file: ' s.flagfilenameO3])
+        flag = load([pathname flagfilenameO3]);
+    end   
 
      %% Combine the flag values
-     disp('Setting the flags to default to 0 to start')
+     disp('Setting some flags to default to 0 to start')
      data.QA_CWV = Start_UTCs*0;
-     data.QA_O3 = Start_UTCs*0;
+     data.QA_O3  = Start_UTCs*0;
      data.QA_NO2 = Start_UTCs*0;
-%     if isfield(flag,'manual_flags');
-%         qual_flag = flag.manual_flags.screen;
-%     else
-%         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-%         qual_flag = bitor(qual_flag,flag.cirrus);
-%         qual_flag = bitor(qual_flag,flag.frost);
-%         qual_flag = bitor(qual_flag,flag.low_cloud);
-%         qual_flag = bitor(qual_flag,flag.unspecified_clouds);
-%     end
-%     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
-%     flag.utc = t2utch(flag.time.t);
-%     [ii,dt] = knnsearch(flag.utc,UTC');
-%     idd = dt<1.0/3600.0; % Distance no greater than one second.
-%     data.qual_flag(idd) = qual_flag(ii(idd));
+     
+    if isfield(flag,'manual_flags');
+        qual_flag = flag.manual_flags.screen;
+    else
+        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
+        qual_flag = bitor(qual_flag,flag.cirrus);
+        qual_flag = bitor(qual_flag,flag.frost);
+        qual_flag = bitor(qual_flag,flag.low_cloud);
+        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+    end
+    data.qual_flag = Start_UTCs*0+1; % sets the default to 1
+    flag.utc = t2utch(flag.time.t);
+    [ii,dt] = knnsearch(flag.utc,UTC');
+    idd = dt<1.0/3600.0; % Distance no greater than one second.
+    data.qual_flag(idd) = qual_flag(ii(idd));
     
 
     %% Now go through the times, and fill up the related variables
@@ -231,32 +237,32 @@ for i=idx_file_proc
     [iig,dtg] = knnsearch(tutc,UTC');
     iddg = dtg<1.0/3600.0; % Distance no greater than one second.
     
-    data.CWV(iddg)      = cwv.cwv940m1(iig(iddg));
-    data.std_CWV(iddg)  = cwv.cwv940m1std(iig(iddg));
-    data.VCD_O3(iddg)   = gas.o3.o3DU(iig(iddg));
-    data.resid_O3(iddg) = gas.o3.o3resiDU(iig(iddg));
+    data.CWV(iddg)      = cwv(iig(iddg));
+    data.std_CWV(iddg)  = 0*cwv(iig(iddg));%! temporary
+    data.VCD_O3(iddg)   = o3DU(iig(iddg));
+    data.resid_O3(iddg) = o3resiDU(iig(iddg));
     
-    if isfield(gas.no2,'no2resiDU')
-        data.VCD_NO2(iddg)  = gas.no2.no2DU;
-        data.resid_NO2(iddg)= gas.no2.no2resiDU;
-    else
+%     if isfield(gas.no2,'no2DU')
+%         data.VCD_NO2(iddg)  = no2DU;
+%         data.resid_NO2(iddg)= no2resiDU;
+%     else
         disp('Applying Loschmidt to convert NO2 from molecules to DU')
         Loschmidt           = 2.686763e19; %molecules/cm2
-        data.VCD_NO2(iddg)  = gas.no2.no2_molec_cm2/(Loschmidt/1000);
-        data.resid_NO2(iddg)= gas.no2.no2resi/(Loschmidt/1000);
-    end
+        data.VCD_NO2(iddg)  = no2_molec_cm2(iig(iddg))/(Loschmidt/1000);
+        data.resid_NO2(iddg)= no2err_molec_cm2(iig(iddg))/(Loschmidt/1000);
+%     end
     
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
-    inans = find(isnan(data.AOD0501));
+    inans = find(isnan(data.VCD_O3));
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;
     data.Longitude(inans) = NaN;
     data.amass_O3(inans) = NaN;
     data.amass_NO2(inans) = NaN;
-    for i=iradstart:length(names)
-        data.(names{i})(inans) = NaN;
-    end
+%     for i=iradstart:length(names)
+%         data.(names{i})(inans) = NaN;
+%     end
     
     %% Now print the data to ICT file
     disp('Printing to file')
