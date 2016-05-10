@@ -24,7 +24,7 @@ ends = datevec(ng(2,:));
 ends(:,4) = ends(:,4) +24.*(ends(:,3)-ends(1,3)); 
 ends(:,6) = floor(ends(:,6));    
 %%
-marks_fname = ['starflags_',daystr,'_',by,marks,now_str];
+marks_fname = ['starflags_',daystr,'_',gas_name_str,'_',by,marks,now_str];
 ng_str = ['function marks = ',marks_fname];
 comment_str = ['% starflags file for ',daystr,' created by ', by(1:end-1), ' on ', now_str, ' to mark ',marks(7:end-1), ' conditions'];
 ng_str = [sprintf('%s  \n ',ng_str), sprintf('%s \n ',comment_str)];
