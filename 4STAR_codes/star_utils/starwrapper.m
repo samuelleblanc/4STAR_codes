@@ -211,22 +211,22 @@ infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functio
 dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
-        if toggle.dostarflag
-    try
-        edit(infofile_) ; % open infofile in case user wants to edit it.
-    catch me
-        disp(['Problem editing starinfo file. Please open manually: ' infofile_])
-    end
-    infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    try
-        s = infofnt(s);
-    catch
-        eval([infofile_(1:end-2),'(s)']);
-        %     s = eval([infofile2,'(s)']);
-    end
-        else
-            run(infofile);
-        end;
+    if toggle.dostarflag
+        try
+            edit(infofile_) ; % open infofile in case user wants to edit it.
+        catch me
+            disp(['Problem editing starinfo file. Please open manually: ' infofile_])
+        end
+        infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+        try
+            s = infofnt(s);
+        catch
+            eval([infofile_(1:end-2),'(s)']);
+            %     s = eval([infofile2,'(s)']);
+        end
+    else
+        run(infofile);
+    end;
 elseif exist(infofile2)==2;
     try
         edit(infofile2) ; % open infofile in case user wants to edit it.
