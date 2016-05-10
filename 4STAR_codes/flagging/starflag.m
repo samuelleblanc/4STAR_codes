@@ -584,6 +584,11 @@ end
 if ~exist('good','var')
     good = [];
 end
+
+% write_to_starinfo = menu('Write the name of this flagfile inside the starinfo file?','Yes','No')
+% if write_to_starinfo==1
+%     error('Feature not yet implemented')
+% end
 return
 
 
