@@ -33,7 +33,7 @@
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 7th, 2016
 %                 ported over from SEmakearchive_ARISE_starzen.m
-%
+% MS, updated starinfo files path
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
@@ -130,7 +130,7 @@ for i=idx_file_proc
     %% get the flight time period
     daystr=dslist{i};
     disp(['on day:' daystr])
-    infofile_ = [starpaths 'starinfo_' daystr '.m'];
+    infofile_ = [starinfo_path 'starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
     s.dummy = '';
     try
