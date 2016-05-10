@@ -11,9 +11,9 @@ else
     s.toggle = update_toggle;
 end
 
-flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
- 
+s.flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
 s.sd_aero_crit = 0.01;
+s.flagfilename='20160504_starflag_man_created20160510_2053by_SL.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
