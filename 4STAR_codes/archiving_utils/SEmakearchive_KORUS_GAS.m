@@ -34,6 +34,7 @@
 % Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 10th, 2016
 %                 ported over from SEmakearchive_KORUS_AOD.m
 % MS, 2016-05-10, adjusted routine to archive gases
+% MS, 2016-05-12, adding CWV flags
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_GAS
@@ -201,34 +202,67 @@ for i=idx_file_proc
  % need to add additional flags for NO2 and CWV
     if isfield(s, 'flagfilename');
         disp(['Loading flag file: ' s.flagfilenameO3])
-        flag = load(s.flagfilenameO3); 
+        flagO3 = load(s.flagfilenameO3); 
+        disp(['Loading flag file: ' s.flagfilenameCWV])
+        flagCWV = load(s.flagfilenameCWV); 
     else
-        [flagfilename, pathname] = uigetfile2('*.mat', ...
+        % O3
+        [flagfilenameO3, pathname] = uigetfile2('*.mat', ...
             ['Pick starflag file for day:' daystr]);
         disp(['Loading flag file: ' s.flagfilenameO3])
-        flag = load([pathname flagfilenameO3]);
+        flagO3 = load([pathname flagfilenameO3]);
+        % CWV
+        [flagfilenameCWV, pathname] = uigetfile2('*.mat', ...
+            ['Pick starflag file for day:' daystr]);
+        disp(['Loading flag file: ' s.flagfilenameCWV])
+        flagCWV = load([pathname flagfilenameCWV]);
     end   
 
      %% Combine the flag values
      disp('Setting some flags to default to 0 to start')
      data.QA_CWV = Start_UTCs*0;
-     data.QA_O3  = Start_UTCs*0;
+     %data.QA_O3  = Start_UTCs*0;
      data.QA_NO2 = Start_UTCs*0;
-     
-    if isfield(flag,'manual_flags');
-        qual_flag = flag.manual_flags.screen;
+    
+    % read O3 flag file 
+    if isfield(flagO3,'manual_flags');
+        qual_flag = flagO3.manual_flags.screen;
     else
-        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        qual_flag = bitor(qual_flag,flag.cirrus);
-        qual_flag = bitor(qual_flag,flag.frost);
-        qual_flag = bitor(qual_flag,flag.low_cloud);
-        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        qual_flag = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
+        qual_flag = bitor(qual_flag,flagO3.cirrus);
+        qual_flag = bitor(qual_flag,flagO3.frost);
+        qual_flag = bitor(qual_flag,flagO3.low_cloud);
+        qual_flag = bitor(qual_flag,flagO3.unspecified_clouds);
     end
+    % general flagging - this is similar to O3 at the moment
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     flag.utc = t2utch(flag.time.t);
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));
+    % O3
+    data.QA_O3 = Start_UTCs*0+1; % sets the default to 1
+    flagO3.utc = t2utch(flagO3.time.t);
+    [ii,dt] = knnsearch(flagO3.utc,UTC');
+    idd = dt<1.0/3600.0; % Distance no greater than one second.
+    data.QA_O3(idd) = qual_flag(ii(idd));
+    
+    % read CWV flag file
+     if isfield(flagO3,'manual_flags');
+        qual_flag = flagCWV.manual_flags.screen;
+    else
+        qual_flag = bitor(flagCWV.before_or_after_flight,flagCWV.bad_aod);
+        qual_flag = bitor(qual_flag,flagCWV.cirrus);
+        qual_flag = bitor(qual_flag,flagCWV.frost);
+        qual_flag = bitor(qual_flag,flagCWV.low_cloud);
+        qual_flag = bitor(qual_flag,flagCWV.unspecified_clouds);
+    end
+    % CWV
+    data.qual_flag = Start_UTCs*0+1; % sets the default to 1
+    flagCWV.utc = t2utch(flagCWV.time.t);
+    [ii,dt] = knnsearch(flagCWV.utc,UTC');
+    idd = dt<1.0/3600.0; % Distance no greater than one second.
+    data.QA_CWV(idd) = qual_flag(ii(idd));
     
 
     %% Now go through the times, and fill up the related variables

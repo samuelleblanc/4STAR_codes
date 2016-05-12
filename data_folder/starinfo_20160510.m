@@ -15,6 +15,8 @@ s.flight=[datenum(2016,5,10,22,59,32) datenum(2016,5,11,7,6,43)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 s.flagfilename = '20160510_starflag_man_created20160511_2155by_SL.mat'; 
+s.flagfilenameO3 = '20160510_starflag_O3_man_created20160512_1421by_MS.mat';
+s.flagfilenameCWV = '20160510_starflag_CWV_man_created20160512_1427by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 

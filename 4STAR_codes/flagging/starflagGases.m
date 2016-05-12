@@ -1,4 +1,4 @@
-function [flags, good, flagfile] = starflag(s, Mode)
+function [flags, good, flagfile] = starflagGases(s, Mode)
 % [flags, good, flagfile] = starflag(s, Mode)
 % s is 4STAR struct containing data and optional toggle field
 % Mode is optional. 1 = automatic flags, 2 = manual flags, 3 = load
