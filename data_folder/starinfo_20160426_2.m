@@ -11,15 +11,11 @@ else
     s.toggle = update_toggle;
 end
 
-%s.flight =[datenum('12:33:54') datenum('17:15')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
-s.flight = [datenum(2016,4,26,12,33,54) datenum(2016,4,27,05,14,00)]; 
-s.langley = [datenum(2016,4,26,14,12,00) datenum(2016,4,26,16,00,00)];  
-%s.langley=[datenum('14:12:00') datenum('16:00')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);  
+s.flight = [datenum(2016,4,26,19,45,00) datenum(2016,4,27,05,14,00)];
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
 s.flagfilename   = '20160426_starflag_man_created20160505_1153by_SL.mat';
 s.flagfilenameO3 = '20160426_starflag_O3_man_created20160512_0442by_MS.mat';
-
  
 % Ozone and other gases 
 s.O3h=21; 

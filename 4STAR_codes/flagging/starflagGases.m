@@ -47,8 +47,8 @@ try
     gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
 catch
     if strcmp(daystr,'20160426')
-        gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_1.mat']);
-        %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_2.mat']);
+        %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_1.mat']);
+        gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_2.mat']);
     end
 end
 
