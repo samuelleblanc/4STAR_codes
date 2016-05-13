@@ -264,10 +264,13 @@ aod_865nm = tau_aero_noscreening(:,nm_865);
 
 if strcmp(gas_name_str,'CWV')
     input_param = gas.cwv;
+    std_param   = gas.cwv_std;
 elseif strcmp(gas_name_str,'O3')
     input_param = gas.o3DU;
+    std_param   = gas.o3resiDU;
 elseif strcmp(gas_name_str,'NO2')
-    input_param = gas.no2DU;
+    input_param = gas.no2_molec_cm2;
+    std_param   = gas.no2err_molec_cm2;
 end
 
 aod_500nm_max=3;
@@ -452,12 +455,12 @@ if (Mode==2)
     panel_1.aod_865nm = aod_865nm;
     panel_2.param = input_param;
     %panel_2.std_ang = sliding_std(ang_noscreening,10)';
-    panel_3.rawrelstd = rawrelstd(:,1);
+    panel_3.rawrelstd = std_param;
     panel_4.Alt = Alt;
     
     ylims.panel_1 = [-.1, 2];
     ylims.panel_2 = [min(input_param) max(input_param)];
-    ylims.panel_3 = [0,1];
+    ylims.panel_3 = [min(std_param) max(std_param)];
     ylims.panel_4 = [0,8000];
     figs.tau_fig.h = 1;
     figs.tau2_fig.h = 2;
