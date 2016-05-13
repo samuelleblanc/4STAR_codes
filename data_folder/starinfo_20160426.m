@@ -19,6 +19,7 @@ s.langley = [datenum(2016,4,26,14,12,00) datenum(2016,4,26,16,00,00)];
 s.sd_aero_crit=0.01; 
 s.flagfilename   = '20160426_starflag_man_created20160505_1153by_SL.mat';
 s.flagfilenameO3 = '20160426_starflag_O3_man_created20160512_0442by_MS.mat';
+s.flagfilenameCWV= '20160426_starflag_CWV_man_created20160512_1608by_MS.mat';
 
  
 % Ozone and other gases 

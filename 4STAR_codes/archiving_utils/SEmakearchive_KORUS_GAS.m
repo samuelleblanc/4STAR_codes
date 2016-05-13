@@ -122,7 +122,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          0          0          0          0      0    0] ; %set=1 to process
+jproc=[         0          0          0          0          0      1    0] ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -220,7 +220,7 @@ for i=idx_file_proc
 
      %% Combine the flag values
      disp('Setting some flags to default to 0 to start')
-     data.QA_CWV = Start_UTCs*0;
+     %data.QA_CWV = Start_UTCs*0;
      %data.QA_O3  = Start_UTCs*0;
      data.QA_NO2 = Start_UTCs*0;
     
@@ -236,8 +236,8 @@ for i=idx_file_proc
     end
     % general flagging - this is similar to O3 at the moment
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
-    flag.utc = t2utch(flag.time.t);
-    [ii,dt] = knnsearch(flag.utc,UTC');
+    flagO3.utc = t2utch(flagO3.time.t);
+    [ii,dt] = knnsearch(flagO3.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));
     % O3
@@ -248,7 +248,7 @@ for i=idx_file_proc
     data.QA_O3(idd) = qual_flag(ii(idd));
     
     % read CWV flag file
-     if isfield(flagO3,'manual_flags');
+     if isfield(flagCWV,'manual_flags');
         qual_flag = flagCWV.manual_flags.screen;
     else
         qual_flag = bitor(flagCWV.before_or_after_flight,flagCWV.bad_aod);
