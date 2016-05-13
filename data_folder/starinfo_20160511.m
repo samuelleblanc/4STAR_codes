@@ -11,16 +11,20 @@ else
     s.toggle = update_toggle;
 end
 
-s.flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
-s.sd_aero_crit = 0.01;
-s.flagfilename  ='20160504_starflag_man_created20160510_2053by_SL.mat'; 
-s.flagfilenameO3='20160504_starflag_O3_man_created20160510_0723by_MS.mat'; 
-s.flagfilenameCWV='20160504_starflag_CWV_man_created20160512_1830by_MS.mat';
+s.flight=[datenum(2016,5,11,23,03,06) datenum(2016,5,12,7,3,42)];  
+% spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
+% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+%s.flagfilename = '20160510_starflag_man_created20160511_2155by_SL.mat'; 
+%s.flagfilenameO3 = '20160510_starflag_O3_man_created20160512_1421by_MS.mat';
+%s.flagfilenameCWV = '20160510_starflag_CWV_man_created20160512_1427by_MS.mat';
 
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.327; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21; % guess 
+s.O3col=0.300; % guess     
+s.NO2col=2.0e15; % guess  
+ 
+s.sd_aero_crit=0.01;  
+ 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
@@ -68,13 +72,13 @@ toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = false;
+toggle_out.gassubtract = true;
 toggle_out.booleanflagging = false;
 toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.doflagging = false; % for running any Yohei style flagging
-toggle_out.dostarflag = true; 
+toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = false;
+toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
 
@@ -83,4 +87,3 @@ if exist('toggle_in', 'var')
 end
 
 return
-

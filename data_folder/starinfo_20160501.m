@@ -19,6 +19,7 @@ s.flight =[datenum(2016,5,1,22,30,00) datenum(2016,5,2,6,55,17)];
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160501_starflag_man_created20160503_2330by_JR.mat';
 s.flagfilenameO3  = '20160501_starflag_O3_man_created20160510_0648by_MS.mat';
+s.flagfilenameCWV = '20160501_starflag_CWV_man_created20160512_1628by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 

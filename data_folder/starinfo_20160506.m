@@ -24,6 +24,7 @@ s.NO2col=2.0e15; % Yohei's guess
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160506_starflag_man_created20160509_0102by_MS.mat';
 s.flagfilenameO3  = '20160506_starflag_O3_man_created20160510_0512by_MS.mat';
+s.flagfilenameCWV = '20160506_starflag_CWV_man_created20160512_1846by_MS.mat';
  
  
 % other tweaks 
