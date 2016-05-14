@@ -222,7 +222,7 @@ for i=idx_file_proc
      disp('Setting some flags to default to 0 to start')
      %data.QA_CWV = Start_UTCs*0;
      %data.QA_O3  = Start_UTCs*0;
-     data.QA_NO2 = Start_UTCs*0;
+     data.QA_NO2 = Start_UTCs*0 + 1;
     
     % read O3 flag file 
     if isfield(flagO3,'manual_flags');
@@ -258,7 +258,7 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flagCWV.unspecified_clouds);
     end
     % CWV
-    data.qual_flag = Start_UTCs*0+1; % sets the default to 1
+    data.QA_CWV = Start_UTCs*0+1; % sets the default to 1
     flagCWV.utc = t2utch(flagCWV.time.t);
     [ii,dt] = knnsearch(flagCWV.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
