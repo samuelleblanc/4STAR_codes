@@ -67,15 +67,15 @@ colslist={'' c 1:13
     'VISonly' visc(3:9) 3:9 
     'NIRonly' nirc(11:13)+1044 11:13};
 % upload gases if 'gas'/'cwv' does not exist in starsun
-if isfield('gas')
+if exist('gas','var')
     cwv2plot  =cwv.cwv940m1;
     o32plot   =gas.o3.o3DU;
-    no22plot  =gas.no2.no2DU;
+    no22plot  =gas.no2.no2_molec_cm2;
 else
     gas   = load(strcat(gasfile_path,daystr{:},'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
-    no22plot =gas.no2DU;
+    no22plot =gas.no2_molec_cm2;
 end
 
 %% filter the gas fields to plot
@@ -96,24 +96,23 @@ end
     end
 
 
-    % Load the flag file
+    % Load the flag file and see if gas flags exist
     if isfield(s, 'flagfilename');
         disp(['Loading flag file: ' s.flagfilenameO3])
         flagO3 = load(s.flagfilenameO3); 
         disp(['Loading flag file: ' s.flagfilenameCWV])
         flagCWV = load(s.flagfilenameCWV); 
+        % read flags
+        flagO3  = flagO3.manual_flags.screen;
+        flagCWV = flagCWV.manual_flags.screen;
+        flagNO2 = ones(length(t),1);% flag all- bad calibration
+    else
+        % don't flag
+        flagO3   = zeros(length(t),1);
+        flagCWV  = zeros(length(t),1);
+        flagNO2  = ones(length(t),1);% flag all-bad calibration
     end   
 
-    % read O3 flag file 
-    if isfield(flagO3,'manual_flags');
-        qual_flag = flagO3.manual_flags.screen;
-    else
-        qual_flag = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
-        qual_flag = bitor(qual_flag,flagO3.cirrus);
-        qual_flag = bitor(qual_flag,flagO3.frost);
-        qual_flag = bitor(qual_flag,flagO3.low_cloud);
-        qual_flag = bitor(qual_flag,flagO3.unspecified_clouds);
-    end
 
 % read auxiliary data from starinfo and select rows
 evalstarinfo(daystr, 'flight');
@@ -344,10 +343,13 @@ end;
 
 % water vapor
 
-if exist('cwv');
-    
+if exist('cwv2plot');
+        
+        % apply flags
+        cwv2plot(flagCWV==1) = NaN;
+        
         figure;
-        [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
+        [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, mods{:}, ...
             'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
             'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
@@ -356,10 +358,13 @@ end;
 
 % O3
 
-if exist('gas');
-    
+if exist('o32plot');
+        
+         % apply flags
+        o32plot(flagO3==1) = NaN;
+        
         figure;
-        [h,filename]=spsun(daystr, 't', gas.o3.o3DU, '.', vars.Alt1e4{:}, mods{:}, ...
+        [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, mods{:}, ...
             'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
             'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
@@ -367,13 +372,17 @@ end;
 
 % NO2
 
-%if exist('gas');    
-%        figure;
-%        [h,filename]=spsun(daystr, 't', gas.no2.no2_molec_cm2, '.', vars.Alt1e4{:}, mods{:}, ...
-%            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
-%            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
-%        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-%end;
+if exist('no22plot'); 
+    
+       % apply flags
+       o32plot(flagO3==1) = NaN;
+       
+       figure;
+       [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, ...
+           'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
+           'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+       pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+end;
 
 
 % tau aero after correction based on AATS
