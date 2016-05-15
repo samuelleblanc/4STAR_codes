@@ -197,7 +197,7 @@ if ~isdir(ICTdir)
 end
 
 %check the missing_data_val
-if ~exsit('missing_data_val','var')
+if ~exist('missing_data_val','var')
   missing_data_val = -9999;
 end
 

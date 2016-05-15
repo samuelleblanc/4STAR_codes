@@ -124,7 +124,7 @@ form.std_CWV   = '%2.3f';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0      1    0] ; %set=1 to process
+jproc=[         1          0          0          0          0      0    0] ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -297,5 +297,6 @@ for i=idx_file_proc
     
     %% Now print the data to ICT file
     disp('Printing to file')
-    ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir,missing_data_val='-99999')
+    % missing_data_val = -99999
+    ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir,-99999)
 end;
