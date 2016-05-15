@@ -35,6 +35,7 @@
 %                 ported over from SEmakearchive_KORUS_AOD.m
 % MS, 2016-05-10, adjusted routine to archive gases
 % MS, 2016-05-12, adding CWV flags
+% MS, 2016-05-14, fixing bugs in gas flags
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_GAS
@@ -94,29 +95,30 @@ info.amass_NO2 = 'unitless, NO2 optical airmass';
 
 info.CWV       = 'g/cm^2, column water vapor calculated as average of values retrieved in 940-960 nm band';
 info.std_CWV   = 'g/cm^2, standard deviation of CWV';
-info.QA_CWV    = 'unitless, quality of retrieved CWV: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.QA_CWV    = 'unitless, quality of retrieved CWV: 0=good; 1=poor, due to clouds, tracking errors, instrument stability, or instrument stability';
 info.VCD_O3    = 'DU, ozone vetical column content retrieved from best fit over the Chappuis spectral band';
 info.resid_O3  = 'DU, O3 rms difference between fitted and measured spectra';
-info.QA_O3     = 'unitless, quality of retrieved O3: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.QA_O3     = 'unitless, quality of retrieved O3: 0=good; 1=poor, due to clouds, tracking errors, instrument stability, or final calibration';
 info.VCD_NO2   = 'DU, nitrogen dioxide vertical column content retrieved from best fit over the 450-490 nm spectral band';
 info.resid_NO2 = 'DU, VCD_NO2 rms difference between fitted and measured spectra';
-info.QA_NO2    = 'unitless, quality of retrieved NO2: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
-info.qual_flag = 'unitless, quality of retrieved gases: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability; not final';
+info.QA_NO2    = 'unitless, quality of retrieved NO2: 0=good; 1=poor, due to clouds, tracking errors, instrument stability or final calibration';
+%info.qual_flag = 'unitless, quality of retrieved gases: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability; not final';
 
 
 %set the format of each field
 form = info;
 names = fieldnames(info);
 for ll=1:length(names); form.(names{ll}) = '%3.2f'; end;
-form.GPS_Alt = '%7.1f';
-form.Latitude = '%3.7f';
+form.GPS_Alt   = '%7.1f';
+form.Latitude  = '%3.7f';
 form.Longitude = '%4.7f';
-form.QA_CWV = '%1.0f';
-form.QA_O3 = '%1.0f';
-form.QA_NO2 = '%1.0f';
-form.CWV = '%2.3f';
-form.std_CWV = '%2.3f';
-form.qual_flag = '%1.0f';
+form.QA_CWV    = '%1.0f';
+form.QA_O3     = '%1.0f';
+form.VCD_O3    = '%4.2f';
+form.QA_NO2    = '%1.0f';
+form.CWV       = '%2.3f';
+form.std_CWV   = '%2.3f';
+%form.qual_flag = '%1.0f';
 
 
 %% prepare list of details for each flight
@@ -226,43 +228,38 @@ for i=idx_file_proc
     
     % read O3 flag file 
     if isfield(flagO3,'manual_flags');
-        qual_flag = flagO3.manual_flags.screen;
+        QA_O3 = flagO3.manual_flags.screen;
     else
-        qual_flag = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
-        qual_flag = bitor(qual_flag,flagO3.cirrus);
-        qual_flag = bitor(qual_flag,flagO3.frost);
-        qual_flag = bitor(qual_flag,flagO3.low_cloud);
-        qual_flag = bitor(qual_flag,flagO3.unspecified_clouds);
+        QA_O3 = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
+        QA_O3 = bitor(QA_O3,flagO3.cirrus);
+        QA_O3 = bitor(QA_O3,flagO3.frost);
+        QA_O3 = bitor(QA_O3,flagO3.low_cloud);
+        QA_O3 = bitor(QA_O3,flagO3.unspecified_clouds);
     end
-    % general flagging - this is similar to O3 at the moment
-    data.qual_flag = Start_UTCs*0+1; % sets the default to 1
-    flagO3.utc = t2utch(flagO3.time.t);
-    [ii,dt] = knnsearch(flagO3.utc,UTC');
-    idd = dt<1.0/3600.0; % Distance no greater than one second.
-    data.qual_flag(idd) = qual_flag(ii(idd));
+    
     % O3
     data.QA_O3 = Start_UTCs*0+1; % sets the default to 1
     flagO3.utc = t2utch(flagO3.time.t);
     [ii,dt] = knnsearch(flagO3.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
-    data.QA_O3(idd) = qual_flag(ii(idd));
+    data.QA_O3(idd) = QA_O3(ii(idd));
     
     % read CWV flag file
      if isfield(flagCWV,'manual_flags');
-        qual_flag = flagCWV.manual_flags.screen;
+        QA_CWV = flagCWV.manual_flags.screen;
     else
-        qual_flag = bitor(flagCWV.before_or_after_flight,flagCWV.bad_aod);
-        qual_flag = bitor(qual_flag,flagCWV.cirrus);
-        qual_flag = bitor(qual_flag,flagCWV.frost);
-        qual_flag = bitor(qual_flag,flagCWV.low_cloud);
-        qual_flag = bitor(qual_flag,flagCWV.unspecified_clouds);
+        QA_CWV = bitor(flagCWV.before_or_after_flight,flagCWV.bad_aod);
+        QA_CWV = bitor(QA_CWV,flagCWV.cirrus);
+        QA_CWV = bitor(QA_CWV,flagCWV.frost);
+        QA_CWV = bitor(QA_CWV,flagCWV.low_cloud);
+        QA_CWV = bitor(QA_CWV,flagCWV.unspecified_clouds);
     end
     % CWV
     data.QA_CWV = Start_UTCs*0+1; % sets the default to 1
     flagCWV.utc = t2utch(flagCWV.time.t);
     [ii,dt] = knnsearch(flagCWV.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
-    data.QA_CWV(idd) = qual_flag(ii(idd));
+    data.QA_CWV(idd) = QA_CWV(ii(idd));
     
 
     %% Now go through the times, and fill up the related variables
