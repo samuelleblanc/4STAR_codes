@@ -25,6 +25,7 @@ function KORUSstarbasicplots(daystr, platform, savefigure);
 % MS   , 2016/01/09, modified to accomodate MLO campaign data.
 % MS   , 2016/04/06, modified to accomodate KORUS-AQ campaign data.
 % MS   , 2016/05/13, added option to read gas_summary if not exist
+% MS   , 2016/05/14, added flagging for gases plots
 
 %********************
 % set parameters
@@ -77,35 +78,42 @@ else
     no22plot =gas.no2DU;
 end
 
-% filter the gas fields to plot
+%% filter the gas fields to plot
 
-if strcmp(daystr{:},'20160501')
-    flagaod = load('20160501_starflag_man_created20160503_2330by_JR.mat');
-    flag03  = load('20160501_starflag_O3_man_created20160510_0648by_MS.mat');% second
-   %flag03  = load('20160501_starflag_O3_man_created20160510_0438by_MS.mat');% first
-elseif strcmp(daystr{:},'20160503')
-    flagaod = load('20160503_starflag_man_created20160509_0026by_MS.mat');
-    flago3  = load('20160503_starflag_O3_man_created20160510_0128by_MS.mat');
-elseif strcmp(daystr{:},'20160504')
-    flagaod = load('20160504_starflag_man_created20160510_2053by_SL.mat');
-    flago3  = load('20160504_starflag_O3_man_created20160510_0723by_MS.mat');
-elseif strcmp(daystr{:},'20160506')
-    flagaod = load('20160506_starflag_man_created20160509_0102by_MS.mat');
-    flago3  = load('20160506_starflag_O3_man_created20160510_0512by_MS.mat');
-elseif strcmp(daystr{:},'20160510')
-    flagaod = load('20160510_starflag_man_created20160511_2155by_SL.mat');
-    flago3  = load('20160510_starflag_O3_man_created20160512_1421by_MS.mat');   
-elseif strcmp(daystr{:},'20160511')
-    flagaod = load('20160511_starflag_man_created20160513_0415by_MS.mat');
-    flago3  = load('20160511_starflag_O3_man_created20160513_0544by_MS.mat');   
-elseif strcmp(daystr{:},'20160512')
-    %flagaod = load('20160511_starflag_man_created20160513_0415by_MS.mat');
-    %flago3  = load('20160511_starflag_O3_man_created20160513_0544by_MS.mat');      
-elseif strcmp(daystr{:},'20160513')
-    %flagaod = load('20160511_starflag_man_created20160513_0415by_MS.mat');
-    %flago3  = load('20160511_starflag_O3_man_created20160513_0544by_MS.mat');          
-end
 
+% read starinfo files
+
+    disp(['on day:' daystr])
+    %cd starinfo_path
+    %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
+    infofile_ = ['starinfo_' daystr '.m'];
+    infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+    s.dummy = '';
+    try
+        s = infofnt(s);
+    catch
+        eval([infofile_(1:end-2),'(s)']);
+    end
+
+
+    % Load the flag file
+    if isfield(s, 'flagfilename');
+        disp(['Loading flag file: ' s.flagfilenameO3])
+        flagO3 = load(s.flagfilenameO3); 
+        disp(['Loading flag file: ' s.flagfilenameCWV])
+        flagCWV = load(s.flagfilenameCWV); 
+    end   
+
+    % read O3 flag file 
+    if isfield(flagO3,'manual_flags');
+        qual_flag = flagO3.manual_flags.screen;
+    else
+        qual_flag = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
+        qual_flag = bitor(qual_flag,flagO3.cirrus);
+        qual_flag = bitor(qual_flag,flagO3.frost);
+        qual_flag = bitor(qual_flag,flagO3.low_cloud);
+        qual_flag = bitor(qual_flag,flagO3.unspecified_clouds);
+    end
 
 % read auxiliary data from starinfo and select rows
 evalstarinfo(daystr, 'flight');
