@@ -46,14 +46,14 @@ starinfo_path = 'E:\KORUS-AQ\starinfo\';
 starsun_path = 'E:\KORUS-AQ\starsun\';
 gasfile_path = 'E:\KORUS-AQ\gas_summary\';
 prefix='korusaq-4STAR-GASES'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='B'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
 
 
 %% Prepare General header for each file
 HeaderInfo = {...
-    'Jens Redemann';...                           % PI name
+    'Jens Redemann';...                          % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
     'KORUS-AQ';...                                  % Mission name
@@ -81,6 +81,7 @@ NormalComments = {...
     };
 
 revComments = {...
+    'RB: Updates to gas flags. NO2 does not have a valid calibration yet. Includes previous RA comments.\n';...
     'RA: First in-field data archival. Calibration coefficients are not final. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
 
@@ -122,7 +123,7 @@ form.std_CWV   = '%2.3f';
 
 
 %% prepare list of details for each flight
-dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511'} ; %put one day string
+dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          0          0          0          0      0    0] ; %set=1 to process
 
