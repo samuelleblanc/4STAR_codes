@@ -300,5 +300,5 @@ for i=idx_file_proc
     
     %% Now print the data to ICT file
     disp('Printing to file')
-    ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir)
+    ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir,missing_data_val='-99999')
 end;
