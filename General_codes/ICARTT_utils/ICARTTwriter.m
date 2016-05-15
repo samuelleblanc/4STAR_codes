@@ -39,6 +39,7 @@
 %                   those in the data structure. Default value is '%6.3f'. For more info, see help for fprintf.
 %  rev:            revision letter (for preliminary data) or number (for final data). MUST BE A STRING!
 %  ICTdir:         full path for save directory.
+%  missing_data_val: (defaults to -9999) the value to be put in the file if there is a missing data
 %
 % OUTPUT:
 %  ict file
@@ -74,12 +75,13 @@
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, March 18th, 2015
 %                 based on ICARTTwriter_example.m written by 20130606 GMW; gwolfe@umbc.edu
-% Modified:
+% Modified (v1.1): Samuel LeBlanc, Osan AB, Korea, May 15th, 2016
+%                  - added the missing_data_val keyword
 %
 % -------------------------------------------------------------------------
 
-function ICARTTwriter(dataID, locID, HeaderInfo, specComments, NormalComments, revComments, startDay,Start_UTC,data,info,form,rev,ICTdir)
-version_set('v1.0')
+function ICARTTwriter(dataID, locID, HeaderInfo, specComments, NormalComments, revComments, startDay,Start_UTC,data,info,form,rev,ICTdir,missing_data_val)
+version_set('v1.1')
 %----------------------------------------------------------
 %  BEGIN INPUT OF MEASUREMENT-SPECIFIC INFO
 %----------------------------------------------------------
@@ -194,10 +196,15 @@ if ~isdir(ICTdir)
     end
 end
 
+%check the missing_data_val
+if ~exsit('missing_data_val','var')
+  missing_data_val = -9999;
+end
+
 %%%%% DATA HANDLING %%%%%
 data = struct2cell(data);
 data = cell2mat(data'); %single matrix, with one column for each variable
-data(isnan(data)) = -9999; %replace missing data
+data(isnan(data)) = missing_data_val; %replace missing data
 
 %%%%% NUMBERS AND FORMATTING BS %%%%%
 numhead  = length(HeaderInfo);                  %number of beginning header lines
@@ -206,7 +213,7 @@ numspec  = length(specComments);                %number of special comments
 numnorm  = length(NormalComments) + numrev;     %number of normal comments
 numlines = numhead + numvar + numspec + numnorm + 9 ;%number of lines in header, with extra lines indicating number of lines
 
-missStr = repmat('-9999, ',1,numvar);         %missing data flag
+missStr = repmat([num2str(missing_data_val) ', '],1,numvar);         %missing data flag
 missStr = [missStr(1:end-2) '\n'];
 
 scaleStr = repmat('1, ',1,numvar);            %scaling factor
