@@ -64,5 +64,6 @@ if exist('program_version','var');
    s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
 disp(['Saving: ',savematfile])
-save(savematfile, '-struct', 's', '-mat'); 
+save(savematfile, '-struct', 's', '-mat');
+make_small(savematfile);
 contents=[contents; fieldnames(s)];
