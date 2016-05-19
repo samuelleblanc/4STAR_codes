@@ -8,6 +8,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % assumed. New calibration files should be linked to this code, and all
 % other 4STAR codes should obtain the c0 from this code. 
 % MS, v1.0, 2016-05-05, KORUS-AQ
+% Modified, MS, 2016-05-18, adding HCOH ref spec
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -46,6 +47,17 @@ end;
                     tmp = load([starpaths,'20160113NO2refspec.mat']);
                     c0gases = tmp.no2refspec;
                 end
+                
+            elseif strcmp(gas,'HCOH')
+                if mode==0
+                    % use lamp FEL?
+                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load([starpaths,'20160113HCOHrefspec.mat']);
+                    c0gases = tmp.hcohrefspec;
+                end    
                 
             end
         end; 

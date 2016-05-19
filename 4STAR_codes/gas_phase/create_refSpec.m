@@ -37,6 +37,8 @@
 %
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer (MSR), Osan, Korea, 05-05-2016
+% Modified:
+% MS, 2016-05-18, Flying over Korea
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -77,6 +79,18 @@ elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     
+elseif strcmp(gas,'HCOH')
+    
+    wind   = [0.335 0.359]; %1ppb background level in clean atmosphere
+    
+    % find good index around solar noon to create averga espectrum
+    ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
+    ref_spec.mean_m = nanmean(s.m_NO2(ind));
+    % from OMI station overpass at MLO [molec/cm2]
+    ref_spec.no2scdref = 0;%2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
+    %ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
+    save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
+    
 end
 
 % compute and plot reference spectrum
@@ -94,7 +108,7 @@ end
     plot(s.w(wln),meanspec+3*stdspec,':k','linewidth',1);hold on;
     plot(s.w(wln),meanspec-3*stdspec,':k','linewidth',1);hold on;
     legend('mean ref spectrum','ref spec +- stdx3');
-    ylabel('count rate (slant total)');title(daystr);
+    ylabel('count rate (slant total)');title(strcat(gas, 'reference spectrum from ',daystr));
     subplot(212);
     plot(s.w(wln),stdspec,'-k','linewidth',2);
     legend('ref spec std');
@@ -125,6 +139,13 @@ elseif strcmp(gas,'NO2')
     [no2_1] = retrieveNO2(dat1,wind(1),wind(2),1);
     [no2_2] = retrieveNO2(dat2,wind(1),wind(2),1);
     [no2_3] = retrieveNO2(dat3,wind(1),wind(2),1);
+elseif strcmp(gas,'HCOH')
+    ref_spec.no2refspec = meanspec;
+    save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    % retrieve NO2
+    [hcoh_1] = retrieveHCOH(dat1,wind(1),wind(2),1);
+    [hcoh_2] = retrieveHCOH(dat2,wind(1),wind(2),1);
+    [hcoh_3] = retrieveHCOH(dat3,wind(1),wind(2),1);    
 end
 
 %% plot retrieved values versus airmass

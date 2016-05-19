@@ -14,9 +14,9 @@ end
 s.ground=[datenum(2016,5,14,2,12,11) datenum(2016,5,14,6,39,29)];  
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-%s.flagfilename = '20160513_starflag_man_created20160513_2304by_MS.mat'; 
-%s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
-%s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';
+s.flagfilename = '20160514_starflag_man_created20160517_1910by_MS.mat'; 
+s.flagfilenameO3 = '20160514_starflag_O3_man_created20160517_2036by_MS..mat';
+s.flagfilenameCWV = '20160514_starflag_CWV_man_created20160517_2032by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % guess 
