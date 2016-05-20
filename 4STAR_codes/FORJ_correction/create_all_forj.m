@@ -1,3 +1,11 @@
+% function to create FORJ test plots analysis and adds
+% the FORJ corrected data to the forj_all.mat under 
+% data_folder
+%-----------------------------------------------------
+% MS, 2016-05-19, modified to add to forj_all.mat under data_folder and not
+% under individual folders
+%--------------------------------------------------------------------------
+
 function create_all_forj
 
 vis = getfullname('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
@@ -8,14 +16,14 @@ if ~exist(matdir,'dir')
     mkdir(matdir);
 end
 % check if forj_all exist in forj dir
-if exist([matdir,filesep,'forj_all.mat'],'file')
-    forj_out = load([matdir,filesep,'forj_all.mat']);
-end
+% if exist([matdir,filesep,'forj_all.mat'],'file')
+%     forj_out = load([matdir,filesep,'forj_all.mat']);
+% end
 
 % check if forj_all exist in starpaths
-% if exist([starpaths,'forj_all.mat'],'file')
-%     forj_out = load([starpaths,'forj_all.mat']);
-% end
+if exist([starpaths,'forj_all.mat'],'file')
+    forj_out = load([starpaths,'forj_all.mat']);
+end
 files = dir([pname_, filesep,'*_VIS_FORJ*.dat']);
 in = 0;
 for f = 1:length(files)
@@ -38,8 +46,8 @@ for f = 1:length(files)
             end            
             forj_out.meas(end+1) = forj_out_.meas;
             forj_out.meas = forj_out.meas(ij);
-            %save([starpaths,'forj_all.mat'],'-struct','forj_out');
-            save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
+            save([starpaths,'forj_all.mat'],'-struct','forj_out');
+            %save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
         end
         else
             disp('forj_out_ was empty')

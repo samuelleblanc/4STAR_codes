@@ -13,7 +13,7 @@
 %
 % INPUT:
 %  - daystr: string date 'yyyymmdd'
-%  - gas is gas str; 'O3' or 'NO2'
+%  - gas is gas str; 'O3' , 'NO2', or 'HCOH'
 % 
 % 
 % OUTPUT:
