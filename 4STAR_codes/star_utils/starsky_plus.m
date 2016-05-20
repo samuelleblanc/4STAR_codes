@@ -16,6 +16,7 @@ end
 if ~exist('sfile','var')
     sfile = s.filename{1};
 end
+! This is the wrong location to save mat files.
 [pname_mat,~,~] = fileparts(sfile);
 if ~exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');

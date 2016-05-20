@@ -4,7 +4,7 @@ function emis = tungsten_spectral_emissivity_vs_lambda_at_T(W,T,nm)
 %%
 if T>=min(W.T1_K) || T<=max(W.T1_K)
     for wl = length(W.um):-1:1        
-        em(wl) = interp1(W.T1_K,W.emis_v_T1(wl,:),T,'cubic');      
+        em(wl) = interp1(W.T1_K,W.emis_v_T1(wl,:),T,'pchip');      
     end
 else
     for wl = length(W.um):-1:1
@@ -13,7 +13,7 @@ else
     end
 end
 if exist('nm','var')
-emis = interp1(W.um, em, nm./1000,'cubic');
+emis = interp1(W.um, em, nm./1000,'pchip');
 wl_ = (nm./1000)<min(W.um)|(nm./1000)>max(W.um);
 if any(wl_)
 [P,S] = polyfit(W.um,em',2);
