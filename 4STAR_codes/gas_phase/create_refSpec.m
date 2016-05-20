@@ -87,7 +87,7 @@ elseif strcmp(gas,'HCOH')
     ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
     ref_spec.mean_m = nanmean(s.m_NO2(ind));
     % from OMI station overpass at MLO [molec/cm2]
-    ref_spec.no2scdref = 0;%2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
+    ref_spec.hcohscdref = 0;%2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
     %ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
     
@@ -142,7 +142,7 @@ elseif strcmp(gas,'NO2')
 elseif strcmp(gas,'HCOH')
     ref_spec.no2refspec = meanspec;
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
-    % retrieve NO2
+    % retrieve HCOH
     [hcoh_1] = retrieveHCOH(dat1,wind(1),wind(2),1);
     [hcoh_2] = retrieveHCOH(dat2,wind(1),wind(2),1);
     [hcoh_3] = retrieveHCOH(dat3,wind(1),wind(2),1);    
@@ -164,6 +164,14 @@ elseif strcmp(gas,'NO2')
     plot(dat2.m_NO2,no2_2.no2SCD,'.c');hold on;
     plot(dat3.m_NO2,no2_3.no2SCD,'.g');hold on;
     xlabel('airmass');ylabel('NO2 relative SCD');
+    
+elseif strcmp(gas,'HCOH')
+    
+    figure(33);
+    plot(dat1.m_NO2,hcoh_1.no2SCD,'.b');hold on;
+    plot(dat2.m_NO2,hcoh_2.no2SCD,'.c');hold on;
+    plot(dat3.m_NO2,hcoh_3.no2SCD,'.g');hold on;
+    xlabel('airmass');ylabel('HCOH relative SCD');    
 end
 
 %% deduce reference spectrum gas amount to be added (compare to OMI)
@@ -226,6 +234,34 @@ elseif strcmp(gas,'NO2')
         % plot on data
         figure(22);
         plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),'-k','linewidth',2);
+elseif strcmp(gas,'HCOH')
+        % bin airmass 1-5 into 100 bins
+        x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+             dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+             dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        y = [no2_1.no2SCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+             no2_2.no2SCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+             no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        binEdge = linspace(min(x),max(x),100);
+        [n,bin] = histc(x,binEdge);
+
+        % find lower 2% in each bin
+        for i=1:length(n)-1
+            pnts = y(x<=binEdge(i+1)&x>=binEdge(i));
+            p2(i) = quantile(pnts,0.02);
+        end
+        figure(33)
+        hold on;
+        plot(binEdge(1:end-1),p2,'.r');
+        axis([0 6.5 -2 2]);
+
+        % fit line
+        in = ~isnan(p2);
+        [Sf,fit] = polyfit(binEdge(in==1),p2(in==1),1);
+
+        % plot on data
+        figure(33);
+        plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),'-k','linewidth',2);        
 end
 
 %% save parameters to struct .mat file
@@ -235,4 +271,7 @@ if strcmp(gas,'O3')
 elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+elseif strcmp(gas,'HCOH')
+    ref_spec.hcohscdref = abs(Sf(2));% MLO supposed to be 0 or not? check.
+    save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
 end
