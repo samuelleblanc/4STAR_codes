@@ -112,7 +112,7 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
    elseif mode==1
        % load reference spectrum
        ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
-       hcohSCD = real((((Loschmidt*ccoef_d(1,:))))') + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
+       hcohSCD = real((((Loschmidt*ccoef_d(1,:))))');% + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohSCDsmooth, sn] = boxxfilt(tplot, hcohSCD, xts);
        hcohvcd_smooth = real(hcohSCDsmooth)./s.m_NO2;
