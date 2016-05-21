@@ -33,6 +33,7 @@
 % Apr-2016, Auckland, NZ
 % May-5-2016, KORUS-AQ,Osan,Korea, added functionality
 % MS, 2016-05-10, saving std field for cwv
+% MS, 2016-05-20, adding retrieveHCOH routine
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -66,7 +67,7 @@ function [gas] = retrieveGases(s)
 %  TBD
 
 %% retrieve HCOH
-%  TBD
+ [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1);
              
 %% save gas data to .mat file
 
@@ -77,6 +78,8 @@ function [gas] = retrieveGases(s)
    %d.no2resiDU       = gas.no2.no2resiDU;
    d.o3DU             = gas.o3.o3DU;
    d.o3resiDU         = gas.o3.o3resiDU;
+   d.hcoh_DU          = gas.hcoh.hcohvcd_smooth;
+   d.hcohresi         = gas.hcoh.RMSres;
    d.cwv              = s.cwv.cwv940m1;
    d.cwv_std          = s.cwv.cwv940m1std;
    d.lat              = s.Lat;

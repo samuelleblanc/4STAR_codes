@@ -11,10 +11,10 @@ else
     s.toggle = update_toggle;
 end
 
-s.flight=[datenum(2016,5,16,22,55,49) datenum(2016,5,17,7,06,50)];  
-s.flagfilename = '20160516_starflag_man_created20160518_1130by_SL.mat'; 
-s.flagfilenameO3 = '20160516_starflag_O3_man_created20160520_2320by_MS.mat';
-s.flagfilenameCWV = '20160516_starflag_CWV_man_created20160520_2303by_MS.mat';
+s.flight=[datenum(2016,5,19,23,05,13) datenum(2016,5,20,7,11,48)];  
+%s.flagfilename = '20160513_starflag_man_created20160513_2304by_MS.mat'; 
+%s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
+%s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % guess 

@@ -140,7 +140,7 @@ elseif strcmp(gas,'NO2')
     [no2_2] = retrieveNO2(dat2,wind(1),wind(2),1);
     [no2_3] = retrieveNO2(dat3,wind(1),wind(2),1);
 elseif strcmp(gas,'HCOH')
-    ref_spec.no2refspec = meanspec;
+    ref_spec.hcohrefspec = meanspec;
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
     % retrieve HCOH
     [hcoh_1] = retrieveHCOH(dat1,wind(1),wind(2),1);
@@ -168,9 +168,9 @@ elseif strcmp(gas,'NO2')
 elseif strcmp(gas,'HCOH')
     
     figure(33);
-    plot(dat1.m_NO2,hcoh_1.no2SCD,'.b');hold on;
-    plot(dat2.m_NO2,hcoh_2.no2SCD,'.c');hold on;
-    plot(dat3.m_NO2,hcoh_3.no2SCD,'.g');hold on;
+    plot(dat1.m_NO2,hcoh_1.hcohSCD,'.b');hold on;
+    plot(dat2.m_NO2,hcoh_2.hcohSCD,'.c');hold on;
+    plot(dat3.m_NO2,hcoh_3.hcohSCD,'.g');hold on;
     xlabel('airmass');ylabel('HCOH relative SCD');    
 end
 
@@ -239,9 +239,9 @@ elseif strcmp(gas,'HCOH')
         x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
              dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
              dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
-        y = [no2_1.no2SCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
-             no2_2.no2SCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
-             no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        y = [hcoh_1.hcohSCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+             hcoh_2.hcohSCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+             hcoh_3.hcohSCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
         binEdge = linspace(min(x),max(x),100);
         [n,bin] = histc(x,binEdge);
 
@@ -253,7 +253,7 @@ elseif strcmp(gas,'HCOH')
         figure(33)
         hold on;
         plot(binEdge(1:end-1),p2,'.r');
-        axis([0 6.5 -2 2]);
+        axis([0 8 -200 200]);
 
         % fit line
         in = ~isnan(p2);
@@ -272,6 +272,6 @@ elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'HCOH')
-    ref_spec.hcohscdref = abs(Sf(2));% MLO supposed to be 0 or not? check.
+    ref_spec.hcohscdref = abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline?
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
 end
