@@ -13,8 +13,8 @@ end
 
 s.flight=[datenum(2016,5,16,23,06,07) datenum(2016,5,17,7,22,08)];  
 %s.flagfilename = '20160513_starflag_man_created20160513_2304by_MS.mat'; 
-%s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
-%s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';
+s.flagfilenameO3 = '20160517_starflag_O3_man_created20160520_2342by_MS.mat';
+s.flagfilenameCWV = '20160517_starflag_CWV_man_created20160520_2329by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % guess 
@@ -70,13 +70,13 @@ toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = false;
+toggle_out.gassubtract = true;
 toggle_out.booleanflagging = false;
 toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = false;
+toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
 

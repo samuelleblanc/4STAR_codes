@@ -10,12 +10,13 @@
 % 
 %
 % CALLING SEQUENCE:
-%  function [hcoh] = retrieveHCOH(s,wstart,wend)
+%  function [hcoh] = retrieveHCOH(s,wstart,wend,1)
 %
 % INPUT:
 %  - s: starsun struct from starwarapper
 %  - wstart  : wavelength range start in micron
 %  - wend    : wavelength range start in micron
+%  - mode    : 1 - use refSpec, 0 - use other c0 (e.g. lamp/langley)
 % 
 % 
 % OUTPUT:
@@ -33,7 +34,7 @@
 %  - *.xs under data_folder
 %
 % EXAMPLE:
-%  - [hcoh] = retrieveHCOH(s,0.335,0.359);
+%  - [hcoh] = retrieveHCOH(s,0.335,0.359,1);
 %
 %
 % MODIFICATION HISTORY:
@@ -76,6 +77,7 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
     % this is end member array (original cross sections)
     
     basis = [hcohcoef(wln), no2_298Kcoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1)];
+    % basis = [hcohcoef(wln), no2_298Kcoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1)];
 
     % solve
     % x = real(Abasis\spectrum_sub');
@@ -105,14 +107,14 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
    if mode==0
         % covert from atm x cm to molec/cm^2
        hcoh_amount =  ccoef_d(1,:);
-       hcohVCD = real((((Loschmidt*hcoh_amount))./(s.m_NO2)')');
+       hcohVCD = real((((1000*hcoh_amount))./(s.m_NO2)')');% conversion from atm x cm to DU
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohVCDsmooth, sn] = boxxfilt(tplot, hcohVCD, xts);
        hcohvcd_smooth = real(hcohVCDsmooth);
    elseif mode==1
        % load reference spectrum
        ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
-       hcohSCD = real((((Loschmidt*ccoef_d(1,:))))');% + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
+       hcohSCD = real((((1000*ccoef_d(1,:))))');% + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohSCDsmooth, sn] = boxxfilt(tplot, hcohSCD, xts);
        hcohvcd_smooth = real(hcohSCDsmooth)./s.m_NO2;
@@ -136,7 +138,7 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
 %    
 
    if plotting
-   % plot fitted and "measured" no2 spectrum
+   % plot fitted and "measured" hcoh spectrum
          for i=1:100:length(s.t)
              figure(8882);
              %plot(s.w((wln)),spectrum_sub(i,:),'--k','linewidth',2);hold on;
@@ -145,10 +147,10 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
              plot(s.w((wln)),hcohspectrum(i,:),'-k','linewidth',2);hold on;
              plot(s.w((wln)),hcohfit(i,:),'--r','linewidth',2);hold on;
              plot(s.w((wln)),hcohresidual(i,:),':k','linewidth',2);hold off;
-             xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' hcohVCD= ',num2str(hcohvcd_smooth(i)/(Loschmidt/1000)),' RMSE = ',num2str(RMSres(i))),...
+             xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' hcohVCD= ',num2str(hcohvcd_smooth(i)),' RMSE = ',num2str(RMSres(i))),...
                     'fontsize',14,'fontweight','bold');
              ylabel('OD','fontsize',14,'fontweight','bold');
-             legend('measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             legend('measured HCOH spectrum','fitted HCOH spectrum','residual');
              %legend('total spectrum baseline and rayliegh subtracted','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
              set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
              pause(0.001);
@@ -159,7 +161,7 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
    if plotting
        figure;subplot(211);%plot(tplot,no2VCD,'.r');hold on;
               plot(tplot,hcohvcd_smooth,'.g');hold on;
-              axis([tplot(1) tplot(end) 0 5e15]);
+              axis([tplot(1) tplot(end) 0 10]);
               xlabel('time');ylabel('no2 [molec/cm^{2}]');title(datestr(s.t(1),'yyyymmdd'));
               %legend('linear inversion','linear inversion smooth');
               legend('linear inversion smooth');
@@ -169,10 +171,10 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
    end
 
    % no2OD is the spectrum portion to subtract
-    hcoh.no2_molec_cm2    = hcohvcd_smooth;
-    hcoh.no2resi          = RMSres;
-    hcoh.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
-    hcoh.no2SCD           = no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
+    hcoh.hcoh_DU          = hcohvcd_smooth;
+    hcoh.hcohresi         = RMSres;
+    hcoh.hcohOD           = (real((((ccoef_d(1,:))))')*hcohcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+    hcoh.hcohSCD           = hcohSCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
 
 
 
