@@ -44,7 +44,8 @@ daystr = datestr(s.t(1),'yyyymmdd');
 
 % load gas file
 try
-    gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
+    %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
+    gas = getfullname('*_gas_summary.mat','gas_summary','Select gas_summary file to flag.');
 catch
     if strcmp(daystr,'20160426')
         %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_1.mat']);
