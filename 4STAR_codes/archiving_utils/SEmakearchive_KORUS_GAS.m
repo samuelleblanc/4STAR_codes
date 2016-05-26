@@ -36,6 +36,7 @@
 % MS, 2016-05-10, adjusted routine to archive gases
 % MS, 2016-05-12, adding CWV flags
 % MS, 2016-05-14, fixing bugs in gas flags
+% MS, 2016-05-26, setting NO2 to -99999 until new calibration is applied
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_GAS
@@ -46,7 +47,7 @@ starinfo_path = 'E:\KORUS-AQ\starinfo\';
 starsun_path = 'E:\KORUS-AQ\starsun\';
 gasfile_path = 'E:\KORUS-AQ\gas_summary\';
 prefix='korusaq-4STAR-GASES'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='B'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='C'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
 
@@ -81,6 +82,7 @@ NormalComments = {...
     };
 
 revComments = {...
+    'RC: NO2 does not have a valid calibration yet, hence set to fill value. Includes previous RA and RB comments.\n';...    
     'RB: Updates to gas flags. NO2 does not have a valid calibration yet. Includes previous RA comments.\n';...
     'RA: First in-field data archival. Calibration coefficients are not final. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
@@ -123,9 +125,9 @@ form.std_CWV   = '%2.3f';
 
 
 %% prepare list of details for each flight
-dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512'} ; %put one day string
+dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          1          0           0] ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -280,8 +282,8 @@ for i=idx_file_proc
 %     else
         disp('Applying Loschmidt to convert NO2 from molecules to DU')
         Loschmidt           = 2.686763e19; %molecules/cm2
-        data.VCD_NO2(iddg)  = no2_molec_cm2(iig(iddg))/(Loschmidt/1000);
-        data.resid_NO2(iddg)= no2err_molec_cm2(iig(iddg))/(Loschmidt/1000);
+        data.VCD_NO2(iddg)  = Start_UTCs(iddg)*0+(-99999);% until new calibration is applied; no2_molec_cm2(iig(iddg))/(Loschmidt/1000);
+        data.resid_NO2(iddg)= Start_UTCs(iddg)*0+(-99999);% until new calibration is applied; no2err_molec_cm2(iig(iddg))/(Loschmidt/1000);
 %     end
     
     
