@@ -369,12 +369,18 @@ end
    
      s.Alt(s.Alt<0)=0;
      
-     
+%      Tslant
      % subtract cwv from tau_aero using m1
      afit_H2Os1 = afit_H2O(:,kz); afit_H2Os1(isNaN(afit_H2Os1)) = 0; afit_H2Os1(afit_H2Os1<0) = 0; afit_H2Os1(isinf(afit_H2Os1)) = 0;
      bfit_H2Os1 = bfit_H2O(:,kz); bfit_H2Os1(isNaN(bfit_H2Os1)) = 0; bfit_H2Os1(bfit_H2Os1<0) = 0; bfit_H2Os1(isinf(bfit_H2Os1)) = 0;
-     cwv2sub   = -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1));
-     s.tau_aero_cwvsub(i,:) = s.tau_aero(i,:)-cwv2sub';
+     afit_H2Os1  = real(afit_H2Os1)'; bfit_H2Os1 = real(bfit_H2Os1)';
+     
+
+     cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
+     s.tau_aero_cwvsub = s.tau_aero-cwv2sub;
+     
+%      cwv2sub   =
+%      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original
      
      
  end
@@ -632,7 +638,8 @@ for i = 1:length(s.t)
         afit_H2Os = afit_H2O(:,kz); afit_H2Os(isNaN(afit_H2Os)) = 0; afit_H2Os(afit_H2Os<0) = 0; afit_H2Os(isinf(afit_H2Os)) = 0;
         bfit_H2Os = bfit_H2O(:,kz); bfit_H2Os(isNaN(bfit_H2Os)) = 0; bfit_H2Os(bfit_H2Os<0) = 0; bfit_H2Os(isinf(bfit_H2Os)) = 0;
     end
-    afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
+    afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;Tslant;
+    afit_H2Os = afit_H2Os'; bfit_H2Os = bfit_H2Os';
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
     cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount';% this is a structure with o2-o2 NIR subtracted

@@ -104,70 +104,6 @@ if isfield(s, 'toggle')
 else
     s.toggle = toggle;
 end
-%% check if the toggles are set in the call to starwrapper
-
-%     
-% if (~isempty(varargin))
-%     if nargin==3;
-%         nnarg=1;
-%         if isa(varargin{1},'struct'); % check if its a toggle structure
-%             toggle = catstruct(toggle,varargin{1}); %concatenate the toggles, but with preference over the input toggle
-%         end;
-%     else;
-%         nnarg=2;
-%         if mod(nargin,2); % varargin not paired
-%             varargin={s2,varargin{:}};
-%         end;
-%         for c=1:2:length(varargin)-1
-%             switch varargin{c}
-%                 case {'verbose'}
-%                     c=c+1;
-%                     toggle.verbose=varargin{c};
-%                     disp(['verbose set to ' num2str(toggle.verbose)])
-%                 case {'saveadditionalvariables'}
-%                     c=c+1;
-%                     toggle.saveadditionalvariables=varargin{c};
-%                     disp(['saveadditionalvariables set to ' num2str(toggle.saveadditionalvariables)])
-%                 case {'savefigure'}
-%                     c=c+1;
-%                     toggle.savefigure=varargin{c};
-%                     disp(['savefigure set to ' num2str(toggle.savefigure)])
-%                 case {'computeerror'}
-%                     c=c+1;
-%                     toggle.computeerror=varargin{c};
-%                     disp(['computeerror set to ' num2str(toggle.computeerror)])
-%                 case {'inspectresults'}
-%                     c=c+1;
-%                     toggle.inspectresults=varargin{c};
-%                     disp(['inspectresults set to ' num2str(toggle.inspectresults)])
-%                 case {'applynonlinearcorr'}
-%                     c=c+1;
-%                     toggle.applynonlinearcorr=varargin{c};
-%                     disp(['applynonlinearcorr set to ' num2str(toggle.applynonlinearcorr)])
-%                 case {'applytempcorr'}
-%                     c=c+1;
-%                     toggle.applytempcorr=varargin{c};
-%                     disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
-%                 case {'applyforjcorr'}
-%                     c=c+1;
-%                     toggle.applytempcorr=varargin{c};
-%                     disp(['applyforjcorr set to ' num2str(toggle.applyforjcorr)])
-%                 otherwise
-%                     error(['Invalid optional argument, ', ...
-%                         varargin{c}]);
-%                     nnarg=0;
-%             end % switch
-%         end % for
-%     end; % nargin==1
-% else
-%     nnarg = 0;
-%     if nargin==2;
-%         if ~isfield(s2,'t');
-%             nnarg=1;
-%             toggle = catstruct(toggle,s2)
-%         end;
-%     end;
-% end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 
@@ -205,7 +141,7 @@ s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
-infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
+infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
@@ -395,99 +331,6 @@ end
 s = matfile(matfilename,'Writable',true);
 pp=numel(s.t);
 qq=size(s.raw,2);
-% if nargin>=2+nnarg
-%     % check whether the two structures share almost identical time arrays
-%     if pp~=length(s2.t);
-%         bad_t=find(diff(s.t)<=0);
-%         bad_t2=find(diff(s2.t)<=0);
-%         if length(bad_t2) > 0
-%             disp('bad_t2 larger than 0');
-%         end
-%         [ainb, bina] = nearest(s.t, s2.t);
-%         st_len = length(s.t);
-%         st2_len = length(s2.t);
-%         fld = fieldnames(s);
-%         for fd = 1:length(fld)
-%             [rr,col] = size(s.(fld{fd}));
-%             if rr == st_len && col==1
-%                 s.(fld{fd}) = s.(fld{fd})(ainb);
-%                 s2.(fld{fd}) = s2.(fld{fd})(bina);
-%             elseif rr==st_len && col == length(s.w)
-%                 s.(fld{fd}) = s.(fld{fd})(ainb,:);
-%                 s2.(fld{fd}) = s2.(fld{fd})(bina,:);
-%             end
-%         end
-%         
-%         %         error(['Different size of time arrays. starwrapper.m needs to be updated.']);
-%     end;
-%     pp=numel(s.t);
-%     qq=size(s.raw,2);
-%     ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
-%     if ngap==0;
-%     elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
-%         warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
-%     else; % many differences. stop.
-%         error([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
-%     end;
-%     % check whether the two structures come from separate spectrometers
-%     if isequal(lower(datatype(1:3)), lower(datatype2(1:3)))
-%         error('Two structures must be for separate spectrometers.');
-%     end;
-%     % discard the s2 variables for which s has duplicates
-%     if toggle.verbose, disp('discarding duplicate structures'), end;
-%     fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
-%         fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
-%     fnok=[]; % Yohei, 2012/11/27
-%     for ff=1:length(fn); % take the values from the s structure, and discard those in s2
-%         if isfield(s, fn{ff});
-%             fnok=[fnok; ff];
-%             if size(s.(fn{ff}),1)~=pp || size(s2.(fn{ff}),1)~=pp
-%                 error(['Check ' fn{ff} '.']);
-%             end;
-%         end;
-%     end;
-%     drawnow;
-%     s2=rmfield(s2, fn(fnok));
-%     clear fnok; % Yohei, 2012/11/27
-%     % combine some of the remaining s2 variables into corresponding s variables
-%     fnc={'raw' 'rawcorr' 'w' 'c0' 'c0err' 'fwhm' 'rate' 'dark' 'darkstd' 'sat_ij' 'skyresp', 'skyresperr'};
-%     qq2=size(s2.raw,2);
-%     s.([lower(datatype(1:3)) 'cols'])=1:qq;
-%     s.([lower(datatype2(1:3)) 'cols'])=(1:qq2)+qq;
-%     for ff=length(fnc):-1:1;
-%         if size(s.(fnc{ff}),2)~=qq || size(s2.(fnc{ff}),2)~=qq2
-%             error(['Check ' fnc{ff} '.']);
-%         else
-%             s.(fnc{ff})=[s.(fnc{ff}) s2.(fnc{ff})];
-%         end;
-%     end;
-%     s.aerosolcols=[s.aerosolcols(:)' s2.aerosolcols(:)'];
-%     %     s.aeronetcols = [s.aeronetcols(:)' s2.aeronetcols(:)'];
-%     note_x = {[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']};
-%     note_x(end+1,1) = {[upper(datatype2(1:3)) ' notes: ']};
-%     for L = 1:length(s.note)
-%         note_x(end+1,1) = {s.note{L}};
-%     end
-%     note_x(end+1,1) = {[upper(datatype(1:3)) ' notes: ']};
-%     for L = 1:length(s2.note)
-%         note_x(end+1,1) = {s2.note{L}};
-%     end
-%     s.note = note_x;
-%     %     s.note={[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']; [upper(datatype(1:3)) ' notes: ']; s.note{:} ;...
-%     %         [upper(datatype2(1:3)) ' notes: ']; s2.note{:}};
-%     s.filename=[s.filename; s2.filename];
-%     s2=rmfield(s2, [fnc(:); 'aerosolcols';'aeronetcols'; 'note'; 'filename']);
-%     % store the remaining s2 variables separately in s
-%     fn=fieldnames(s2);
-%     for ff=1:length(fn);
-%         s.([lower(datatype(1:3)) fn{ff}])=s.(fn{ff});
-%         s.([lower(datatype2(1:3)) fn{ff}])=s2.(fn{ff});
-%     end;
-%     s=rmfield(s, setdiff(fn,'t'));
-%     qq=qq+qq2;
-%     clear qq2 s2;
-%     [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
-% end
 
 %% get solar zenith angle, airmass, temperatures, etc.
 v=datevec(s.t);
@@ -764,11 +607,11 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
     % if toggle.gassubtract
-%         tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
-%         s.rateslant        = real(s.rate./repmat(s.f,1,qq));
-%         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
-%         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
-%         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+        tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+        s.rateslant        = real(s.rate./repmat(s.f,1,qq));
+        s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
+        s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
+        s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
     % end;
     
     % compare rate structures:
@@ -871,14 +714,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % water vapor retrieval (940fit+c0 method)
     %-----------------------------------------
     if toggle.runwatervapor;
-        if toggle.verbose; disp('water vapor retrieval start'), end;
+        tic; if toggle.verbose; disp('water vapor retrieval start'), end;
+        
         [cwv] = cwvcorecalc_(s,model_atmosphere);
+        if toggle.verbose; disp({['Water vapor retrieval duration:'],toc}); end;
         s.cwv = cwv;
         
         % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
-        s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
-        
-        if toggle.verbose; disp('water vapor retrieval end'), end;
+        s.tau_aero_subtract = real(cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same        
         % gases subtractions and o3/no2 conc [in DU] from fit
         %-----------------------------------------------------
         if toggle.gassubtract
@@ -888,12 +731,11 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
             
             % this is new routine
-            [s.gas] = retrieveGases(s);
-            
+            gas = retrieveGases_(s);
+            s.gas = gas;
             % subtract derived gasess
-            
-            s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-                                                         - s.tau_NO2 - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
+            s.tau_aero_subtract_all = s.tau_aero_subtract - gas.o3.o3OD - gas.o3.o4OD - gas.o3.h2oOD ...
+               -s.tau_NO2 - gas.co2.co2OD - gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
             
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
@@ -1004,7 +846,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
     
     % fit a polynomial curve to the non-strongly-absorbing wavelengths
-    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
+    w = s.w; tau_aero = s.tau_aero;
+    [a2,a1,a0,ang,curvature]=polyfitaod(w(s.aerosolcols),tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
     s.tau_aero_polynomial=[a2 a1 a0];
     
     % derive optical depths and gas mixing ratios
@@ -1240,4 +1083,103 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
 end % done with plotting sun results
 
 s.toggle = toggle;
+return
+
+function s = combine_star_s_s2(s,s2,toggle);
+pp=numel(s.t);
+qq=size(s.raw,2);
+    % check whether the two structures share almost identical time arrays
+    if pp~=length(s2.t);
+        bad_t=find(diff(s.t)<=0);
+        bad_t2=find(diff(s2.t)<=0);
+        if length(bad_t2) > 0
+            disp('bad_t2 larger than 0');
+        end
+        [ainb, bina] = nearest(s.t, s2.t);
+        st_len = length(s.t);
+        st2_len = length(s2.t);
+        fld = fieldnames(s);
+        for fd = 1:length(fld)
+            [rr,col] = size(s.(fld{fd}));
+            if rr == st_len && col==1
+                s.(fld{fd}) = s.(fld{fd})(ainb);
+                s2.(fld{fd}) = s2.(fld{fd})(bina);
+            elseif rr==st_len && col == length(s.w)
+                s.(fld{fd}) = s.(fld{fd})(ainb,:);
+                s2.(fld{fd}) = s2.(fld{fd})(bina,:);
+            end
+        end
+        
+        %         error(['Different size of time arrays. starwrapper.m needs to be updated.']);
+    end;
+    pp=numel(s.t);
+    qq=size(s.raw,2);
+    ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
+    if ngap==0;
+    elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
+        warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
+    else; % many differences. stop.
+        error([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
+    end;
+    % check whether the two structures come from separate spectrometers
+    if isequal(lower(s.datatype(1:3)), lower(s2.datatype(1:3)))
+        error('Two structures must be for separate spectrometers.');
+    end;
+    % discard the s2 variables for which s has duplicates
+    if toggle.verbose, disp('discarding duplicate structures'), end;
+    fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
+        fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
+    fnok=[]; % Yohei, 2012/11/27
+    for ff=1:length(fn); % take the values from the s structure, and discard those in s2
+        if isfield(s, fn{ff});
+            fnok=[fnok; ff];
+            if size(s.(fn{ff}),1)~=pp || size(s2.(fn{ff}),1)~=pp
+                error(['Check ' fn{ff} '.']);
+            end;
+        end;
+    end;
+    drawnow;
+    s2=rmfield(s2, fn(fnok));
+    clear fnok; % Yohei, 2012/11/27
+    % combine some of the remaining s2 variables into corresponding s variables
+    fnc={'raw' 'rawcorr' 'w' 'c0' 'c0err' 'fwhm' 'rate' 'dark' 'darkstd' 'sat_ij' 'skyresp', 'skyresperr'};
+    qq2=size(s2.raw,2);
+    s.([lower(s.datatype(1:3)) 'cols'])=1:qq;
+    s.([lower(s2.datatype(1:3)) 'cols'])=(1:qq2)+qq;
+    for ff=length(fnc):-1:1;
+        if size(s.(fnc{ff}),2)~=qq || size(s2.(fnc{ff}),2)~=qq2
+            error(['Check ' fnc{ff} '.']);
+        else
+            s.(fnc{ff})=[s.(fnc{ff}) s2.(fnc{ff})];
+        end;
+    end;
+    s.aerosolcols=[s.aerosolcols(:)' s2.aerosolcols(:)'];
+    %     s.aeronetcols = [s.aeronetcols(:)' s2.aeronetcols(:)'];
+    note_x = {[upper(s.datatype(1:3)) ' and ' upper(s2.datatype(1:3)) ' data were combined with starwrapper.m. ']};
+    note_x(end+1,1) = {[upper(s2.datatype(1:3)) ' notes: ']};
+    for L = 1:length(s.note)
+        note_x(end+1,1) = {s.note{L}};
+    end
+    note_x(end+1,1) = {[upper(s.datatype(1:3)) ' notes: ']};
+    for L = 1:length(s2.note)
+        note_x(end+1,1) = {s2.note{L}};
+    end
+    s.note = note_x;
+    %     s.note={[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']; [upper(datatype(1:3)) ' notes: ']; s.note{:} ;...
+    %         [upper(datatype2(1:3)) ' notes: ']; s2.note{:}};
+    s.filename=[s.filename; s2.filename];
+    s2=rmfield(s2, [fnc(:); 'aerosolcols';'aeronetcols'; 'note'; 'filename']);
+    % store the remaining s2 variables separately in s
+    fn=fieldnames(s2);
+    for ff=1:length(fn);
+        s.([lower(s.datatype(1:3)) fn{ff}])=s.(fn{ff});
+        s.([lower(s2.datatype(1:3)) fn{ff}])=s2.(fn{ff});
+    end;
+    s=rmfield(s, setdiff(fn,'t'));
+    qq=qq+qq2;
+    clear qq2 s2;
+    [daystr, filen, s.datatype]=starfilenames2daystr(s.filename, 1);
+% end
+
+
 return

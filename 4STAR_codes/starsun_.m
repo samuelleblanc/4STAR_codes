@@ -55,8 +55,11 @@ load(sourcefile,contents0{:},'program_version');
 
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
-s=starwrapper_(vis_sun, nir_sun, toggle,savematfile);
-
+t_wrap = tic
+s=starwrapper_(vis_sun, nir_sun, toggle,savematfile); toggle = s.toggle;
+if toggle.verbose
+    disp({['Time for starwrapper:'],toc(t_wrap)})
+end
 %********************
 % save
 %********************
@@ -64,6 +67,9 @@ if exist('program_version','var');
    s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
 disp(['Saving: ',savematfile])
-save(savematfile, '-struct', 's', '-mat');
+% save(savematfile, '-struct', 's', '-mat');
 make_small(savematfile);
 contents=[contents; fieldnames(s)];
+
+
+return
