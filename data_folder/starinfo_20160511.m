@@ -17,7 +17,7 @@ s.flight=[datenum(2016,5,11,23,03,06) datenum(2016,5,12,7,3,42)];
 s.flagfilename = '20160511_starflag_man_created20160513_0415by_MS.mat'; 
 s.flagfilenameO3 = '20160511_starflag_O3_man_created20160513_0544by_MS.mat';
 s.flagfilenameCWV = '20160511_starflag_CWV_man_created20160513_0550by_MS.mat';
-
+%s.flag = starflags_20160511_CWV_MS_marks_ALL_20160523_0126;% runs a function.
 % Ozone and other gases 
 s.O3h=21; % guess 
 s.O3col=0.300; % guess     
