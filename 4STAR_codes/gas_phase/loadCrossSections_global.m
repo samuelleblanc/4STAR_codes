@@ -9,7 +9,7 @@
      Loschmidt=2.686763e19;             % molec/cm3*atm
      
      invis = 'visLambda.txt';
-     innir = strrep(invis,'_vis','_nir');
+     innir = strrep(invis,'vis','nir');
      if exist(invis,'file')
          vis.nm  = importdata(invis);
          nir.nm  = importdata(innir);
@@ -99,14 +99,13 @@
      
      % no2-220K
      invis = 'no2_220K_vanDaele4star_vis.xs';
-     innir = strrep(invis,'_vis','_nir');
+
      if exist(invis,'file')
          no2vis  = importdata(invis);
-         no2nir  = importdata(innir);
      else
          no2vis  = importdata(fullfile(starpaths,invis));
-         no2nir  = importdata(fullfile(starpaths,innir));
      end
+ 
      no2_220.visnm     = no2vis.data(:,1);
      no2_220.visXs     = no2vis.data(:,2);
      no2_220.visInterp = interp1(no2_220.visnm, no2_220.visXs, vis.nm,'pchip','extrap');
@@ -160,6 +159,9 @@
          brovis  = importdata(invis);
      else
          brovis  = importdata(fullfile(starpaths,invis));
+     end
+     if isstruct(brovis)&&isfield(brovis,'data')
+         brovis = brovis.data;
      end
      bro.visnm     = brovis(:,1);
      bro.visXs     = brovis(:,2);
