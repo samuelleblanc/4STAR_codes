@@ -65,6 +65,7 @@ end
 switch time_choice
     case 1
         t = serial2hs(time);
+        t = time;
         t_str = 'time [HH:MM:SS]';
     case 2
         t = serial2hs(time);
@@ -72,6 +73,12 @@ switch time_choice
     otherwise
         t = serial2doys(time);
         t_str = 'time (day of year)';
+end
+
+if isfield(varin,'field_name')
+    field_name = varin.field_name; varin = rmfield(varin,'field_name');
+else
+    field_name = 'Optical Depth';
 end
 
 if isfield(varin,'flags')
@@ -324,7 +331,7 @@ grid on %added by jml
 ylabel('tau')
 xlabel(t_str)
 
-title(['Optical Depth: good(',num2str(sum(screen==0)),' screened(',num2str(sum(screen~=0)),'0']);
+title([field_name, ': good(',num2str(sum(screen==0)),' screened(',num2str(sum(screen~=0)),'0']);
 if exist('figs','var')&&isfield(figs,'tau_fig')
     set(tau_fig,'unit','normalized','position',figs.tau_fig.pos);
 else

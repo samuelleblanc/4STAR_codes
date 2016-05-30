@@ -72,7 +72,7 @@ if ~exist('verbose','var'); verbose=true; end;
 if verbose; disp('...in starc0mod'), end;
 
 % get the version of matlab
-vv = version('-release')
+vv = version('-release');
 newmatlab = false; 
 if str2num(vv(1:4)) >= 2015;
     newmatlab = true;
