@@ -51,18 +51,29 @@
 % MS: 2016-02-23: re-editing changes that were made after MLO and deleted
 % -------------------------------------------------------------------------
 %% function routine
-function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
-
+function [cwv] = cwvcorecalc(s,model_atmosphere)
+toggle = s.toggle;
+tic
+Alt = s.Alt;
+modc0 = s.c0mod;
+pp=numel(s.t); qq=size(s.raw,2);
+        tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+%         rateslant        = real(s.rate./repmat(s.f,1,qq));
+        ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
+        tau_tot_slant    = real(-log(ratetot./repmat(s.c0,pp,1)));
+%         tau_tot_vertical = real(-log(ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
 %----------------------------------------------------------------------
  showfigure = 0;
  Loschmidt=2.686763e19;                   % molec/cm3*atm
  cwvoptfit = true;
  
+ 
 %----------------------------------------------------------------------
 %% lamp calibration
 % lamp calibration spectra
-wvis = s.w(1:1044);
-wnir = s.w(1045:end);
+w = s.w;
+wvis = w(1:1044);
+wnir = w(1045:end);
 %
 % find wavelength range for 940 nm water vapor bands
  nm_0880 = interp1(wvis,[1:length(wvis)],0.8823, 'nearest');
@@ -74,18 +85,19 @@ wnir = s.w(1045:end);
  wln_vis1 = find(wvis<=wvis(nm_0990)&wvis>=wvis(nm_0880)); 
 
  % initialize subtracted OD spectra
- wvOD    = zeros(length(s.t),length(s.w));
- wvODfit = zeros(length(s.t),length(s.w));
+ wvOD    = zeros(length(s.t),length(w));
+ wvODfit = zeros(length(s.t),length(w));
  
  % calculate OD spectra:
  qqvis = length(wvis);
  qqnir = length(wnir);
  pp    = length(s.t);
- qq    = length(s.w);
- sundist   = repmat(s.f(1),length(s.t),length(s.w));
+ qq    = length(w);
+ f = s.f;
+ sundist   = repmat(f(1),length(s.t),length(w));
  calibc0   = repmat(s.c0,length(s.t),1);
  spc       = s.rate./calibc0./sundist;
- Tslant    = spc.*exp((s.tau_ray).*repmat(s.m_ray,1,length(s.w)));
+ Tslant    = spc.*exp((s.tau_ray).*repmat(s.m_ray,1,length(w)));
  tau_ODslant = -log(Tslant);
  %rateall    = real(starsun.rate./repmat(starsun.f,1,qq)./tr(starsun.m_ray, starsun.tau_ray)); % rate adjusted for the Rayleigh component
  %tau_OD     = real(-log(rateall./repmat(starsun.c0,pp,1)));%./repmat(starsun.m_aero,1,qq));   % total slant optical depth (Rayeigh subtracted)
@@ -128,9 +140,9 @@ spc_modc0       = s.rate./calibmodc0./sundist;
 %
 
 % slant transmittance corrected for Rayleigh
-modc0Tw=spc_modc0.*exp((s.tau_ray).*repmat(s.m_ray,1,length(s.w)));
+modc0Tw=spc_modc0.*exp((s.tau_ray).*repmat(s.m_ray,1,length(w)));
 % tau_OD modc0
-tau_ODmodc0 = -log(modc0Tw)./repmat(s.m_aero,1,length(s.w));
+tau_ODmodc0 = -log(modc0Tw)./repmat(s.m_aero,1,length(w));
 tau_ODmodc0slant = -log(modc0Tw);
 %
 
@@ -164,17 +176,16 @@ for wrange=[1];
 % calculate linear baseline for only the water vapor band region
 % calculate polynomial baseline
 order2=1;  % order of baseline polynomial fit
-poly3=zeros(length(s.w(wln)),length(s.t));  % calculated polynomial
+poly3=zeros(length(w(wln)),length(s.t));  % calculated polynomial
 poly3_c=zeros(length(s.t),(order2)+1);            % polynomial coefficients
 order_in2=1;
 thresh_in2=0.01;
-% deduce baseline
-for i=1:length(s.t)
+for i=length(s.t):-1:1
 % function (fn) can be: 'sh','ah','stq','atq'
 % for gui use (visualization) write:
 % [poly2_,poly2_c_,iter,order,thresh,fn]=backcor(wvis(wln_ind),starsun.tau_aero(goodTime(i),wln_ind));
 % spectrum calculated by modc0 calibration (vertical OD)
-        [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(s.w(wln),tau_ODmodc0slant(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
+        [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(w(wln),tau_ODmodc0slant(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
         poly3(:,i)=poly3_;        % calculated polynomials
         poly3_c(i,:)=poly3_c_';   % polynomial coefficients
 
@@ -193,6 +204,7 @@ end
  baseline = (tau_aero)';% this is slant
  spectrum = tau_ODmodc0slant(:,wln);
  spectrum_sub = spectrum-baseline;%
+ if toggle.verbose; disp({'baseline cwv subtraction:',toc});end
 %% end of baseline subtraction 
 
  
@@ -201,7 +213,7 @@ end
  %     (starsun.tau_ray(:,wln)).*repmat(starsun.m_ray,1,length(starsun.w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
  % tau_aero is slant path here
  Tw=spc_modc0(:,wln).*exp(tau_aero'+...
-    (s.tau_ray(:,wln)).*repmat(s.m_ray,1,length(s.w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
+    (s.tau_ray(:,wln)).*repmat(s.m_ray,1,length(w(wln))));    % disregarding O3 in those wavelengths (above 800 nm)
  
  %
  % upload a and b parameters (from LBLRTM - new spec FWHM)
@@ -215,8 +227,8 @@ end
  %
  % interpolate H2O parameters to whole wln grid
  % this is not used here; altitude interpolated is used
- H2Oa = interp1(xs.wavelen,xs.cs_sort(:,1),(s.w)*1000,'nearest','extrap');
- H2Ob = interp1(xs.wavelen,xs.cs_sort(:,2),(s.w)*1000,'nearest','extrap');
+ H2Oa = interp1(xs.wavelen,xs.cs_sort(:,1),(w)*1000,'nearest','extrap');
+ H2Ob = interp1(xs.wavelen,xs.cs_sort(:,2),(w)*1000,'nearest','extrap');
  % transform H2Oa nan to zero
  H2Oa(isnan(H2Oa)==1)=0;
  % transform H2Oa inf to zero
@@ -228,11 +240,15 @@ end
  %---------------------------------------
  % calculate water vapor
  %---------------------------------------
- 
+ if toggle.verbose; disp({'Hitran cross sections:',toc});end
+
+ m_H2O = s.m_H2O;
+ disp('CWV method 1')
  if model_atmosphere==1 %MLO
+     disp(['model atmosphere 1: MLO'])
       H2O_conv=1244.12; %converts cm-atm in pr cm or g/cm2.  the conversion factor has units of [cm^3/g]. 
       
-      U1=(1./repmat(s.m_H2O,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(s.t)))))'.*...
+      U1=(1./repmat(m_H2O,1,length(wln))).*(((1./(-repmat(H2Oa((wln))',1,length(s.t)))))'.*...
          (log(Tw))).^((1./(repmat(H2Ob((wln))',1,length(s.t))))'); 
       Ufinal  = U1/H2O_conv;
       avg_U1 = mean(Ufinal(:,ind),2);%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
@@ -242,6 +258,7 @@ end
       bfit_H2O = H2Ob';
       cfit_H2O=ones(length(xs.wavelen),1);
  elseif model_atmosphere==3 % TCAP winter/ARISE
+     disp(['model atmosphere 3: TCAP winter/ARISE'])
      % load altitude dependent coef.
      alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
      alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter1000m.mat'));
@@ -258,14 +275,13 @@ end
       afit_H2O=[alt0.cs_sort(:,1) alt1000.cs_sort(:,1) alt2000.cs_sort(:,1) alt3000.cs_sort(:,1) alt4000.cs_sort(:,1) alt5000.cs_sort(:,1) alt6000.cs_sort(:,1) alt7000.cs_sort(:,1) alt8000.cs_sort(:,1) alt9000.cs_sort(:,1)];
       bfit_H2O=[alt0.cs_sort(:,2) alt1000.cs_sort(:,2) alt2000.cs_sort(:,2) alt3000.cs_sort(:,2) alt4000.cs_sort(:,2) alt5000.cs_sort(:,2) alt6000.cs_sort(:,2) alt7000.cs_sort(:,2) alt8000.cs_sort(:,2) alt9000.cs_sort(:,2)];
       cfit_H2O=ones(length(xs.wavelen),length(zkm_LBLRTM_calcs));
-
-      for j=1:length(s.t)
-          kk=find(s.Alt(j)/1000>=zkm_LBLRTM_calcs);
-          if s.Alt(j)/1000<0 kk=1; end  %handles alts slightly less than zero
+      for j=length(s.t):-1:1
+          kk=find(Alt(j)/1000>=zkm_LBLRTM_calcs);
+          if Alt(j)/1000<0 kk=1; end  %handles alts slightly less than zero
           kz=kk(end);
-          CWV1=(-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))')./s.m_H2O(j);
-          CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./s.m_H2O(j);
-          CWVint_atmcm = CWV1 + (s.Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
+          CWV1=(-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))')./m_H2O(j);
+          CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./m_H2O(j);
+          CWVint_atmcm = CWV1 + (Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
           Ucalc(j,:)=CWVint_atmcm;      
       end
       %Uold=U;
@@ -288,6 +304,8 @@ end
     %  U1_lamp_conv=U1_lamp/H2O_conv;
     
  elseif model_atmosphere==2 % SEAC4RS/TCAP summer
+     disp(['model atmosphere 2: SEAC4RS / TCAP summer'])
+
      % load altitude dependent coef.
      alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));
      alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat'));
@@ -305,8 +323,6 @@ end
      alt13000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat'));
      alt14000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat'));
 
-
-
       zkm_LBLRTM_calcs=[0:14];
       afit_H2O=[alt0.cs_sort(:,1) alt1000.cs_sort(:,1) alt2000.cs_sort(:,1) alt3000.cs_sort(:,1) alt4000.cs_sort(:,1) alt5000.cs_sort(:,1) alt6000.cs_sort(:,1) alt7000.cs_sort(:,1) alt8000.cs_sort(:,1) alt9000.cs_sort(:,1)...
                 alt10000.cs_sort(:,1) alt11000.cs_sort(:,1) alt12000.cs_sort(:,1) alt13000.cs_sort(:,1) alt14000.cs_sort(:,1)];
@@ -321,17 +337,16 @@ end
       
       
       Ucalc    = NaN(length(s.t),length(wln));
-      colTw    = NaN(length(s.t),length(s.w));
+      colTw    = NaN(length(s.t),length(w));
       %tau_h2oa = NaN(length(starsun.t),length(starsun.w));
-      
-      for j=1:length(s.t)
-          if ~isNaN(s.Alt(j))
-              kk=find(s.Alt(j)/1000>=zkm_LBLRTM_calcs);
-              if s.Alt(j)/1000<=0 kk=1; end            %handles alts slightly less than zero
+      for j=length(s.t):-1:1
+          if ~isNaN(Alt(j))
+              kk=find(Alt(j)/1000>=zkm_LBLRTM_calcs);
+              if Alt(j)/1000<=0 kk=1; end            %handles alts slightly less than zero
               kz=kk(end);
-              CWV1=((-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))'))./s.m_H2O(j);
-              CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./s.m_H2O(j);
-              CWVint_atmcm = CWV1 + (s.Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
+              CWV1=((-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))'))./m_H2O(j);
+              CWV2=(-log(Tw(j,:)./(cfit_H2O(wln,kz+1))')./(afit_H2O(wln,kz+1))').^(1./(bfit_H2O(wln,kz+1))')./m_H2O(j);
+              CWVint_atmcm = CWV1 + (Alt(j)/1000-zkm_LBLRTM_calcs(kz))*(CWV2-CWV1)/(zkm_LBLRTM_calcs(kz+1)-zkm_LBLRTM_calcs(kz));
               Ucalc(j,:)    =CWVint_atmcm; 
               colTw(j,:)    =exp(- afit_allH2O(:,kz).*(nanmean(CWVint_atmcm(26:52))).^bfit_allH2O(:,kz));
               %tau_h2oa(j,:) = real(-log(colTw(j,:)));
@@ -348,7 +363,7 @@ end
               
           else
               Ucalc(j,:)   =zeros(1,length(wln)); 
-              colTw(j,:)   =zeros(1,length(s.w));
+              colTw(j,:)   =zeros(1,length(w));
               %tau_h2oa(j,:)=zeros(1,length(starsun.w));
               
           end
@@ -367,20 +382,22 @@ end
      avg_U1 = abs(real(nanmean(Ufinal(:,ind),2)));%(1:78=920-980)%26-52=940-960 26-40=940-950 nm
      std_U1 = abs(real((nanstd(Ufinal(:,ind),[],2)))); 
    
-     s.Alt(s.Alt<0)=0;
+     Alt(Alt<0)=0;
      
-%      Tslant
+     
      % subtract cwv from tau_aero using m1
      afit_H2Os1 = afit_H2O(:,kz); afit_H2Os1(isNaN(afit_H2Os1)) = 0; afit_H2Os1(afit_H2Os1<0) = 0; afit_H2Os1(isinf(afit_H2Os1)) = 0;
      bfit_H2Os1 = bfit_H2O(:,kz); bfit_H2Os1(isNaN(bfit_H2Os1)) = 0; bfit_H2Os1(bfit_H2Os1<0) = 0; bfit_H2Os1(isinf(bfit_H2Os1)) = 0;
-     afit_H2Os1  = real(afit_H2Os1)'; bfit_H2Os1 = real(bfit_H2Os1)';
      
-
+     afit_H2Os1  = real(afit_H2Os1)'; bfit_H2Os1 = real(bfit_H2Os1)';
      cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
      s.tau_aero_cwvsub = s.tau_aero-cwv2sub;
+
      
-%      cwv2sub   =
-%      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original
+%      cwv2sub   = -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1));
+%       tau_aero_cwvsub(i,:) = s.tau_aero(i,:)-cwv2sub';
+%       end
+%      s.tau_aero_cwvsub = tau_aero_cwvsub;
      
      
  end
@@ -412,14 +429,14 @@ end
      % with Lat/Alt-bound by low CWV values
      figure(5);scatter3(s.Lat(avg_U1<=0.5&avg_U1>=0),s.Altavg(avg_U1<=0.5&avg_U1>=0),avg_U1(avg_U1<=0.5&avg_U1>=0),10,avg_U1(avg_U1<=0.5&avg_U1>=0),'filled');
      xlabel('Latitude','fontsize',12,'fontweight','bold');ylabel('Altitude [m]','fontsize',12,'fontweight','bold');
-     set(gca,'fontsize',12,'fontweight','bold');axis([min(s.Lat) max(s.Lat) min(s.Alt) max(s.Alt) 0 1]);
+     set(gca,'fontsize',12,'fontweight','bold');axis([min(s.Lat) max(s.Lat) min(Alt) max(Alt) 0 1]);
      cb=colorbar; set(cb,'fontsize',12,'fontweight','bold');title('CWV [g/cm^{2}]','fontsize',12','fontweight','bold');
 
      % plot average 0.92-0.96 (1:52)
      %  figure;errorbar(starsun.UTHh((goodTime)),mean(Ufinal(:,26:52),2),std(Ufinal(:,26:52),[],2),'d','color',[0 0.8 0.2],'MarkerSize',6);hold on;
      %         plot(starsun.UTHh((goodTime)),starsun.Altavg((goodTime))/1000,'-','color',[0.5 0.5 0.5],'LineWidth',2);
      figure(44);
-     [AX,H1,H2] = plotyy(s.UTHh,avg_U1,s.UTHh,s.Alt);
+     [AX,H1,H2] = plotyy(s.UTHh,avg_U1,s.UTHh,Alt);
      set(get(AX(1),'Ylabel'),'String','Columnar Water vapor [g cm^{-2}]','FontSize',16,'color',[0 0.8 0.2]) 
      set(get(AX(2),'Ylabel'),'String','Altitude [meters]','FontSize',16,'color',[0.5 0.5 0.5]) 
      set(H1,'LineStyle','d','MarkerFaceColor',[0 0.8 0.2],'MarkerSize',6)
@@ -434,22 +451,15 @@ end
 %% fmincon conversion
 % begin of method 2
 %====================
-if cwvoptfit;
+tic;
+if cwvoptfit
 swv_opt=[];
 wv_residual = [];
 
-for i = 1:length(s.t)
- % choose right altitude coef
-    if model_atmosphere~=1 % run for airborne campaigns only
-        if ~isNaN(s.Alt(i))
-              kk=find(s.Alt(i)/1000>=zkm_LBLRTM_calcs);
-              if s.Alt(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
-              kz=kk(end);
-              
-        else 
-             kz=1; 
-        end
-    end
+% Set Options
+%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',500,'MaxIter',100);
+
        % !!! can use co2/ch4/o2 xs altitude dependance similarly
        %
        %  x0 = [300 10000 10000 0.75 0.8 -2 -0.1]; % this is initial guess
@@ -462,25 +472,6 @@ for i = 1:length(s.t)
        else
            x0 = [5000 0.75 0.8 -2];
        end
-        %if lampcalib==1
-            y = real((spectrum(i,:)));%this is total OD
-%        else
-%             y = (spectrum(i,:));%waterOD(i,:);
-%        end
-       meas = [s.w(wln)' y'];
-       Xdat = meas(:,1);
-       if model_atmosphere==1
-           ac = real(afit_H2O(wln)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
-           bc = real(bfit_H2O(wln)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
-           PAR  = [ac bc];
-       else
-           ac = real(afit_H2O(wln,kz)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
-           bc = real(bfit_H2O(wln,kz)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
-           PAR  = [ac bc];
-       end
-       
-       % Set Options
-       options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
        
        % bounds
        if wrange==3
@@ -501,6 +492,7 @@ for i = 1:length(s.t)
            U_ = [NaN NaN NaN NaN];
        end
        
+              
        if x0(1)>=ub(1)
            x0(1) = ub(1)/2;
        elseif x0(1)<0
@@ -508,6 +500,40 @@ for i = 1:length(s.t)
        elseif isNaN(x0(1))
            x0(1) = lb(1);
        end
+
+
+for i = length(s.t):-1:1
+ % choose right altitude coef
+    if model_atmosphere~=1 % run for airborne campaigns only
+        if ~isNaN(Alt(i))
+              kk=find(Alt(i)/1000>=zkm_LBLRTM_calcs);
+              if Alt(i)/1000<=0 kk=1; end            %handles alts slightly less than zero
+              kz=kk(end);
+              
+        else 
+             kz=1; 
+        end
+    end
+
+        %if lampcalib==1
+            y = real((spectrum(i,:)));%this is total OD
+%        else
+%             y = (spectrum(i,:));%waterOD(i,:);
+%        end
+       meas = [w(wln)' y'];
+       Xdat = meas(:,1);
+       if model_atmosphere==1
+           ac = real(afit_H2O(wln)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
+           bc = real(bfit_H2O(wln)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
+           PAR  = [ac bc];
+       else
+           ac = real(afit_H2O(wln,kz)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;
+           bc = real(bfit_H2O(wln,kz)); bc(isNaN(bc)) = 0; bc(bc<0) = 0; bc(isinf(bc)) = 0;
+           PAR  = [ac bc];
+       end
+       
+       
+
        
        %ynan = isNaN(y); realy = isreal(y);
        % check spectrum validity for conversion
@@ -528,36 +554,41 @@ for i = 1:length(s.t)
            else
             ylarge = logical(y>=4);
             if sum(ylarge)<10
-            [U_,fval,exitflag,output]  = fmincon('H2Oresi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
+                                         %fmincon(FUN,      X,A,  B,Aeq,Beq,LB,UB,NONLCON,options,varargin)
+            [U_,fval,exitflag,output]  = fmincon('H2Oresi',x0,[],[],[],[],  lb,ub, [],   options, meas,PAR);
             end
            end
             if (isNaN(U_(1)) || ~isreal(U_(1)) || U_(1)<0 )
                 if wrange==3||wrange==4
                     U_ = [NaN NaN NaN NaN NaN];
-                    swv_opt = [swv_opt; U_];
-                    wv_residual = [wv_residual;NaN];
+%                     swv_opt(i,:) = U_;%[swv_opt; U_];
+%                     wv_residual = [wv_residual;NaN];
                 elseif wrange==5
                     U_ = [NaN NaN NaN NaN NaN NaN NaN];
-                    swv_opt = [swv_opt; U_];
-                    wv_residual = [wv_residual;NaN];
+%                     swv_opt = [swv_opt; U_];
+%                     wv_residual = [wv_residual;NaN];
                 else
                     U_ = [NaN NaN NaN NaN];
-                    swv_opt = [swv_opt; U_];
-                    wv_residual = [wv_residual;NaN];
+%                     swv_opt = [swv_opt; U_];
+%                     wv_residual = [wv_residual;NaN];
                 end
-                
+                swv_opt(i,:) = U_;
+                wv_residual(i) = NaN;
             else
-                if wrange==3||wrange==4
-                    swv_opt = [swv_opt; real(U_)];
-                    wv_residual = [wv_residual;real(fval)];
-                elseif wrange==5
-                    swv_opt = [swv_opt; real(U_)];
-                    wv_residual = [wv_residual;real(fval)];
-                else
-                    swv_opt = [swv_opt; real(U_)];
-                    wv_residual = [wv_residual;real(fval)];
-                end
-                cwv_opt_ = (real(U_(1))/H2O_conv)/s.m_H2O(i); 
+%                 if wrange==3||wrange==4
+%                     swv_opt = [swv_opt; real(U_)];
+%                     wv_residual = [wv_residual;real(fval)];
+%                 elseif wrange==5
+%                     swv_opt = [swv_opt; real(U_)];
+%                     wv_residual = [wv_residual;real(fval)];
+%                 else
+%                     swv_opt = [swv_opt; real(U_)];
+%                     wv_residual = [wv_residual;real(fval)];
+%                 end
+%                 x0 = real(U_);
+                swv_opt(i,:) = real(U_);
+                wv_residual(i,:) = real(fval);
+                cwv_opt_ = (real(U_(1))/H2O_conv)/m_H2O(i); 
                 cwv_opt_round = round(cwv_opt_*100)/100;
                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
                % plot fitted figure
@@ -612,18 +643,23 @@ for i = 1:length(s.t)
        else
            if wrange==3||wrange==4
                U_ = [NaN NaN NaN NaN NaN];
-               swv_opt = [swv_opt; U_];
-               wv_residual = [wv_residual;NaN];
+%                swv_opt = [swv_opt; U_];
+%                wv_residual = [wv_residual;NaN];
            elseif wrange==5
                U_ = [NaN NaN NaN NaN NaN NaN NaN];
-               swv_opt = [swv_opt; U_];
-               wv_residual = [wv_residual;NaN];
+%                swv_opt = [swv_opt; U_];
+%                wv_residual = [wv_residual;NaN];
            else
                U_ = [NaN NaN NaN NaN];
-               swv_opt = [swv_opt; U_];
-               wv_residual = [wv_residual;NaN];
+%                swv_opt = [swv_opt; U_];
+%                wv_residual = [wv_residual;NaN];
            end
+           swv_opt(i,:) = U_;
+           wv_residual(i) = NaN;
        end
+end
+if toggle.verbose; disp({'spectral fitting',toc});end
+
 % water vapor subtraction per altitude (based on 940 nm band)
 %------------------------------------------------------------
     if wrange==1
@@ -638,11 +674,15 @@ for i = 1:length(s.t)
         afit_H2Os = afit_H2O(:,kz); afit_H2Os(isNaN(afit_H2Os)) = 0; afit_H2Os(afit_H2Os<0) = 0; afit_H2Os(isinf(afit_H2Os)) = 0;
         bfit_H2Os = bfit_H2O(:,kz); bfit_H2Os(isNaN(bfit_H2Os)) = 0; bfit_H2Os(bfit_H2Os<0) = 0; bfit_H2Os(isinf(bfit_H2Os)) = 0;
     end
-    afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;Tslant;
-    afit_H2Os = afit_H2Os'; bfit_H2Os = bfit_H2Os';
-    wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
+    afit_H2Os(1:nm_0675) = 0;  bfit_H2Os(1:nm_0675) = 0;
+    afit_H2Os = afit_H2Os'; bfit_H2Os = bfit_H2Os';Tslant;
+    wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));;
+    swv = real(swv_opt(:,1));
+    wvamount = -log(  exp(  -(ones([pp,1])*afit_H2Os).*((swv*ones([1,qq])).^(ones([pp,1])*bfit_H2Os))  )  );
+%     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));%orig
+    
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
-    cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount';% this is a structure with o2-o2 NIR subtracted
+    cwv.tau_OD_wvsubtract = tau_tot_slant-wvamount;% this is a structure with o2-o2 NIR subtracted
     end
     
     % QA plot of tau_OD_wvsubtract vs.tau_ODslant
@@ -660,17 +700,15 @@ for i = 1:length(s.t)
 %         legend(le{ll,:});
 %         axis([min(starsun.UTHh) max(starsun.UTHh) -0.0005 0.0005]);
 %         plot(starsun.UTHh,zeros(length(starsun.UTHh),1),'-m');hold off;
-%     end
-    
-end % end of loop over all data points for wv retrieval
-   cwv_opt = (swv_opt(:,1)/H2O_conv)./s.m_H2O;% retrieval is made on slant./starsun.m_H2O;  %conversion from slant path to vertical
+%     end    
+% end of loop over all data points for wv retrieval
+   cwv_opt = (swv_opt(:,1)/H2O_conv)./m_H2O;% retrieval is made on slant./starsun.m_H2O;  %conversion from slant path to vertical
    if wrange==4
        cwv.(lab3) = swv_opt(:,2)./s.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
    elseif wrange==5
        cwv.(lab3) = swv_opt(:,2)./s.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
        cwv.(lab4) = swv_opt(:,3)./s.m_ray; % this is [atm x cm]     !! check if needs to be divided with airmass
-   end
-    
+   end    
     % save in each wavelength range retrieval
     cwv.(lab2)     = cwv_opt;
     cwv.(labstd2)  = sqrt(wv_residual/length(wln));

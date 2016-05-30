@@ -59,7 +59,7 @@ elseif ~isempty(strfind(lower(userpath),'qin'));
     figurefolder='C:\zq_working_baeri\4star\figures\';
     author='Qin';
 elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor')) | ~isempty(strfind(lower(userpath),lower('D:\Documents\GitHub'))); 
-    matfolder='D:\data\4STAR\yohei\mat\';
+    matfolder='C:\Users\d3k014\Documents\GitHub\4STAR_codes\data_folder\';
     figurefolder='D:\data\4STAR\yohei\img\';
     author='Connor';
 elseif ~isempty(strfind(lower(userpath),'jredeman'));
