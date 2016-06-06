@@ -31,6 +31,17 @@ function [flags,screened,good,figs] = visi_screen_v10(time, tau, varargin)
 % flag "good" or "not good". clouds are clear or not clear.
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
 % SL, v1.1, 2015/05/04, added special function button for rerunning some automated screening
+
+%Things to modify/add:
+% Button for flagging mode: ON, CLEAR, Toggle
+% Button for selection region: inside, outside, before (within), after, after (within), above, above (during), below, below (during),
+%
+% Button for RESET (to initial flags)
+% Button for UNDO
+% Button for REDO
+% Button to read in flags from other file
+
+
 version_set('1.1');
 if rem(nargin,2)~=0
     error('Problem with number of nargins.')

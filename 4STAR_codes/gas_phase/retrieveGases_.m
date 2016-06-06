@@ -70,6 +70,7 @@ if toggle.verbose disp({['In retrieveHCOH:'],toc}); end
 %----------------------------------------------------------------------
 
    Loschmidt          = 2.686763e19; %molecules/cm2
+   d.t                = s.t; % always keep Matlab time!
    d.no2_molec_cm2    = gas.no2.no2_molec_cm2;%gas.no2.no2DU*(Loschmidt/1000);
    d.no2err_molec_cm2 = gas.no2.no2resi;%gas.no2.no2resiDU*(Loschmidt/1000);
    d.no2DU            = d.no2_molec_cm2/(Loschmidt/1000);

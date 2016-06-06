@@ -202,7 +202,7 @@ for i=idx_file_proc
     %% Combine the flag values
     disp('Setting the flags')
     if isfield(flag,'manual_flags');
-        qual_flag = flag.manual_flags.screen;
+        qual_flag = ~flag.manual_flags.good;
     else
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
         qual_flag = bitor(qual_flag,flag.cirrus);

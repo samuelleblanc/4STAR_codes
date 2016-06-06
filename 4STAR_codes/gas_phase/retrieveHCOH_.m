@@ -47,7 +47,7 @@ function [hcoh] = retrieveHCOH(s,wstart,wend,mode)
 
 plotting = 0;
 % load cross-sections
-loadCrossSections_global;
+loadCrossSections_global_;
 w = s.w; toggle = s.toggle; 
 tau_ray =s.tau_ray;
  Loschmidt=2.686763e19;                   % molec/cm3*atm

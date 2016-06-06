@@ -120,7 +120,7 @@ end
 
 CH4conc = sc(:,1);
 CO2conc = sc(:,2);
-CO2resi = sc_residual;
+CO2resi = sc_residual';
 co2OD   = ODfit;
 %co2subtract=spectrum_sub;
 % co2spec = spectrum_sub;

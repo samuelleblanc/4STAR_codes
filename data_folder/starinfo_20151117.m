@@ -1,5 +1,4 @@
 function s = starinfo(s)
-version_set('2016-02-17 16:45');
 if exist('s','var')&&isfield(s,'t')&&~isempty(s.t)
    daystr = datestr(s.t(1),'yyyymmdd');
 else
@@ -41,12 +40,12 @@ s.ng(:,1:2) = s.ng(:,1:2) - datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(
  
 % or load flags from file as follows:
 % 1. Call the function by name as in:
-% s.ng_new = starflags_20151117_CF_marks_ALL_20160217_0302;
-% % 2. Call the function by handle (better for running on compiler)
-% marks_fnt  = str2func('starflags_20151117_CF_marks_ALL_20160217_0302'); 
-% s.ng_newer = marks_fnt();
-% % 3. Load the mat file and convert to 'ng'
-% s.ng_mat = cnvt_flags2ng(load(['E:\data\4STAR\yohei\mat\20151117_starflag_man_created20160217_0944by_CF.mat']));
+s.ng_new = starflags_20151117_CF_marks_ALL_20160217_0302;
+% 2. Call the function by handle (better for running on compiler)
+marks_fnt  = str2func('starflags_20151117_CF_marks_ALL_20160217_0302'); 
+s.ng_newer = marks_fnt();
+% 3. Load the mat file and convert to 'ng'
+% s.ng_mat = cnvt_flags2ng(load(['E:\data\4STAR\yohei\mat\20151117_starflag_man_created20160212_1438by_CF.mat']));
 
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
@@ -101,9 +100,9 @@ function toggle_out = update_toggle(toggle_in)
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
 toggle_out.verbose=true;
+toggle_out.saveadditionalvariables=true;
 toggle_out.savefigure=false;
 toggle_out.computeerror=true;
-toggle_out.saveadditionalvariables=true;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data

@@ -1,4 +1,4 @@
-function forj_vis_out = TCAPII_forj_az_v2(vis)
+function [forj_vis_out, forj_vis] = TCAPII_forj_az_v2(vis)
 % v2 attempt to clean up darks and lights, added "lights" boolean
 if ~exist('vis','var')||~exist(vis,'file');
     vis = getfullname('*_VIS_FORJ.dat','forj','Select a forj data file.');
@@ -35,9 +35,13 @@ darks_vis = mean(forj_vis.spectra(dark,:));
 
 %%
  vis_spec = forj_vis.spectra-ones([length(forj_vis.time),1])*darks_vis;
- lights = forj_vis.t.shutter==1 & vis_spec(:,pix_630)>(0.96*max(vis_spec(:,pix_630)));
+ lights = forj_vis.t.shutter==1 & vis_spec(:,pix_630)>(0.9*max(vis_spec(:,pix_630)));
 % pix 520-560 looks quite good
 % mean_spec = mean(vis_spec(~dark,:));
+figure; plot(recs(lights), vis_spec(lights, pix_630),'x-');
+xlabel('rec #'); ylabel('signal-darks'); tl = title(forj_vis.fname); set(tl,'interp','none')
+figure; scatter(forj_vis.t.AZ_deg(lights), vis_spec(lights,pix_630),32,[1:sum(lights)],'filled');
+xlabel('Azimuth deg'); ylabel('signal-dark');tl = title(forj_vis.fname); set(tl,'interp','none')
 mean_spec = mean(vis_spec(lights,:));
 pix = [1:length(forj_vis.nm)];
 %%
@@ -262,5 +266,6 @@ else
     disp('No rotation?');
     forj_vis_out = [];
 end
-
+forj_vis.spec_sans_dark = mean(forj_vis.spectra(forj_vis.t.shutter==1,:))-mean(forj_vis.spectra(forj_vis.t.shutter==0,:));
+figure; plot(forj_vis.nm, forj_vis.spec_sans_dark,'b-'); tl= title(fstem); set(tl,'interp','none')
 return

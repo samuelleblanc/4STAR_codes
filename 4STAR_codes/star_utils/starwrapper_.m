@@ -328,6 +328,7 @@ clear s s_raw r_raw
 if exist('s2','var')
     clear s2
 end
+disp(['Loading ', matfilename, ' as a Writable matfile object.']);
 s = matfile(matfilename,'Writable',true);
 pp=numel(s.t);
 qq=size(s.raw,2);
@@ -431,57 +432,65 @@ if toggle.doflagging;
             end;
             s.rawstd=NaN(pp, numel(cc));
             s.rawmean=NaN(pp, numel(cc));
+            t = s.t;
+            raw = s.raw;
             for i=1:pp;
-                rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
+                rows=find(t>=t(i)-ti/2&t<=t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
                 if numel(rows)>0;
-                    s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                    s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
+                    s.rawstd(i,:)=nanstd(raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                    s.rawmean(i,:)=nanmean(raw(rows,cc),1);
                 end;
             end;
+            clear raw
             s.rawrelstd=s.rawstd./s.rawmean;
         end;
         
         % flag all columns (see below for flagging specific columns)
         nflagallcolsitems=7;
-        s.flagallcolsitems=repmat({''},nflagallcolsitems,1);
-        s.flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
-        s.flagallcols(s.Str~=1,:,1)=true; s.flagallcolsitems(1)={'darks or sky scans'};
+        flagallcolsitems=repmat({''},nflagallcolsitems,1);
+        flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
+        flagallcols(s.Str~=1,:,1)=true; flagallcolsitems(1)={'darks or sky scans'};
+       
         if strmatch('sun', lower(datatype(end-2:end)));
-            s.flagallcols(s.Md~=1,:,2)=true; s.flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
-            s.flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; s.flagallcolsitems(3)={'high standard deviation'};
+            flagallcols(s.Md~=1,:,2)=true; flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
+            flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; flagallcolsitems(3)={'high standard deviation'};
         end;
-        s.flagallcols(s.m_aero>m_aero_max,:,4)=true; s.flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
+        flagallcols(s.m_aero>m_aero_max,:,4)=true; flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
         for i=1:size(s.ng,1);
             ng=incl(s.t,s.ng(i,1:2));
             if isempty(ng);
             elseif s.ng(i,3)<10;
-                s.flagallcols(ng,:,5)=true; s.flagallcolsitems(5)={'unknown or others (manual flag)'};
+                flagallcols(ng,:,5)=true; flagallcolsitems(5)={'unknown or others (manual flag)'};
             elseif s.ng(i,3)<100;
-                s.flagallcols(ng,:,6)=true; s.flagallcolsitems(6)={'clouds (manual flag)'};
+                flagallcols(ng,:,6)=true; flagallcolsitems(6)={'clouds (manual flag)'};
             elseif s.ng(i,3)<1000;
-                s.flagallcols(ng,:,7)=true; s.flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
+                flagallcols(ng,:,7)=true; flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
             end;
         end;
-        if size(s.flagallcols,3)~=nflagallcolsitems;
+        if size(flagallcols,3)~=nflagallcolsitems;
             error('Update starwrapper.m.');
         end;
+        s.flagallcolsitems = flagallcolsitems; clear flagallcolsitems
+        s.flagallcols = flagallcols; clear flagallcols
         
         % flag specific columns
         nflagitems=1;
-        s.flagitems=repmat({},nflagitems,1);
-        s.flag=false(pp,qq,nflagitems); % flags applied to each column separately
-        s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; s.flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
-        if size(s.flag,3)~=nflagitems;
+        flagitems=repmat({},nflagitems,1);
+        flag=false(pp,qq,nflagitems); % flags applied to each column separately
+        flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
+        if size(flag,3)~=nflagitems;
             error('Update starwrapper.m.');
         end;
+        s.flag = flag; clear flag
+        s.flagitems = flagitems; clear flagitems
         
     else; % the old flagging system
         % execute manual flags to screen out data for clouds and other unfavorable conditions
         if toggle.verbose; disp('in the old flagging system'), end;
-        s.flag=zeros(size(s.rate));
+        flag=zeros(size(s.rate));
         for i=1:size(s.ng,1);
             ng=incl(s.t,s.ng(i,1:2));
-            s.flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
+            flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
         end;
         
         % auto screening
@@ -490,15 +499,15 @@ if toggle.doflagging;
         % YS: agreed. And different screens mean they should be applied in starsun
         % and starsky, not in starwrapper.
         autoscrnote='Auto-screening was applied for ';
-        s.flag(s.Str~=1,:)=s.flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
+        flag(s.Str~=1,:)=flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
         autoscrnote=[autoscrnote 'darks or sky scans, '];
-        s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
+        flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
         autoscrnote=[autoscrnote '<=1 signal-to-noise ratio or non-positive c0, ']; % YS 2012/10/09
-        s.flag(s.m_aero>m_aero_max,:)=s.flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
+        flag(s.m_aero>m_aero_max,:)=flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
         autoscrnote=[autoscrnote 'aerosol airmass higher than ' num2str(m_aero_max) ', ']; % YS 2012/10/09
         if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
             % non-tracking mode - is this redundant with the Str-based screening?
-            s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
+            flag(s.Md~=1,:)=flag(s.Md~=1,:)+0.2;
             autoscrnote=[autoscrnote 'non-tracking modes, '];
             % STD-based cloud screening
             ti=9/86400;
@@ -519,9 +528,10 @@ if toggle.doflagging;
                 end;
             end;
             s.rawrelstd=s.rawstd./s.rawmean;
-            s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
+            flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
             autoscrnote=[autoscrnote 'STD higher than ' num2str(s.sd_aero_crit) ' at columns #' num2str(cc) ', '];
         end;
+        s.flag = flag; clear flag
         s.note=[autoscrnote(1:end-2) '. ' s.note];
     end;
 end; % toggle.doflagging
@@ -732,7 +742,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             
             % this is new routine
             gas = retrieveGases_(s);
-            s.gas = gas;
+%             s.gas = gas;
             % subtract derived gasess
             s.tau_aero_subtract_all = s.tau_aero_subtract - gas.o3.o3OD - gas.o3.o4OD - gas.o3.h2oOD ...
                -s.tau_NO2 - gas.co2.co2OD - gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
@@ -785,8 +795,9 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     
     % estimate uncertainties in tau aero - largely inherited from AATS14_MakeAOD_MLO_2011.m
     if toggle.computeerror;
-        s.m_err=0.0003.*(s.m_ray/2).^2.2; % expression for dm/m is from Reagan report
-        s.m_err(s.m_ray<=2)=0.0003; % negligible for TCAP July, but this needs to be revisited. The AATS code offers two options: this (0.03%) and 1%.
+        m_err=0.0003.*(s.m_ray/2).^2.2; % expression for dm/m is from Reagan report
+        m_err(s.m_ray<=2)=0.0003; % negligible for TCAP July, but this needs to be revisited. The AATS code offers two options: this (0.03%) and 1%.
+        s.m_err = m_err;
         s.tau_aero_err1=abs(tau.*repmat(s.m_err,1,qq)); % YS 2012/10/09 abs avoids imaginary part and hence reduces the size of tau_aero_err (for which tau_aero is NaN as long as rate<=darkstd is screened out.).
         if size(s.c0err,1)==1;
             s.tau_aero_err2=1./s.m_aero*(s.c0err./s.c0);
@@ -821,14 +832,15 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [s.flags, good]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        [flags, good]=starflag_(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        s.flags = flags;
     end;
     %************************************************************
     
     %% apply flags to the calculated tau_aero_noscreening
-    s.tau_aero=s.tau_aero_noscreening;
+    tau_aero=s.tau_aero_noscreening;
     if toggle.dostarflag && toggle.flagging==1;
-        s.tau_aero(s.flags.bad_aod,:)=NaN;
+        tau_aero(flags.bad_aod,:)=NaN;
     end;
     % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
     % 2014/07/18.
@@ -836,19 +848,20 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % apply flags to the calculated tau_aero_noscreening
     if toggle.doflagging;
         if toggle.booleanflagging;
-            s.tau_aero(any(s.flagallcols,3),:)=NaN;
-            s.tau_aero(any(s.flag,3))=NaN;
+            tau_aero(any(s.flagallcols,3),:)=NaN;
+            tau_aero(any(s.flag,3))=NaN;
         else
-            s.tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
+            tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
         end;
     end;
     % The end of "The lines below used to be around here. But recent
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
     
     % fit a polynomial curve to the non-strongly-absorbing wavelengths
-    w = s.w; tau_aero = s.tau_aero;
+    w = s.w; 
     [a2,a1,a0,ang,curvature]=polyfitaod(w(s.aerosolcols),tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
     s.tau_aero_polynomial=[a2 a1 a0];
+    s.tau_aero = tau_aero; clear tau_aero;
     
     % derive optical depths and gas mixing ratios
     % Michal's code TO BE PLUGGED IN HERE.

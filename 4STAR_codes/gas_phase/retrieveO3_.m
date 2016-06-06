@@ -50,7 +50,7 @@ function [o3] = retrieveO3_(s,wstart,wend,mode)
 plotting = 0;
 linear   = 1;% do only linear inversion
 % load cross-sections
-loadCrossSections_global;
+loadCrossSections_global_;
 w = s.w; toggle = s.toggle; t = s.t; 
 rateslant = s.rateslant;
 tau_OD  = s.tau_tot_slant;
