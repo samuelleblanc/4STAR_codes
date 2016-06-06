@@ -44,7 +44,7 @@ function [no2] = retrieveNO2(s,wstart,wend,mode)
 
 plotting = 0;
 % load cross-sections
-loadCrossSections_global;
+loadCrossSections_global_;
 
  Loschmidt=2.686763e19;                   % molec/cm3*atm
  % find wavelength range index

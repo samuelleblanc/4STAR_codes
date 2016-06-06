@@ -1,4 +1,4 @@
-function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0,c0)
+function [O3conc,H2Oconc,O4conc,O3resi,ODfit,allvar] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,tau_OD,x0,c0)
 % retrieve o3 and derive fitted spectrum for subtraction
 % x0 is initial guess from linear inversion
 %
@@ -15,14 +15,15 @@ function [O3conc,H2Oconc,O4conc,O3resi,o3OD,allvar] = o3corecalc_lin_adj(s,o3coe
 % MS, 2016-05-05, adding c0gases
 %------------------------------------------------------------------
 ODfit = zeros(length(s.t),length(s.w));
-tau_o3o4h2o_subtract = tau_OD;
+% tau_o3o4h2o_subtract = tau_OD; 
+clear tau_OD
 %------------------------------------------------
 
 sc=[];
 sc_residual = [];
 o3_DU = [];
 
-for i = 1:length(s.t)
+for i = length(s.t):-1:1
     
     % 3nd order initial guess:o3-300h2o-5000;o4-10000      
     %x0 = [0.3 1 0.5 0.1 0 0.1 0]; 
@@ -78,13 +79,14 @@ for i = 1:length(s.t)
                                         U_(1) = NaN;U_(2) = NaN; U_(3) = NaN;
                                 end
 
-                                sc = [sc; real(U_)];
-                                sc_residual = [sc_residual;real(fval)];
-                                o3_conc_ = (real(U_(1)))/s.m_O3(i); 
-                                o3_round = round(o3_conc_*100)/100;% this is vertical (tau_aero is slant) in atmxcm
-                                o3_DU_    = (o3_conc_*1000);       % conversion to DU
-                                o3_DU_round = round(o3_DU_);
-                                o3_DU = [o3_DU;o3_DU_];
+                                sc(i,:) = real(U_);
+                                sc_residual(i) = real(fval);
+                                % Moved outside of "for i" loop
+%                                 o3_conc_ = (real(U_(1)))/s.m_O3(i); 
+%                                 o3_round = round(o3_conc_*100)/100;% this is vertical (tau_aero is slant) in atmxcm
+%                                 o3_DU_    = (o3_conc_*1000);       % conversion to DU
+%                                 o3_DU_round = round(o3_DU_);
+%                                 o3_DU(i) = o3_DU_;
 
                                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
 
@@ -105,7 +107,7 @@ for i = 1:length(s.t)
                                 % assign fitted spectrum
                                 ODfit(i,wln) = yfit;
                                 % save spectrum to subtract
-                                tau_o3o4h2o_subtract(i,wln) = yo3subtractall/s.m_O3(i);
+%                                 tau_o3o4h2o_subtract(i,wln) = yo3subtractall/s.m_O3(i);
                                 %% plot measured and computed fit
 %                                        figure(444);
 %                                        ax(1)=subplot(211);
@@ -134,36 +136,44 @@ for i = 1:length(s.t)
                              else
 
                                U_ = [NaN NaN NaN NaN NaN NaN NaN];
-                               sc = [sc; U_];
-                               sc_residual = [sc_residual;NaN];
-                               o3_DU = [o3_DU;NaN];
+                               sc(i,:)= U_;
+                               sc_residual(i) = NaN;
+                               o3_DU(i) =NaN;
 
                              end % if isreal x0   
             else
                U_ = [NaN NaN NaN NaN NaN NaN NaN];
-               sc = [sc; U_];
-               sc_residual = [sc_residual;NaN];
-               o3_DU = [o3_DU;NaN];
+               sc(i,:) = U_;
+               sc_residual(i) = NaN;
+               o3_DU(i) = NaN;
                
            end     % test if values are not too high (clouds/instrument issues)
            
        else
           
                U_ = [NaN NaN NaN NaN NaN NaN NaN];
-               sc = [sc; U_];
-               sc_residual = [sc_residual;NaN];
-               o3_DU = [o3_DU;NaN];
+               sc(i,:) =  U_;
+               sc_residual(i) = NaN;
+               o3_DU(i) = NaN;
            
        end
        
 end
+sc(i,:) = real(U_);
+o3_conc_ = sc(:,1)/s.m_O3;
+% o3_round = round(o3_conc_*100)/100;% this is vertical (tau_aero is slant) in atmxcm
+o3_DU    = (o3_conc_*1000);       % conversion to DU
+% o3_DU_round = round(o3_DU);
+
+
+
 
 %% save variables
 O3conc  = o3_DU;
 O4conc  = sc(:,2)./s.m_ray; % scaling back retrieved values due to scale down of coef
 H2Oconc = sc(:,3)./s.m_H2O;% scaling back retrieved values due to scale down of coef
 O3resi  = sqrt(sc_residual);
-o3OD    = ODfit;
+% o3OD    = ODfit;
 allvar  = sc;
 return;
 

@@ -11,7 +11,7 @@ else
     s.toggle = update_toggle;
 end
 
-s.flight=[datenum(2016,5,24,22,53,37) datenum(2016,5,25,07,11,30)];
+s.flight=[datenum(2016,5,24,22,53,37) datenum(2016,5,25,07,10,11)];
 %s.flagfilename = '20160513_starflag_man_created20160513_2304by_MS.mat'; 
 %s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
 %s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';

@@ -176,10 +176,14 @@ switch Mode
         outputfile=[starpaths,filesep,flagfile];
         disp(['Starflag mode 2 to output to:' flagfile])
 end
+
+flags_matio = matfile(flagfile,'Writable',true);
+flags_matio.flagfile = flagfile;
+
  mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
  disp(['Corresponding "marks" m-file to: ',mark_fname])
 
-
+[flags,flag_info] = cnvt_ng2flags(ng,t);
 if isfield(s,'flight')
     flight = s.flight;
 elseif any(Alt>0)
@@ -189,29 +193,29 @@ else
     flight(1) = t(1);
     flight(2) = t(end);
 end
-horilegs = [];
-if isfield(s,'horileg')
-    s.horilegs = s.horileg;
-    s = rmfield(s,'horileg');
-end
-if isfield(s,'horilegs')
-    horilegs = s.horilegs;
-end
-flags.hor_legs = false(size(t));
-for r = 1:size(horilegs,1)
-    flags.hor_legs = flags.hor_legs | (t>=horilegs(r,1)&t<=horilegs(r,2));
-end
-if isfield(s,'groundcomparison')
-    groundtest = s.groundcomparison;
-else
-    groundtest = [];
-end
-flags.groundtest = false(size(t));
-for r = 1:size(groundtest,1)
-    flags.groundtest = flags.groundtest | (t>=groundtest(r,1)&t<=groundtest(r,2));
-end
+% horilegs = [];
+% if isfield(s,'horileg')
+%     s.horilegs = s.horileg;
+%     s = rmfield(s,'horileg');
+% end
+% if isfield(s,'horilegs')
+%     horilegs = s.horilegs;
+% end
+% flags.hor_legs = false(size(t));
+% for r = 1:size(horilegs,1)
+%     flags.hor_legs = flags.hor_legs | (t>=horilegs(r,1)&t<=horilegs(r,2));
+% end
+% if isfield(s,'groundcomparison')
+%     groundtest = s.groundcomparison;
+% else
+%     groundtest = [];
+% end
+% flags.groundtest = false(size(t));
+% for r = 1:size(groundtest,1)
+%     flags.groundtest = flags.groundtest | (t>=groundtest(r,1)&t<=groundtest(r,2));
+% end
+% 
 
-[flags,flag_info] = cnvt_ng2flags(ng,t);
 flags.before_or_after_flight = t<flight(1) | t>flight(2);
 if ~isfield(flags, 'bad_aod')
     flags.bad_aod = false(size(t));
@@ -226,16 +230,22 @@ end
 % We've populated our workspace with 4STAR measurements
 % Now we'll build the input for automatic screening and visi_screen.
 
+nm_380 = interp1(w,[1:length(w)],.38, 'nearest');
 nm_500 = interp1(w,[1:length(w)],.5, 'nearest');
 nm_870 = interp1(w,[1:length(w)],.87, 'nearest');
 nm_452 = interp1(w,[1:length(w)],.452, 'nearest');
 nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
 colsang=[nm_452 nm_865];
 ang_noscreening=sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+aod_380nm = tau_aero_noscreening(:,nm_380);
+aod_452nm = tau_aero_noscreening(:,nm_452);
 aod_500nm = tau_aero_noscreening(:,nm_500);
 aod_865nm = tau_aero_noscreening(:,nm_865);
 aod_500nm_max=3;
 m_aero_max=15;
+
+%calculate quantity [1-cos(roll angle)]
+roll_proxy=1-cos(s.roll*pi/180);
 
 % % initializing a logical field
 % good_ang = true(size(ang_noscreening));
@@ -412,11 +422,14 @@ end
 if (Mode==2)
     %Run visi_screen in manual mode (mode=2)
     %We define several fields to plot in the auxiliary panels
-    panel_1.aod_500nm = aod_500nm;
+    panel_1.aod_380nm = aod_380nm;
+    panel_1.aod_452nm = aod_452nm;
     panel_1.aod_865nm = aod_865nm;
+    
     panel_2.ang = ang_noscreening;
-    panel_2.std_ang = sliding_std(ang_noscreening,10)';
-    panel_3.rawrelstd = rawrelstd(:,1);
+    %panel_2.std_ang = sliding_std(ang_noscreening,10)'; %JL
+    panel_2.roll_proxy = roll_proxy;
+    panel_3.rawrelstd = rawrelstd(:,1);    panel_3.quad = s.QdVlr./(s.QdVtot +.5);
     panel_4.Alt = Alt;
     
     ylims.panel_1 = [-.1, 2];
@@ -433,7 +446,7 @@ if (Mode==2)
     figs.aux_fig.pos = [0.6167 0.0769 0.2917 0.8306];
     
     % Define flags which do not flag data as "bad".
-    no_mask = {'smoke','dust','unspecified_aerosol','before_or_after_flight','hor_legs', 'vert_legs'};
+    no_mask = {'smoke','dust','before_or_after_flight','hor_legs', 'vert_legs'};
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
     if isfield(flags,'aerosol_init_auto')
@@ -449,10 +462,9 @@ if (Mode==2)
         test_good=test_good+strcmp(no_mask(i_f),F_t);
     end
     screen_bad_list = F_t(~test_good);
-    
-    [flags, screen, good, figs] = visi_screen_v10(t,aod_500nm,'time_choice',1,'flags',flags,'no_mask',no_mask,'figs',figs,...
-        'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,'field_name','aod 500nm',...
-        'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
+    [flags, screen, good, figs] = visi_screen_v12(t,aod_500nm,'time_choice',2,'flags',flags,'flags_matio',flags_matio,'no_mask',no_mask,'figs',figs,...
+        'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,'field_name','aod 500nm')%,...
+%         'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
     % returns:
     %   flags: struct of logicals (from flags inarg) of length(time)
     %           Also contains time, and settings in "manual_flags", and
@@ -464,7 +476,9 @@ if (Mode==2)
     manual_flags.nomask_list=no_mask;
     manual_flags.screen_bad_list=screen_bad_list;
     manual_flags.good=good; % These are only those records not marked by tests in screen_bad_list
-    manual_flags.screen=logical(screen); % bitwise mapping of flags not in screen_bad_list into uint32.
+%     manual_flags.screen=logical(screen); % bitwise mapping of flags not in screen_bad_list into uint32.
+    manual_flags.screen=screen; % bitwise mapping of flags not in screen_bad_list into uint32.
+        
     if exist('auto_settings','var')
         manual_flags.auto_settings = auto_settings;
     end

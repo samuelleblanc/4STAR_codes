@@ -42,7 +42,7 @@ function [co2] = retrieveCO2(s,wstart,wend)
 
 plotting = 0;
 % load cross-sections
-loadCrossSections_global;
+loadCrossSections_global_;
 w = s.w; 
  % find wavelength range index
  istart = interp1(w,[1:length(w)],wstart, 'nearest');
