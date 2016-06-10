@@ -1,12 +1,17 @@
 dirty = getfullname('*.dat','lamp','Select lamp measurement before cleaning');
-dirty = strrep(dirty,'NIR','VIS');
+dirty = strrep(dirty,'NIR','VIS'); % dirty (20160602_075) 
 vis_dirty = sphere_spec(dirty);
 dirty = strrep(dirty,'VIS','NIR');
 nir_dirty = sphere_spec(dirty);
 
+dirty = getfullname('*.dat','lamp','Select lamp measurement before cleaning');
+dirty = strrep(dirty,'NIR','VIS'); % dirty (20160604_009) 
+vis_dirty = sphere_spec(dirty);
+dirty = strrep(dirty,'VIS','NIR');
+nir_dirty = sphere_spec(dirty);
 
 clean = getfullname('*.dat','lamp','Select lamp measurement after cleaning');
-clean = strrep(clean,'NIR','VIS');
+clean = strrep(clean,'NIR','VIS'); % clean (20160531_120)
 vis_clean = sphere_spec(clean);
 clean = strrep(clean,'VIS','NIR');
 nir_clean = sphere_spec(clean);
@@ -19,15 +24,12 @@ ylabel('dirty/clean %');
 xlabel('wavelength [nm]')
 ylim([0,100]);
 
-[~, forj_clean] = TCAPII_forj_az_v2;
-[~, forj_dirty] = TCAPII_forj_az_v2;
+[~, forj_clean] = TCAPII_forj_az_v2; %20160530_021
+[~, forj_dirty] = TCAPII_forj_az_v2; %20160602_071
 figure; plot(forj_clean.nm, forj_clean.spec_sans_dark, 'b-',forj_clean.nm, forj_dirty.spec_sans_dark, 'r-')
 
 figure; plot(forj_clean.nm, 100.* forj_dirty.spec_sans_dark./ forj_clean.spec_sans_dark, 'kx')
 legend('FORJ dirty/clean')
-
-
-
 
 [~, forj_unstable] = TCAPII_forj_az_v2;
 [~, forj_stable] = TCAPII_forj_az_v2;

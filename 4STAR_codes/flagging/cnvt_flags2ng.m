@@ -20,7 +20,7 @@ for fld = length(flag_name):-1:1
 end
 flag_name = fieldnames(flags);
 tag = 3;
-ng = [];
+ng = [];flag_tag = [];
 for fld = 1:length(flag_name)
     switch flag_name{fld}
         case 'unknown'

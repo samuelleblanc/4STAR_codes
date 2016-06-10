@@ -20,6 +20,7 @@ function [flags, good, flagfile] = starflag_(s, Mode)
 % CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
 % SL, 2016-05-04, added special function buttons to visi_screen
+% CJF, 2016-06-07, many structural changes
 version_set('1.4');
 
 while ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
@@ -31,122 +32,18 @@ end % done loading starinfo file
 if ~exist('Mode','var') || Mode~=1
     Mode = 2;
 end
+
+[flags, inp] = define_starflags_20160605(s);
+
 t = s.t;
-daystr = datestr(t(1),'yyyymmdd');
-
-% First load some fields that should always exist in starsun
-w=s.w; Lon=s.Lon; Lat=s.Lat; Alt=s.Alt; Pst=s.Pst; Tst=s.Tst; aerosolcols=s.aerosolcols;
-viscols=s.viscols; nircols=s.nircols; rateaero=s.rateaero;
-c0=s.c0; m_aero=s.m_aero; QdVlr=s.QdVlr; QdVtb=s.QdVtb; QdVtot=s.QdVtot; ng=s.ng;Md=s.Md;
-Str=s.Str; raw=s.raw; dark=s.dark;
-
-% Next attempt to load some fields that may not exist depending on starsun
-% version or toggle settings and populate them
-try;
-    rawrelstd=s.rawrelstd;
-catch;
-    ti=9/86400;
-    cc=[408 169+1044];
-    pp=numel(s.t);
-    rawstd=NaN(pp, numel(cc));
-    rawmean=NaN(pp, numel(cc));
-    for i=1:pp;
-        rows=find(t>=t(i)-ti/2&t<=t(i)+ti/2 & Str==1); % Yohei, 2012/10/22 s.Str>0
-        if numel(rows)>0;
-            rawstd(i,:)=nanstd(raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-            rawmean(i,:)=nanmean(raw(rows,cc),1);
-        end;
-    end;
-    rawrelstd=rawstd./rawmean;
-    clear rawstd rawmean
-end;
-try
-    tau_aero_noscreening=s.tau_aero_noscreening;
-catch
-    tau_aero_noscreening = s.tau_aero;
-end
-try isfield(s,'darkstd')
-    darkstd=s.darkstd;
-catch
-    disp('no darkstd')
-end
-try
-    sd_aero_crit = s.sd_aero_crit;
-catch
-    disp('no sd_aero_crit');
-end
-
-if ~exist('sd_aero_crit','var') % then it wasn't found in starun above so read starinfo file
-    if isobject(s)
-        s = load(s.Properties.Source);
-    end
-    infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
-    infofile_ = ['starinfo_' daystr]
-    infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
-    if exist(infofile_,'file')
-        edit(infofile_) ; % open infofile in case user wants to edit it.
-        if Mode ~=1
-            OK = menu(['Edit ',infofile_,'.m as desired and click OK when done.'],'OK');
-        end
-        infofnt = str2func(infofile_); % Use function handle instead of eval for compiler compatibility
-        s = infofnt(s);
-        %     s = eval([infofile2,'(s)']);
-    elseif exist(infofile2)==2;
-        edit(infofile2) ; % open infofile in case user wants to edit it.
-        if Mode ~=1
-            OK = menu(['Edit ',infofile2,'.m as desired and click OK when done.'],'OK');
-        end
-        infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
-        s = infofnt(s);
-        %     s = eval([infofile2,'(s)']);
-    elseif exist(infofile)==2;
-        open(infofile);
-        if Mode ~=1
-            OK = menu(['Edit ',infofile,'.m as desired and click OK when done.'],'OK');
-        end
-        run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
-        %     eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
-    else; % copy an existing old starinfo file and run it
-        while dayspast<maxdayspast;
-            dayspast=dayspast+1;
-            infofile_previous=fullfile(starpaths, ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
-            if exist(infofile_previous);
-                copyfile(infofile_previous, infofile);
-                if Mode ~=1
-                    OK = menu(['Edit ',infofile,'.m as desired and click OK when done.'],'OK');
-                end
-                open(infofile);
-                run(infofile);
-                %             eval(['edit ' infofile ';']);
-                %             eval(['run ' infofile ';']);
-                warning([infofile ' has been created from ' ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
-                break;
-            end;
-        end;
-    end;
-end
-% We've populated our workspace with 4STAR measurements
-% Now we'll build the input for automatic screening and visi_screen.
-% Now apply all starsun and automated flags...
-[flags,flag_info] = cnvt_ng2flags(ng,t);
-
-
-
-
+daystr = datestr(t(1),'yyyymmdd'); now_str = datestr(now,'yyyymmdd_HHMM');
+flagfile = [daystr,'_starflag_auto_created_',now_str,'.mat'];
+flags.flagfile = flagfile; % make it so that we save the flagfile name.
 %Define ouput file names
 % Use "which" to locate directory containing starinfo and put flag files in same location
-starinfo_name = which(['starinfo_',daystr,'.m']); pname = fileparts(starinfo_name); pname = [pname, filesep];
-now_str = datestr(now,'yyyymmdd_HHMM');
-
-%%
-% if Mode==1 %Automatic mode
-flagfile = [daystr,'_starflag_auto_created',now_str,'.mat'];
-outputfile=[starpaths,filesep,flagfile];%This has to be starsun.mat
+outputfile=[starpaths,filesep,flagfile];
 op_name_str = 'auto';
-disp(['Starflag mode 1 to output to:' flagfile])
-flags.time.t = t;
-flags.flag_str = flag_str;
-flags.flagfile = flagfile; % make it so that we save the flagfile name.
+disp(['Automatic flags written to: ' flagfile])
 
 [~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
 if ~exist(outputfile,'file')
@@ -157,7 +54,6 @@ else
     save(outputfile,'-append','-struct','flags');
 end
 
-% Output an m-file representing all these flags in "ng" format
 [flag_all, flag_names_all, flag_tag_all] = cnvt_flags2ng(t, flags);
 if ~isempty(flag_all)
     [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
@@ -185,33 +81,22 @@ if Mode~=1
         case 8
             op_name_str = 'KP';
     end
-    % Define several flags
-    % flags.before_or_after_flight = t<flight(1) | t>flight(2);
-    % flags.bad_aod = false(size(t));
-    % flags.unspecified_clouds = false(size(t));   
-    flags.smoke = [];
-    flags.dust = [];
-    flags.cirrus = [];
-    flags.low_cloud = [];
-    flags.hor_legs = [];
-    flags.spiral = [];
-    flags.frost = [];
+
 
     % Define flags which do not flag data as "bad".
-    no_mask = {'smoke','dust','before_or_after_flight','hor_legs', 'spiral'};
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
 
     
     %We define several fields to plot in the auxiliary panels
-    panel_1.aod_380nm = aod_380nm;
-    panel_1.aod_452nm = aod_452nm;
-    panel_1.aod_865nm = aod_865nm;
+    panel_1.aod_380nm = inp.aod_380nm;
+    panel_1.aod_452nm = inp.aod_452nm;
+    panel_1.aod_865nm = inp.aod_865nm;
     
-    panel_2.ang = ang_noscreening;
+    panel_2.ang = inp.ang_noscreening;
     panel_2.Quad = sqrt(s.QdVlr.^2 + s.QdVtb.^2)./s.QdVtot;
-    panel_3.rawrelstd = rawrelstd(:,1);
-    panel_4.Alt = Alt;
+    panel_3.rawrelstd = inp.rawrelstd(:,1);
+    panel_4.Alt = s.Alt;
     
     ylims.panel_1 = [-.1, 2];
     ylims.panel_2 = [-1,4];
@@ -235,9 +120,15 @@ if Mode~=1
         flags = rmfield(flags,'auto_settings');
     end
     F_t=fieldnames(flags);
+    for i_f=length(F_t):-1:1
+        fld = F_t{i_f};
+        if ~islogical(flags.(fld))&&~isempty(flags.(fld))
+                F_t(i_f) = [];
+        end
+    end               
     test_good=zeros(size(F_t));
-    for i_f=1:length(no_mask)
-        test_good=test_good+strcmp(no_mask(i_f),F_t);
+    for i_f=1:length(flags.flag_struct.flag_noted)
+        test_good=test_good+strcmp(flags.flag_struct.flag_noted(i_f),F_t);
     end
     screen_bad_list = F_t(~test_good);
             
@@ -249,9 +140,9 @@ if Mode~=1
     flags_matio.flagfile = flagfile;
     
     mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
-    disp(['Corresponding "marks" m-file to: ',mark_fname])
+    disp(['Corresponding "marks" m-file to: ',mark_fname]);
         
-    [flags, screen, good, figs] = visi_screen_v14(t,aod_500nm,'time_choice',1,'flags',flags,'flags_matio',flags_matio,'no_mask',no_mask,'figs',figs,...
+    [flags, screen, good, figs] = visi_screen_v14(t,inp.aod_500nm,'time_choice',1,'flags',flags,'flags_matio',flags_matio,'no_mask',flags.flag_struct.flag_noted,'figs',figs,...
         'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,'field_name','aod 500nm');
     %     ,...
     %         'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
