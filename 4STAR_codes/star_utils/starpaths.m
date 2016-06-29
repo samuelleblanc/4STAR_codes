@@ -24,8 +24,10 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 %                      on both computers, V 1.2
 % Modified (v1.3): by Samuel LeBlanc, 2015-08-26
 %                  - added check for linux, for use on pleaides
+% Modified (v1.5): by Kristina Pistone, 2016-06-29: added data path for my
+%                   machine
 %---------------------------------------------------------------------
-version_set('1.4');
+version_set('1.5');
 
 % get the version of matlab
 vv = version('-release');
@@ -113,6 +115,10 @@ elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on plei
         %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
         %if nargin>1; matfolder=[matfolder raw filesep]; end;
     end;
+elseif ~isempty(strfind(lower(userpath),'kpistone'))
+    matfolder='C:\Users\kpistone\Documents\4STAR\data' ;
+    figurefolder='C:\Users\kpistone\Documents\4STAR\data\figs\';
+    author='Kristina';
 else
     warning('Update starpaths.m');
 %     matfolder=cd;
