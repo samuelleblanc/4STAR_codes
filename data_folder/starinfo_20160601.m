@@ -14,6 +14,10 @@ end
 flight=[datenum(2016,5,30,22 ,58,24) datenum(2016,6,1,07,12,23)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+
+s.flagfilename = '20160601_starflag_man_created20160612_1738by_JL.mat'; 
+%s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
+%s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
