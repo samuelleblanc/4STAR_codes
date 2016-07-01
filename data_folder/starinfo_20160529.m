@@ -16,8 +16,8 @@ flight=[datenum(2016,5,29,22,52,02) datenum(2016,5,30,07,24,38)];
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 
 s.flagfilename = '20160529_starflag_man_created20160613_0916by_JL.mat'; 
-%s.flagfilenameO3 = '20160513_starflag_O3_man_created20160513_2259by_MS.mat';
-%s.flagfilenameCWV = '20160513_starflag_CWV_man_created20160513_2302by_MS.mat';
+s.flagfilenameO3 = '20160529_starflag_O3_man_created20160701_1357by_MS.mat';
+s.flagfilenameCWV = '20160529_starflag_CWV_man_created20160701_1347by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
