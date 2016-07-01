@@ -34,6 +34,7 @@
 % Written (v1.0): Samuel LeBlanc, Osan AFB, Korea, May 7th, 2016
 %                 ported over from SEmakearchive_ARISE_starzen.m
 % MS, updated starinfo files path
+% 2016-07-01, MS, tweaked for certain flag days for KORUS
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
@@ -120,9 +121,9 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521'} ; %put one day string
+dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          1          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -203,6 +204,12 @@ for i=idx_file_proc
     disp('Setting the flags')
     if isfield(flag,'manual_flags');
         qual_flag = ~flag.manual_flags.good;
+    elseif strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+        qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
+        qual_flag = bitor(qual_flag,flag.flags.cirrus);
+        qual_flag = bitor(qual_flag,flag.flags.frost);
+        qual_flag = bitor(qual_flag,flag.flags.low_cloud);
+        qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
     else
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
         qual_flag = bitor(qual_flag,flag.cirrus);
@@ -211,7 +218,12 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.unspecified_clouds);
     end
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
-    flag.utc = t2utch(flag.time.t);
+    % tweak for different flag files
+    if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+        flag.utc = t2utch(flag.flags.time.t);
+    else
+        flag.utc = t2utch(flag.time.t);
+    end
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));

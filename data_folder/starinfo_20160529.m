@@ -11,7 +11,7 @@ else
     s.toggle = update_toggle;
 end
 % 22:52:02   07:24:38
-flight=[datenum(2016,5,29,22,52,02) datenum(2016,5,30,07,24,38)]; 
+s.flight=[datenum(2016,5,29,22,52,02) datenum(2016,5,30,07,24,38)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 
