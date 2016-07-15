@@ -15,7 +15,7 @@ s.flight=[datenum(2016,5,30,22,52,02) datenum(2016,5,31,07,00,16)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 
-%s.flagfilename = '20160529_starflag_man_created20160613_0916by_JL.mat'; 
+s.flagfilename = '20160530_starflag_auto_created20160714_1615.mat'; 
 s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';
 s.flagfilenameCWV = '20160530_starflag_CWV_man_created20160701_1609by_MS.mat';
  

@@ -33,10 +33,10 @@ end;
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
     s.Lat(s.Lon==0 & s.Lat==0)=NaN; 
-    s.Lon(isnan(s.Lon))       =127.0264; % tweaks for Osan AFB
-    s.Lat(s.Lat==0)           =37.0878;  % tweaks for Osan AFB 
-    s.Alt(s.Alt==14)          =35.7;  % tweaks for Osan AFB
-    s.Alt(s.Alt==0)           =35.7;  % tweaks for Osan AFB 
+    s.Lon(isnan(s.Lon))       =-118.08; % tweaks for Osan AFB
+    s.Lat(s.Lat==0)           =36.61;  % tweaks for Osan AFB 
+    s.Alt(s.Alt==14)          =840;  % tweaks for Osan AFB
+    s.Alt(s.Alt==0)           =840;  % tweaks for Osan AFB 
 end; 
 if isfield(s, 'AZstep') & isfield(s, 'AZ_deg'); 
     s.AZ_deg=s.AZstep/(-50); 
