@@ -17,7 +17,7 @@ s.flight =[datenum(2016,6,02,22,57,01) datenum(2016,6,3,7,15,24)];
  
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
-s.flagfilename    = '20160602_starflag_auto_created20160714_1702.mat';
+s.flagfilename    = '20160602_starflag_man_created20160718_1638by_CF.mat';%'20160602_starflag_auto_created20160714_1702.mat';
 s.flagfilenameO3  = '20160602_starflag_O3_man_created20160701_1601by_MS.mat';
 s.flagfilenameCWV = '20160602_starflag_CWV_man_created20160701_1549by_MS.mat';
  
