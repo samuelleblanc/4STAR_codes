@@ -42,10 +42,10 @@
 function SEmakearchive_KORUS_GAS
 version_set('v1.0')
 %% set variables
-ICTdir = 'E:\KORUS-AQ\gas_ict\';
-starinfo_path = 'E:\KORUS-AQ\starinfo\';
-starsun_path = 'E:\KORUS-AQ\starsun\';
-gasfile_path = 'E:\KORUS-AQ\gas_summary\';
+ICTdir = 'D:\KORUS-AQ\gas_ict\';
+starinfo_path = 'D:\KORUS-AQ\starinfo\';
+starsun_path = 'D:\KORUS-AQ\starsun\';
+gasfile_path = 'D:\KORUS-AQ\gas_summary\';
 prefix='korusaq-4STAR-GASES'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='C'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
@@ -127,7 +127,7 @@ form.std_CWV   = '%2.3f';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          1          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          1          0          0] ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -205,7 +205,7 @@ for i=idx_file_proc
 
  %% Load the flag file
  % need to add additional flags for NO2 and CWV
-    if isfield(s, 'flagfilename');
+    if isfield(s, 'flagfilenameO3');
         disp(['Loading flag file: ' s.flagfilenameO3])
         flagO3 = load(s.flagfilenameO3); 
         disp(['Loading flag file: ' s.flagfilenameCWV])
