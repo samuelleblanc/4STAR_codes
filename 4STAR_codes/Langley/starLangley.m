@@ -2,18 +2,18 @@
 % computation is done in Langley.m, and saving in starsavec0.m.
 %
 % Yohei, 2012/01/23, 2013/02/19
-% Michal, 2015-01-07, added version_set (v 1.0) for version control of this
-% script
-% Michal, 2015-01-07, added an option to plot Langley with Azdeg
-%                     added an option to plot Langley with Tst
-%                     changed version to 1.1
-% Michal, 2015-01-20, added an option for further data range screening for
-%                     Langley (Line 45)
-% Michal, 2015-10-20, added options for the new Oct 2015 re-run of ARISE c0
-%                     added NIR wavelengths in cols for plots
-% Michal, 2015-10-28, tweaked to adjust ARISE unc to 0.03
-% Michal, 2016-01-09, tweaked to accomodate MLO, Jan-2016 Langleys
-% Michal, 2016-01-21, updated to include MLO-Jan-2016 airmass constraints
+% Michal,   2015-01-07, added version_set (v 1.0) for version control of this
+%                       script
+% Michal,   2015-01-07, added an option to plot Langley with Azdeg
+%                       added an option to plot Langley with Tst
+%                       changed version to 1.1
+% Michal,   2015-01-20, added an option for further data range screening for
+%                       Langley (Line 45)
+% Michal,   2015-10-20, added options for the new Oct 2015 re-run of ARISE c0
+%                       added NIR wavelengths in cols for plots
+% Michal,   2015-10-28, tweaked to adjust ARISE unc to 0.03
+% Michal,   2016-01-09, tweaked to accomodate MLO, Jan-2016 Langleys
+% Michal,   2016-01-21, updated to include MLO-Jan-2016 airmass constraints
 %--------------------------------------------------------------------------
 
 version_set('1.1');
@@ -21,12 +21,12 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160426';
+daystr='20160702';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
 cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
-savefigure=0;
+savefigure=1;
 
 %********************
 % generate a new cal
@@ -94,13 +94,17 @@ elseif isequal(daystr, '20160426')
     ok = ok(m_aero(ok)>=4);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
+    if savefigure;
+        title('20160702 evening with FORJ correction')
+        starsas(['star' daystr 'evening_Langleyplot_stdevs.fig, starLangley.m']);
+    end;
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
     [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
     %lstr=setspectrumcolor(h(:,1), w(cols));
     %lstr=setspectrumcolor(h(:,2), w(cols));
     hold on;
-    h0=plot(m_aero(ok), rateaero(ok,cols), '.','color',[.5 .5 .5]);
+    h0=plot(m_aero(ok), rateaero(ok,cols(4)), '.','color',[.5 .5 .5]);
     chi=get(gca,'children');
     set(gca,'children',flipud(chi));
     ylabel('Count Rate (/ms) for Aerosols');

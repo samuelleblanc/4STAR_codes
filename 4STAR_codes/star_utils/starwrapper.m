@@ -533,7 +533,7 @@ if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't app
     AZ_deg_   = s.AZstep/(-50);
     AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
     AZunique = unique(AZ_deg);
-    s.forj_corr = forj_corr.corr(AZ_deg+1)'
+    s.forj_corr = forj_corr.corr(AZ_deg+1)';
     s.rate=s.rate.*repmat(s.forj_corr,1,qq);
     if toggle.applyforjcorr==2;
         dAZdt=diff(s.AZstep/(-50))./diff(s.t)/86400
