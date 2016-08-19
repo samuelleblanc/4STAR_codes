@@ -1,4 +1,4 @@
-function [X,FVAL,EXITFLAG,OUTPUT,LAMBDA,GRAD,HESSIAN] = fmincon(FUN,X,A,B,Aeq,Beq,LB,UB,NONLCON,options,varargin)
+function [X,FVAL,EXITFLAG,OUTPUT,LAMBDA,GRAD,HESSIAN] = star_fmincon(FUN,X,A,B,Aeq,Beq,LB,UB,NONLCON,options,varargin)
 %FMINCON finds a constrained minimum of a function of several variables.
 %   FMINCON attempts to solve problems of the form:
 %    min F(X)  subject to:  A*X  <= B, Aeq*X  = Beq (linear constraints)
@@ -126,8 +126,6 @@ function [X,FVAL,EXITFLAG,OUTPUT,LAMBDA,GRAD,HESSIAN] = fmincon(FUN,X,A,B,Aeq,Be
 %
 %   See also OPTIMOPTIONS, OPTIMTOOL, FMINUNC, FMINBND, FMINSEARCH, @, FUNCTION_HANDLE.
 
-%   Copyright 1990-2013 The MathWorks, Inc.
-%   $Revision: 1.1.6.30 $  $Date: 2013/02/26 01:48:38 $
 
 defaultopt = struct( ...
     'Algorithm','trust-region-reflective', ...
