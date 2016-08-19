@@ -533,7 +533,8 @@ if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't app
     AZ_deg_   = s.AZstep/(-50);
     AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
     AZunique = unique(AZ_deg);
-    s.rate=s.rate.*repmat(forj_corr.corr(AZ_deg+1)',1,qq);
+    s.forj_corr = forj_corr.corr(AZ_deg+1)'
+    s.rate=s.rate.*repmat(s.forj_corr,1,qq);
     if toggle.applyforjcorr==2;
         dAZdt=diff(s.AZstep/(-50))./diff(s.t)/86400
         dAZdt=([dAZdt; 0]+[0; dAZdt])/2; % rotation rate
@@ -709,7 +710,7 @@ end; % toggle.doflagging
 % mode of gas retrieval proc
 % gasmode=menu('Select gas retrieval mode:','1: CWV only','2: PCA, hyperspectral');
 
-if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));
+if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype),'forj'));
     % || ~isempty(strfind(lower(datatype),'sky')); % not for FOV, ZEN, PARK data
     
     %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
