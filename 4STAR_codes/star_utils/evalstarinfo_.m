@@ -27,6 +27,7 @@ try;
     run(starinfofile);  
 catch;
     s.dummy=true;
+    disp(starinfofile)
     try;
        run(starinfofile)
     catch;

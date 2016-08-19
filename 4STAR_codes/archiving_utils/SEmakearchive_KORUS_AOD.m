@@ -35,14 +35,15 @@
 %                 ported over from SEmakearchive_ARISE_starzen.m
 % MS, updated starinfo files path
 % 2016-07-01, MS, tweaked for certain flag days for KORUS
+% 2016-07-14, MS, twaeked to accept automatic flags
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
 version_set('v1.0')
 %% set variables
-ICTdir = 'E:\KORUS-AQ\aod_ict\';
-starinfo_path = 'E:\KORUS-AQ\starinfo\';
-starsun_path = 'E:\KORUS-AQ\starsun\';
+ICTdir = 'D:\KORUS-AQ\aod_ict\';
+starinfo_path = 'D:\KORUS-AQ\starinfo\';
+starsun_path = 'D:\KORUS-AQ\starsun\';
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
@@ -123,7 +124,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          1          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          1          0          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -211,16 +212,19 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.low_cloud);
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
     else
+        % only for automatic flagging
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        qual_flag = bitor(qual_flag,flag.cirrus);
-        qual_flag = bitor(qual_flag,flag.frost);
-        qual_flag = bitor(qual_flag,flag.low_cloud);
-        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        %qual_flag = bitor(qual_flag,flag.cirrus);
+        %qual_flag = bitor(qual_flag,flag.frost);
+        %qual_flag = bitor(qual_flag,flag.low_cloud);
+        %qual_flag = bitor(qual_flag,flag.unspecified_clouds);
     end
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     % tweak for different flag files
     if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
         flag.utc = t2utch(flag.flags.time.t);
+    %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
+    %    flag.utc = UTC';
     else
         flag.utc = t2utch(flag.time.t);
     end
