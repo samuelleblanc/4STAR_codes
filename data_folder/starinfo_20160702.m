@@ -26,9 +26,9 @@ langley2=[datenum(2016,07,03,03,00,00) datenum(2016,07,03,05,00,00)]; %evening L
 % langley=[datenum(2016,07,02,21,50,00) datenum(2016,07,02,22,30,00); datenum(2016,07,03,03,00,00) datenum(2016,07,03,05,00,00)]; %evening Langley v2 (incorporating some solar noon
  
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.268; % we think it was this yesterday?
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21; % 
+s.O3col=0.258;    % OMI overpass
+s.NO2col=3.18e15; % OMI overpass 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
