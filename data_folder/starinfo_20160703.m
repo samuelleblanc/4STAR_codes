@@ -16,9 +16,9 @@ end
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
  
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.268; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21; % 
+s.O3col=0.257; % omi overpass    
+s.NO2col=3.18e15; % omi overpass 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
