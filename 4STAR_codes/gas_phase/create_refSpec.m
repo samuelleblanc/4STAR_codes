@@ -63,8 +63,12 @@ if strcmp(gas,'O3')
     ind = find((s.m_O3>=min(s.m_O3)-0.00001&s.m_O3<=min(s.m_O3)+0.00001));
     ref_spec.mean_m = nanmean(s.m_O3(ind));
     % from DB instrument at MLO - DS mode
-    ref_spec.o3scdref = 243*ref_spec.mean_m;% in [DU]
-    ref_spec.o3scdref = 335;
+    if strcmp(daystr,'20160113')
+        ref_spec.o3scdref = 243*ref_spec.mean_m;% in [DU]
+        ref_spec.o3scdref = 335;% derived from MLE method
+    elseif strcmp(daystr,'20160702')||strcmp(daystr,'20160703')
+        ref_spec.o3scdref = 259*ref_spec.mean_m;% in [DU]
+    end
     save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     
 elseif strcmp(gas,'NO2')
@@ -75,8 +79,12 @@ elseif strcmp(gas,'NO2')
     ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
     ref_spec.mean_m = nanmean(s.m_NO2(ind));
     % from OMI station overpass at MLO [molec/cm2]
-    ref_spec.no2scdref = 2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
-    ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
+    if strcmp(daystr,'20160113')
+        ref_spec.no2scdref = 2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
+        ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
+    elseif strcmp(daystr,'20160702')||strcmp(daystr,'20160703')
+        ref_spec.no2scdref = 3.18e15*ref_spec.mean_m;%this is total column; MLO 20160702
+    end
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     
 elseif strcmp(gas,'HCOH')
@@ -120,9 +128,15 @@ clear s
 %% use refspec to retrieve quantities at MLO:
 
 % upload data points:
-dat1 = load([starpaths,'20160111starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
-dat2 = load([starpaths,'20160112starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
-dat3 = load([starpaths,'20160113starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+% MLO Jan-2016
+%dat1 = load([starpaths,'20160111starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+%dat2 = load([starpaths,'20160112starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+%dat3 = load([starpaths,'20160113starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+
+% MLO June-2016
+dat1 = load([starpaths,'20160702starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+dat2 = load([starpaths,'20160703starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
+dat3 = load([starpaths,'20160704starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
 
 if strcmp(gas,'O3')
     ref_spec.o3refspec = meanspec;
@@ -178,6 +192,7 @@ end
 if strcmp(gas,'O3')
     
         % bin airmass 1-5 into 100 bins
+        % these airmass values are for MLO Jan-2016
         x = [dat1.m_O3(dat1.m_O3<=8.5&dat1.m_O3>=3);
              dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=3);
              dat3.m_O3(dat3.m_O3<=8.5&dat3.m_O3>=3)];
@@ -208,6 +223,7 @@ if strcmp(gas,'O3')
         
 elseif strcmp(gas,'NO2')
         % bin airmass 1-5 into 100 bins
+        % these airmass values are for MLO Jan-2016
         x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
              dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
              dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
@@ -236,6 +252,7 @@ elseif strcmp(gas,'NO2')
         plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),'-k','linewidth',2);
 elseif strcmp(gas,'HCOH')
         % bin airmass 1-5 into 100 bins
+        % these airmass values are for MLO Jan-2016
         x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
              dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
              dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];

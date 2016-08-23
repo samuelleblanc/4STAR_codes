@@ -25,7 +25,7 @@ end;
 
 % select a source file
 
-    if t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+    if t>=datenum([2016 1 09 0 0 0]) && t<=datenum([2016 4 18 0 0 0]); % use MLO Jan-2016
         if now>=datenum([2016 1 19 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
@@ -61,6 +61,44 @@ end;
                 
             end
         end; 
+        
+    elseif t> datenum([2016 4 18 0 0 0]); % use MLO June-2016
+        if now>=datenum([2016 4 18 0 0 0]);
+             if strcmp(gas,'O3')
+                if mode==0
+                    % use MLO c0
+                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load([starpaths,'20160702O3refspec.mat']);
+                    c0gases = tmp.o3refspec;
+                end
+            elseif strcmp(gas,'NO2')
+                if mode==0
+                    % use MLO c0
+                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load([starpaths,'20160702NO2refspec.mat']);
+                    c0gases = tmp.no2refspec;
+                end
+                
+            elseif strcmp(gas,'HCOH')
+                if mode==0
+                    % use lamp FEL?
+                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load([starpaths,'20160702HCOHrefspec.mat']);
+                    c0gases = tmp.hcohrefspec;
+                end    
+                
+            end
+        end;     
+        
     end
     
     
