@@ -23,8 +23,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.6, 2016-04-07, update latest c0 to WFF 20151104, which seems like our best bet.
 % MS, v1.7, 2016-05-01, updated c0 from korus-aq transit flight 1
 % MS, v1.7, 2016-05-02, updated c0 from korus-aq transit 1, o3 corrected
+% SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016. 
 
-version_set('1.6');
+version_set('1.8');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -38,7 +39,12 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
+    if t>=datenum([2016 6 30 0 0 0]); % MLO June 2016 for ORACLES 2016
+        if t>=datenum([2016 6 30 0 0 0]);
+        daystr='20160707';
+        filesuffix='Langley_MLO_June2016_mean';
+        end;    
+    elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
         if now>=datenum([2016 4 7 0 0 0]);
             %daystr='20151104';
             %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';      % ground-based sunrise measurements at WFF is our best bet for KORUS
