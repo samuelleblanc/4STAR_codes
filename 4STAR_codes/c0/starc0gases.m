@@ -9,6 +9,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % other 4STAR codes should obtain the c0 from this code. 
 % MS, v1.0, 2016-05-05, KORUS-AQ
 % Modified, MS, 2016-05-18, adding HCOH ref spec
+% Modified, MS, 2016-08-23, added June 2016 MLO gases c0
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -67,7 +68,7 @@ end;
              if strcmp(gas,'O3')
                 if mode==0
                     % use MLO c0
-                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
@@ -77,7 +78,7 @@ end;
             elseif strcmp(gas,'NO2')
                 if mode==0
                     % use MLO c0
-                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
@@ -88,7 +89,7 @@ end;
             elseif strcmp(gas,'HCOH')
                 if mode==0
                     % use lamp FEL?
-                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
