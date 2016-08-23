@@ -193,12 +193,21 @@ if strcmp(gas,'O3')
     
         % bin airmass 1-5 into 100 bins
         % these airmass values are for MLO Jan-2016
-        x = [dat1.m_O3(dat1.m_O3<=8.5&dat1.m_O3>=3);
-             dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=3);
-             dat3.m_O3(dat3.m_O3<=8.5&dat3.m_O3>=3)];
-        y = [o3_1.o3SCD(dat1.m_O3<=8.5&dat1.m_O3>=3);
-             o3_2.o3SCD(dat2.m_O3<=8.5&dat2.m_O3>=3);
-             o3_3.o3SCD(dat3.m_O3<=8.5&dat3.m_O3>=3)];
+        if strcmp(daystr,'20160113')
+            x = [dat1.m_O3(dat1.m_O3<=8.5&dat1.m_O3>=3);
+                 dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=3);
+                 dat3.m_O3(dat3.m_O3<=8.5&dat3.m_O3>=3)];
+            y = [o3_1.o3SCD(dat1.m_O3<=8.5&dat1.m_O3>=3);
+                 o3_2.o3SCD(dat2.m_O3<=8.5&dat2.m_O3>=3);
+                 o3_3.o3SCD(dat3.m_O3<=8.5&dat3.m_O3>=3)];
+        elseif strcmp(daystr,'20160702') 
+        % these airmass values are for MLO June-2016
+            x = [dat1.m_O3(dat1.m_O3<=8.5&dat1.m_O3>=1);
+                 dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=1)];
+            y = [o3_1.o3SCD(dat1.m_O3<=8.5&dat1.m_O3>=1);
+                 o3_2.o3SCD(dat2.m_O3<=8.5&dat2.m_O3>=1)];
+            y = real(y); 
+        end 
         binEdge = linspace(min(x),max(x),100);
         [n,bin] = histc(x,binEdge);
 
@@ -224,12 +233,22 @@ if strcmp(gas,'O3')
 elseif strcmp(gas,'NO2')
         % bin airmass 1-5 into 100 bins
         % these airmass values are for MLO Jan-2016
-        x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
-             dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
-             dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
-        y = [no2_1.no2SCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
-             no2_2.no2SCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
-             no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        if strcmp(daystr,'20160113')
+            x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+                 dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+                 dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+            y = [no2_1.no2SCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+                 no2_2.no2SCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+                 no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        elseif strcmp(daystr,'20160702')
+             x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=1);
+                  dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=1)];
+             y = [no2_1.no2SCD(dat1.m_NO2<=5&dat1.m_NO2>=1);
+                  no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=1)];
+              
+             y(y<0) = NaN; 
+        end
+        
         binEdge = linspace(min(x),max(x),100);
         [n,bin] = histc(x,binEdge);
 
@@ -250,15 +269,24 @@ elseif strcmp(gas,'NO2')
         % plot on data
         figure(22);
         plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),'-k','linewidth',2);
+        
 elseif strcmp(gas,'HCOH')
         % bin airmass 1-5 into 100 bins
         % these airmass values are for MLO Jan-2016
-        x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
-             dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
-             dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
-        y = [hcoh_1.hcohSCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
-             hcoh_2.hcohSCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
-             hcoh_3.hcohSCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        if strcmp(daystr,'20160113')
+            x = [dat1.m_NO2(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+                 dat2.m_NO2(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+                 dat3.m_NO2(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+            y = [hcoh_1.hcohSCD(dat1.m_NO2<=6.5&dat1.m_NO2>=3);
+                 hcoh_2.hcohSCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
+                 hcoh_3.hcohSCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
+        elseif strcmp(daystr,'20160702')
+            x = [dat1.m_NO2(dat1.m_NO2<=3&dat1.m_NO2>=1);
+                 dat2.m_NO2(dat2.m_NO2<=3&dat2.m_NO2>=1)];
+            y = [hcoh_1.hcohSCD(dat1.m_NO2<=3&dat1.m_NO2>=1);
+                 hcoh_2.hcohSCD(dat2.m_NO2<=3&dat2.m_NO2>=1)];
+        end
+        
         binEdge = linspace(min(x),max(x),100);
         [n,bin] = histc(x,binEdge);
 
@@ -289,6 +317,6 @@ elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'HCOH')
-    ref_spec.hcohscdref = abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline?
+    ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline?
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
 end

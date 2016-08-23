@@ -10,11 +10,13 @@
 % MS: 2015/10/02, added some more tweaks to adopt to ARISE 20141002
 %                 Langley, after code changes
 % MS, 2016-01-09, tweaked to accomodate Jan-2016 MLO processing
+% MS, 2016-08-23, tweaked to accomodate June 2016 MLO
 %********************
 % set parameters
 %********************
-daystr='20160426';
+%daystr='20160426';% airborne KORUS-AQ
 %daystr='20130712';
+daystr='20160702';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -46,8 +48,8 @@ ok=incl(t,langley);
 % load water vapor coef
 % load H2O a and b parameters
 % watvapcoef   = load(strcat(starpaths,'cross_sections_uv_vis_swir_all.mat'));                                % 3.4km MidLatSummer-old FWHM
-  watvapcoef   = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));          % Alt=0km MidLatSummer 
-% watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));        % 3.4km Tropical MLO
+% watvapcoef   = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));          % Alt=0km MidLatSummer 
+  watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));        % 3.4km Tropical MLO
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');   % 6.85km MidLatWinter for 20130214
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');      % 6.0km MidLatWinter for 20130212
 % watvapcoef = load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);              % 6.0km MidLatWinter for 20130212
@@ -196,6 +198,15 @@ elseif strcmp(daystr,'20160426')  % KORUS transit 1
     c0mod = c0vis;
     c0mod(iwln) = c0_mod;
     filesuffix='modified_Langley_korusaq_transit1_v1'; 
+    visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
+    
+elseif strcmp(daystr,'20160702')  % June-2016 MLO   
+    c0file = '20160707_VIS_C0_Langley_MLO_June2016_mean.dat';
+    c0=importdata(fullfile(starpaths, c0file));
+    c0vis = c0.data(:,3);
+    c0mod = c0vis;
+    c0mod(iwln) = c0_mod;
+    filesuffix='modified_Langley_MLO';
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');
