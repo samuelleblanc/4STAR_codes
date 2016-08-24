@@ -18,7 +18,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % CJF: 2012/10/05
 % CJF: 2013/12/05: edited lines 145 and following to strip empty records
 % SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
-version_set('1.0');
+% SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
+version_set('1.1');
 %********************
 % control input
 %********************
@@ -26,14 +27,14 @@ version_set('1.0');
 if nargin<1 || isempty(source)
     source='ask';
 end;
-[filenames, ext, daystr]=starsource(source, '.dat');
+[filenames, ext, daystr,~,instrumentname]=starsource(source, '.dat');
 if isempty(filenames);
     return;
 end;
 
 %% destination
 if nargin<2 || isempty(savematfile) || isequal(savematfile, 'ask'); % if savematfile is not given, generate a default name and ask to modify it
-    savematfile=[daystr 'star.mat'];
+    savematfile=[instrumentname '_' daystr 'star.mat'];
 end;
 savematfile=stardestination(savematfile);
 if isequal(savematfile, 0);
@@ -82,9 +83,12 @@ for i=1:length(filenames);
     cf=[cf ext0];
     clear folder0 ext0;
     if length(cf)>16;
-        filen=str2num(cf(10:12));
+        [daystr,filen,dtype,instrumentname]=starfilenames2daystr({cf},1);
+        filen = str2num(filen);
+        %filen=str2num(cf(10:12));
         if isempty(find(filen==filen00)); % don't re-read the files listed in filen00
-            type=lower(cf(14:end-4));
+            %type=lower(cf(14:end-4));
+            type=lower(dtype);
             try
                 s=starter(cf0); % read the raw file.
                 if ~isempty(s.t) && ((isfield(s, 'raw') && ~isempty(s.raw)) || (isfield(s, 'fname') && ~isempty(strfind(lower(s.fname), 'track')))); % time is given, and either raw isn't empty or it's a track file
