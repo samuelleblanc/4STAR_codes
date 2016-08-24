@@ -26,7 +26,7 @@ end;
 
 % select a source file
 
-    if t>=datenum([2016 1 09 0 0 0]) && t<=datenum([2016 4 18 0 0 0]); % use MLO Jan-2016
+    if t>=datenum([2016 1 09 0 0 0]) && t<=datenum([2016 6 19 0 0 0]); % KORUS-AQ/SARP
         if now>=datenum([2016 1 19 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
@@ -35,7 +35,7 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160113O3refspec.mat']);
+                    tmp = load([starpaths,'20160113O3refspec.mat']);%MLO Jan-2016 for O3
                     c0gases = tmp.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
@@ -45,7 +45,8 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160113NO2refspec.mat']);
+                    % tmp = load([starpaths,'20160113NO2refspec.mat']);
+                    tmp = load([starpaths,'20160702NO2refspec.mat']);% MLO June-2016 for NO2
                     c0gases = tmp.no2refspec;
                 end
                 
@@ -56,14 +57,14 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160113HCOHrefspec.mat']);
+                    tmp = load([starpaths,'20160702HCOHrefspec.mat']);% MLO June-2016 for HCOH
                     c0gases = tmp.hcohrefspec;
                 end    
                 
             end
         end; 
         
-    elseif t> datenum([2016 4 18 0 0 0]); % use MLO June-2016
+    elseif t> datenum([2016 6 30 0 0 0]); % use MLO June-2016-ORACLES
         if now>=datenum([2016 4 18 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
