@@ -203,11 +203,9 @@ if strcmp(gas,'O3')
         elseif strcmp(daystr,'20160702') 
         % these airmass values are for MLO June-2016
             x = [dat1.m_O3(dat1.m_O3<=8.5&dat1.m_O3>=1);
-                 dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=1);
-                 dat3.m_O3(dat3.m_O3<=8.5&dat3.m_O3>=1)];
+                 dat2.m_O3(dat2.m_O3<=8.5&dat2.m_O3>=1)];
             y = [o3_1.o3SCD(dat1.m_O3<=8.5&dat1.m_O3>=1);
-                 o3_2.o3SCD(dat2.m_O3<=8.5&dat2.m_O3>=1)
-                 o3_3.o3SCD(dat3.m_O3<=8.5&dat3.m_O3>=1)];
+                 o3_2.o3SCD(dat2.m_O3<=8.5&dat2.m_O3>=1)];
             y = real(y); 
         end 
         binEdge = linspace(min(x),max(x),100);
@@ -244,11 +242,9 @@ elseif strcmp(gas,'NO2')
                  no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
         elseif strcmp(daystr,'20160702')
              x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=1);
-                  dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=1);
-                  dat3.m_NO2(dat3.m_NO2<=5&dat3.m_NO2>=1)];
+                  dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=1)];
              y = [no2_1.no2SCD(dat1.m_NO2<=5&dat1.m_NO2>=1);
-                  no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=1);
-                  no2_3.no2SCD(dat3.m_NO2<=5&dat3.m_NO2>=1)];
+                  no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=1)];
               
              y(y<0) = NaN; 
         end
@@ -272,7 +268,7 @@ elseif strcmp(gas,'NO2')
 
         % plot on data
         figure(22);
-        plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),':k','linewidth',2);
+        plot([0:0.1:6.5],polyval(Sf,[0:0.1:6.5]),'-k','linewidth',2);
         
 elseif strcmp(gas,'HCOH')
         % bin airmass 1-5 into 100 bins
@@ -315,7 +311,7 @@ end
 
 %% save parameters to struct .mat file
 if strcmp(gas,'O3')
-    ref_spec.o3scdref=abs(Sf(2));%
+    ref_spec.o3scdref=abs(Sf(2));%313.5DU
     save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2')
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
