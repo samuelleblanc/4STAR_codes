@@ -38,6 +38,7 @@
 % Written: Michal Segal-Rozenhaimer, 2016-04 based on former versions
 % Modified from retrieveNO2_20160505
 % MS, 2016-05-05, added usage of reference spectrum
+% MS, 2016-08-24, created a bug in reading c0gases and ref amount
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode)
@@ -61,11 +62,13 @@ loadCrossSections_global;
  % decide which c0 to use
  % mode = 1;%0-MLO c0; 1-MLO ref spec
   
-  [c0]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
+  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
   
   if mode==0
       % when mode==0 need to choose wln
-      c0 = c0(wln)';
+      c0 = tmp(wln)';
+  elseif mode==1
+      c0 = tmp.o3refspec;
   end
   
  
@@ -120,8 +123,8 @@ end
        no2vcd_smooth = real(no2VCDsmooth);
    elseif mode==1
        % load reference spectrum
-       ref_spec = load([starpaths,'20160113NO2refspec.mat']);
-       no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + ref_spec.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
+       % ref_spec = load([starpaths,'20160113NO2refspec.mat']);
+       no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
        no2vcd_smooth = real(no2SCDsmooth)./s.m_NO2;
