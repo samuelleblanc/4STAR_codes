@@ -1,22 +1,55 @@
-function [daystr, filen, datatype]=starfilenames2daystr(filenames, staysingle)
+function [daystr, filen, datatype, instrumentname]=starfilenames2daystr(filenames, staysingle)
 
+% Function to grab the day string from the filename. 
+% Also grabs the file number, the datatype, the instrument name from the
+% filename. Works for files spanning more than one day. 
+%
+%
+% SL, v1.1, 2018-08-23, added the ability to use the new filename system which
+% returns the instrument name and the version_set tracking
+version_set('1.1')
 if nargin<2
     staysingle=1;
 end;
 daystr=[];
 filen=[];
 datatype={};
+instrumentname={};
 for i=1:length(filenames);
     filenames{i}(filenames{i}=='\' | filenames{i}=='/')=filesep; % let Mac run star.mat flies created on a PC.
     [folder0, file0, ext0]=fileparts(char(filenames(i)));
-    if isequal(lower(ext0), '.mat') || (length(file0)>=14 && isequal(file0(9),'_') && isequal(file0(13),'_')); % look only at mat file or 4STAR-formatted files.
+    file0str = strsplit(file0,'_');
+    if (isequal(lower(ext0), '.mat') && all(isstrprop(file0(1:8),'digit'))) || (length(file0)>=14 && isequal(file0(9),'_') && isequal(file0(13),'_')); % look only at mat file or old 4STAR-formatted files.
         daystr=[daystr; file0(1:8)];
         if ~isequal(lower(ext0), '.mat')
             filen=[filen; {file0(10:12)}];
             datatype=[datatype; {file0(14:end)}];
         end;
+        instrumentname = [instrumentname; '4STAR'];
+    elseif isequal(datestr(datenum(file0str{2},'yyyymmdd'),'yyyymmdd'),file0str{2});
+        daystr = [daystr; file0str{2}];
+        if ~isequal(lower(ext0), '.mat')
+            filen=[filen; {file0str{3}}];
+            if length(file0str)>4;
+                datatype=[datatype; {[file0str{4} '_' file0str{5}]}];
+            else;
+                datatype=[datatype; {file0str{4}}];
+            end;
+        end;        
+        instrumentname = [instrumentname; file0str{1}];
+    elseif isequal(lower(ext0), '.mat'); %new mat file type
+        daystr = [daystr; file0str{2}(1:8)];  
+        instrumentname = [instrumentname; file0str{1}];        
     end;
 end;
+
+if length(unique(instrumentname))>1;
+   error('The input files are from different instruments'); 
+else;
+    instrumentname = unique(instrumentname);
+    instrumentname = instrumentname{1};
+end;
+
 if staysingle
     daystr=unique(daystr,'rows');
     if size(daystr,1)~=1; % if multiple dates are mixed, empty the daystr

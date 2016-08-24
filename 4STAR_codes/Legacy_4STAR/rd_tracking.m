@@ -1,4 +1,12 @@
 function track = rd_tracking_F4_v2(infile);
+
+%% Function to read the tracking files, original from CJF
+% SL, v2.1, 2016-08-23, added version_set to control this document, added
+%                       handling of the instrument name in the filenames
+
+version_set('2.1')
+
+%%
 if ~exist('infile','var')||~exist(infile,'file')
     infile = getfullname('*_TRACK.dat','SPICE2','Select tracking file');
 end
@@ -44,7 +52,8 @@ if PM
         track.(labels{l}) = C{l+1};
     end
     track.(labels{1}) = double(C{1});
-    in_date = strtok(fname,'_');
+    %in_date = strtok(fname,'_');
+    in_date = starfilenames2daystr({fname},1);
     in_times = C{2};
     PMs = C{3};
     %%
@@ -66,7 +75,8 @@ else
         track.(labels{l}) = C{l};
     end
     track.(labels{1}) = double(C{1});
-    in_date = strtok(fname,'_');
+    %in_date = strtok(fname,'_');
+    in_date = starfilenames2daystr({fname},1);
     in_times = C{2};
     for t = length(in_times):-1:1
         len(t) =  length([in_date, ' ',in_times{t}]);

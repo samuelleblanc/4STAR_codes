@@ -29,10 +29,10 @@ end;
 [pathstr, filename]=fileparts(file);
 
 % tell the type type
-type=lower(filename(14:end));
+%type=lower(filename(14:end));
 
 % read the file
-if isequal(type, 'track'); % track file
+if length(findstr(lower(filename),'track'))>0; %isequal(type, 'track'); % track file
     s = rd_tracking(file); % Connor's code
     s.t=s.time; % for consistency in nomenclature
 else % all other types

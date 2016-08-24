@@ -86,8 +86,11 @@ function	s=starwrapper(s, s2, varargin)
 %                       changed flags.aerosol_init_auto to flags.bad_aod to
 %                       make it compatible with starflag
 % MS: v2.6, 2015-02-29: added recent changes after MLO of constant stray light correction
+% SL: v2.7, 2016-08-23, Added information about the instrument name and
+%                       auto turn off of the running watervapor if the Optimization Toolbox is
+%                       not found.
 
-version_set('2.6');  
+version_set('2.7');  
 %********************
 %% prepare for processing
 %********************
@@ -193,9 +196,12 @@ s2.note={};
 
 %% get data type
 if toggle.verbose; disp('get data types'), end;
-[daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
+[daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);
 if nargin>=(2+nnarg)
-    [daystr2, filen2, datatype2]=starfilenames2daystr(s2.filename, 1);
+    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);
+    if instrumentname~=instrumentname2;
+        error('Instrument name on files from both structures do not match')
+    end;
 end;
 
 %********************
@@ -479,7 +485,7 @@ if nargin>=2+nnarg
     s=rmfield(s, setdiff(fn,'t'));
     qq=qq+qq2;
     clear qq2 s2;
-    [daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr(s.filename, 1);
 end
 
 %% get solar zenith angle, airmass, temperatures, etc.
@@ -864,6 +870,11 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
     % water vapor retrieval (940fit+c0 method)
     %-----------------------------------------
+    if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
+        toggle.runwatervapor = false;
+        warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
+    end;
+        
     if toggle.runwatervapor;
         if toggle.verbose; disp('water vapor retrieval start'), end;
         [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
@@ -1054,7 +1065,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     cols=cols(isfinite(cols)==1);
     colsang=cols([3 7]);
     ang=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
-    daystr=starfilenames2daystr(s.filename);
+    [daystr,nul,nul,instrumnetname]=starfilenames2daystr(s.filename);
     figure;
     for ii=unique(yypanel);
         subplot(max(yypanel), 1, ii);
@@ -1104,7 +1115,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
             set(lh,'fontsize',10,'location','best');
         end;
         if ii==1;
-            title(daystr);
+            title([instrumentname ' ' daystr]);
         end;
     end;
     linkaxes(ax,'x');
@@ -1112,7 +1123,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     % then use dynamicDateTicks instead
     xlabel('Time');
     if savefigure;
-        starsas(['star' daystr 'starwrapper_screening.fig']);
+        starsas(['star_' instrumentname '_' daystr 'starwrapper_screening.fig']);
     end;
     
     % prepare to plot average tau and tau_aero_err

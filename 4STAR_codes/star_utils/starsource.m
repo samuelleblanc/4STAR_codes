@@ -1,9 +1,13 @@
-function [filenames, ext, daystr, filen]=starsource(source, datatype)
+function [filenames, ext, daystr, filen,instrumentname]=starsource(source, datatype)
 
 % regulate source input for 4STAR codes including allstarmat.m.
 % Yohei, 2012/04/11
 % CJF: 2012/10/05, modified to output filen for use when datetype has "sky"
 % regulate input and output of this code
+% SL, v1.2, 2016/08/23, added instrument name to outputs and version_set to
+% this file
+
+version_set('1.2')
 if nargin<1
     source='ask';
 elseif isempty(source)
@@ -117,5 +121,6 @@ for i=1:numel(source);
     end;
 end;
 %cjf include filen in output
-[daystr,filen]=starfilenames2daystr(filenames,1); % attempt to get the day string from the individual file names.
+[daystr,filen,nul,instrumentname]=starfilenames2daystr(filenames,1); % attempt to get the day string from the individual file names.
 clear source folder0 file0 ext0 i;
+return
