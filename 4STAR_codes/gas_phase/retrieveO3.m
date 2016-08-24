@@ -43,6 +43,7 @@
 % from gasessubtract.m
 % MS, 2016-05-05, Osan, Korea, added c0gases for O3 retrieval
 %                              added option to use linear/lin_constrained
+% MS, 2016-08-24, corrected bug to read correct scd reference
 % -------------------------------------------------------------------------
 %% function routine
 function [o3] = retrieveO3(s,wstart,wend,mode)
@@ -73,11 +74,13 @@ loadCrossSections_global;
  % decide which c0 to use
  % mode = 1;%0-MLO c0; 1-MLO ref spec
   
-  [c0]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode);
+  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode);
   
   if mode==0
       % when mode==0 need to choose wln
-      c0 = c0(wln)';
+      c0 = tmp(wln)';
+  elseif mode==1
+      c0 = tmp.o3refspec;
   end
  
  
@@ -85,16 +88,6 @@ loadCrossSections_global;
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
  
- % apply specified O3 gas c0
- % decide which c0 to use
- % mode = 1;%0-MLO c0; 1-MLO ref spec
-  
-  [c0]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode);
-  
-  if mode==0
-      % when mode==0 need to choose wln
-      c0 = c0(wln)';
-  end
  
  basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
@@ -127,8 +120,8 @@ loadCrossSections_global;
        o3vcd_smooth = real(o3VCDsmooth);
    elseif mode==1
        % load reference spectrum
-       ref_spec = load([starpaths,'20160113O3refspec.mat']);
-       o3SCD = real((((ccoef(1,:))*1000))') + ref_spec.o3scdref;%ref_spec.o3col*ref_spec.mean_m;
+       % ref_spec = load([starpaths,'20160113O3refspec.mat']);
+       o3SCD = real((((ccoef(1,:))*1000))') + tmp.o3scdref;%ref_spec.o3col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [o3SCDsmooth, sn] = boxxfilt(tplot, o3SCD, xts);
        o3vcd_smooth = real(o3SCDsmooth)./s.m_O3;
@@ -203,8 +196,11 @@ loadCrossSections_global;
            O3conc=[];H2Oconc=[];O4conc=[];O2conc=[];O3resi=[];o3OD=[];
 
            % perform constrained retrieval
-
-          [O3conc, H2Oconc, O4conc, O3resi, o3OD, varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,s.tau_aero,x0,c0(wln));
+            if mode==0
+                    [O3conc, H2Oconc, O4conc, O3resi, o3OD, varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,s.tau_tot_slant,x0,c0(wln));
+            elseif mode==1
+                    [O3conc, H2Oconc, O4conc, O3resi, o3OD, varall_lin] = o3corecalc_lin_adj(s,o3coef,o4coef,h2ocoef,wln,s.tau_tot_slant,x0,c0);
+            end
 
 
            [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);

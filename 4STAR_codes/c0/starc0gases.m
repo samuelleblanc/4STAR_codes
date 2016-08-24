@@ -10,6 +10,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % MS, v1.0, 2016-05-05, KORUS-AQ
 % Modified, MS, 2016-05-18, adding HCOH ref spec
 % Modified, MS, 2016-08-23, added June 2016 MLO gases c0
+% Modified, MS, 2016-08-24, applied refSpec to c0gases
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -37,7 +38,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160113O3refspec.mat']);
-                    c0gases = tmp.o3refspec;
+                    c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
                 if mode==0
@@ -48,7 +49,7 @@ end;
                     % use ref_spec
                     %tmp = load([starpaths,'20160113NO2refspec.mat']);
                     tmp = load([starpaths,'20160702NO2refspec.mat']);
-                    c0gases = tmp.no2refspec;
+                    c0gases = tmp;%.no2refspec;
                 end
                 
             elseif strcmp(gas,'HCOH')
@@ -59,7 +60,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160702HCOHrefspec.mat']);
-                    c0gases = tmp.hcohrefspec;
+                    c0gases = tmp;%.hcohrefspec;
                 end    
                 
             end
@@ -76,7 +77,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160702O3refspec.mat']);
-                    c0gases = tmp.o3refspec;
+                    c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
                 if mode==0
@@ -86,7 +87,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160702NO2refspec.mat']);
-                    c0gases = tmp.no2refspec;
+                    c0gases = tmp;%.no2refspec;
                 end
                 
             elseif strcmp(gas,'HCOH')
@@ -97,7 +98,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160702HCOHrefspec.mat']);
-                    c0gases = tmp.hcohrefspec;
+                    c0gases = tmp;%.hcohrefspec;
                 end    
                 
             end
