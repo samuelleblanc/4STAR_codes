@@ -15,8 +15,6 @@ end
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 % langley1=[datenum(2016,07,02,16,13,00) datenum(2016,07,02,18,24,00)]; %morning Langley 1.8-12 NB: instrument error (I think?) means we lost between ~14 and ~11 airmass here; 16:10 actually starts around 16:13, and airmass 11 (rayleigh)
-% langley =[datenum(2016,07,02,16,13,00) datenum(2016,07,02,18,08,00)];
-
 langley1=[datenum(2016,07,02,16,13,00) datenum(2016,07,02,18,08,00)]; %morning Langley 2-12 NB: instrument error (I think?) means we lost between ~14 and ~11 airmass here; 16:10 actually starts around 16:13, and airmass 11 (rayleigh)
 langley2=[datenum(2016,07,03,03,00,00) datenum(2016,07,03,05,00,00)]; %evening Langley airmass ~2.2 to 12 (all we had for that one)
 
@@ -79,13 +77,13 @@ toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = true;
+toggle_out.gassubtract = false;
 toggle_out.booleanflagging = false;
 toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = true;
+toggle_out.runwatervapor = false;
 toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 
