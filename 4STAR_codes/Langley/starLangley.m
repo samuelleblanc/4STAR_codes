@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160702';
+daystr='20160823';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -52,16 +52,36 @@ else
     % in field
 end;
 file=fullfile(starpaths, source);
+if ~exist(file);
+    [file, contents0, savematfile]=startupbusiness('langley');
+end;    
 load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero','tau_aero_noscreening');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
 %starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
+starinfofile_=['starinfo_' daystr(1:8)];
 s=importdata(starinfofile);
 %s1=s(strmatch('langley',s));
 s1=s(strncmp('langley',s,1));
-eval(s1{:});
+try;
+    eval(s1{:});
+catch;
+    try;
+        infofnt = str2func(starinfofile_);
+        try;
+            s = infofnt(s);
+            langley = s.langley;
+        catch;
+            eval([starinfofile_,'(s)']);
+            langley = s.langley;
+        end;
+    catch;
+        edit(starinfofile)
+        error('No Langley time defined in starinfo file')
+    end;
+end;
 ok=incl(t,langley);
 % perform different QA filtering
 if isequal(daystr, '20141002')
