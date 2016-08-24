@@ -5,6 +5,12 @@ function s = staraero(s, toggle)
 % the values from "toggle" propagated onto s.toggle. 
 % If no "toggle" supplied, then values from update_toggle are pushed onto
 % s.toggle.
+
+% SL, v1.1, 2016-08-23, added version_set to control this document, added
+%                       instrument name controls
+
+version_set('1.1')
+
 if ~isfield(s,'toggle')
     if ~exist('toggle','var')
         toggle = update_toggle;
@@ -501,7 +507,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     cols=cols(isfinite(cols)==1);
     colsang=cols([3 7]);
     ang=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
-    daystr=starfilenames2daystr(s.filename);
+    [daystr,nul,nul,instrumentname]=starfilenames2daystr(s.filename);
     figure;
     for ii=unique(yypanel);
         subplot(max(yypanel), 1, ii);
@@ -551,7 +557,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
             set(lh,'fontsize',10,'location','best');
         end;
         if ii==1;
-            title(daystr);
+            title([instrumentname ' ' daystr]);
         end;
     end;
     linkaxes(ax,'x');
@@ -559,7 +565,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     % then use dynamicDateTicks instead
     xlabel('Time');
     if savefigure;
-        starsas(['star' daystr 'starwrapper_screening.fig']);
+        starsas(['star' '_' instrumentname '_' daystr 'starwrapper_screening.fig']);
     end;
     
     % prepare to plot average tau and tau_aero_err

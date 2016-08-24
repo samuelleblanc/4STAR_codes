@@ -30,7 +30,7 @@ function [flags, good, flagfile] = starflag(s, Mode)
 %                corrected bug in lines 31,37 (disp function)
 % CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
-% SL, 2016-05-04, added special function buttons to visi_screen
+% SL, v1.4, 2016-05-04, added special function buttons to visi_screen
 version_set('1.4');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
@@ -348,7 +348,7 @@ if (Mode==2)
         case 5 %Previous flags:Yes separate file, your own pre-screening:No
             clear('flags')
             source='ask';
-            [sourcefile, ext, ~,filen]=starsource(source, 'sun');
+            [sourcefile, ext, ~,filen,instrumentname]=starsource(source, 'sun');
             if exist('sourcefile','var')&&~isempty(sourcefile) && exist(sourcefile{1},'file')
                 flags = load(sourcefile{1});
             else
@@ -366,7 +366,7 @@ if (Mode==2)
         case 6 %'Previous flags:Yes separate file, your own pre-screening:Yes');
             clear('flags')
             source='ask';
-            [sourcefile, ext, ~,filen]=starsource(source, 'sun');
+            [sourcefile, ext, ~,filen,instrumentname]=starsource(source, 'sun');
             if exist('sourcefile','var') && ~isempty(sourcefile) && exist(sourcefile{1},'file')
                 flags = load(sourcefile{1});
             else

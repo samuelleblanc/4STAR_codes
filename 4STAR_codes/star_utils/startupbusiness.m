@@ -4,7 +4,8 @@ function [sourcefile, contents, savematfile]=startupbusiness(datatype, source, s
 % Yohei, 2012/04/11, 2012/06/27
 % CJF: v1.0, 2012/10/05, modified to include filen in saved mat file
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
-version_set('1.0');
+% SL: v1.1, 2016/08/23, added control and handling of the instrument name
+version_set('1.1');
 %********************
 % regulate input
 %********************
@@ -20,7 +21,7 @@ if nargin<2 || isempty(source)
     source='ask';
 end;
 % cjf: Modified to include filen, to be used when datetype has "sky"
-[sourcefile, ext, daystr,filen]=starsource(source, datatype);
+[sourcefile, ext, daystr,filen,instrumentname]=starsource(source, datatype);
 
 % Load sky scans 2x2, not 1x1.
 if numel(sourcefile)==1 && (~isempty(strfind(sourcefile{1},'VIS_SKY'))||~isempty(strfind(sourcefile{1},'NIR_SKY')))
@@ -45,7 +46,7 @@ else
 end
 % destination
 if nargin<3 || isempty(savematfile) || isequal(savematfile, 'ask'); % if savematfile is not given, generate a default name and ask to modify it
-    savematfile=[daystr skyn 'star' datatype '.mat'];
+    savematfile=[instrumentname '_' daystr skyn 'star' datatype '.mat'];
 end;
 savematfile=stardestination(savematfile);
 if isequal(savematfile, 0);
