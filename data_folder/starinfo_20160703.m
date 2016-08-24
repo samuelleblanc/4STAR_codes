@@ -68,13 +68,13 @@ toggle_out.computeerror=true;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = false;
+toggle_out.gassubtract = true;
 toggle_out.booleanflagging = false;
 toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = false;
+toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 
