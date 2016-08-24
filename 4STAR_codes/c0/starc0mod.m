@@ -83,11 +83,13 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2015 9 16 0 0 0]); %
-        if now>=datenum([2016 7 07 0 0 0]); % use June MLO 2016 for ORACLES
+        if now>=datenum([2016 7 07 0 0 0]) && t>=datenum([2016 7 07 0 0 0]); % use June MLO 2016 for ORACLES
+        %if now>=datenum([2016 7 07 0 0 0]); % use June MLO 2016 for ORACLES
             daystr='20160702';
             filesuffix='modified_Langley_MLO'; % MLO June 2016
             model_atmosphere=2; %use MidLat summer for ORACLES
-        elseif now>=datenum([2016 3 17 0 0 0]); % KORUS transit for KORUS-AQ
+        %elseif now>=datenum([2016 3 17 0 0 0]); % KORUS transit for KORUS-AQ
+        elseif now>=datenum([2016 3 17 0 0 0]) && t>=datenum([2016 4 26 0 0 0]); % KORUS transit for KORUS-AQ
             %daystr='20151104';
             %filesuffix='modified_Langley_at_WFF_Ground_screened_3correctO3'; % NAAMES ground with correct O3
             %daystr='20160109';
