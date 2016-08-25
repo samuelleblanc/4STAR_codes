@@ -40,7 +40,8 @@
 % MODIFICATION HISTORY:
 % Written: Michal Segal-Rozenhaimer, 2016-05-18, on the plane over Korea
 % 
-% 
+% Modifications:
+% MS, fixed bug in reading hcoh c0
 % -------------------------------------------------------------------------
 %% function routine
 function [hcoh] = retrieveHCOH(s,wstart,wend,mode)
@@ -60,12 +61,15 @@ loadCrossSections_global;
  % decide which c0 to use
  % mode = 0-lamp?; 1-MLO ref spec
   
-  [c0]=starc0gases(nanmean(s.t),s.toggle.verbose,'HCOH',mode);
+  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'HCOH',mode);
   
   if mode==0
       % when mode==0 need to choose wln
-      c0 = c0(wln)';
+      c0 = tmp(wln)';
+  elseif mode==1
+      c0 = tmp.hcohrefspec;
   end
+  
   
  
  % calculate residual spectrum (Rayleigh subtracted)
@@ -113,8 +117,8 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
        hcohvcd_smooth = real(hcohVCDsmooth);
    elseif mode==1
        % load reference spectrum
-       ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
-       hcohSCD = real((((1000*ccoef_d(1,:))))');% + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
+       % ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
+       hcohSCD = real((((1000*ccoef_d(1,:))))');% there is 0 HCOH in MLO + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohSCDsmooth, sn] = boxxfilt(tplot, hcohSCD, xts);
        hcohvcd_smooth = real(hcohSCDsmooth)./s.m_NO2;
