@@ -39,6 +39,7 @@
 % Modified from retrieveNO2_20160505
 % MS, 2016-05-05, added usage of reference spectrum
 % MS, 2016-08-24, created a bug in reading c0gases and ref amount
+% MS, 2016-08-25, corrected a bug in reading Refspec
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode)
@@ -68,7 +69,7 @@ loadCrossSections_global;
       % when mode==0 need to choose wln
       c0 = tmp(wln)';
   elseif mode==1
-      c0 = tmp.o3refspec;
+      c0 = tmp.no2refspec;
   end
   
  
