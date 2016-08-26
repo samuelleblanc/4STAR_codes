@@ -24,7 +24,7 @@ function ORACLESstarbasicplots(daystr, platform, savefigure)
 % Yohei, 2015/11/09, being modified from NAAMESstarbasicplots.m. Continuously evolving throughout the campaign.
 % MS   , 2016/01/09, modified to accomodate MLO campaign data.
 % MS   , 2016/04/06, modified to accomodate KORUS-AQ campaign data.
-
+% MS   , 2016/08/26, updated plotting gas fields for ORACLES
 %********************
 % set parameters
 %********************
@@ -87,6 +87,54 @@ elseif isequal(platform, 'ground');
         groundcomparison=tlim;
     end;
 end;
+
+% upload gases if 'gas'/'cwv' does not exist in starsun
+if exist('gas','var')
+    cwv2plot  =cwv.cwv940m1;
+    o32plot   =gas.o3.o3DU;
+    no22plot  =gas.no2.no2DU;
+else
+    gas   = load(strcat(starpaths,daystr{:},'_gas_summary.mat'));
+    cwv2plot =gas.cwv;
+    o32plot  =gas.o3DU;
+    no22plot =gas.no2DU;
+end
+
+%% filter the gas fields to plot
+
+
+% read starinfo files
+
+    disp(['on day:' daystr])
+    %cd starinfo_path
+    %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
+    infofile_ = ['starinfo_' daystr '.m'];
+    infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+    s.dummy = '';
+    try
+        s = infofnt(s);
+    catch
+        eval([infofile_(1:end-2),'(s)']);
+    end
+
+
+    % Load the flag file and see if gas flags exist
+    if isfield(s, 'flagfilenameO3');
+        disp(['Loading flag file: ' s.flagfilenameO3])
+        flagO3 = load(s.flagfilenameO3); 
+        disp(['Loading flag file: ' s.flagfilenameCWV])
+        flagCWV = load(s.flagfilenameCWV); 
+        % read flags
+        flagO3  = flagO3.manual_flags.screen;
+        flagCWV = flagCWV.manual_flags.screen;
+        flagNO2 = zeros(length(t),1);
+    else
+        % don't flag
+        flagO3   = zeros(length(t),1);
+        flagCWV  = zeros(length(t),1);
+        flagNO2  = zeros(length(t),1);
+    end   
+
 
 % prepare common lines
 mods={'tlim', tlim, ...
@@ -297,11 +345,14 @@ end;
 
 % water vapor
 
-if exist('cwv');
+if exist('cwv2plot');
+    
+    % apply flags
+    cwv2plot(flagCWV==1) = NaN;
     
     figure;
     %         [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
-    [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
+    [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
         vars.xtlim{:},mods{:}, ...
         'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
         'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
@@ -311,11 +362,14 @@ end;
 
 % O3
 
-if exist('gas');
+if exist('o32plot');
     
+    % apply flags
+    o32plot(flagO3==1) = NaN;
+   
     figure;
 %     [h,filename]=spsun(daystr, 't', gas.o3.o3DU, '.', vars.Alt1e4{:}, 'ylim', [0 500], ...
-[h,filename]=spsun(daystr, 't', gas.o3.o3DU, '.', vars.Alt1e4{:}, 'ylim', [200 700], ...
+[h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, 'ylim', [200 700], ...
         vars.xtlim{:}, mods{:}, ...
         'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
         'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
@@ -324,9 +378,13 @@ end;
 
 % NO2
 
-if exist('gas');
+if exist('no22plot');
+    
+       % apply flags
+       no22plot(flagNO2==1) = NaN;
+       
        figure;
-       [h,filename]=spsun(daystr, 't', gas.no2DU, '.', vars.Alt1e4{:}, mods{:}, ...
+       [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, ...
            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
