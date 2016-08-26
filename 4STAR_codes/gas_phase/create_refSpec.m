@@ -241,10 +241,12 @@ elseif strcmp(gas,'NO2')
                  no2_2.no2SCD(dat2.m_NO2<=6.5&dat2.m_NO2>=3);
                  no2_3.no2SCD(dat3.m_NO2<=6.5&dat3.m_NO2>=3)];
         elseif strcmp(daystr,'20160702')
-             x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=1);
-                  dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=1)];
-             y = [no2_1.no2SCD(dat1.m_NO2<=5&dat1.m_NO2>=1);
-                  no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=1)];
+             x = [dat1.m_NO2(dat1.m_NO2<=8&dat1.m_NO2>=1);
+                  dat2.m_NO2(dat2.m_NO2<=8&dat2.m_NO2>=1);
+                  dat3.m_NO2(dat3.m_NO2<=8&dat3.m_NO2>=1)];
+             y = [no2_1.no2SCD(dat1.m_NO2<=8&dat1.m_NO2>=1);
+                  no2_2.no2SCD(dat2.m_NO2<=8&dat2.m_NO2>=1);
+                  no2_3.no2SCD(dat3.m_NO2<=8&dat3.m_NO2>=1)];
               
              y(y<0) = NaN; 
         end

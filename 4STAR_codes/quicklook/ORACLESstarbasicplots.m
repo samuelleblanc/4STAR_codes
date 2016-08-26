@@ -1,4 +1,4 @@
-function KORUSstarbasicplots(daystr, platform, savefigure);
+function ORACLESstarbasicplots(daystr, platform, savefigure)
 
 % KORUSstarbasicplots(DAYSTR, PLATFORM, SAVEFIGURE) generates basic plots of
 % KORUS 4STAR data for the single day specified by DAYSTR and for the
@@ -324,13 +324,13 @@ end;
 
 % NO2
 
-%if exist('gas');
-%        figure;
-%        [h,filename]=spsun(daystr, 't', gas.no2.no2_molec_cm2, '.', vars.Alt1e4{:}, mods{:}, ...
-%            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
-%            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
-%        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-%end;
+if exist('gas');
+       figure;
+       [h,filename]=spsun(daystr, 't', gas.no2DU, '.', vars.Alt1e4{:}, mods{:}, ...
+           'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
+           'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+       pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+end;
 
 
 % tau aero after correction based on AATS
