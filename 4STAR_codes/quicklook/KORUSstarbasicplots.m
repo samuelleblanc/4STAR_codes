@@ -97,7 +97,7 @@ end
 
 
     % Load the flag file and see if gas flags exist
-    if isfield(s, 'flagfilename');
+    if isfield(s, 'flagfilenameO3');
         disp(['Loading flag file: ' s.flagfilenameO3])
         flagO3 = load(s.flagfilenameO3); 
         disp(['Loading flag file: ' s.flagfilenameCWV])
