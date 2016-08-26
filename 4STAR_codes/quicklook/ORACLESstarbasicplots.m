@@ -90,9 +90,10 @@ end;
 
 % upload gases if 'gas'/'cwv' does not exist in starsun
 if exist('gas','var')
-    cwv2plot  =cwv.cwv940m1;
-    o32plot   =gas.o3.o3DU;
-    no22plot  =gas.no2.no2DU;
+    Loschmidt=2.686763e19;                   % molec/cm3*atm
+    cwv2plot  = cwv.cwv940m1;
+    o32plot   = gas.o3.o3DU;
+    no22plot  = gas.no2.no2_molec_cm2/(Loschmidt/1000);
 else
     gas   = load(strcat(starpaths,daystr{:},'_gas_summary.mat'));
     cwv2plot =gas.cwv;
