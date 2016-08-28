@@ -193,7 +193,7 @@ end
                 for i=1:length(filelist)
                         plot(i,lang.(strcat('c0_',filelist{:,i}))(ind(ii)),'o','color',colorlist(i,:),'markersize',marksize(ii));hold on;
                 end
-                legendall = {legendall wlnstr{ii}};
+                legendall = {legendall{:} wlnstr{ii}};
             end
             xlabel('measurement #');
             ylabel('c0 value');
