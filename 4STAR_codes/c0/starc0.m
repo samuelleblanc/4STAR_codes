@@ -39,10 +39,13 @@ end;
 
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 6 30 0 0 0]); % MLO June 2016 for ORACLES 2016
-        if t>=datenum([2016 6 30 0 0 0]);
-        daystr='20160707';
-        filesuffix='Langley_MLO_June2016_mean';
+    if t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
+        if t>=datenum([2016 8 23 0 0 0]);
+            daystr='20160823';
+            filesuffix='refined_Langley_ORACLES_WFF_gnd';
+        elseif t>=datenum([2016 6 30 0 0 0]); %MLO June 2016
+            daystr='20160707';
+            filesuffix='Langley_MLO_June2016_mean';
         end;    
     elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
         if now>=datenum([2016 4 7 0 0 0]);
