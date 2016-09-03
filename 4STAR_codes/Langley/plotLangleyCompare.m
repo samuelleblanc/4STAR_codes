@@ -75,6 +75,9 @@ function plotLangleyCompare(filelist,band)
 % filelist = {'20160426_VIS_C0_refined_Langley_korusaq_transit1_v1','20160426_VIS_C0_refined_Langley_korusaq_transit1_v2'};
 % filelist = {'20160426_VIS_C0_refined_Langley_korusaq_transit1_v2','20160109_VIS_C0_refined_Langley_at_MLO_screened_2std_averagethru20160113'};
 
+% compare the MLO June 2016 and ORACLES c0 from WFF ground
+filelist = {'20160707_VIS_C0_Langley_MLO_June2016_mean','20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2'}
+band = 'vis'
 
 % prepare for plotting
 colorlist_ = varycolor(140);
