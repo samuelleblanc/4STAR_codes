@@ -95,10 +95,14 @@ if exist('gas','var')
     o32plot   = gas.o3.o3DU;
     no22plot  = gas.no2.no2_molec_cm2/(Loschmidt/1000);
 else
-    gas   = load(strcat(starpaths,daystr,'_gas_summary.mat'));
-    cwv2plot =gas.cwv;
-    o32plot  =gas.o3DU;
-    no22plot =gas.no2DU;
+    try;
+        gas   = load(strcat(starpaths,daystr,'_gas_summary.mat'));
+        cwv2plot =gas.cwv;
+        o32plot  =gas.o3DU;
+        no22plot =gas.no2DU;
+    catch;
+        disp('No gases')
+    end;
 end
 
 %% filter the gas fields to plot
