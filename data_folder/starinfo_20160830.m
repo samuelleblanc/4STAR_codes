@@ -10,9 +10,9 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.flagfilename = '20160902_starflag_man_created20160904_1850by_SL.mat';
+s.flagfilename = '20160830_starflag_man_created20160904_1844by_SL.mat';
  
-s.flight=[datenum(2016,9,3,7,01,54) datenum(2016,9,3,14,58,31)]; 
+s.flight=[datenum(2016,8,30,7,9,12) datenum(2016,8,30,8,31,57)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
  

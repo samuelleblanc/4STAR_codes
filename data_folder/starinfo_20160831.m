@@ -10,16 +10,18 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.flagfilename = '20160902_starflag_man_created20160904_1850by_SL.mat';
+
+s.flagfilename = '20160831_starflag_man_created20160904_1609by_SL.mat';
  
-s.flight=[datenum(2016,9,3,7,01,54) datenum(2016,9,3,14,58,31)]; 
+s.flight=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+s.langley=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)];
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.268; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3col=0.350; % Michal's guess     
+s.NO2col=2.0e15; % Michal's guess  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
