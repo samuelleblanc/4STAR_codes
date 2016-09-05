@@ -60,6 +60,7 @@
 % Modified, Michal Segal, May-02-2016, updated mod c0 for KORUS transit
 % Modified, Michal Segal, Aug-23-2016, updated modc0 for ORACLES based on
 %                                      June MLO (20160702) modified Langley
+% Modified, Michal Segal, Sep-5-2016,  20160825 modc0 from ORACLES tran#2
 % -------------------------------------------------------------------------
 %% function routine
 function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(t,verbose)
@@ -85,8 +86,10 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2015 9 16 0 0 0]); %
         if now>=datenum([2016 7 07 0 0 0]) && t>=datenum([2016 7 07 0 0 0]); % use June MLO 2016 for ORACLES
         %if now>=datenum([2016 7 07 0 0 0]); % use June MLO 2016 for ORACLES
-            daystr='20160702';
-            filesuffix='modified_Langley_MLO'; % MLO June 2016
+            %daystr='20160702';
+            %filesuffix='modified_Langley_MLO'; % MLO June 2016
+            daystr='20160825';
+            filesuffix='20160825_VIS_C0_modified_Langley_ORACLES_transit2'; % ORACLES transit#2
             model_atmosphere=2; %use MidLat summer for ORACLES
         %elseif now>=datenum([2016 3 17 0 0 0]); % KORUS transit for KORUS-AQ
         elseif now>=datenum([2016 3 17 0 0 0]) && t>=datenum([2016 4 26 0 0 0]); % KORUS transit for KORUS-AQ

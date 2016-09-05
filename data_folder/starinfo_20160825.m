@@ -18,9 +18,9 @@ end
 s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
  
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.268; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21; % 
+s.O3col=0.280; %      
+s.NO2col=2.0e15; %  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
