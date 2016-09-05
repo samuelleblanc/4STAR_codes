@@ -49,6 +49,7 @@
 %                 subtracted) with water vapor subtraction
 % MS: 2016-01-10  fixed some bugs related to cwv retrieval for model atm=1
 % MS: 2016-02-23: re-editing changes that were made after MLO and deleted
+% MS: 2016-09-02: tweaked to account for erroneous altitudes
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
@@ -327,6 +328,8 @@ end
       for j=1:length(s.t)
           if ~isNaN(s.Alt(j))
               kk=find(s.Alt(j)/1000>=zkm_LBLRTM_calcs);
+              % tweak to account for erroneous altitudes
+              if length(kk)>14 kk=kk(1):kk(14); end;
               if s.Alt(j)/1000<=0 kk=1; end            %handles alts slightly less than zero
               kz=kk(end);
               CWV1=((-log(Tw(j,:)./(cfit_H2O(wln,kz))')./(afit_H2O(wln,kz))').^(1./(bfit_H2O(wln,kz))'))./s.m_H2O(j);
