@@ -89,7 +89,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %daystr='20160702';
             %filesuffix='modified_Langley_MLO'; % MLO June 2016
             daystr='20160825';
-            filesuffix='20160825_VIS_C0_modified_Langley_ORACLES_transit2'; % ORACLES transit#2
+            filesuffix='modified_Langley_ORACLES_transit2'; % ORACLES transit#2
             model_atmosphere=2; %use MidLat summer for ORACLES
         %elseif now>=datenum([2016 3 17 0 0 0]); % KORUS transit for KORUS-AQ
         elseif now>=datenum([2016 3 17 0 0 0]) && t>=datenum([2016 4 26 0 0 0]); % KORUS transit for KORUS-AQ
