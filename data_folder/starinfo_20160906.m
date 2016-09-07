@@ -21,6 +21,12 @@ s.flight=[datenum(2016,9,6,06,53,49) datenum(2016,9,6,14,39,19)];
 s.O3h=21; % 
 s.O3col=0.300; % Michal's guess     
 s.NO2col=2.0e15; % % 
+
+% flags
+s.flagfilename = '20160906_starflag_man_created20160907_0617by_MS.mat'; 
+%s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';
+%s.flagfilenameCWV = '20160530_starflag_CWV_man_created20160701_1609by_MS.mat';
+
  
 % other tweaks 
 if isfield(s, 'Pst'); 

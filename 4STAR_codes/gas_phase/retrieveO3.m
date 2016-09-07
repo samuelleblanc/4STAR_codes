@@ -83,13 +83,32 @@ loadCrossSections_global;
       c0 = tmp.o3refspec;
   end
  
+%  c0_wstart=0.490;
+%  c0_wend  =0.682;
+%  % find c0 wavelength range index
+%  c0_istart = interp1(s.w,[1:length(s.w)],c0_wstart, 'nearest');
+%  c0_iend   = interp1(s.w,[1:length(s.w)],c0_wend  , 'nearest');
+%  
+%  c0_wln_ind = find(s.w<=s.w(c0_iend)&s.w>=s.w(c0_istart)); 
+%  c0_wln     = s.w(c0_wln_ind);
+%  
+%  % find wavelength range for new c0
+%  new_c0_istart = interp1(c0_wln,[1:length(c0_wln)],wstart, 'nearest');
+%  new_c0_iend   = interp1(c0_wln,[1:length(c0_wln)],wend  , 'nearest');
+%  new_c0_wln    = c0_wln(new_c0_istart:new_c0_iend);
+%  new_c0        = c0(new_c0_istart:new_c0_iend);
+%  c0=new_c0;
+%  % find wavelengths
+%  wln_istart = interp1(s.w,[1:length(s.w)],wstart, 'nearest');
+%  wln_iend   = interp1(s.w,[1:length(s.w)],wend  , 'nearest');
+%  wln        = find(s.w<=s.w(wln_iend)&s.w>=s.w(wln_istart)); 
+%  w = s.w(wln); 
  
  % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
  
- 
- basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
+    basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
  
    ccoef=[];
@@ -174,7 +193,7 @@ loadCrossSections_global;
    if plotting
 %      plot fitted and "measured" o3 spectrum
          for i=1:1000:length(s.t)
-             figure(111);
+             figure(1111);
              plot(s.w((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
              plot(s.w((wln)),o3fit(i,:),'-r','linewidth',2);hold on;
              plot(s.w((wln)),o3residual(i,:),':k','linewidth',2);hold off;
