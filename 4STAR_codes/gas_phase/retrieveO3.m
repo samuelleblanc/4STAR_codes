@@ -190,6 +190,17 @@ loadCrossSections_global;
 
    %RMSEo3_new     = sqrt(sum(sum((o3residual.^2)))/(length(wln)-8));
    
+   % save data for further plotting (heatmap)
+   t   = serial2Hh(s.t);
+   alt = s.Alt;
+   lat = s.Lat;
+   lon = s.Lon;
+   res = real(o3residual./repmat(s.m_O3,1,length(wln)));
+   res_ = res(~isnan(res(:,1)),:);
+   dat = [t alt lat lon res];
+   fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual','.txt');
+   save(fi,'-ASCII','dat');
+   
    if plotting
 %      plot fitted and "measured" o3 spectrum
          for i=1:1000:length(s.t)
@@ -203,6 +214,42 @@ loadCrossSections_global;
              set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
              pause(1);
          end
+      c_wln    = s.w(wln);
+      wlnlabel = arrayfun(@(x){sprintf('%0.3f',x)}, c_wln);
+      tlabel   = arrayfun(@(x){sprintf('%0.3f',x)}, t);
+      altlabel = arrayfun(@(x){sprintf('%0.3f',x)}, alt);
+      latlabel = arrayfun(@(x){sprintf('%0.3f',x)}, lat);
+      lonlabel = arrayfun(@(x){sprintf('%0.3f',x)}, lon);
+      dat=dat(:,[5:246]);
+      %dat = dat';
+      figure(222);
+      surf(res);
+      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
+      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
+      heatmap(dat', wlnlabel,tlabel);
+      colormap(redblue);
+      colorbar;
+      
+      figure(223);
+      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
+      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
+      heatmap(dat, wlnlabel,altlabel);
+      colormap(redblue);
+      colorbar;
+      
+      figure(224);
+      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
+      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
+      heatmap(dat, wlnlabel,latlabel);
+      colormap(redblue);
+      colorbar;
+      
+      figure(225);
+      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
+      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
+      heatmap(dat, wlnlabel,lonlabel);
+      colormap(redblue);
+      colorbar;
    end
    
    
