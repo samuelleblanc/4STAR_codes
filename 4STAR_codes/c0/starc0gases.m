@@ -77,6 +77,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load([starpaths,'20160702O3refspec.mat']);
+                    tmp = load([starpaths,'20160825O3refspec.mat']);
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
