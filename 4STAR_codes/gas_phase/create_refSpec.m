@@ -68,6 +68,8 @@ if strcmp(gas,'O3')
         ref_spec.o3scdref = 335;% derived from MLE method
     elseif strcmp(daystr,'20160702')||strcmp(daystr,'20160703')
         ref_spec.o3scdref = 259*ref_spec.mean_m;% in [DU]
+    elseif strcmp(daystr,'20160825')
+        ref_spec.o3scdref = 275*ref_spec.mean_m;% in [DU]    
     end
     save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     
