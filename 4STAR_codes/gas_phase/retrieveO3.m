@@ -196,7 +196,7 @@ loadCrossSections_global;
    lat = s.Lat;
    lon = s.Lon;
    res = real(o3residual./repmat(s.m_O3,1,length(wln)));
-   res_ = res(~isnan(res(:,1)),:);
+   
    dat = [t alt lat lon res];
    fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual','.txt');
    save(fi,'-ASCII','dat');
@@ -220,7 +220,59 @@ loadCrossSections_global;
       altlabel = arrayfun(@(x){sprintf('%0.3f',x)}, alt);
       latlabel = arrayfun(@(x){sprintf('%0.3f',x)}, lat);
       lonlabel = arrayfun(@(x){sprintf('%0.3f',x)}, lon);
-      dat=dat(:,[5:246]);
+      %dat=dat(:,[5:246]);
+      
+      % create meshgrid
+      [x, y] = meshgrid(c_wln,t);
+      figure(1);
+      mesh(x,y,res);
+      xlabel('wavelength');
+      ylabel('time');
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd')));
+      colormap('redblue');colorbar; %axis 'square'
+      axis([min(c_wln) max(c_wln) min(t) max(t) min(min((res))) max(max((res)))]);view(2);
+      % save
+      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_time');
+      save_fig(1,fi,false);
+                                   
+      
+      [x, y] = meshgrid(c_wln,alt);
+      figure(2);
+      mesh(x,y,res);
+      xlabel('wavelength');
+      ylabel('altitude');
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      colormap('redblue');colorbar;
+      axis([min(c_wln) max(c_wln) min(alt) max(alt) min(min((res))) max(max((res)))]);view(2);
+      % save
+      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_alt');
+      save_fig(2,fi,false);
+      
+      
+      [x, y] = meshgrid(c_wln,lat);
+      figure(3);
+      mesh(x,y,res);
+      xlabel('wavelength');
+      ylabel('latitude');
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      colormap('redblue');colorbar;
+      axis([min(c_wln) max(c_wln) min(lat) max(lat) min(min((res))) max(max((res)))]);view(2);
+      % save
+      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lat');
+      save_fig(3,fi,false);      
+      
+      [x, y] = meshgrid(c_wln,lon);
+      figure(4);
+      mesh(x,y,res);
+      xlabel('wavelength');
+      ylabel('longitude');
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      colormap('redblue');colorbar;
+      axis([min(c_wln) max(c_wln) min(lon) max(lon) min(min((res))) max(max((res)))]);view(2);
+      % save
+      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lon');
+      save_fig(4,fi,false);
+      
       %dat = dat';
       figure(222);
       surf(res);
