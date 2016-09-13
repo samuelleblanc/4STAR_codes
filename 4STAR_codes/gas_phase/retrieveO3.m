@@ -107,17 +107,30 @@ loadCrossSections_global;
  % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
- 
+  if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+      % pre-ORACLES
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
+  elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+      % ORACLES
+    basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
+        ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];
+  end
  
    ccoef=[];
    RR=[];
    % o3 inversion is being done on total slant path (not Rayleigh
    % subtracted)
    for k=1:length(s.t);
-        %meas = log(s.c0(wln)'./s.rateslant(k,(wln))');
-        meas = log(c0'./s.rateslant(k,(wln))');
+       
+        if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+               % pre-ORACLES
+                 meas = log(s.c0(wln)'./s.rateslant(k,(wln))');
+                 
+        elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+               % ORACLES
+                 meas = log(c0'./s.ratetot(k,(wln))');
+        end
 
         % invert
         coef=basis\meas;
@@ -141,7 +154,7 @@ loadCrossSections_global;
        % load reference spectrum
        % ref_spec = load([starpaths,'20160113O3refspec.mat']);
        o3SCD = real((((ccoef(1,:))*1000))') + tmp.o3scdref;%ref_spec.o3col*ref_spec.mean_m;
-       tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [o3SCDsmooth, sn] = boxxfilt(tplot, o3SCD, xts);
        o3vcd_smooth = real(o3SCDsmooth)./s.m_O3;
    end
@@ -182,8 +195,15 @@ loadCrossSections_global;
   end
    
     % prepare to plot spectrum OD and o3 cross section
-   %tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
-   tau_OD = log(repmat(c0,length(s.t),1)./s.rateslant(:,(wln)));
+    if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+               % pre-ORACLES
+           %tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
+           tau_OD = log(repmat(c0,length(s.t),1)./s.rateslant(:,(wln)));
+    elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+           % ORACLES
+   
+            tau_OD = log(repmat(c0,length(s.t),1)./s.ratetot(:,(wln)));
+    end
    o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
    o3fit          = ccoef(1,:)'*basis(:,1)';
    o3residual     = tau_OD-RR';
@@ -196,14 +216,18 @@ loadCrossSections_global;
    lat = s.Lat;
    lon = s.Lon;
    res = real(o3residual./repmat(s.m_O3,1,length(wln)));
+   % normalize residual -1 to 1
+   [res_norm, mu, range] = featureNormalizeRange(res);
    
-   dat = [t alt lat lon res];
-   fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual','.txt');
+   
+   dat = [t alt lat lon res_norm];
+   fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual_20160825c0_norm','.txt');
    save(fi,'-ASCII','dat');
    
    if plotting
+       
 %      plot fitted and "measured" o3 spectrum
-         for i=1:1000:length(s.t)
+         for i=1:100:length(s.t)
              figure(1111);
              plot(s.w((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
              plot(s.w((wln)),o3fit(i,:),'-r','linewidth',2);hold on;
@@ -225,83 +249,54 @@ loadCrossSections_global;
       % create meshgrid
       [x, y] = meshgrid(c_wln,t);
       figure(1);
-      mesh(x,y,res);
+      mesh(x,y,res_norm);
       xlabel('wavelength');
       ylabel('time');
       title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd')));
       colormap('redblue');colorbar; %axis 'square'
       axis([min(c_wln) max(c_wln) min(t) max(t) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_time');
+      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_time_norm_sub');
       save_fig(1,fi,false);
                                    
       
       [x, y] = meshgrid(c_wln,alt);
       figure(2);
-      mesh(x,y,res);
+      mesh(x,y,res_norm);
       xlabel('wavelength');
       ylabel('altitude');
-      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd')));
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(alt) max(alt) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_alt');
+      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_alt_norm_sub');
       save_fig(2,fi,false);
       
       
       [x, y] = meshgrid(c_wln,lat);
       figure(3);
-      mesh(x,y,res);
+      mesh(x,y,res_norm);
       xlabel('wavelength');
       ylabel('latitude');
-      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd')));
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(lat) max(lat) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lat');
+      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lat_norm_sub');
       save_fig(3,fi,false);      
       
       [x, y] = meshgrid(c_wln,lon);
       figure(4);
-      mesh(x,y,res);
+      mesh(x,y,res_norm);
       xlabel('wavelength');
       ylabel('longitude');
-      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd HH:MM:SS')));
+      title(strcat('O_{3} residual heatmap',datestr(s.t(1),'yyyy-mm-dd')));
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(lon) max(lon) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('D:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lon');
+      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lon_norm_sub');
       save_fig(4,fi,false);
       
-      %dat = dat';
-      figure(222);
-      surf(res);
-      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
-      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
-      heatmap(dat', wlnlabel,tlabel);
-      colormap(redblue);
-      colorbar;
-      
-      figure(223);
-      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
-      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
-      heatmap(dat, wlnlabel,altlabel);
-      colormap(redblue);
-      colorbar;
-      
-      figure(224);
-      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
-      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
-      heatmap(dat, wlnlabel,latlabel);
-      colormap(redblue);
-      colorbar;
-      
-      figure(225);
-      %heatmap(dat(:,[1,5:246]), 'RowLabels', wlnlabel, 'ColumnLabels',tlabel,'Colormap', 'redbluecmap');
-      %heatmap(dat,'RowLabels', 5:246,'Colorbar',true);
-      heatmap(dat, wlnlabel,lonlabel);
-      colormap(redblue);
-      colorbar;
    end
    
    
