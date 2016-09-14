@@ -88,7 +88,14 @@ end
 
     % this is end member array (original cross sections)
     
+  if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+      % pre-ORACLES
     basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1)];
+    
+  elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+      % ORACLES
+    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1)];
+  end
 
     % solve
     % x = real(Abasis\spectrum_sub');
