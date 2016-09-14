@@ -42,9 +42,9 @@
 function SEmakearchive_ORACLES_AOD
 version_set('v2.0')
 %% set variables
-ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
-starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\';
+ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
+starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
@@ -122,9 +122,9 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906'} ; %put one day string
+dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          1          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0           0           1          1          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -197,7 +197,7 @@ for i=idx_file_proc
     else
         [flagfilename, pathname] = uigetfile2('*.mat', ...
             ['Pick starflag file for day:' daystr]);
-        disp(['Loading flag file: ' s.flagfilename])
+        disp(['Loading flag file: ' pathname flagfilename])
         flag = load([pathname flagfilename]);
     end
     
