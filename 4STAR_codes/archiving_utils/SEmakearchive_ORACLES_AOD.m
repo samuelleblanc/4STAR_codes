@@ -37,14 +37,20 @@
 % 2016-07-01, MS, tweaked for certain flag days for KORUS
 % 2016-07-14, MS, twaeked to accept automatic flags
 % 2016-09-04, SL,v2.0 ported from KORUS
+% 2016-09-18, SL,v2.1, added variable paths depending on the user
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
-version_set('v2.0')
+version_set('v2.1')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
+if getUserName=='sleblan2';
+    ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
+    starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+    starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\';
+end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
@@ -124,7 +130,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0           0           1          1          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0           0           0          0          1] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -267,3 +273,11 @@ for i=idx_file_proc
     disp('Printing to file')
     ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir)
 end;
+
+function name = getUserName ()
+    if isunix() 
+        name = getenv('USER'); 
+    else 
+        name = getenv('username'); 
+    end
+return
