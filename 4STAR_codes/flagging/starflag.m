@@ -31,7 +31,10 @@ function [flags, good, flagfile] = starflag(s, Mode)
 % CJF, 2015-01-09, commented "aerosol_init_auto" to make it obsolete
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
 % SL, v1.4, 2016-05-04, added special function buttons to visi_screen
-version_set('1.4');
+% SL, v1.5, 2016-09-19, modified code to use the smaller starsun files for starflag use
+
+%% Start
+version_set('1.5');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -39,6 +42,14 @@ if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     s = load(sunfile);
 end % done loading starinfo file
 
+%% Check if it is a smaller file for starflag use
+if isfield(s,'save_for_starflag');
+    save_for_starflag = true;
+else
+    save_for_starflag = false;
+end;
+
+%% get the correct day information
 daystr = datestr(s.t(1),'yyyymmdd');
 if ~isfield(s,'sd_aero_crit') % read starinfo file
     daystr = datestr(s.t(1),'yyyymmdd');
@@ -52,8 +63,12 @@ if ~isfield(s,'sd_aero_crit') % read starinfo file
         %     s = eval([infofile2,'(s)']);
     elseif exist(infofile2)==2;
         edit(infofile2) ; % open infofile in case user wants to edit it.
-        infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
-        s = infofnt(s);
+        try;
+            infofnt = str2func(infofile2); % Use function handle instead of eval for compiler compatibility
+            s = infofnt(s);
+        catch;
+            eval(infofile2)
+        end;
         %     s = eval([infofile2,'(s)']);
     elseif exist(infofile)==2;
         open(infofile);
@@ -76,9 +91,17 @@ if ~isfield(s,'sd_aero_crit') % read starinfo file
     end;
 end
 if ~isempty(s)
-    t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
-    viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
-    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;Md=s.Md;
+    t=s.t;Alt=s.Alt;
+    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtot=s.QdVtot;Md=s.Md;ng=s.ng;
+    try;
+        Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
+        viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
+        QdVtb=s.QdVtb;
+        Lon=s.Lon;Lat=s.Lat;
+        w = s.w;
+    catch;
+        disp('Missing some variables, trying anyway')
+    end;
     try;
         rawrelstd=s.rawrelstd;
     catch;
@@ -97,17 +120,19 @@ if ~isempty(s)
         s.rawrelstd=s.rawstd./s.rawmean;
         rawrelstd=s.rawrelstd;
     end;
-    Str=s.Str;raw=s.raw;dark=s.dark;
-    if isfield(s,'tau_aero_noscreening')
-        tau_aero_noscreening=s.tau_aero_noscreening;
-    else
-        tau_aero_noscreening = s.tau_aero;
-    end
+    Str=s.Str;
+    raw=s.raw;dark=s.dark;
+    if ~save_for_starflag;
+        if isfield(s,'tau_aero_noscreening')
+            tau_aero_noscreening=s.tau_aero_noscreening;
+        else
+            tau_aero_noscreening = s.tau_aero;
+        end
+    end;
     if isfield(s,'darkstd')
         darkstd=s.darkstd;
-    end
+    end    
     sd_aero_crit = s.sd_aero_crit;
-    
 end
 
 if ~exist('Mode','var')||Mode==0
@@ -230,23 +255,31 @@ end
 % We've populated our workspace with 4STAR measurements
 % Now we'll build the input for automatic screening and visi_screen.
 
-nm_380 = interp1(w,[1:length(w)],.38, 'nearest');
-nm_500 = interp1(w,[1:length(w)],.5, 'nearest');
-nm_870 = interp1(w,[1:length(w)],.87, 'nearest');
-nm_452 = interp1(w,[1:length(w)],.452, 'nearest');
-nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
-colsang=[nm_452 nm_865];
-ang_noscreening=sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
-aod_380nm = tau_aero_noscreening(:,nm_380);
-aod_452nm = tau_aero_noscreening(:,nm_452);
-aod_500nm = tau_aero_noscreening(:,nm_500);
-aod_865nm = tau_aero_noscreening(:,nm_865);
-aod_500nm_max=3;
-m_aero_max=15;
+if save_for_starflag
+    nm_380=s.nm_380;nm_500=s.nm_500;nm_865=s.nm_865;nm_452=s.nm_452;
+    ang_noscreening=s.ang_noscreening;
+    aod_380nm=s.aod_380nm;aod_452nm=s.aod_452nm;aod_500nm=s.aod_500nm;aod_865nm=s.aod_865nm;
+    aod_500nm_max=3;
+    m_aero_max=15;
+    roll_proxy=s.roll_proxy;
+else;
+    nm_380 = interp1(w,[1:length(w)],.38, 'nearest');
+    nm_500 = interp1(w,[1:length(w)],.5, 'nearest');
+    nm_870 = interp1(w,[1:length(w)],.87, 'nearest');
+    nm_452 = interp1(w,[1:length(w)],.452, 'nearest');
+    nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
+    colsang=[nm_452 nm_865];
+    ang_noscreening=sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+    aod_380nm = tau_aero_noscreening(:,nm_380);
+    aod_452nm = tau_aero_noscreening(:,nm_452);
+    aod_500nm = tau_aero_noscreening(:,nm_500);
+    aod_865nm = tau_aero_noscreening(:,nm_865);
+    aod_500nm_max=3;
+    m_aero_max=15;
 
-%calculate quantity [1-cos(roll angle)]
-roll_proxy=1-cos(s.roll*pi/180);
-
+    %calculate quantity [1-cos(roll angle)]
+    roll_proxy=1-cos(s.roll*pi/180);
+end;
 % % initializing a logical field
 % good_ang = true(size(ang_noscreening));
 % % Here is an example of how to use logical flags in succession without
