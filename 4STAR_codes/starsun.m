@@ -66,4 +66,5 @@ end;
 disp(['Saving: ',savematfile])
 save(savematfile, '-struct', 's', '-mat');
 make_small(savematfile);
+make_for_starflag(savematfile);
 contents=[contents; fieldnames(s)];
