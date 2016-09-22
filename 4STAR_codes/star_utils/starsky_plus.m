@@ -6,11 +6,14 @@ function s = starsky_plus(s)
 % albedo and could include incorporation of flight telemetry to improve
 % scattering angle accuracy.
 if ~exist('s','var')
-    sfile = getfullname_('*sky?.mat','starsky','Select star sky mat file.');
+    sfile = getfullname('*SKY*.mat','starsky','Select star sky mat file.');
     s = load(sfile);
+    if isfield(s,'s_out')
+        s = s.s_out;
+    end
 end
 if isfield(s,'filename')
-    [p,skytag,x] = fileparts(s.filename{1});
+    [p,skytag,x] = fileparts(strrep(s.filename{1},'\',filesep));
     skytag = strrep(skytag,'_VIS_','_');skytag = strrep(skytag,'_NIR_','_');
 end
 if ~exist('sfile','var')
