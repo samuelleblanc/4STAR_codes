@@ -2,7 +2,7 @@ function savematfile=stardestination(unconfirmed_savematfile)
 
 % regulate destination for 4STAR codes including allstarmat.m.
 % Yohei, 2012/04/11
-
+% CJF: 20160922, fixing defaultsavefolder to be the datapath in starpaths
 if ~isstr(unconfirmed_savematfile);
     error('Destination must be given in a string.');
 elseif size(unconfirmed_savematfile,1)~=1;
@@ -15,10 +15,9 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
     else
         savematfile=unconfirmed_savematfile;
     end;
-else; % ask for a full path
+else % ask for a full path
     if ~isempty(which('starpaths')); % look into pre-set path
-        defaultsavefolder=get_last_used_path();
-        defaultsourcefolder=fullfile(defaultsavefolder, 'raw');
+        [defaultsavefolder, figurefolder, askforsourcefolder, author]=starpaths;
     else
         defaultsavefolder='';
     end;
