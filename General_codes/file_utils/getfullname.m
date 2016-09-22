@@ -8,7 +8,7 @@ function [fullname] = getfullname(fspec,pathfile,dialog);
 % access to the protected matlabroot directory
 
 
-pname = strrep(userpath,';',filesep);
+pname = strrep(strrep(userpath,';',filesep),':',filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
