@@ -59,7 +59,11 @@ for fld = 1:length(flag_name)
             end
             flag_tag(fld) = tag;
     end
-    tmp = flags.(flag_name{fld}).*(good);
+    try;
+        tmp = flags.(flag_name{fld}).*(good);
+    catch;
+        tmp = flags.(flag_name{fld}).*(good');
+    end;
     starts = find(diff([false;tmp])>0);
     ends = find(diff([tmp;false])<0);
     if ~isempty(starts)
