@@ -128,9 +128,9 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914'} ; %put one day string
+dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0           0           0          0          1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0           0           0          0          0          1] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
