@@ -43,7 +43,7 @@ vals = textscan(fgetl(fid),'%f');
 vals = vals{:};
 scan_str = [repmat('%f ',[1, length(vals)]),'%*[^\n]'];
 fseek(fid,data_i,-1);
-[C] = textscan(fid, scan_str, 'bufsize',20000);
+[C] = textscan(fid, scan_str);
 fclose(fid);
 %%
 cols = length(C);

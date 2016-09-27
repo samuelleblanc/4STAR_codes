@@ -1,7 +1,8 @@
 function star = starsky_scan(star)
 % Generate sky scans from starsky struct
 % This routine is called from "starsky"
-[pname,fstem,ext] = fileparts(star.filename{1});
+
+[pname,fstem,ext] = fileparts(strrep(star.filename{1},'\',filesep));
 pname = [pname, filesep];
 fstem = strrep(fstem, '_VIS','');
 star.time = star.t;

@@ -60,10 +60,16 @@ elseif ~isempty(strfind(lower(userpath),'qin'));
     matfolder='C:\zq_working_baeri\4star\data\';
     figurefolder='C:\zq_working_baeri\4star\figures\';
     author='Qin';
-elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor')) | ~isempty(strfind(lower(userpath),lower('D:\Documents\GitHub'))); 
+elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor')) 
+    author='Connor';
+    if isdir('/Users/d3k014/Desktop/data/4STAR/')
+        matfolder = '/Users/d3k014/Desktop/data/4STAR/processed/';
+        figurefolder = '/Users/d3k014/Desktop/data/4STAR/img/';
+    else
     matfolder='C:\Users\d3k014\Documents\GitHub\4STAR_codes\data_folder\';
     figurefolder='D:\data\4STAR\yohei\img\';
-    author='Connor';
+    end
+
 elseif ~isempty(strfind(lower(userpath),'jredeman'));
     matfolder='c:\jens\Matlab\4STAR_codes-master\data_folder\';
     figurefolder='c:\Jens\Data\4STAR\figures\';
@@ -127,3 +133,5 @@ else
     figurefolder='D:\data\4STAR\yohei\img\';
     author='cjf';
 end;
+
+return
