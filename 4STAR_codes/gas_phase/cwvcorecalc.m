@@ -208,11 +208,12 @@ end
  % upload a and b parameters (from LBLRTM - new spec FWHM)
  if model_atmosphere==1||model_atmosphere==2 %!!! check if xs should be related to calibration or measurement location 
      xs_ = 'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat';
-     xs  = load(fullfile(starpaths, xs_));
+%      xs = load(xs_); %xs  = load(fullfile(starpaths, xs_));
  else
      xs_ = 'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat';
-     xs  = load(fullfile(starpaths, xs_));
+%      xs  = load(xs_); %xs = load(fullfile(starpaths, xs_));
  end
+ xs = load(xs_);
  %
  % interpolate H2O parameters to whole wln grid
  % this is not used here; altitude interpolated is used
@@ -285,27 +286,45 @@ end
     %  avg_U1((isnan(avg_U1_)==1))=0;
     %  avg_U1 = real(avg_U1);
     %   U1_conv    =U1/H2O_conv;
-    %   U1_convavg =mean(U1_conv(:,26:52),2) 
+    %   U1_convavg =mean(U1_conv(:,26:52),2)
     %  U1_lamp_conv=U1_lamp/H2O_conv;
     
  elseif model_atmosphere==2 % SEAC4RS/TCAP summer
      % load altitude dependent coef.
-     alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));
-     alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat'));
-     alt2000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum2000m.mat'));
-     alt3000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum3000m.mat'));
-     alt4000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum4000m.mat'));
-     alt5000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum5000m.mat'));
-     alt6000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));
-     alt7000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer7000m.mat'));
-     alt8000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer8000m.mat'));
-     alt9000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer9000m.mat'));
-     alt10000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer10000m.mat'));
-     alt11000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer11000m.mat'));
-     alt12000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer12000m.mat'));
-     alt13000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat'));
-     alt14000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat'));
-
+     if exist('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat','file')
+         alt0    = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat');
+         alt1000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat');
+         alt2000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum2000m.mat');
+         alt3000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum3000m.mat');
+         alt4000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum4000m.mat');
+         alt5000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum5000m.mat');
+         alt6000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat');
+         alt7000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer7000m.mat');
+         alt8000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer8000m.mat');
+         alt9000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer9000m.mat');
+         alt10000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer10000m.mat');
+         alt11000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer11000m.mat');
+         alt12000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer12000m.mat');
+         alt13000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat');
+         alt14000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat');
+     else
+         
+         alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));
+         alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat'));
+         alt2000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum2000m.mat'));
+         alt3000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum3000m.mat'));
+         alt4000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum4000m.mat'));
+         alt5000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum5000m.mat'));
+         alt6000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));
+         alt7000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer7000m.mat'));
+         alt8000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer8000m.mat'));
+         alt9000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer9000m.mat'));
+         alt10000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer10000m.mat'));
+         alt11000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer11000m.mat'));
+         alt12000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer12000m.mat'));
+         alt13000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat'));
+         alt14000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat'));
+     end
 
 
       zkm_LBLRTM_calcs=[0:14];
