@@ -12,10 +12,10 @@ else
 end
 
  
-s.flight=[datenum(2016,8,25,10,46,18) datenum(2016,8,25,20,15,42)]; 
+s.flight=[datenum(2016,8,27,7,55,42) datenum(2016,8,27,14,29,09)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+%s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
  
 % Ozone and other gases 
 s.O3h=21; % 

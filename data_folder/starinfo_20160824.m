@@ -12,15 +12,16 @@ else
 end
 
  
-s.flight=[datenum(2016,8,25,10,46,18) datenum(2016,8,25,20,15,42)]; 
+% flight=[datenum(2016,6,18,17,00,00) datenum(2016,6,18,22,34,43)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+%s.langley=[datenum(2016,8,23,10,52,00) datenum(2016,8,23,11,47,00)];
+s.flight=[datenum(2016,8,24,11,51,25) datenum(2016,8,24,17,41,47)];
  
 % Ozone and other gases 
-s.O3h=21; % 
-s.O3col=0.280; %      
-s.NO2col=2.0e15; %  
+s.O3h=21; % Yohei's guess 
+s.O3col=0.268; % Yohei's guess     
+s.NO2col=2.0e15; % Yohei's guess  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
