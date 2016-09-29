@@ -19,7 +19,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % CJF: 2013/12/05: edited lines 145 and following to strip empty records
 % SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
 % SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
-version_set('1.1');
+% SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file 
+version_set('1.2');
 %********************
 % control input
 %********************
@@ -167,4 +168,9 @@ for ii=1:length(contents);
     end;
 end;
 
+
+%********************
+%% Calculate the times and minutes in the star.mat file
+%********************
+starminutes(daystr,savematfile)
 return
