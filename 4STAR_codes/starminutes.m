@@ -70,7 +70,7 @@ end;
 
 [ff,pp]=fileparts(fnn);
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fnn});
-
+disp(['Doing for day: ' daystr])
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
 if exist(infofile_)==2;
@@ -97,7 +97,7 @@ catch;
 end;
 
 disp('*** Now for the minutes in flight ***')
-
+t_park = 0.0;
 for u=1:length(uu);
 nn=findstr(uu{u},'vis');
     if nn; 
@@ -112,6 +112,10 @@ nn=findstr(uu{u},'vis');
             if sum(t_sub)>0;
                 t=calc_mins(s.(uu{u}).t(t_sub));
             end;
+            tsubp = (s.(uu{u}).t>s.flight(1) & s.(uu{u}).t<s.flight(2) & s.(uu{u}).Str==0);
+            if sum(tsubp)>0;
+                t_park = t_park +calc_mins(s.(uu{u}).t(tsubp));
+            end
             disp(['Minutes in ' uu{u} ': ' num2str(t) ' number:' num2str(kk(2))])
         else;
             t=0.0;
@@ -124,10 +128,15 @@ nn=findstr(uu{u},'vis');
                 if sum(t_sub)>0;
                     t=t+calc_mins(s.(uu{u})(i).t(t_sub));
                 end;
+                tsubp = (s.(uu{u})(i).t>s.flight(1) & s.(uu{u})(i).t<s.flight(2) & s.(uu{u})(i).Str==0);
+                if sum(tsubp)>0;
+                    t_park = t_park +calc_mins(s.(uu{u})(i).t(tsubp));
+                end
             end;
             disp(['Minutes in ' uu{u} ': ' num2str(t) ' number:' num2str(kk(2))])
         end;
     end;
 end;
+disp(['Total Minutes parked: ' num2str(t_park)])
 
 return;
