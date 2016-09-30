@@ -47,7 +47,11 @@ if length(unique(instrumentname))>1;
    error('The input files are from different instruments'); 
 else;
     instrumentname = unique(instrumentname);
-    instrumentname = instrumentname{1};
+    try;
+        instrumentname = instrumentname{1};
+    catch;
+        error('Cant subset the instrument name, possibly no file available')
+    end;
 end;
 
 if staysingle
