@@ -55,11 +55,13 @@
 %          - added default hiss file based on date values
 % Modified (v2.1): by Samuel LeBlanc, NASA Ames, 2015-11-11
 %          - added default for pre-NAAMES plotting
+% Modified (v2.2): by Samuel LeBlanc, NASA Ames, 2016-09-29
+%          - added control for pre-KORUS data in 2016
 % -------------------------------------------------------------------------
 
 %% Start of function
 function hiss_star_cals = Radiance_cals_4STAR2(daystrin)
-version_set('2.1');
+version_set('2.2');
 
 if exist('daystrin','var')
     date = daystrin;
@@ -69,9 +71,10 @@ else
     %date='20140624'
     %date='20140716'
     %date='20141024'
-    date = '20150915'
+    %date = '20150915'
+    date = '20160330'
 end
-docorrection=true; %do nonlinear correction
+docorrection=false; %do nonlinear correction
 
 if ~exist(['C:\Users\sleblan2\Research\4STAR\cal\' date])
     pname=uigetdir('C:\','Find folder for calibration files');
@@ -83,6 +86,8 @@ if date(1:4)=='2014'|date(1:4)=='2015';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20140606091700HISS.txt');
 elseif date(1:4)=='2013';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20130605124300HISS.txt');
+elseif date(1:4)=='2016';
+    hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20160121125700HISS.txt');
 else
     hiss = get_hiss;
 end;
@@ -105,14 +110,22 @@ for ll = lamps
     nir.fname = [date,'_',fnum,'_NIR_',pp,'.dat'];
     vis.fname = [date,'_',fnum,'_VIS_',pp,'.dat'];
     fnames = {[pname,filesep,lamp_str,filesep,nir.fname];[pname,filesep,lamp_str,filesep,vis.fname]};
-    [sourcefile, contents0, savematfile]=startupbusiness('park', fnames,['.' filesep 'tempmatdata.mat']);
+    [sourcefile, contents0, savematfile]=startupbusiness('', fnames,['.' filesep 'tempmatdata.mat']);
     load(sourcefile,contents0{:},'program_version');
+    if exist('vis_zen')>0;
+        vis_park=vis_zen; nir_park=nir_zen;
+    end;    
     
     %% add variables and make adjustments common among all data types. Also
     % combine the two structures.
-    s=starwrapper(vis_park, nir_park,'applytempcorr',false,'verbose',false,'applynonlinearcorr',docorrection);
+    tog.applynonlinearcorr = docorrection;
+    tog.verbose = false;
+    tog.applytempcorr = false;
+    tog.computeerror = false;
+    s=starwrapper(vis_park, nir_park,tog);%'applytempcorr',false,'verbose',false,'applynonlinearcorr',docorrection);
     note = s.note;
     s.utc = t2utch(s.t);
+    s.toggle
     
     shut = s.Str==0;
     shut(2:end)= shut(1:end-1)&shut(2:end); shut(1:end-1) = shut(1:end-1)&shut(2:end);

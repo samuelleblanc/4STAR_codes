@@ -44,6 +44,7 @@
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, March 16th, 2015
 %          - modified some plotting options, to show NIR response functions
 %          more clearly
+% Modified (v1.3): by Samuel LeBlanc
 % -------------------------------------------------------------------------
 
 %% Start of function
@@ -55,8 +56,8 @@ version_set('1.2');
 %date='20140624'
 date='20140716';
 %date='20141024'
-date = '20150915'
-docorrection=true; %false;
+date = '20160330'
+docorrection=false; %false;
 
 %% Legacy codes
 % nir = rd_spc_TCAP_v2([pname,'20120920_003_NIR_park.dat']);
@@ -255,7 +256,27 @@ for ll = lamps
         end
         pp='park';
         date='20141024';
-    else
+    elseif date=='20160330'|date=='20160329';
+        switch ll
+            case 12
+                fnum = '018';
+            case 9
+                fnum = '020';
+            case 6
+                fnum = '021';
+            case 3
+                fnum = '022';
+            case 2
+                fnum = '023';
+            case 1
+                fnum = '024';
+            case 0
+                fnum = '025';
+        end
+        pp='ZEN';
+        date='20160330';
+        
+    else;
         disp('problem! date not recongnised')
     end
     

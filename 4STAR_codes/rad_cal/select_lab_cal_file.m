@@ -28,10 +28,12 @@
 %                 - ported over from Radiance_cals_4STAR.m
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, Nov. 10th, 2015
 %                  - update to match the lab cals from 20150915 
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2016-09-29
+%                  - update to pre-KORUS lab cals from 20160330
 % -------------------------------------------------------------------------
 
 function [date fnum pp] = select_lab_cal_file(date,ll)
-version_set('v1.1');
+version_set('v1.2');
 if date=='20131121' | date=='20131120'
     switch ll %% make sure that the file number is correctly set for each lamp setting, dependent on the day of calibration.
         case 12
@@ -157,7 +159,25 @@ elseif date=='20150915' | date=='20150916'
         warning('Date being modified to match files')
     end;
     date='20150915';
-    
+elseif date=='20160330'|date=='20160329';
+        switch ll
+            case 12
+                fnum = '018';
+            case 9
+                fnum = '020';
+            case 6
+                fnum = '021';
+            case 3
+                fnum = '022';
+            case 2
+                fnum = '023';
+            case 1
+                fnum = '024';
+            case 0
+                fnum = '025';
+        end
+        pp='ZEN';
+        date='20160330';
 else
     disp('problem! date not recongnised')
 end

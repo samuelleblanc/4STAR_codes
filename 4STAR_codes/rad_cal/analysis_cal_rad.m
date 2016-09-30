@@ -54,7 +54,8 @@ version_set('1.3');
 %date='20140624';
 %date='20140716';
 %date='20141024';
-date = '20150915'
+%date = '20150915';
+date = '20160330';
 
 disp(['Loading the matlab file: ' pname file])
 disp(['for Date: ' date])
@@ -171,6 +172,13 @@ elseif date == '20140716';
     lampstr = 'Lamps_12';
     fnum = '003';
     st = '008';
+elseif date =='20160330';
+    ll = 12; % select the lamps-12
+    iint_vis = 3; % 12 ms int time
+    iint_nir = 3; % 150 ms int time
+    lampstr = 'Lamps_12';
+    fnum = '018';
+    st = '024';
 else
     ll=1; %select the lamps-9
     iint_vis=3;
