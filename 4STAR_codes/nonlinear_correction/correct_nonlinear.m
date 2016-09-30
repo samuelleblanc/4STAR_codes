@@ -36,12 +36,14 @@
 % Modified (v1.0): by Samuel LeBlanc, October 10th, 2014
 %           - changed wd to be no smaller than 0
 %           - added version_set call
+% Modified (v1.1): by Samuel LeBlanc, Santa Cruz, CA, 2016-09-30
+%           - changed the file to reference with the 20160330 (most recent)
 %
 % -------------------------------------------------------------------------
 
 %% Function routine
 function spout_raw=correct_nonlinear(spin_raw, verbose)
-version_set('1.0');
+version_set('1.1');
 
 %% Determine either vis or nir spectrometer
 if length(spin_raw(1,:)) == 512 
@@ -54,6 +56,7 @@ end
 
 %% Load the file containing the look-up-table correction
 date='20130507';
+date='20160330';
 pname=starpaths; %'C:\Users\sleblan2\Research\4STAR\cal\20130506';
 if verbose, disp(['loading correction file:' pname date '_resp_corr.mat']), end;
 % load([pname date '_resp_corr.mat']);

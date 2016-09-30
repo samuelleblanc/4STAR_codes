@@ -29,12 +29,14 @@
 % Modified (v1.0): by Samuel LeBlanc, NASA Ames, Oct 13th, 2014
 %          - ported to newest radiance calibration file
 %          - added comments and version control
+% Modified v1.1: by Samuel LeBlanc, NASA Ames, 2016-09-29
+%          - added control over nuber of header lines for 2016 version.
 %
 % -------------------------------------------------------------------------
 
 %% Start of function
 function [archi] = get_hiss(in)
-version_set('1.0');
+version_set('1.1');
 
 % 4STAR radiance cal after TCAP2 and before SEAC4RS
 % Source:    Hiss                                        (ARC High Output Sphere)                                                                           
@@ -73,10 +75,14 @@ if fid>2
     fname = [fname, ext];
     date=fname(1:8);
     dd=str2num(date);
+    hlines = 15;
+    if dd==20160121.0;
+        hlines=16;
+    end;
     if dd<20140604.0,
       %C = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f\n ','HeaderLines',15,'Delimiter','\n'); %%*[^\n]
       %C=textscan(fid,'%f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',15);
-      C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',15);
+      C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',hlines);
       fclose(fid);
       archi.fname = fname;
       archi.nm = C{1};
@@ -97,7 +103,7 @@ if fid>2
         archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1,archi.lamps_p5],'-');
     legend('12 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp','0.5 lamp');
     else;
-      C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',15);
+      C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',hlines);
       fclose(fid);
       archi.fname = fname;
       archi.nm = C{1};
