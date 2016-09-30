@@ -58,12 +58,14 @@
 %                  mission, until 2014-10-24
 % Modified (v1.6): Samuel LeBlanc, NASA Ames, 2015-11-11, happy veteran's day
 %                  Update to NAAMES, put in the pre-NAAMES lab cal
+% Modified (v1.7): Samuel LeBlanc, NASA Ames, 2016-09-29
+%                  Update with pre KORUS radiance cal data
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.6');
+version_set('1.7');
 
 % control the input
 if nargin==0;
@@ -108,11 +110,14 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         daystr = '20141024';
         filesuffix = 'from_20141024_005_VIS_park_with_20140606091700HISS';
         %filesuffix = 'from_20141024_009_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2015 09 15 0 0 0]);
+    elseif t >= datenum([2015 09 15 0 0 0]) && t < datenum([2016 03 30 0 0 0]);
         % For using calibration from the pre-NAAMES-2015 large sphere lab
         % cal
         daystr = '20150915';
         filesuffix = 'from_20150915_012_VIS_park_with_20140606091700HISS';
+    elseif t >= datenum([2016 03 30 0 0 0]);
+        daystr = '20160330';
+        filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
