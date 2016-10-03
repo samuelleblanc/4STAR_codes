@@ -119,6 +119,7 @@ if Mode~=1
         auto_settings = flags.auto_settings;
         flags = rmfield(flags,'auto_settings');
     end
+    % Here is the place to remove non-logical elements from flag
     F_t=fieldnames(flags);
     for i_f=length(F_t):-1:1
         fld = F_t{i_f};
@@ -133,10 +134,10 @@ if Mode~=1
     screen_bad_list = F_t(~test_good);
             
     flagfile = [daystr,'_starflag_man_created',now_str, 'by_',op_name_str,'.mat'];
-    outputfile=[starpaths,filesep,flagfile];
+    outputfile=[starpaths,flagfile];
     disp(['Starflag mode 2 to output to:' flagfile])
     
-    flags_matio = matfile(flagfile,'Writable',true);
+    flags_matio = matfile(outputfile,'Writable',true);
     flags_matio.flagfile = flagfile;
     
     mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
@@ -154,6 +155,7 @@ if Mode~=1
     %   figs: output of figure numbers and positions to preserve figure layout
     % Now populate the struct that will be output to starsun.mat.
     flags.time.t = t;
+    no_mask = flags.flag_struct.flag_noted
     manual_flags.nomask_list=no_mask;
     manual_flags.screen_bad_list=screen_bad_list;
     manual_flags.good=good; % These are only those records not marked by tests in screen_bad_list
