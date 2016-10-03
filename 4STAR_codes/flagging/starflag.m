@@ -90,6 +90,7 @@ if ~isfield(s,'sd_aero_crit') % read starinfo file
         end;
     end;
 end
+min_aod = -0.05;
 if ~isempty(s)
     t=s.t;Alt=s.Alt;
     c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtot=s.QdVtot;Md=s.Md;ng=s.ng;
@@ -193,16 +194,16 @@ now_str = datestr(now,'yyyymmdd_HHMM');
 switch Mode
     case 1
         flagfile = [daystr,'_starflag_auto_created',now_str,'.mat'];
-        outputfile=[starpaths,filesep,flagfile];%This has to be starsun.mat
+        outputfile=[starpaths,flagfile];%This has to be starsun.mat
         op_name_str = 'auto';
         disp(['Starflag mode 1 to output to:' flagfile])
     case 2
         flagfile = [daystr,'_starflag_man_created',now_str, 'by_',op_name_str,'.mat'];
-        outputfile=[starpaths,filesep,flagfile];
+        outputfile=[starpaths,flagfile];
         disp(['Starflag mode 2 to output to:' flagfile])
 end
 
-flags_matio = matfile(flagfile,'Writable',true);
+flags_matio = matfile(outputfile,'Writable',true);
 flags_matio.flagfile = flagfile;
 
  mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
@@ -293,18 +294,18 @@ end;
 %Fixed pre-screening in the case of Mode 1 automatic
 if (Mode==1)
     flags_str.before_or_after_flight = '(t<flight(1)|t>flight(2))';
-    flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+    flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>aod_500nm_max) | rawrelstd(:,1)>sd_aero_crit';
     if exist('darkstd','var')
-        flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+        flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
     else
-        flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+        flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
     end
     flags_str.smoke = '';
     flags_str.dust = '';
     flags_str.cirrus = '';
     flags_str.low_cloud = '';
     flags_str.hor_legs = '';
-    flags_str.vert_legs = '';
+%     flags_str.vert_legs = '';
     flags_str.unspecified_aerosol = '';
     flags_str.frost = '';
     reset_flags=true;
@@ -333,7 +334,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            flags_str.vert_legs = '';
+%             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -342,18 +343,20 @@ if (Mode==2)
         case 3 %Previous flags:Yes from starsun, your own pre-screening:Yes
             %User needs to modify what's below
             flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>aod_500nm_max) | rawrelstd(:,1)>sd_aero_crit';
             if exist('darkstd','var')
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
             else
-                flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
             end
+            %                 flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            flags_str.vert_legs = '';
+%             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -361,18 +364,18 @@ if (Mode==2)
             %Users need to modify what's below:
             clear('flags')
             flags_str.before_or_after_flight = '(t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+            flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>aod_500nm_max) | rawrelstd(:,1)>sd_aero_crit';
             if exist('darkstd','var')
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
             else
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
             end
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            flags_str.vert_legs = '';
+%             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             
@@ -410,18 +413,18 @@ if (Mode==2)
             end
             %Users need to modify what's below:
             flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>aod_500nm_max) | rawrelstd(:,1)>sd_aero_crit';
             if exist('darkstd','var')
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
             else
-                flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
             end
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            flags_str.vert_legs = '';
+%             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -438,7 +441,7 @@ if (reset_flags)
     if ~isempty(flags_str.cirrus) flags.cirrus=eval(flags_str.cirrus);else flags.cirrus = []; end
     if ~isempty(flags_str.low_cloud) flags.low_cloud=eval(flags_str.low_cloud);else flags.low_cloud = []; end
     if ~isempty(flags_str.hor_legs) flags.hor_legs=eval(flags_str.hor_legs);else flags.hor_legs = []; end
-    if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
+%     if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
     if ~isempty(flags_str.unspecified_aerosol) flags.unspecified_aerosol=eval(flags_str.unspecified_aerosol);else flags.unspecified_aerosol = []; end
     if ~isempty(flags_str.frost) flags.frost=eval(flags_str.frost);else flags.frost = []; end
     auto_settings = flags_str;
@@ -479,7 +482,7 @@ if (Mode==2)
     figs.aux_fig.pos = [0.6167 0.0769 0.2917 0.8306];
     
     % Define flags which do not flag data as "bad".
-    no_mask = {'smoke','dust','before_or_after_flight','hor_legs', 'vert_legs'};
+    no_mask = {'smoke','dust','before_or_after_flight','hor_legs'};
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
     if isfield(flags,'aerosol_init_auto')
