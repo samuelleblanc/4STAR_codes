@@ -115,12 +115,18 @@ else
     flags.noted = false(size(t));
     flags.event = false(size(t));
 end
-
+% trying to get rid of non-boolean or non-empty flag fields
 if isstruct(flags)
     flag_names = fieldnames(flags);
     for f = length(flag_names):-1:1
         if isstruct(flags.(char(flag_names(f))))
-            flags = rmfield(flags,char(flag_names(f)));
+%             flags = rmfield(flags,char(flag_names(f)));
+            flag_names(f) = [];
+        elseif ischar(flags.(char(flag_names(f))))
+%             flags = rmfield(flags,char(flag_names(f)));
+            flag_names(f) = [];
+        elseif length(flags.(char(flag_names(f)))) == length(t) && ~islogical(flags.(char(flag_names(f))))
+%             flags = rmfield(flags,char(flag_names(f)));
             flag_names(f) = [];
         else
             if length(flags.(char(flag_names(f))))~=length(t)
@@ -130,14 +136,15 @@ if isstruct(flags)
                 flags.(char(flag_names(f))) = flags.(char(flag_names(f)))';
             end
             if strcmp(char(flag_names(f)),'aerosol_init_auto') %MK modified 20140402 this flag is redundant with others; we don't need it.
-                flags = rmfield(flags,char(flag_names(f)));
+%                 flags = rmfield(flags,char(flag_names(f)));
                 flag_names(f) = [];
             end
             
         end
     end
 end
-nflags = length(fieldnames(flags));
+% nflags = length(fieldnames(flags));
+nflags = length(flag_names);
 % zoom('on');
 extra_buttons = {'FLAGGING MODE','SELECTION MODE','semilog ON/OFF','IMPORT FLAGS','UNDO','REDO','CLEAR','RESET','DONE','ABORT'};
 if isfield(varin,'special_fn_name')
@@ -207,7 +214,7 @@ gray_flags = uint32(zeros(size(t)));
 gray_flags = bitcmp(gray_flags); % Take complement,
 
 if isstruct(flags)&exist('flag_gray','var')
-    flag_names = fieldnames(flags);
+%     flag_names = fieldnames(flags);
     for f = 1:length(flag_names)
         if any(strcmp(flag_gray,flag_names{f}))
             gray_flags = bitset(gray_flags,f,false);
@@ -646,7 +653,7 @@ end
 for f = 1:length(flag_names)
     flags.(char(flag_names(f))) = logical(bitget(screen(:,FI),f));
 end
-flags.time.t = time';
+% flags.time.t = time';
 flags_matio.flags = flags;
 
 %%
