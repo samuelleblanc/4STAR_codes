@@ -25,7 +25,7 @@ function [filename, pathname, filterindex] = uigetfile2(varargin)
 %  2016/02/12 CJF Modified to use userpath
 
 % name of mat file to save last used directory information
-pname = strrep(userpath,';',filesep);
+pname = strrep(strrep(userpath,';',filesep),':',filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
