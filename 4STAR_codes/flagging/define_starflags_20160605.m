@@ -123,7 +123,7 @@ flag_noted =  {'before_or_after_flight','smoke','dust','hor_legs','spiral'}; % T
 
 for ff = 1:length(flag_names)
     name = char(flag_names(ff));
-    if ~isfield(flags_in,'name')
+    if ~isfield(flags_in,name)
         flags_in.(name) = [];
     end
 end
@@ -160,6 +160,7 @@ inp.aod_452nm = tau_aero_noscreening(:,nm_452);
 inp.aod_500nm = tau_aero_noscreening(:,nm_500);
 inp.aod_865nm = tau_aero_noscreening(:,nm_865);
 inp.aod_500nm_max=3;
+inp.min_aod = -0.05;
 inp.m_aero = s.m_aero;
 inp.m_aero_max=15;
 c0 = s.c0;                % cjf: I think negative or non-physical c0 would be better 
@@ -169,7 +170,7 @@ dark = s.dark; inp.dark_500nm = dark(:,nm_500); clear dark
 darkstd = s.darkstd; inp.darkstd_500nm = darkstd(:,nm_500); clear darkstd
 
 flags_out = set_starflags_20160605(inp,flags_in);
-flags_out.flag_struct.flag_str = capture_m('set_flags_20160605.m');
+flags_out.flag_struct.flag_str = capture_m('set_starflags_20160605.m');
 flags_out.flag_struct.flag_names = flag_names;
 flags_out.flag_struct.flag_noted = flag_noted;
 
