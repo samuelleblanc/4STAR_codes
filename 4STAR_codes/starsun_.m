@@ -1,4 +1,4 @@
-function [savematfile, contents]=starsun(varargin)
+function [savematfile, contents]=starsun_(varargin)
 
 % starsun(source, savematfile)
 % reads 4STAR _SUN data, gets relevant variables, makes adjustments, and

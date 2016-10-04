@@ -1,4 +1,4 @@
-function	s=starwrapper(s, s2, toggle, matfilename)
+function	s=starwrapper(s, s2, toggle)
 
 %% STARWRAPPER, called in the middle of a 4STAR processing code (e.g.,
 % starsun.m, starsky.m), adds variables and makes adjustments common among
@@ -139,8 +139,8 @@ if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
-infofile_ = ['starinfo_' daystr '.m'];
-infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
+infofile_ = ['starinfo_' daystr '.m']; data_folder = getfilepath('4STAR_git_data_folder','Select 4STAR GitHub data folder.');
+infofile = fullfile(data_folder, ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
@@ -323,13 +323,13 @@ drawnow;
 if exist('s','var')&&exist('s2','var');
     s = combine_star_s_s2(s,s2,toggle);
 end
-save(matfilename,'-struct','s','-v7.3');
-clear s s_raw r_raw
-if exist('s2','var')
-    clear s2
-end
-disp(['Loading ', matfilename, ' as a Writable matfile object.']);
-s = matfile(matfilename,'Writable',true);
+% save(matfilename,'-struct','s','-v7.3');
+% clear s s_raw r_raw
+% if exist('s2','var')
+%     clear s2
+% end
+% disp(['Loading ', matfilename, ' as a Writable matfile object.']);
+% s = matfile(matfilename,'Writable',true);
 pp=numel(s.t);
 qq=size(s.raw,2);
 
@@ -416,6 +416,7 @@ if toggle.doflagging;
     m_aero_max=15;
     if toggle.booleanflagging; % new flagging system
         boolean=toggle.booleanflagging;
+        Str = s.Str;
         %warning('Boolean flagging is under development. Please report any bug to Yohei.');
         if toggle.verbose; disp('in the boolean flagging system'), end;
         % prepare for flagging
@@ -430,18 +431,20 @@ if toggle.doflagging;
             else;
                 cc=[408 169+1044];
             end;
-            s.rawstd=NaN(pp, numel(cc));
-            s.rawmean=NaN(pp, numel(cc));
+            rawstd=NaN(pp, numel(cc));
+            rawmean=NaN(pp, numel(cc));
             t = s.t;
             raw = s.raw;
+ 
             for i=1:pp;
-                rows=find(t>=t(i)-ti/2&t<=t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-                if numel(rows)>0;
-                    s.rawstd(i,:)=nanstd(raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                    s.rawmean(i,:)=nanmean(raw(rows,cc),1);
+                rows=(t>=t(i)-ti/2&t<=t(i)+ti/2 & Str==1); % Yohei, 2012/10/22 changed from s.Str>0
+                if sum(rows)>1;
+                    rawstd(i,:)=nanstd(raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                    rawmean(i,:)=nanmean(raw(rows,cc),1);
                 end;
             end;
-            clear raw
+            s.rawstd = rawstd; s.rawmean =rawmean; clear rawstd ; clear rawmean
+            clear raw 
             s.rawrelstd=s.rawstd./s.rawmean;
         end;
         
@@ -449,21 +452,22 @@ if toggle.doflagging;
         nflagallcolsitems=7;
         flagallcolsitems=repmat({''},nflagallcolsitems,1);
         flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
-        flagallcols(s.Str~=1,:,1)=true; flagallcolsitems(1)={'darks or sky scans'};
+        flagallcols(Str~=1,:,1)=true; flagallcolsitems(1)={'darks or sky scans'};
        
         if strmatch('sun', lower(datatype(end-2:end)));
             flagallcols(s.Md~=1,:,2)=true; flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
             flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; flagallcolsitems(3)={'high standard deviation'};
         end;
         flagallcols(s.m_aero>m_aero_max,:,4)=true; flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
-        for i=1:size(s.ng,1);
-            ng=incl(s.t,s.ng(i,1:2));
+        sng = s.ng;
+        for i=1:size(sng,1);
+            ng=incl(t,sng(i,1:2));
             if isempty(ng);
-            elseif s.ng(i,3)<10;
+            elseif sng(i,3)<10;
                 flagallcols(ng,:,5)=true; flagallcolsitems(5)={'unknown or others (manual flag)'};
-            elseif s.ng(i,3)<100;
+            elseif sng(i,3)<100;
                 flagallcols(ng,:,6)=true; flagallcolsitems(6)={'clouds (manual flag)'};
-            elseif s.ng(i,3)<1000;
+            elseif sng(i,3)<1000;
                 flagallcols(ng,:,7)=true; flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
             end;
         end;
@@ -723,15 +727,21 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
     % water vapor retrieval (940fit+c0 method)
     %-----------------------------------------
+    if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
+        toggle.runwatervapor = false;
+        warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
+    end;
+    
     if toggle.runwatervapor;
-        tic; if toggle.verbose; disp('water vapor retrieval start'), end;
+        tic_water = tic; if toggle.verbose; disp('water vapor retrieval start'), end;
         
         [cwv] = cwvcorecalc_(s,model_atmosphere);
         if toggle.verbose; disp({['Water vapor retrieval duration:'],toc}); end;
-        s.cwv = cwv;
         
         % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
-        s.tau_aero_subtract = real(cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same        
+        s.tau_aero_subtract = real(cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same 
+        s.cwv = cwv; clear cwv
+        toc(tic_water)
         % gases subtractions and o3/no2 conc [in DU] from fit
         %-----------------------------------------------------
         if toggle.gassubtract
@@ -741,7 +751,9 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s);
             
             % this is new routine
-            gas = retrieveGases_(s);
+            tic_gas = tic;
+            gas = retrieveGases_(s); 
+            toc(tic_gas)
 %             s.gas = gas;
             % subtract derived gasess
             s.tau_aero_subtract_all = s.tau_aero_subtract - gas.o3.o3OD - gas.o3.o4OD - gas.o3.h2oOD ...
@@ -750,6 +762,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
         end;
+               
     end;
     %elseif gasmode==2 && ~isempty(strfind(lower(datatype),'sun'))
     % use retrieved O3/NO2 to subtract
@@ -764,7 +777,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %         %-----------------------------------------------------
     %         if verbose; disp('o3/no2 standard retrieval start'), end;
     %         [s.pcadata s.pcavisdata s.pcanirdata s.pcvis s.pcnir s.eigvis s.eignir s.pcanote] =starPCAshort(s);
-    %         [s.tau_O3 s.o3VCD s.tau_NO2 s.no2VCD s.mse_O3 s.mse_NO2 s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrieveo3no2cwv(s,cross_sections);    % s.tau_O3/NO2 are columnar OD
+    %         [s.tau_O3 s.o3VCD s.tau_NO2 s.no2VCD s.mse_O3 s.mse_NO2 s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrieveo3no2cwvs.(s,cross_sections);    % s.tau_O3/NO2 are columnar OD
     %         if verbose; disp('o3/no2 standard retrieval end'), end;
     % original:s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O); % rate adjusted for the aerosol component
     %         s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2)./tr(s.m_ray, s.tau_CH4));
