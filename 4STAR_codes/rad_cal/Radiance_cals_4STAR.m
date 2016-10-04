@@ -6,6 +6,8 @@
 %   Needs update in code to select specific files corresponding to specific
 %   lamp numbers
 %   Uses old matlab routines to read 4STAR data
+%   
+%   ***** DEFUNCT, USE Radiance_cals_4STAR2.m ******
 %
 % CALLING SEQUENCE:
 %   hiss_star_cals = Radiance_cals_4STAR
@@ -49,7 +51,8 @@
 
 %% Start of function
 function hiss_star_cals = Radiance_cals_4STAR
-version_set('1.2');
+warning('***** DEFUNCT, USE Radiance_cals_4STAR2.m ******')
+version_set('1.3');
 
 %date='20131121'
 %date='20130506'
