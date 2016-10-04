@@ -10,24 +10,28 @@
      
      invis = 'visLambda.txt';
      innir = strrep(invis,'vis','nir');
-     if exist(invis,'file')
-         vis.nm  = importdata(invis);
-         nir.nm  = importdata(innir);
-     else
-         vis.nm  = importdata(fullfile(starpaths,invis));
-         nir.nm  = importdata(fullfile(starpaths,innir));
-     end
+     vis.nm  = importdata(which(invis));
+     nir.nm  = importdata(which(innir));
+%      if exist(invis,'file')
+%          vis.nm  = importdata(invis);
+%          nir.nm  = importdata(innir);
+%      else
+%          vis.nm  = importdata(fullfile(starpaths,invis));
+%          nir.nm  = importdata(fullfile(starpaths,innir));
+%      end
           
      % h2o
      invis = 'H2O_1013mbar273K_vis.xs';
      innir = strrep(invis,'_vis','_nir');
-     if exist(invis,'file')
-         watervis  = importdata(invis);
-         waternir  = importdata(innir);
-     else
-         watervis  = importdata(fullfile(starpaths,invis));
-         waternir  = importdata(fullfile(starpaths,innir));
-     end
+     watervis  = importdata(which(invis));
+     waternir  = importdata(which(innir));
+%      if exist(invis,'file')
+%          watervis  = importdata(invis);
+%          waternir  = importdata(innir);
+%      else
+%          watervis  = importdata(fullfile(starpaths,invis));
+%          waternir  = importdata(fullfile(starpaths,innir));
+%      end
      water.visnm     = watervis.data(:,1);
      water.visXs     = watervis.data(:,2);
      water.visInterp = interp1(water.visnm, water.visXs, vis.nm,'pchip','extrap');
@@ -38,13 +42,15 @@
      % o2
      invis = 'O2_1013mbar273K_vis4star.xs';
      innir = strrep(invis,'_vis','_nir');
-     if exist(invis,'file')
-         o2vis  = importdata(invis);
-         o2nir  = importdata(innir);
-     else
-         o2vis  = importdata(fullfile(starpaths,invis));
-         o2nir  = importdata(fullfile(starpaths,innir));
-     end
+     o2vis  = importdata(which(invis));
+     o2nir  = importdata(which(innir));
+%      if exist(invis,'file')
+%          o2vis  = importdata(invis);
+%          o2nir  = importdata(innir);
+%      else
+%          o2vis  = importdata(fullfile(starpaths,invis));
+%          o2nir  = importdata(fullfile(starpaths,innir));
+%      end
      o2.visnm     = o2vis.data(:,1);
      o2.visXs     = o2vis.data(:,2);
      o2.visInterp = interp1(o2.visnm, o2.visXs, vis.nm,'pchip','extrap');
@@ -55,13 +61,15 @@
      % co2
      invis = 'CO2_1013mbar273K_vis4star.xs';
      innir = strrep(invis,'_vis','_nir');
-     if exist(invis,'file')
-         co2vis  = importdata(invis);
-         co2nir  = importdata(innir);
-     else
-         co2vis  = importdata(fullfile(starpaths,invis));
-         co2nir  = importdata(fullfile(starpaths,innir));
-     end
+         co2vis  = importdata(which(invis));
+         co2nir  = importdata(which(innir));
+%      if exist(invis,'file')
+%          co2vis  = importdata(invis);
+%          co2nir  = importdata(innir);
+%      else
+%          co2vis  = importdata(fullfile(starpaths,invis));
+%          co2nir  = importdata(fullfile(starpaths,innir));
+%      end
      co2.visnm     = co2vis.data(:,1);
      co2.visXs     = co2vis.data(:,2);
      co2.visInterp = interp1(co2.visnm, co2.visXs, vis.nm,'pchip','extrap');
@@ -71,11 +79,12 @@
      
      % ch4
      innir = 'CH4_1013mbar273K_nir4star.xs';
-     if exist(invis,'file')
-         ch4nir  = importdata(innir);
-     else
-         ch4nir  = importdata(fullfile(starpaths,innir));
-     end
+     ch4nir  = importdata(which(innir));
+%      if exist(invis,'file')
+%          ch4nir  = importdata(innir);
+%      else
+%          ch4nir  = importdata(fullfile(starpaths,innir));
+%      end
      ch4.nirnm     = ch4nir.data(:,1);
      ch4.nirXs     = ch4nir.data(:,2);
      ch4.nirInterp = interp1(ch4.nirnm, ch4.nirXs, nir.nm,'pchip','extrap');
@@ -83,13 +92,15 @@
      % o4
      invis = 'O4_CIA_296K_vis.xs';
      innir = strrep(invis,'_vis','_nir');
-     if exist(invis,'file')
-         o4vis  = importdata(invis);
-         o4nir  = importdata(innir);
-     else
-         o4vis  = importdata(fullfile(starpaths,invis));
-         o4nir  = importdata(fullfile(starpaths,innir));
-     end
+              o4vis  = importdata(which(invis));
+         o4nir  = importdata(which(innir));
+%      if exist(invis,'file')
+%          o4vis  = importdata(invis);
+%          o4nir  = importdata(innir);
+%      else
+%          o4vis  = importdata(fullfile(starpaths,invis));
+%          o4nir  = importdata(fullfile(starpaths,innir));
+%      end
      o4.visnm     = o4vis.data(:,1);
      o4.visXs     = o4vis.data(:,2);
      o4.visInterp = interp1(o4.visnm, o4.visXs, vis.nm,'pchip','extrap');
@@ -99,12 +110,12 @@
      
      % no2-220K
      invis = 'no2_220K_vanDaele4star_vis.xs';
-
-     if exist(invis,'file')
-         no2vis  = importdata(invis);
-     else
-         no2vis  = importdata(fullfile(starpaths,invis));
-     end
+no2vis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          no2vis  = importdata(invis);
+%      else
+%          no2vis  = importdata(fullfile(starpaths,invis));
+%      end
  
      no2_220.visnm     = no2vis.data(:,1);
      no2_220.visXs     = no2vis.data(:,2);
@@ -112,54 +123,59 @@
      
      % no2-298K
      invis = 'no2_298K_vanDaele4star_vis.xs';
-     if exist(invis,'file')
-         no2vis  = importdata(invis);
-     else
-         no2vis  = importdata(fullfile(starpaths,invis));
-     end
+     no2vis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          no2vis  = importdata(invis);
+%      else
+%          no2vis  = importdata(fullfile(starpaths,invis));
+%      end
      no2_298.visnm     = no2vis.data(:,1);
      no2_298.visXs     = no2vis.data(:,2);
      no2_298.visInterp = interp1(no2_298.visnm, no2_298.visXs, vis.nm,'pchip','extrap');
      
      % no2
      invis = 'no2_vis4star.txt';
-     if exist(invis,'file')
-         no2vis  = importdata(invis);
-     else
-         no2vis  = importdata(fullfile(starpaths,invis));
-     end
+     no2vis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          no2vis  = importdata(invis);
+%      else
+%          no2vis  = importdata(fullfile(starpaths,invis));
+%      end
      no2.visnm     = no2vis(:,1);
      no2.visXs     = no2vis(:,2);
      no2.visInterp = interp1(no2.visnm, no2.visXs, vis.nm,'pchip','extrap');
      
      % o3
      invis = 'O3_223K_convTech5.txt';
-     if exist(invis,'file')
-         o3vis  = importdata(invis);
-     else
-         o3vis  = importdata(fullfile(starpaths,invis));
-     end
+     o3vis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          o3vis  = importdata(invis);
+%      else
+%          o3vis  = importdata(fullfile(starpaths,invis));
+%      end
      o3.visnm     = o3vis(:,1);
      o3.visXs     = o3vis(:,2);
      o3.visInterp = interp1(o3.visnm, o3.visXs, vis.nm,'pchip','extrap');
      % hcoh
 
      invis = 'HCHO_293K4STAR.txt';
-     if exist(invis,'file')
-         hcohvis  = importdata(invis);
-     else
-         hcohvis  = importdata(fullfile(starpaths,invis));
-     end
+     hcohvis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          hcohvis  = importdata(invis);
+%      else
+%          hcohvis  = importdata(fullfile(starpaths,invis));
+%      end
      hcoh.visnm     = hcohvis(:,1);
      hcoh.visXs     = hcohvis(:,2);
      hcoh.visInterp = interp1(hcoh.visnm, hcoh.visXs, vis.nm,'pchip','extrap');
      % bro
      invis = 'BrO_243K_AIR4star.txt';
-     if exist(invis,'file')
-         brovis  = importdata(invis);
-     else
-         brovis  = importdata(fullfile(starpaths,invis));
-     end
+     brovis  = importdata(which(invis));
+%      if exist(invis,'file')
+%          brovis  = importdata(invis);
+%      else
+%          brovis  = importdata(fullfile(starpaths,invis));
+%      end
      if isstruct(brovis)&&isfield(brovis,'data')
          brovis = brovis.data;
      end
