@@ -237,6 +237,8 @@ if writenew==1;
     vis.rad=rad(1:1044);          nir.rad=rad(1045:end);
     vis.fname=s.filename{2};      nir.fname=s.filename{1};
     vis.time=s.t;                 nir.time=s.t;
+    vis.fname = strrep(vis.fname,'NIR','VIS'); %assure the proper filename
+    nir.fname = strrep(nir.fname,'VIS','NIR'); %assure the proper filename
     
     [vis.fresp,nir.fresp]=write_SkyResp_files_2(vis,nir,tra,dir);
     disp('Response function file written');

@@ -74,7 +74,7 @@ else
     %date = '20150915'
     date = '20160330'
 end
-docorrection=false; %do nonlinear correction
+docorrection=true; %do nonlinear correction
 
 if ~exist(['C:\Users\sleblan2\Research\4STAR\cal\' date])
     pname=uigetdir('C:\','Find folder for calibration files');

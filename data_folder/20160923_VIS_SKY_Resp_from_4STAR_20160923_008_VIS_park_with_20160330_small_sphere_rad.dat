@@ -1,4 +1,4 @@
-% Radiance calibration [Resp in cts/ms / [W/m^2.sr.um]] for 4STAR VIS spectrometer (1044 channels) derived from C:\Users\sleblan2\Research\4STAR\cal\20160923\4STAR_20160923_008_NIR_park.dat on 2016-10-04 10:30:00. 
+% Radiance calibration [Resp in cts/ms / [W/m^2.sr.um]] for 4STAR VIS spectrometer (1044 channels) derived from C:\Users\sleblan2\Research\4STAR\cal\20160923\4STAR_20160923_008_VIS_park.dat on 2016-10-04 13:58:41. 
 % Calibration used data from the average of the lamps and integration time from the measurement day of:20160923 
 % Also requires calibrated radiance from C:\Users\sleblan2\Research\4STAR\cal\20160330_small_sphere_rad.mat. 
 Pix  Wavelength     resp       rate        rad 
