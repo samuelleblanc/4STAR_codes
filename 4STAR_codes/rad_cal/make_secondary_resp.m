@@ -1,6 +1,7 @@
 %% Details of the function:
 % NAME:
 %   make_secondary_resp
+%   ***** DEFUNCT DO NOT USE ANYMORE, AUTOMATED INTO SMALL_SPHERE_CAL.M ***
 % 
 % PURPOSE:
 %   Print to file the response function from the secondary cal
@@ -32,16 +33,20 @@
 % Written (v1.0): Samuel LeBlanc, on Hercules C130, lat: 70 lon: -148, September 15th, 2014
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                 - changed startup to startup_plotting
+% Modified (v1.2): by Samuel LeBlanc, Santa Cruz, CA, 2016-09-30
+%                 - changed the reference spectra of the small sphere to
+%                 2016-03-30
 % -------------------------------------------------------------------------
 
 %% Start of function
 function make_secondary_resp(varargin)
+warning('***** DEFUNCT DO NOT USE ANYMORE, AUTOMATED INTO SMALL_SPHERE_CAL.M *****')
 version_set('1.1')
 startup_plotting
 dir='C:\Users\sleblan2\Research\4STAR\cal\';
 
 %% get the value of radiance of the small sphere at transfer time
-smsph_cal='20140716_small_sphere_rad.mat';
+smsph_cal='20160330_small_sphere_rad.mat';
 r=load([dir smsph_cal]);
 archi.units='Wm^{-2}nm^{-1}sr^{-1}'; archi.fname=[dir smsph_cal];
 lampstr='Small integrating sphere';
