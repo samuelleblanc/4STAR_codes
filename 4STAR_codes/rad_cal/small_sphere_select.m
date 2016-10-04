@@ -204,6 +204,14 @@ switch daystr
         fnamesbak={[dir filesep daystr filesep daystr '_011_VIS_park.dat'];...
                    [dir filesep daystr filesep daystr '_011_NIR_park.dat']};
         fltbak = [-2];
+    case '20160715'
+        fnames={[dir filesep daystr filesep '4STAR_' daystr '_005_VIS_park.dat'];...
+                [dir filesep daystr filesep '4STAR_' daystr '_005_NIR_park.dat']};
+        flt=[-2]; % -1 for choosing
+        isbackground=false;
+        fnamesbak={[dir filesep daystr filesep '4STAR_' daystr '_005_VIS_park.dat'];...
+                   [dir filesep daystr filesep '4STAR_' daystr '_005_NIR_park.dat']};
+        fltbak = [-2];
     case '20160923'
         fnames={[dir filesep daystr filesep '4STAR_' daystr '_008_VIS_park.dat'];...
                 [dir filesep daystr filesep '4STAR_' daystr '_008_NIR_park.dat']};
