@@ -18,6 +18,9 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
 else % ask for a full path
     if ~isempty(which('starpaths')); % look into pre-set path
         [defaultsavefolder, figurefolder, askforsourcefolder, author]=starpaths;
+        if getUserName=='sleblan2'; % special for Sam
+            defaultsavefolder = get_last_used_path();
+        end;
     else
         defaultsavefolder='';
     end;
