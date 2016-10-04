@@ -27,13 +27,14 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, October 15th, 2014
-% Modified: 
+% Modified v1.1: Samuel LeBlanc, Santa Cruz, CA, 2016-09-30
+%                added value from March calibration from cal lab
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function tra=load_sphere_transfer(t,dir)
-version_set('1.0');
+version_set('1.1');
 
 %% prepare input
 if nargin < 1
@@ -46,10 +47,12 @@ end;
 if isnumeric(t);
     if t >= datenum([2014 06 24 0 0 0]) && t < datenum([2014 07 16 0 0 0]);
         daystr='20140624';
-    elseif t >= datenum([2014 07 16 0 0 0]) t < datenum([2015 09 15 0 0 0]);
+    elseif t >= datenum([2014 07 16 0 0 0]) && t < datenum([2015 09 15 0 0 0]);
         daystr='20140716';
-    elseif t >= datenum([2015 09 15 0 0 0]);
+    elseif t >= datenum([2015 09 15 0 0 0]) && t < datenum([2016 03 30 0 0 0]);
         daystr = '20150915';
+    elseif t >= datenum([2016 03 30 0 0 0]);
+        daystr = '20160330';
     end;
 else; % special collections
     disp('No Special collections yet')

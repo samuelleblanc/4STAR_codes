@@ -100,14 +100,41 @@ load(sourcefile,contents0{:},'program_version');
 
 %% add variables and make adjustments common among all data types. Also
 % combine the two structures.
+if exist('vis_park_v2'); % special case handling
+    vis_park = vis_park_v2; nir_park = nir_park_v2;
+end;
 s=starwrapper(vis_park, nir_park,'applytempcorr',false,'verbose',false);
 for i=1:length(s.t); s.rad(i,:)=s.rate(i,:)./s.skyresp; end;
 note = s.note;
 
-%% build the mean and standard dev radiance values
+%% Get the filtered points and special case of either no filter set, or a filter set to -1 for choosing
 if flt(1) == -999;
     flt = [1:length(s.t)];
+elseif flt(1) == -1; % Choose the filter bounds
+    figure;
+    ax1 = subplot(3,1,1);
+    plot(s.raw(:,400),'.');
+    ylabel('Raw @ 500 nm');
+    ax2 = subplot(3,1,2);
+    plot(s.rate(:,400),'.');
+    ylabel('Rate @ 500 nm');
+    ax3 = subplot(3,1,3);    
+    plot(s.Str,'.');
+    ylabel('Shutter');
+    linkaxes([ax1,ax2,ax3],'x');
+    istart = input('Enter the starting point number:');
+    iend = input('Enter the ending point number:');
+    flt = [double(istart):double(iend)];
+elseif flt(1) == -2; % Automatic determination of the filter bounds
+    disp('Automatic dectection of the file indices from the save file')
+    d = [0,s.Str'==2,0];
+    startind = strfind(d,[0,1]);
+    endind = strfind(d,[1,0])-1;
+    flt = [startind(2):endind(2)];
+    fltbak = [startind(3):endind(3)];
 end;
+
+%% build the mean and standard dev radiance values
 rad=nanmean(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 rad_std=nanstd(s.rad(flt(s.sat_time(flt)==0 & s.raw(flt,500)>2000),:));
 nm=s.w*1000.0;
