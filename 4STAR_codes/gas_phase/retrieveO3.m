@@ -1,3 +1,4 @@
+function [o3] = retrieveO3(s,wstart,wend,mode)
 %% Details of the function:
 % NAME:
 %   retrieveO3
@@ -46,7 +47,6 @@
 % MS, 2016-08-24, corrected bug to read correct scd reference
 % -------------------------------------------------------------------------
 %% function routine
-function [o3] = retrieveO3(s,wstart,wend,mode)
 
 plotting = 0;
 linear   = 1;% do only linear inversion
@@ -109,28 +109,40 @@ loadCrossSections_global;
  % c0  = c0_.data(wln,3);
   if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
       % pre-ORACLES
+      rate = s.rateslant; 
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
   elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
       % ORACLES
+      rate = s.ratetot;
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];
   end
- 
+ rate = rate(:,wln); 
+ tau_OD = log(repmat(c0,length(s.t),1)./rate);
    ccoef=[];
    RR=[];
    % o3 inversion is being done on total slant path (not Rayleigh
    % subtracted)
+%         if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+%                % pre-ORACLES
+%                  rate = s.rateslant;
+%                  
+%         elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+%                % ORACLES
+%                  rate = s.ratetot;
+%         end
+   
    for k=1:length(s.t);
-       
-        if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
-               % pre-ORACLES
-                 meas = log(s.c0(wln)'./s.rateslant(k,(wln))');
-                 
-        elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
-               % ORACLES
-                 meas = log(c0'./s.ratetot(k,(wln))');
-        end
+       meas = log(c0'./rate(k,:)');
+%         if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+%                % pre-ORACLES
+%                  meas = log(s.c0(wln)'./rate(k,(wln))');
+%                  
+%         elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+%                % ORACLES
+%                  meas = log(c0'./rate(k,(wln))');
+%         end
 
         % invert
         coef=basis\meas;
@@ -162,17 +174,19 @@ loadCrossSections_global;
    % checkexiting toolbox
    %v=ver;f=any(strcmp('optim', {v.Name}));
    %license('test', 'optim_toolbox') 
+   % cjf: I may have made a copy-paste error here
 %  % calculate error
-   tau_OD  = s.tau_tot_slant;%s.tau_tot_vertical;% need to also check tau_tot_slant;
-   o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
+%    tau_OD  = s.tau_tot_slant; %s.tau_tot_vertical;% need to also check tau_tot_slant;
+   o3Err   = (tau_OD'-RR)./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
    MSEo3DU = real(((1/length(wln)-8)*sum(o3Err.^2))');                         
    
-   %license('test', 'optim_toolbox') 
-
-   % calculate error
-   tau_OD  = s.tau_tot_slant;%s.tau_tot_vertical;% need to also check tau_tot_slant;
-   o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
-   MSEo3DU = real(((1/length(wln))*sum(o3Err.^2))');                         
+%    %license('test', 'optim_toolbox') 
+% 
+%    % calculate error
+%    %      s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
+%    tau_OD = log(repmat(c0,length(s.t),1)./rate);
+%    o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
+%    MSEo3DU = real(((1/length(wln))*sum(o3Err.^2))');                         
    RMSEo3  = real(sqrt(real(MSEo3DU)))./s.m_O3;                                % convert to DU vertical
    
 %    gas.o3Inv    = o3VCD;%o3vcd_smooth is the default output;
@@ -193,17 +207,17 @@ loadCrossSections_global;
               xlabel('time');ylabel('o3 RMSE [DU]');
               title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
   end
-   
+%    tau_OD = log(repmat(c0,length(s.t),1)./rate);
     % prepare to plot spectrum OD and o3 cross section
-    if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
-               % pre-ORACLES
-           %tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
-           tau_OD = log(repmat(c0,length(s.t),1)./s.rateslant(:,(wln)));
-    elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
-           % ORACLES
-   
-            tau_OD = log(repmat(c0,length(s.t),1)./s.ratetot(:,(wln)));
-    end
+%     if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+%                % pre-ORACLES
+%            %tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
+%            tau_OD = log(repmat(c0,length(s.t),1)./s.rateslant(:,(wln)));
+%     elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+%            % ORACLES
+%    
+%             tau_OD = log(repmat(c0,length(s.t),1)./s.ratetot(:,(wln)));
+%     end
    o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
    o3fit          = ccoef(1,:)'*basis(:,1)';
    o3residual     = tau_OD-RR';
@@ -222,10 +236,11 @@ loadCrossSections_global;
    
    dat = [t alt lat lon res_norm];
    fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual_20160825c0_norm','.txt');
-   save(fi,'-ASCII','dat');
+   save([starpaths,fi],'-ASCII','dat');
    
    if plotting
-       
+       [~,figdir] = starpaths; 
+   ! BAD use of absolute paths in plotting here !   
 %      plot fitted and "measured" o3 spectrum
          for i=1:100:length(s.t)
              figure(1111);
@@ -256,7 +271,7 @@ loadCrossSections_global;
       colormap('redblue');colorbar; %axis 'square'
       axis([min(c_wln) max(c_wln) min(t) max(t) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_time_norm_sub');
+      fi = strcat(figdir,datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_time_norm_sub');
       save_fig(1,fi,false);
                                    
       
@@ -269,7 +284,7 @@ loadCrossSections_global;
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(alt) max(alt) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_alt_norm_sub');
+      fi = strcat(figdir,datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_alt_norm_sub');
       save_fig(2,fi,false);
       
       
@@ -282,7 +297,7 @@ loadCrossSections_global;
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(lat) max(lat) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lat_norm_sub');
+      fi = strcat(figdir,datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lat_norm_sub');
       save_fig(3,fi,false);      
       
       [x, y] = meshgrid(c_wln,lon);
@@ -294,7 +309,7 @@ loadCrossSections_global;
       colormap('redblue');colorbar;
       axis([min(c_wln) max(c_wln) min(lon) max(lon) min(min((res))) max(max((res)))]);view(2);
       % save
-      fi = strcat('E:\ORACLES\figs\',datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lon_norm_sub');
+      fi = strcat(figdir,datestr(s.t(1),'yyyy-mm-dd'),'O3_res_w_lon_norm_sub');
       save_fig(4,fi,false);
       
    end
@@ -375,8 +390,8 @@ loadCrossSections_global;
     % 0 is good data, 1 is bad data
     
     ti=60/86400;
-            for i=1:length(s.t);
-                rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2);
+            for i=1:length(t);
+                rows=find(t>=t(i)-ti/2&t<=t(i)+ti/2);
                 if numel(rows)>0;
                     o3std(i) =nanstd(o3vcd_smooth(rows),0,1);
                     o3mean(i)=nanmean(o3vcd_smooth(rows),1);
@@ -386,8 +401,4 @@ loadCrossSections_global;
             % flag
             o3relstd=o3std./o3mean;
             o3.flag(o3relstd>sd_o3_crit)=1;
-
-    
-  
- 
  return;

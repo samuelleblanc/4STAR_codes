@@ -60,18 +60,21 @@ tau_ray =s.tau_ray;
 
  % decide which c0 to use
  % mode = 0-lamp?; 1-MLO ref spec
-  
+  toggle = s.toggle;
   [c0]=starc0gases(nanmean(s.t),toggle.verbose,'HCOH',mode);
   
   if mode==0
       % when mode==0 need to choose wln
       c0 = c0(wln)';
+  elseif mode==1
+      c0 = c0.hcohrefspec;
   end
   
  
  % calculate residual spectrum (Rayleigh subtracted)
-eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*tau_ray(:,wln);
-
+ rateslant = s.rateslant;
+eta = repmat(log(c0),length(s.t),1) - log(rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*tau_ray(:,wln);
+clear rateslant
 % do linear retrieval first (no wavelength shift) 
 
 
@@ -114,7 +117,8 @@ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1
        hcohvcd_smooth = real(hcohVCDsmooth);
    elseif mode==1
        % load reference spectrum
-       ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
+       ref_spec = load(which(['20160113HCOHrefspec.mat']));
+%        ref_spec = load([starpaths,'20160113HCOHrefspec.mat']);
        hcohSCD = real((((1000*ccoef_d(1,:))))');% + ref_spec.hcohscdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohSCDsmooth, sn] = boxxfilt(tplot, hcohSCD, xts);

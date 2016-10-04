@@ -69,6 +69,8 @@ loadCrossSections_global_;
   if mode==0
       % when mode==0 need to choose wln
       c0 = c0(wln)';
+  elseif mode==1
+      c0 = c0.no2refspec;
   end
   
  
@@ -123,7 +125,7 @@ end
        no2vcd_smooth = real(no2VCDsmooth);
    elseif mode==1
        % load reference spectrum
-       ref_spec = load('20160113NO2refspec.mat');
+       ref_spec = load(which('20160113NO2refspec.mat'));
        no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + ref_spec.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(t); tplot(tplot<10) = tplot(tplot<10)+24;
        [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
