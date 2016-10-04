@@ -33,33 +33,58 @@ end;
              if strcmp(gas,'O3')
                 if mode==0
                     % use MLO c0
+                    try
+                        tmp = importdata(['20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    catch
                     tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160113O3refspec.mat']);
+                    try
+                        tmp = load(['20160113O3refspec.mat']);
+                    catch
+                        tmp = load([starpaths,'20160113O3refspec.mat']);
+                    end
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
                 if mode==0
                     % use MLO c0
-                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata(which(['20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat'])); % MLO-Jan-2016 mean
+%                     try
+%                         tmp = importdata(['20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+%                     catch
+%                     tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+%                     end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
                     %tmp = load([starpaths,'20160113NO2refspec.mat']);
-                    tmp = load([starpaths,'20160702NO2refspec.mat']);
+                    try
+                        tmp = load(['20160702NO2refspec.mat']);
+                    catch
+                        tmp = load([starpaths,'20160702NO2refspec.mat']);
+                    end
                     c0gases = tmp;%.no2refspec;
                 end
                 
             elseif strcmp(gas,'HCOH')
                 if mode==0
                     % use lamp FEL?
-                    tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    try
+                        tmp = importdata(['20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    catch
+                        tmp = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']); % MLO-Jan-2016 mean
+                    end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160702HCOHrefspec.mat']);
+                    try
+                        tmp = load(['20160702HCOHrefspec.mat']);
+                    catch
+                        tmp = load([starpaths,'20160702HCOHrefspec.mat']);
+                    end
                     c0gases = tmp;%.hcohrefspec;
                 end    
                 
@@ -72,33 +97,63 @@ end;
              if strcmp(gas,'O3')
                 if mode==0
                     % use MLO c0
-                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata(which(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat'])); % MLO-Jan-2016 mean
+%                     try
+%                         tmp = importdata(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     catch                       
+%                     tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160702O3refspec.mat']);
-                    %tmp = load([starpaths,'20160825O3refspec.mat']);
+                    tmp = load(which(['20160702O3refspec.mat']));
+%                     try
+%                         tmp = load(['20160702O3refspec.mat']);
+%                     catch
+%                     tmp = load([starpaths,'20160702O3refspec.mat']);
+%                     %tmp = load([starpaths,'20160825O3refspec.mat']);
+%                     end
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
                 if mode==0
                     % use MLO c0
-                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata(which(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat'])); % MLO-Jan-2016 mean
+%                     try
+%                         tmp = importdata(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     catch
+%                         tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160702NO2refspec.mat']);
+                    tmp = load(which(['20160702NO2refspec.mat']));
+%                     try
+%                         tmp = load(['20160702NO2refspec.mat']);
+%                     catch
+%                         tmp = load([starpaths,'20160702NO2refspec.mat']);
+%                     end
                     c0gases = tmp;%.no2refspec;
                 end
                 
             elseif strcmp(gas,'HCOH')
                 if mode==0
                     % use lamp FEL?
-                    tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+                    tmp = importdata(which(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat'])); % MLO-Jan-2016 mean
+%                     try
+%                         tmp = importdata(['20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     catch
+%                         tmp = importdata([starpaths,'20160707_VIS_C0_Langley_MLO_June2016_mean.dat']); % MLO-Jan-2016 mean
+%                     end
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load([starpaths,'20160702HCOHrefspec.mat']);
+                    tmp = load(which(['20160702HCOHrefspec.mat']));
+%                     try
+%                         tmp = load(['20160702HCOHrefspec.mat']);
+%                     catch
+%                         tmp = load([starpaths,'20160702HCOHrefspec.mat']);
+%                     end
                     c0gases = tmp;%.hcohrefspec;
                 end    
                 
