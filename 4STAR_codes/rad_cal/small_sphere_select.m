@@ -156,10 +156,66 @@ switch daystr
         fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_013_VIS_park.dat'];...
                    [dir filesep daystr filesep 'Lamps_0' filesep daystr '_013_NIR_park.dat']};
         fltbak=[1:77];
+    case '20160330'
+        fnames={[dir filesep daystr filesep 'small_sphere' filesep daystr '_029_VIS_park.dat'];...
+                [dir filesep daystr filesep 'small_sphere' filesep daystr '_029_NIR_park.dat']};
+        flt=[39,52,65,78,91,104,117,130,143,156,169,182,195,208,221,234,247,260,273,286]-3;%[33:284];
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep 'Lamps_0' filesep daystr '_025_VIS_park.dat'];...
+                   [dir filesep daystr filesep 'Lamps_0' filesep daystr '_025_NIR_park.dat']};
+        fltbak=[40:140];
+    case '20160428'
+        fnames={[dir filesep daystr filesep daystr '_004_VIS_park.dat'];...
+                [dir filesep daystr filesep daystr '_004_NIR_park.dat']};
+        flt=[11:1182]; % -1 for choosing
+        isbackground=false;
+        fnamesbak={[dir filesep daystr filesep daystr '_004_VIS_park.dat'];...
+                   [dir filesep daystr filesep daystr '_004_NIR_park.dat']};
+        fltbak = [1183:1260];
+    case '20160514'
+        fnames={[dir filesep daystr filesep daystr '_005_VIS_park_v2.dat'];...
+                [dir filesep daystr filesep daystr '_005_NIR_park_v2.dat']};
+        flt=[450:540]; % -1 for choosing
+        isbackground=false;
+        fnamesbak={[dir filesep daystr filesep daystr '_006_VIS_park.dat'];...
+                   [dir filesep daystr filesep daystr '_006_NIR_park.dat']};   
+        fltbak = [27:37];
+    case '20160519'
+        fnames={[dir filesep daystr filesep daystr '_028_VIS_park.dat'];...
+                [dir filesep daystr filesep daystr '_028_NIR_park.dat']};
+        flt=[-2]; % -1 for choosing
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep daystr '_028_VIS_park.dat'];...
+                   [dir filesep daystr filesep daystr '_028_NIR_park.dat']};
+        fltbak = [-2];
+    case '20160521'
+        fnames={[dir filesep daystr filesep daystr '_002_VIS_park.dat'];...
+                [dir filesep daystr filesep daystr '_002_NIR_park.dat']};
+        flt=[-2]; % -1 for choosing
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep daystr '_002_VIS_park.dat'];...
+                   [dir filesep daystr filesep daystr '_002_NIR_park.dat']};
+        fltbak = [-2];
+    case '20160604'
+        fnames={[dir filesep daystr filesep daystr '_011_VIS_park.dat'];...
+                [dir filesep daystr filesep daystr '_011_NIR_park.dat']};
+        flt=[-2]; % -1 for choosing
+        isbackground=true;
+        fnamesbak={[dir filesep daystr filesep daystr '_011_VIS_park.dat'];...
+                   [dir filesep daystr filesep daystr '_011_NIR_park.dat']};
+        fltbak = [-2];
+    case '20160923'
+        fnames={[dir filesep daystr filesep '4STAR_' daystr '_008_VIS_park.dat'];...
+                [dir filesep daystr filesep '4STAR_' daystr '_008_NIR_park.dat']};
+        flt=[40:180]; % -1 for choosing
+        isbackground=false;
+        fnamesbak={[dir filesep daystr filesep '4STAR_' daystr '_008_VIS_park.dat'];...
+                   [dir filesep daystr filesep '4STAR_' daystr '_008_NIR_park.dat']};
+        fltbak = [-2];
     otherwise
         warning('daystr not found in small_sphere_select, please manually select:');
         fnames=getfullname('*.dat','Select calibration files');
-        flt=[-999];
+        flt=[-1];
         isbackground=menu('Is there a background radiation file?','Yes','No');
         if isbackground == 1; 
             fnamesbak=getfullname('*.dat','Select background files');

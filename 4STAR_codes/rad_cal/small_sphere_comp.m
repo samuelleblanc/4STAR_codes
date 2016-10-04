@@ -36,20 +36,26 @@
 %                 - change startup to startup_plotting
 %                 - added plot of change in resp function at different
 %                 pixels (wavelength).
+% Modified (V1.3): by Samuel LeBlanc, NASA Ames, 2016-10-04
+%                  - added comparisons for KORUS+ORACLES
 %
 % -------------------------------------------------------------------------
 
 %% start of function
 function small_sphere_comp(varargin)
-version_set('1.2');
+version_set('1.3');
 startup_plotting
 dir='C:\Users\sleblan2\Research\4STAR\cal\';
 ll='\';
 
+%campaign = 'ARISE';
+campaign = 'KORUS_ORACLES';
 
 %% setup the files to load and load them
-dates=['20140624';'20140716';'20140804';'20140825';'20140914';'20140920';'20140926';'20141024'];
-ref=4;
+%dates=['20140624';'20140716';'20140804';'20140825';'20140914';'20140920';'20140926';'20141024']; % ARISE
+dates = ['20160330';'20160428';'20160514';'20160519';'20160521';'20160604';'20160923']
+%ref=4; %ARISE
+ref = 7;
 num=length(dates(:,1));
 %files=[dir dates(1,:) '_small_sphere_rad.mat';...
 %       dir dates(2,:) '_small_sphere_rad.mat';...
@@ -103,7 +109,7 @@ hold off;
 xlabel('Wavelength (nm)');
 ylabel('Ratio of Sphere Radiances');
 title(['Change in sphere radiances compared to: ' dates(ref,:)]);
-fi=[dir 'Comp_rad_sphere'];
+fi=[dir campaign '_Comp_rad_sphere'];
 ylim([0.8,1.15]);
 xlim([300 1700]);
 grid on;
@@ -140,7 +146,7 @@ hold off;
 xlabel('Wavelength [nm]');
 ylabel('Ratio of Sphere Radiances');
 title(['Change in sphere radiances compared to: ' dates(ref,:)]);
-fi=[dir 'Comp_rad_sphere-subset'];
+fi=[dir campaign '_Comp_rad_sphere-subset'];
 ylim([0.8,1.15]);
 xlim([300 1700]);
 grid on;
@@ -212,7 +218,7 @@ xlim([930 1730]);
 grid on;
 linkaxes([axn1,axn2],'x');
 
-fi22=[dir 'Comp_resp_sphere'];
+fi22=[dir campaign '_Comp_resp_sphere'];
 save_fig(22,fi22,true);
 
 %% Plot the time trace of the changes of radiance with each calibration
@@ -249,7 +255,7 @@ ylabel('Radiances [Wm^{-2}sr^{-1}\mum^{-1}]');
 legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
 title('Small sphere calibration over time');
 grid;
-fi4 = [dir 'Comp_rad_sphere_time'];
+fi4 = [dir campaign '_Comp_rad_sphere_time'];
 save_fig(14,fi4);
 
 %% plot the relative time trace of radiance change with each calibration
@@ -270,7 +276,7 @@ ylabel('Relative Radiances [%]');
 legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
 title('Small sphere relative calibration over time');
 grid;
-fi5 = [dir 'Comp_rel_rad_sphere_time'];
+fi5 = [dir campaign '_Comp_rel_rad_sphere_time'];
 save_fig(15,fi5);
 
 %% Plot the time trace of the changes of responses with each calibration
@@ -307,7 +313,7 @@ ylabel('Responses [Cts/ms.(Wm^{-2}sr^{-1}\mum^{-1})^{-1}]');
 legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
 title('Small sphere responses over time');
 grid;
-fi24 = [dir 'Comp_resp_sphere_time'];
+fi24 = [dir campaign '_Comp_resp_sphere_time'];
 save_fig(24,fi24);
 
 %% plot the relative time trace of response change with each calibration
@@ -328,7 +334,7 @@ ylabel('Relative Responses [%]');
 legend('500 nm','650 nm','800 nm','1000 nm','1200 nm','1600 nm');
 title('Small sphere relative responses over time');
 grid;
-fi25 = [dir 'Comp_rel_resp_sphere_time'];
+fi25 = [dir campaign '_Comp_rel_resp_sphere_time'];
 save_fig(25,fi25);
 end
 
