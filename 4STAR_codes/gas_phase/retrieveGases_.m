@@ -88,8 +88,8 @@ if toggle.verbose disp({['In retrieveHCOH:'],toc}); end
    d.sza              = s.sza;
    d.tUTC             = serial2hs(s.t);
    
-  t = s.t;
-   fi = strcat(datestr(t(1),'yyyymmdd'),'_gas_summary.mat');
+
+   fi = strcat(datestr(d.t(1),'yyyymmdd'),'_gas_summary.mat');
    save([starpaths fi],'-struct','d');
    
   
