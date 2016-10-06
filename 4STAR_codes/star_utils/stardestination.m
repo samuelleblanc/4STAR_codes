@@ -25,9 +25,13 @@ else % ask for a full path
         'Save file as');
     if ~isequal(savematfile,0);
         savematfile=fullfile(defaultsavefolder,savematfile);
+        if getUserName=='sleblan2'; % special for Sam
+            updateLastUsedPath(defaultsavefolder);
+        end;
     end;
 end;
 
+%% function to get the last used path
 function lastDir = get_last_used_path()
 
 % name of mat file to save last used directory information
@@ -55,4 +59,27 @@ if exist(lastDirMat, 'file') ~= 0
         lastDir = lastUsedDir;
     end
 end;
+return
+
+%% function to save the last used path
+function updateLastUsedPath(savefolder);
+% name of mat file to save last used directory information
+pname = strrep(userpath,';',filesep);
+pathdir = [pname, 'filepaths',filesep];
+if ~exist(pathdir,'dir')
+    mkdir(pname, 'filepaths');
+end
+lastDirMat = [pathdir, 'lastUsedDir.mat'];
+
+if ~isequal(savefolder,0)
+    try
+        % save last folder used to lastDirMat mat file
+        lastUsedDir = savefolder;
+        save(lastDirMat, 'lastUsedDir');
+    catch
+        % error saving lastDirMat mat file, display warning, the folder
+        % will not be remembered
+        disp(['Warning: Could not save file ''', lastDirMat, '''']);
+    end
+end
 return
