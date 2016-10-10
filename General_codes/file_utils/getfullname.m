@@ -1,4 +1,4 @@
-function [pname] = getfullname(fspec,pathfile,dialog);
+function [fullname] = getfullname(fspec,pathfile,dialog);
 % function [fullname] = getfullname(fspec,pathfile,dialog);
 % fspec is a string indicating the file mask to be used with uigetfile
 % pathfile is a string indicating the filename stem of the mat-file to use
