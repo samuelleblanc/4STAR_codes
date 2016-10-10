@@ -296,6 +296,7 @@ if ~exist('visc0')
     visnote=[visnote(1:end-2) '.'];
     nirnote=[nirnote(1:end-2) '.'];
 end;
+if verbose; disp(['Using the C0 from ' visfilename]), end;
 
 % return channels used for AOD fitting
 [visc,nirc]=starchannelsatAATS(t);
