@@ -198,7 +198,7 @@ end
 
 %check the missing_data_val
 if ~exist('missing_data_val','var')
-  missing_data_val = -9999;
+  missing_data_val = -9999.0;
 end
 
 %%%%% DATA HANDLING %%%%%
