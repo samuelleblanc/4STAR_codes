@@ -8,12 +8,13 @@
 % 
 %
 % CALLING SEQUENCE:
-%  function [no2] = retrieveNO2(s,wstart,wend)
+%  function [no2] = retrieveNO2wfit(s,wstart,wend,mode)
 %
 % INPUT:
 %  - s: starsun struct from starwarapper
 %  - wstart  : wavelength range start in micron
 %  - wend    : wavelength range start in micron
+%  - mode    : 0-Langley c0, 1-refSpec c0
 % 
 % 
 % OUTPUT:
@@ -31,7 +32,7 @@
 %  - *.xs under data_folder
 %
 % EXAMPLE:
-%  - [no2] = retrieveNO2(s,0.430,0.490);
+%  - [no2] = retrieveNO2(s,0.430,0.490,1);
 %
 %
 % MODIFICATION HISTORY:
@@ -39,7 +40,7 @@
 % 
 % -------------------------------------------------------------------------
 %% function routine
-function [no2] = retrieveNO2(s,wstart,wend)
+function [no2] = retrieveNO2wfit(s,wstart,wend,mode)
 
 plotting = 0;
 % load cross-sections
@@ -55,8 +56,20 @@ loadCrossSections_global;
  % select NO2 absorbing band to plot residuals for
  ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
  
+ [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
+  
+  if mode==0
+      % when mode==0 need to choose wln
+      c0 = tmp(wln)';
+      %c0  = repmat(c0_,length(s.t),1);
+  elseif mode==1
+      c0 = tmp.no2refspec;
+      %c0  = repmat(c0_,length(s.t),1);
+  end
+  
+ 
  % calculate residual spectrum (Rayleigh subtracted)
- eta = repmat(log(s.c0(wln)),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+ eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
 
 %% fit a linear line to spectra
 %===============================
@@ -76,16 +89,16 @@ for i=1:length(s.t)
     
     % plot
     
-%     figure(2222);
-%     subplot(211);
-%     plot(s.w(wln),eta(i,:),'.-','markersize',8);hold on;
-%     plot(s.w(wln),f,'-r','linewidth',2);hold off;
-%     legend('total OD','OD linear fit');title(serial2Hh(s.t(i)));
-%     xlabel('wavelength');ylabel('OD');
-%     subplot(212);
-%     plot(s.w(wln),eta_residual(i,:),'-k','linewidth',2);
-%     xlabel('wavelength');ylabel('residual spectrum');
-%     pause(0.01);
+    figure(2222);
+    subplot(211);
+    plot(s.w(wln),eta(i,:),'.-','markersize',8);hold on;
+    plot(s.w(wln),f,'-r','linewidth',2);hold off;
+    legend('total OD','OD linear fit');title(serial2Hh(s.t(i)));
+    xlabel('wavelength');ylabel('OD');
+    subplot(212);
+    plot(s.w(wln),eta_residual(i,:),'-k','linewidth',2);
+    xlabel('wavelength');ylabel('residual spectrum');
+    pause(0.01);
 
     
 end

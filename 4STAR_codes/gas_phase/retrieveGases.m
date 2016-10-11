@@ -52,7 +52,8 @@ function [gas] = retrieveGases(s)
 %% retrieve NO2
 
 
- [gas.no2] = retrieveNO2(s,0.450,0.490,1);
+ [gas.no2] = retrieveNO2(s,0.450,0.490,0);
+ [gas.no2]= retrieveNO2wfit(s,0.450,0.490,0);
 
 %% retrieve O3
 

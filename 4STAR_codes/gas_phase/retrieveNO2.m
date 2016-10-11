@@ -57,7 +57,7 @@ loadCrossSections_global;
  
 
   % select NO2 absorbing band to plot residuals for
- ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
+ ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.460  ,'nearest');
  
  % apply specified NO2 gas c0
  % decide which c0 to use
@@ -67,19 +67,40 @@ loadCrossSections_global;
   
   if mode==0
       % when mode==0 need to choose wln
-      c0 = tmp(wln)';
+      c0_ = tmp(wln)';
+      c0  = repmat(c0_,length(s.t),1);
   elseif mode==1
-      c0 = tmp.no2refspec;
+      c0_ = tmp.no2refspec;
+      c0  = repmat(c0_,length(s.t),1);
   end
   
  
  % calculate residual spectrum (Rayleigh subtracted)
-eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+ 
+ if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+      % pre-ORACLES
+      
+        %eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+        eta = log(c0) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+        
+        
+        %eta = log(c0./s.ratetot);% ratetot is Ray subtracted
+        
+ elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+      % ORACLES
+      % don't subtract Rayleigh
+      
+       %eta1 = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln));
+       eta1 = log(c0) - log(s.rateslant(:,wln));
+       
+       %eta = -log(s.rateslant(:,wln)./(repmat((c0),length(s.t),1)));
+      
+ end
 
 if plotting
 % plot residual to fit (ind 12 in wln, which is 459nm).
         figure;
-        plot(s.m_aero,1000*eta(:,ires),'.','color',[0.8,0.8,0.8],'markersize',8);
+        plot(s.m_aero,eta(:,ires),'.','color',[0.8,0.8,0.8],'markersize',8);
         axis([min(s.m_aero) max(s.m_aero) -10 20]);
 end
 
@@ -88,14 +109,10 @@ end
 
     % this is end member array (original cross sections)
     
-  if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
-      % pre-ORACLES
-    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1)];
-    
-  elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
-      % ORACLES
-    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1)];
-  end
+  
+    %basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1)];
+    basis = [no2_298Kcoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
+   
 
     % solve
     % x = real(Abasis\spectrum_sub');
@@ -126,14 +143,14 @@ end
         % covert from atm x cm to molec/cm^2
        no2_amount =  ccoef_d(1,:);
        no2VCD = real((((Loschmidt*no2_amount))./(s.m_NO2)')');
-       tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [no2VCDsmooth, sn] = boxxfilt(tplot, no2VCD, xts);
        no2vcd_smooth = real(no2VCDsmooth);
    elseif mode==1
        % load reference spectrum
        % ref_spec = load([starpaths,'20160113NO2refspec.mat']);
        no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
-       tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
+       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
        no2vcd_smooth = real(no2SCDsmooth)./s.m_NO2;
    end
@@ -157,21 +174,22 @@ end
 
    if plotting
    % plot fitted and "measured" no2 spectrum
-         for i=1:100:length(s.t)
+         for i=1:500:length(s.t)
              figure(8882);
-             %plot(s.w((wln)),spectrum_sub(i,:),'--k','linewidth',2);hold on;
-             %plot(s.w((wln)),no2meas(i,:),'-y','linewidth',2);hold on;
-             %plot(s.w((wln)),RR_d(:,i),'--c','linewidth',2);hold on;
+             plot(s.w((wln)),eta1(i,:),'-y','linewidth',2);hold on;
+             plot(s.w((wln)),eta(i,:),'--k','linewidth',2);hold on;
+             plot(s.w((wln)),s.tau_aero(i,wln).*s.m_aero(i),'--m','linewidth',2);hold on;
+             plot(s.w((wln)),RR_d(:,i),'--c','linewidth',2);hold on;
              plot(s.w((wln)),no2spectrum(i,:),'-k','linewidth',2);hold on;
              plot(s.w((wln)),no2fit(i,:),'--r','linewidth',2);hold on;
              plot(s.w((wln)),no2residual(i,:),':k','linewidth',2);hold off;
              xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcd_smooth(i)/(Loschmidt/1000)),' RMSE = ',num2str(RMSres(i))),...
                     'fontsize',14,'fontweight','bold');
              ylabel('OD','fontsize',14,'fontweight','bold');
-             legend('measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
-             %legend('total spectrum baseline and rayliegh subtracted','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             %legend('measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             legend('total spectrum not subtracted','total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
              set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
-             pause(0.001);
+             pause;
          end
    end
    
