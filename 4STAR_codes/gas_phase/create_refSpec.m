@@ -39,6 +39,7 @@
 % Written: Michal Segal-Rozenhaimer (MSR), Osan, Korea, 05-05-2016
 % Modified:
 % MS, 2016-05-18, Flying over Korea
+% MS, 2016-10-10, added wln to saved refSpec
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -86,6 +87,8 @@ elseif strcmp(gas,'NO2')
         ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
     elseif strcmp(daystr,'20160702')||strcmp(daystr,'20160703')
         ref_spec.no2scdref = 3.18e15*ref_spec.mean_m;%this is total column; MLO 20160702
+    elseif strcmp(daystr,'20160825')
+        ref_spec.no2scdref = 3.0e15*ref_spec.mean_m;%this is strat based on total-trop airmass 1 during transit   
     end
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     
@@ -142,6 +145,7 @@ dat3 = load([starpaths,'20160704starsun.mat'],'t','w','m_aero','rateslant','m_O3
 
 if strcmp(gas,'O3')
     ref_spec.o3refspec = meanspec;
+    ref_spec.o3wln     = s.w(wln);
     save([starpaths, daystr,'O3refspec.mat'],'-struct','ref_spec');
     % retrieve O3
     [o3_1] = retrieveO3(dat1,wind(1),wind(2),1);
@@ -150,6 +154,7 @@ if strcmp(gas,'O3')
     
 elseif strcmp(gas,'NO2')
     ref_spec.no2refspec = meanspec;
+    ref_spec.no2wln     = s.w(wln);
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     % retrieve NO2
     [no2_1] = retrieveNO2(dat1,wind(1),wind(2),1);
@@ -157,6 +162,7 @@ elseif strcmp(gas,'NO2')
     [no2_3] = retrieveNO2(dat3,wind(1),wind(2),1);
 elseif strcmp(gas,'HCOH')
     ref_spec.hcohrefspec = meanspec;
+    ref_spec.hcohwln     = s.w(wln);
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
     % retrieve HCOH
     [hcoh_1] = retrieveHCOH(dat1,wind(1),wind(2),1);
@@ -314,13 +320,14 @@ elseif strcmp(gas,'HCOH')
 end
 
 %% save parameters to struct .mat file
-if strcmp(gas,'O3')
+% save new reference amount only for MLO cases
+if strcmp(gas,'O3') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.o3scdref=abs(Sf(2));%313.5DU
     save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
-elseif strcmp(gas,'NO2')
+elseif strcmp(gas,'NO2') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
-elseif strcmp(gas,'HCOH')
+elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline?
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
 end
