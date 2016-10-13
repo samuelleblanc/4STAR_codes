@@ -40,6 +40,7 @@
 % Modified:
 % MS, 2016-05-18, Flying over Korea
 % MS, 2016-10-10, added wln to saved refSpec
+% MS, 2016-10-11, changed wln range of NO2
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -76,7 +77,8 @@ if strcmp(gas,'O3')
     
 elseif strcmp(gas,'NO2')
     
-    wind   = [0.450 0.490];
+    %wind   = [0.450 0.490];
+    wind   = [0.460 0.490];
     
     % find good index around solar noon to create averga espectrum
     ind = find((s.m_NO2>=min(s.m_NO2)-0.00001&s.m_NO2<=min(s.m_NO2)+0.00001));
@@ -87,8 +89,9 @@ elseif strcmp(gas,'NO2')
         ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
     elseif strcmp(daystr,'20160702')||strcmp(daystr,'20160703')
         ref_spec.no2scdref = 3.18e15*ref_spec.mean_m;%this is total column; MLO 20160702
+        ref_spec.no2scdref = 2.76e15*ref_spec.mean_m;%this is derived reference amount; MLO 20160702
     elseif strcmp(daystr,'20160825')
-        ref_spec.no2scdref = 3.0e15*ref_spec.mean_m;%this is strat based on total-trop airmass 1 during transit   
+        ref_spec.no2scdref = 3.0e15*ref_spec.mean_m;%this is omi strat based on total-trop airmass 1 during transit   
     end
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     

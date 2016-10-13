@@ -107,8 +107,8 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    % tmp = load(which(['20160702O3refspec.mat']));
-                    tmp = load(which(['20160825O3refspec.mat']));
+                    tmp = load(which(['20160702O3refspec.mat']));
+                    %tmp = load(which(['20160825O3refspec.mat']));
 %                     try
 %                         tmp = load(['20160702O3refspec.mat']);
 %                     catch
@@ -131,7 +131,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     tmp = load(which(['20160702NO2refspec.mat']));
-                    %tmp = load(which(['20160825NO2refspec.mat']));
+                    %tmp = load(which(['20160825NO2refspec.mat']));too low
 %                     try
 %                         tmp = load(['20160702NO2refspec.mat']);
 %                     catch
@@ -155,8 +155,8 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    % tmp = load(which(['20160702HCOHrefspec.mat']));
-                    tmp = load(which(['20160825HCOHrefspec.mat']));
+                    tmp = load(which(['20160702HCOHrefspec.mat']));
+                    %tmp = load(which(['20160825HCOHrefspec.mat']));
 %                     try
 %                         tmp = load(['20160702HCOHrefspec.mat']);
 %                     catch

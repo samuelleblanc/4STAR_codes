@@ -34,6 +34,7 @@
 % May-5-2016, KORUS-AQ,Osan,Korea, added functionality
 % MS, 2016-05-10, saving std field for cwv
 % MS, 2016-05-20, adding retrieveHCOH routine
+% MS, 2016-10-12, changed default NO2 wavelength range to 460-490 nm
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -52,8 +53,7 @@ function [gas] = retrieveGases(s)
 %% retrieve NO2
 
 
- [gas.no2] = retrieveNO2(s,0.450,0.490,0);
- [gas.no2]= retrieveNO2wfit(s,0.450,0.490,0);
+ [gas.no2] = retrieveNO2(s,0.460,0.490,1);
 
 %% retrieve O3
 
@@ -76,7 +76,7 @@ function [gas] = retrieveGases(s)
    d.no2_molec_cm2    = gas.no2.no2_molec_cm2;%gas.no2.no2DU*(Loschmidt/1000);
    d.no2err_molec_cm2 = gas.no2.no2resi;%gas.no2.no2resiDU*(Loschmidt/1000);
    d.no2DU            = d.no2_molec_cm2/(Loschmidt/1000);
-   %d.no2resiDU       = gas.no2.no2resiDU;
+   d.no2resiDU        = gas.no2.no2resi;
    d.o3DU             = gas.o3.o3DU;
    d.o3resiDU         = gas.o3.o3resiDU;
    d.hcoh_DU          = gas.hcoh.hcoh_DU;
@@ -86,6 +86,7 @@ function [gas] = retrieveGases(s)
    d.lat              = s.Lat;
    d.lon              = s.Lon;
    d.alt              = s.Alt;
+   d.pst              = s.Pst;
    d.sza              = s.sza;
    d.tUTC             = serial2Hh(s.t);
    

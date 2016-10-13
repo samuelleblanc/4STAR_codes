@@ -45,6 +45,8 @@ function [o3] = retrieveO3(s,wstart,wend,mode)
 % MS, 2016-05-05, Osan, Korea, added c0gases for O3 retrieval
 %                              added option to use linear/lin_constrained
 % MS, 2016-08-24, corrected bug to read correct scd reference
+% MS, 2016-09-06, added selection between pre-ORACLEs and ORACLES
+% MS, 2016-10-13, tweaked code to be compatible with no2 code
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -109,17 +111,26 @@ loadCrossSections_global;
  % c0  = c0_.data(wln,3);
   if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
       % pre-ORACLES
-      rate = s.rateslant; 
+%       rate = s.rateslant; 
+%       rate = rate(:,wln); 
+%       basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
+%         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
+    
+    rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+ 
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
-        ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
+        ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1)];% 
+    
   elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
       % ORACLES
-      rate = s.ratetot;
+      % rate = s.ratetot;% this is Ray subtracted
+      rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+ 
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
-        ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];
+        ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];% 2nd order doesn't work in oracles
   end
- rate = rate(:,wln); 
- tau_OD = log(repmat(c0,length(s.t),1)./rate);
+ %rate = rate(:,wln); 
+ %tau_OD = log(repmat(c0,length(s.t),1)./rate);
    ccoef=[];
    RR=[];
    % o3 inversion is being done on total slant path (not Rayleigh
@@ -134,7 +145,8 @@ loadCrossSections_global;
 %         end
    
    for k=1:length(s.t);
-       meas = log(c0'./rate(k,:)');
+       %meas = log(c0'./rate(k,:)');
+       meas = rate(k,:)';
 %         if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
 %                % pre-ORACLES
 %                  meas = log(s.c0(wln)'./rate(k,(wln))');
@@ -175,34 +187,66 @@ loadCrossSections_global;
    %v=ver;f=any(strcmp('optim', {v.Name}));
    %license('test', 'optim_toolbox') 
    % cjf: I may have made a copy-paste error here
+   
 %  % calculate error
-%    tau_OD  = s.tau_tot_slant; %s.tau_tot_vertical;% need to also check tau_tot_slant;
-   o3Err   = (tau_OD'-RR)./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
-   MSEo3DU = real(((1/length(wln)-8)*sum(o3Err.^2))');                         
+%  tau_OD  = s.tau_tot_slant; %s.tau_tot_vertical;% need to also check tau_tot_slant;
+   %o3Err   = (tau_OD'-RR)./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
+   %MSEo3DU = real(((1/length(wln)-8)*sum(o3Err.^2))');                         
    
 %    %license('test', 'optim_toolbox') 
 % 
-%    % calculate error
+     %% calculate error
 %    %      s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
 %    tau_OD = log(repmat(c0,length(s.t),1)./rate);
 %    o3Err   = (tau_OD(:,wln)'-RR(:,:))./repmat((o3coef(wln)),1,length(s.t));    % in atm cm
 %    MSEo3DU = real(((1/length(wln))*sum(o3Err.^2))');                         
-   RMSEo3  = real(sqrt(real(MSEo3DU)))./s.m_O3;                                % convert to DU vertical
+   % RMSEo3  = real(sqrt(real(MSEo3DU)))./s.m_O3;                                % convert to DU vertical
    
 %    gas.o3Inv    = o3VCD;%o3vcd_smooth is the default output;
 %    gas.o3Inv    = o3vcd_smooth;
 %    gas.o3resiInv= RMSEo3;
+          
+   % prepare to plot spectrum OD and o3 cross section
+   o3spectrum     = rate-RR' + (ccoef(1,:))'*basis(:,1)';
+   o3fit          = (ccoef(1,:))'*basis(:,1)';
+   o3residual     = real(rate-RR');
+   t=nansum((o3residual).^2,2);
+   RMSres = 1000*sqrt(t)/(length(wln)-size(basis,2));
+
+
+ if plotting
+   % plot fitted and "measured" no2 spectrum
+         for i=1:500:length(s.t)
+             figure(8882);
+             
+             plot(s.w((wln)),rate(i,:),'--k','linewidth',2);hold on;
+             plot(s.w((wln)),s.tau_aero(i,wln).*s.m_aero(i),'--m','linewidth',2);hold on;
+             plot(s.w((wln)),RR(:,i),'--c','linewidth',2);hold on;
+             plot(s.w((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
+             plot(s.w((wln)),o3fit(i,:),'--r','linewidth',2);hold on;
+             plot(s.w((wln)),o3residual(i,:),':k','linewidth',2);hold off;
+             xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' o3VCD= ',num2str(o3vcd_smooth(i)),' RMSE = ',num2str(RMSres(i))),...
+                    'fontsize',14,'fontweight','bold');
+             ylabel('OD','fontsize',14,'fontweight','bold');
+             
+             legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured O_{3} spectrum','fitted O_{3} spectrum','residual');
+             set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
+             pause;
+         end
+   end
+   
+
 
   if plotting
        figure;subplot(211);%plot(tplot,o3VCD,'.r');hold on;
               plot(tplot,o3vcd_smooth,'.g');hold on;
               %plot(tplot,O3conc_smooth,'.r');hold on;
-              axis([tplot(1) tplot(end) 250 350]);
+              axis([tplot(1) tplot(end) 300 450]);
               xlabel('time');ylabel('o3 [DU]');
               title([datestr(s.t(1),'yyyy-mm-dd'), ' linear inversion']);
               %legend('inversion','inversion smooth','constrained inversion smooth');
               legend('inversion smooth');
-              subplot(212);plot(tplot,RMSEo3,'.r');hold on;
+              subplot(212);plot(tplot,RMSres,'.r');hold on;
               axis([tplot(1) tplot(end) 0 5]);
               xlabel('time');ylabel('o3 RMSE [DU]');
               title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
@@ -218,29 +262,33 @@ loadCrossSections_global;
 %    
 %             tau_OD = log(repmat(c0,length(s.t),1)./s.ratetot(:,(wln)));
 %     end
-   o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
-   o3fit          = ccoef(1,:)'*basis(:,1)';
-   o3residual     = tau_OD-RR';
+%    o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
+%    o3fit          = ccoef(1,:)'*basis(:,1)';
+%    o3residual     = tau_OD-RR';
 
    %RMSEo3_new     = sqrt(sum(sum((o3residual.^2)))/(length(wln)-8));
    
-   % save data for further plotting (heatmap)
-   t   = serial2Hh(s.t);
-   alt = s.Alt;
-   lat = s.Lat;
-   lon = s.Lon;
-   res = real(o3residual./repmat(s.m_O3,1,length(wln)));
-   % normalize residual -1 to 1
-   [res_norm, mu, range] = featureNormalizeRange(res);
+    if plotting
+        
+         % save data for further plotting (heatmap)
+%            t   = serial2Hh(s.t);
+%            alt = s.Alt;
+%            lat = s.Lat;
+%            lon = s.Lon;
+%            res = real(o3residual./repmat(s.m_O3,1,length(wln)));
+%            % normalize residual -1 to 1
+%            [res_norm, mu, range] = featureNormalizeRange(res);
+% 
+% 
+%            dat = [t alt lat lon res_norm];
+%            fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual_20160825c0_norm','.txt');
+%            save([starpaths,fi],'-ASCII','dat');
    
-   
-   dat = [t alt lat lon res_norm];
-   fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual_20160825c0_norm','.txt');
-   save([starpaths,fi],'-ASCII','dat');
-   
-   if plotting
+ 
+        
+        
        [~,figdir] = starpaths; 
-   ! BAD use of absolute paths in plotting here !   
+   %! BAD use of absolute paths in plotting here !   
 %      plot fitted and "measured" o3 spectrum
          for i=1:100:length(s.t)
              figure(1111);

@@ -69,7 +69,12 @@ loadCrossSections_global;
   
  
  % calculate residual spectrum (Rayleigh subtracted)
- eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+  eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+ 
+  %ratesub=real(s.rate(:,wln)./(repmat(s.f,1,length(wln)))./tr(s.m_ray, s.tau_ray(:,wln)));
+  %eta    =real(-log(ratesub./repmat(c0,length(s.t),1)));
+  
+
 
 %% fit a linear line to spectra
 %===============================
@@ -89,21 +94,21 @@ for i=1:length(s.t)
     
     % plot
     
-    figure(2222);
-    subplot(211);
-    plot(s.w(wln),eta(i,:),'.-','markersize',8);hold on;
-    plot(s.w(wln),f,'-r','linewidth',2);hold off;
-    legend('total OD','OD linear fit');title(serial2Hh(s.t(i)));
-    xlabel('wavelength');ylabel('OD');
-    subplot(212);
-    plot(s.w(wln),eta_residual(i,:),'-k','linewidth',2);
-    xlabel('wavelength');ylabel('residual spectrum');
-    pause(0.01);
+%     figure(2222);
+%     subplot(211);
+%     plot(s.w(wln),eta(i,:),'.-','markersize',8);hold on;
+%     plot(s.w(wln),f,'-r','linewidth',2);hold off;
+%     legend('total OD','OD linear fit');title(serial2Hh(s.t(i)));
+%     xlabel('wavelength');ylabel('OD');
+%     subplot(212);
+%     plot(s.w(wln),eta_residual(i,:),'-k','linewidth',2);
+%     xlabel('wavelength');ylabel('residual spectrum');
+%     pause(0.01);
 
     
 end
 
-
+% this is to check residual dependance with SZA/airmass
 if plotting
 % plot residual to fit (which is 470nm).
         figure;
@@ -112,12 +117,153 @@ if plotting
 end
 
 % do linear retrieval first (no wavelength shift) 
-% basis = [no2coef(wln), no2coefdiff(wln), o4coef(wln), o3coef(wln)];
-  
 
-    % this is end member array (original cross sections)
-    % basis = [no2_298Kcoef(wln), no2coefdiff(wln), o4coef(wln), o3coef(wln)];% this was original
-    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1)];
+    % this is end member array (cross sections)
+    % fitting no2 at 298 and the temp difference spectrum (second basis element); total column is
+    % the SCD of the no2 (298) xs (first basis element)
+    % pre-ORACLES
+    basis = [no2_298Kcoef(wln), -no2coefdiff(wln),o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1)];
+   
+    % use this for ORACLES:
+    basis = [no2_298Kcoef(wln), -no2coefdiff(wln),o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1), ((s.w(wln)').^3).*ones(length(wln),1)];
+   
+   
+    % solve
+    % x = real(Abasis\spectrum_sub');
+    
+    ccoef_d=[];
+    RR_d=[];
+    
+    for k=1:length(s.t);
+
+        coef=real(basis\eta(k,:)');
+        % coef=real(Abasis\spectrum_sub(k,:)');
+        % scale coef back
+        scoef = coef;%./scale;
+
+        % reconstruct spectrum
+        recon=basis*scoef;
+        RR_d=[RR_d recon];
+        ccoef_d=[ccoef_d scoef];
+    end 
+    
+    % to get back to regular cross section:
+    % test_spec=qno2*rno2;
+    
+   % calculate no2 scd and vcd
+   % create smooth no2 time-series
+   xts = 60/3600;   %60 sec in decimal time
+   if mode==0
+        % covert from atm x cm to molec/cm^2
+       no2_amount =  ccoef_d(1,:);% + ccoef_d(2,:);
+       no2VCD = real((((Loschmidt*no2_amount))./(s.m_NO2)')');
+       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
+       [no2VCDsmooth, sn] = boxxfilt(tplot, no2VCD, xts);
+       no2vcd_smooth = real(no2VCDsmooth);
+   elseif mode==1
+       % load reference spectrum
+       % ref_spec = load([starpaths,'20160113NO2refspec.mat']);
+       no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
+       %no2SCD = real(ccoef_d(1,:) + ccoef_d(2,:))*Loschmidt + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
+       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
+       [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
+       no2vcd_smooth = real(no2SCDsmooth)./s.m_NO2;
+   end
+    
+    
+   % calculate error
+   tau_OD  = s.tau_tot_slant;
+   no2Err  = (tau_OD(:,wln)'-RR_d(:,:))./repmat((no2_298Kcoef(wln)),1,length(s.t)); 
+   MSEno2DU = real(((1/length(wln)-7)*sum(no2Err.^2))');                          
+   RMSEno2  = real(sqrt(real(MSEno2DU)))./s.m_NO2; % convert to vertical
+          
+   % prepare to plot spectrum OD and no2 cross section
+   %no2spectrum     = eta-RR_d' + (ccoef_d(1,:))'*basis(:,1)';
+   % this is to account for temp of xs
+   no2spectrum     = eta-RR_d' + ((ccoef_d(1,:) + ccoef_d(2,:)))'*(basis(:,1)+basis(:,2))';%((ccoef_d(1,:) + ccoef_d(2,:)))'*basis(:,1)';
+   % this is not temp diff.
+   %no2fit          = (ccoef_d(1,:))'*basis(:,1)';
+   no2fit          = (ccoef_d(1,:) + ccoef_d(2,:))'*(basis(:,1)+basis(:,2))';
+   no2residual     = real(eta-RR_d');
+   t=nansum((no2residual).^2,2);
+   RMSres = sqrt(t)/(length(wln)-size(basis,2));
+   %RMSres = real(sqrt((nansum((no2residual).^2,2))/(length(wln)-size(basis,2))));
+%    no2meas     = spectrum_sub - exp-((ccoef_d(2,:)/no2diff_norm')*basis(:,2)' - (ccoef_d(3,:)/o3_norm')*basis(:,3)' - (ccoef_d(4,:)')*basis(:,4)' - ccoef_d(5,:)'*basis(:,5)');
+%    no2fit      = exp(-(ccoef_d(1,:)')*basis(:,1)');
+%    no2residual = spectrum_sub - exp(-(ccoef_d(1,:)')*basis(:,1)' - (ccoef_d(2,:)')*basis(:,2)' - (ccoef_d(3,:)')*basis(:,3)' - ccoef_d(4,:)'*basis(:,4)' - ccoef_d(5,:)'*basis(:,5)');
+%    
+
+   if plotting
+   % plot fitted and "measured" no2 spectrum
+         for i=1:500:length(s.t)
+             figure(8882);
+             %plot(s.w((wln)),eta1(i,:),'-y','linewidth',2);hold on;
+             plot(s.w((wln)),eta(i,:),'--k','linewidth',2);hold on;
+             plot(s.w((wln)),s.tau_aero(i,wln).*s.m_aero(i),'--m','linewidth',2);hold on;
+             plot(s.w((wln)),RR_d(:,i),'--c','linewidth',2);hold on;
+             plot(s.w((wln)),no2spectrum(i,:),'-k','linewidth',2);hold on;
+             plot(s.w((wln)),no2fit(i,:),'--r','linewidth',2);hold on;
+             plot(s.w((wln)),no2residual(i,:),':k','linewidth',2);hold off;
+             xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' no2VCD= ',num2str(no2vcd_smooth(i)/(Loschmidt/1000)),' RMSE = ',num2str(RMSres(i))),...
+                    'fontsize',14,'fontweight','bold');
+             ylabel('OD','fontsize',14,'fontweight','bold');
+             %legend('measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
+             pause;
+         end
+   end
+   
+   
+   if plotting
+       figure;subplot(211);%plot(tplot,no2VCD,'.r');hold on;
+              %plot(tplot,no2vcd_smooth,'.g');hold on;
+              plot(tplot,no2vcd_smooth/(Loschmidt/1000),'.g');hold on;
+              %axis([tplot(1) tplot(end) 0 5e17]);
+              axis([tplot(1) tplot(end) 0 10]);
+              %xlabel('time');ylabel('no2 [molec/cm^{2}]');title(datestr(s.t(1),'yyyymmdd'));
+              xlabel('time');ylabel('no2 [DU]');title(datestr(s.t(1),'yyyymmdd'));
+              %legend('linear inversion','linear inversion smooth');
+              legend('linear inversion smooth');
+              subplot(212);plot(tplot,RMSres,'.r');hold on;
+              axis([tplot(1) tplot(end) 0 0.005]);
+              xlabel('time');ylabel('no2 RMSE');
+   end
+
+   % no2OD is the spectrum portion to subtract
+    no2.no2_molec_cm2    = no2vcd_smooth;
+    no2.no2resi          = RMSres;
+    no2.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+    no2.no2SCD           = no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     
     % define baseline array
