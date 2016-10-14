@@ -107,8 +107,8 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load(which(['20160702O3refspec.mat']));
-                    %tmp = load(which(['20160825O3refspec.mat']));
+                    %tmp = load(which(['20160702O3refspec.mat']));
+                    tmp = load(which(['20160825O3refspec.mat']));
 %                     try
 %                         tmp = load(['20160702O3refspec.mat']);
 %                     catch

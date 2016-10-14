@@ -109,19 +109,19 @@ loadCrossSections_global;
  % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
-  if     s.t(1) <= datenum([2016 8 25 0 0 0]); 
+  if     s.t(1) < datenum([2016 8 26 0 0 0]); 
       % pre-ORACLES
 %       rate = s.rateslant; 
 %       rate = rate(:,wln); 
 %       basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
 %         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1) ((s.w(wln)').^2).*ones(length(wln),1) ((s.w(wln)').^3).*ones(length(wln),1)];
-    
+%     
     rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
  
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1)];% 
     
-  elseif s.t(1) > datenum([2016 8 25 0 0 0]);   
+  elseif s.t(1) > datenum([2016 8 26 0 0 0]);   
       % ORACLES
       % rate = s.ratetot;% this is Ray subtracted
       rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
@@ -241,7 +241,7 @@ loadCrossSections_global;
        figure;subplot(211);%plot(tplot,o3VCD,'.r');hold on;
               plot(tplot,o3vcd_smooth,'.g');hold on;
               %plot(tplot,O3conc_smooth,'.r');hold on;
-              axis([tplot(1) tplot(end) 300 450]);
+              axis([tplot(1) tplot(end) 250 450]);
               xlabel('time');ylabel('o3 [DU]');
               title([datestr(s.t(1),'yyyy-mm-dd'), ' linear inversion']);
               %legend('inversion','inversion smooth','constrained inversion smooth');

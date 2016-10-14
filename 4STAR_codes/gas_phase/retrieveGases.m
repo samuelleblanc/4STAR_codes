@@ -88,6 +88,9 @@ function [gas] = retrieveGases(s)
    d.alt              = s.Alt;
    d.pst              = s.Pst;
    d.sza              = s.sza;
+   d.m_aero           = s.m_aero;
+   d.m_o3             = s.m_O3;
+   d.m_no2            = s.m_NO2;
    d.tUTC             = serial2Hh(s.t);
    
   
