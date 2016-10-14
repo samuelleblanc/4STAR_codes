@@ -414,7 +414,7 @@ loadCrossSections_global;
            
             % save parameters
             o3.o3DU    = o3vcd_smooth;
-            o3.o3resiDU= RMSEo3;
+            o3.o3resiDU= RMSres;
             o3.o3SCD   = (ccoef(1,:)*1000)';
 
             o3.o4      = real(ccoef(2,:));
