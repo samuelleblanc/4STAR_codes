@@ -13,8 +13,11 @@ end
 
 s.flight =[datenum(2016,6,02,22,57,01) datenum(2016,6,3,7,15,24)];  
 %s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-    
- 
+%s.dirty = [datenum(2016,6,3,08,02,00) datenum(2016,6,3,08,04,00)];
+%s.clean = [datenum(2016,6,3,08,05,30) datenum(2016,6,3,08,07,30)];
+s.dirty = [datenum(2016,6,4,01,39,00) datenum(2016,6,4,01,41,00)];
+s.clean = [datenum(2016,6,4,02,40,15) datenum(2016,6,4,02,42,30)];
+
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160602_starflag_man_created20160718_1638by_CF.mat';%'20160602_starflag_auto_created20160714_1702.mat';

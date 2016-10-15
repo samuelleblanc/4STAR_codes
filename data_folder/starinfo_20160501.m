@@ -13,7 +13,9 @@ end
 
 s.flight =[datenum(2016,5,1,22,30,00) datenum(2016,5,2,6,55,17)];  
 %s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-    
+s.dirty = [datenum(2016,5,3,2,58,00) datenum(2016,5,3,3,00,30)];
+s.clean = [datenum(2016,5,3,3,13,00) datenum(2016,5,3,3,17,00)];
+
  
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 

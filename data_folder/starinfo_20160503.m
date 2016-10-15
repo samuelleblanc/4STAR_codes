@@ -13,7 +13,7 @@ end
 
 s.flight=[datenum(2016,5,3,23,03,08) datenum(2016,5,4,7,17,30)]; !!! to be updated 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
-% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];   
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 

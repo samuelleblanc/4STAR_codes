@@ -11,8 +11,10 @@ else
     s.toggle = update_toggle;
 end
 
-spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
+s.spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+s.dirty = [datenum(2016,4,28,00,22,00) datenum(2016,4,28,00,29,00)];
+s.clean = [datenum(2016,4,28,00,45,00) datenum(2016,4,28,00,49,30)];
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
