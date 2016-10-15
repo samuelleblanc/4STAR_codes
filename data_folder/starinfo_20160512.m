@@ -14,9 +14,14 @@ end
 s.flight=[datenum(2016,5,12,22,58,13) datenum(2016,5,13,3,29,11)];  
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+s.dirty = [datenum(2016,5,14,2,22,00) datenum(2016,5,14,2,33,00)];
+s.clean = [datenum(2016,5,14,2,54,30) datenum(2016,5,14,2,57,00)];  
+
+
 s.flagfilename = '20160512_starflag_man_created20160513_0604by_MS.mat'; 
 s.flagfilenameO3 = '20160512_starflag_O3_man_created20160513_0557by_MS.mat';
 s.flagfilenameCWV = '20160512_starflag_CWV_man_created20160513_0601by_MS.mat';
+
 
 % Ozone and other gases 
 s.O3h=21; % guess 

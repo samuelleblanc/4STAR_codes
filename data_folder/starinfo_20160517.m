@@ -12,6 +12,9 @@ else
 end
 
 s.flight=[datenum(2016,5,16,23,06,07) datenum(2016,5,17,7,22,08)];  
+s.dirty = [datenum(2016,5,19,2,6,30) datenum(2016,5,19,2,11,30)];
+s.clean = [datenum(2016,5,19,2,31,20) datenum(2016,5,19,2,34,30)];
+
 s.flagfilename = '20160517_starflag_man_created20160520_2349by_MS.mat'; 
 s.flagfilenameO3 = '20160517_starflag_O3_man_created20160520_2342by_MS.mat';
 s.flagfilenameCWV = '20160517_starflag_CWV_man_created20160520_2329by_MS.mat';

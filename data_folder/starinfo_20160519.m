@@ -16,6 +16,7 @@ s.flagfilename = '20160519_starflag_man_created20160521_1543by_SL.mat';
 s.flagfilenameO3 = '20160519_starflag_O3_man_created20160530_0049by_MS.mat';
 s.flagfilenameCWV = '20160519_starflag_CWV_man_created20160530_0045by_MS.mat';
 
+
 % Ozone and other gases 
 s.O3h=21; % guess 
 s.O3col=0.300; % guess     

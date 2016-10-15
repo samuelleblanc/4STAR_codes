@@ -17,6 +17,8 @@ s.ground=[datenum(2016,5,14,2,12,11) datenum(2016,5,14,6,39,29)];
 s.flagfilename = '20160514_starflag_man_created20160517_1910by_MS.mat'; 
 s.flagfilenameO3 = '20160514_starflag_O3_man_created20160517_2036by_MS..mat';
 s.flagfilenameCWV = '20160514_starflag_CWV_man_created20160517_2032by_MS.mat';
+s.dirty = [datenum(2016,5,14,2,22,00) datenum(2016,5,14,2,33,00)];
+s.clean = [datenum(2016,5,14,2,54,30) datenum(2016,5,14,2,57,00)];
 
 % Ozone and other gases 
 s.O3h=21; % guess 
