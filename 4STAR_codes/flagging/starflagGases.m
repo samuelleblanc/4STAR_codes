@@ -179,7 +179,7 @@ if (Mode==2)
     end
     
     % define gas name to analyze
-     gas_name = menu('what gas field is being flagged?','CWV','O3','NO2');
+     gas_name = menu('what gas field is being flagged?','CWV','O3','NO2','HCOH');
      gas_name_str = '?';
     switch gas_name
         case 1
