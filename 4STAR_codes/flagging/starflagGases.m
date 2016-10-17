@@ -34,13 +34,16 @@ function [flags, good, flagfile] = starflagGases(s, Mode)
 % MS, 2016-05-09, modified starflag for gases
 % MS, 2016-10-17, modified to add automatic QA filtering and HCOH readout
 %                 use case 3 as defualt
+%                 minimizing variables read from starsun
 %------------------------------------------------------------------------------
 version_set('1.5');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
     sunfile = getfullname('*starsun*.mat','starsun','Select starsun file to flag.');
-    s = load(sunfile);
+    s = load(sunfile,'tau_aero','m_aero','flags','t','w','rawrelstd','Lon','Lat','Alt','Pst','Tst','aerosolcols','viscols','nircols','rateaero','c0','QdVlr','QdVtb','QdVtot','ng','Md','raw','Str','dark',...
+                     'tau_aero_noscreening','darkstd','sd_aero_crit');
+
 end % done loading starinfo file
 
 daystr = datestr(s.t(1),'yyyymmdd');
