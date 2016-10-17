@@ -13,7 +13,7 @@ end
 s.flagfilename = '20160830_starflag_man_created20160904_1844by_SL.mat';
 s.flagfilenameCWV  = '20160830_starflag_CWV_man_created20161017_1254by_MS.mat';
 s.flagfilenameO3   = '20160830_starflag_O3_man_created20161017_1255by_MS.mat';
-s.flagfilenameNO2  = '20160524_starflag_O3_man_created20160701_1323by_MS.mat';
+s.flagfilenameNO2  = '20160830_starflag_NO2_man_created20161017_1302by_MS.mat';
 s.flagfilenameHCOH = '20160524_starflag_CWV_man_created20160701_1314by_MS.mat';
  
 s.flight=[datenum(2016,8,30,7,9,12) datenum(2016,8,30,8,31,57)]; 
