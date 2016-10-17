@@ -12,10 +12,10 @@ else
 end
 
 s.flagfilename = '20160831_starflag_man_created20160904_1609by_SL.mat';
-s.flagfilenameCWV  = '20160825_starflag_CWV_man_created20161017_1310by_MS.mat';
-s.flagfilenameO3   = '20160825_starflag_O3_man_created20161017_1314by_MS.mat';
-s.flagfilenameNO2  = '20160825_starflag_NO2_man_created20161017_1324by_MS.mat';
-s.flagfilenameHCOH = '20160825_starflag_HCOH_man_created20161017_1335by_MS.mat';
+s.flagfilenameCWV  = '20160831_starflag_CWV_man_created20161017_1339by_MS.mat';
+s.flagfilenameO3   = '20160831_starflag_O3_man_created20161017_1340by_MS.mat';
+s.flagfilenameNO2  = '20160831_starflag_NO2_man_created20161017_1349by_MS.mat';
+s.flagfilenameHCOH = '20160831_starflag_HCOH_man_created20161017_1351by_MS.mat';
  
 s.flight=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
