@@ -16,6 +16,12 @@ s.flight=[datenum(2016,8,25,10,46,18) datenum(2016,8,25,20,15,42)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+
+%s.flagfilename = '20160830_starflag_man_created20160904_1844by_SL.mat';
+s.flagfilenameCWV  = '20160825_starflag_CWV_man_created20161017_1310by_MS.mat';
+s.flagfilenameO3   = '20160825_starflag_O3_man_created20161017_1314by_MS.mat';
+s.flagfilenameNO2  = '20160825_starflag_NO2_man_created20161017_1324by_MS.mat';
+s.flagfilenameHCOH = '20160825_starflag_HCOH_man_created20161017_1335by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; % 
