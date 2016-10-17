@@ -16,7 +16,7 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
         savematfile=unconfirmed_savematfile;
     end;
 else % ask for a full path
-    if getUserName=='sleblan2';
+    if (strcmp(getUserName,'sleblan2'));
         defaultsavefolder=get_last_used_path();
     else
         if ~isempty(which('starpaths')); % look into pre-set path
@@ -29,7 +29,7 @@ else % ask for a full path
         'Save file as');
     if ~isequal(savematfile,0);
         savematfile=fullfile(defaultsavefolder,savematfile);
-        if getUserName=='sleblan2'; % special for Sam
+        if (strcmp(getUserName,'sleblan2')); % special for Sam
             updateLastUsedPath(defaultsavefolder);
         end;
     end;
