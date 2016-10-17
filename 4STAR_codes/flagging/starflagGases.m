@@ -32,7 +32,10 @@ function [flags, good, flagfile] = starflagGases(s, Mode)
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
 % SL, 2016-05-04, added special function buttons to visi_screen
 % MS, 2016-05-09, modified starflag for gases
-version_set('1.4');
+% MS, 2016-10-17, modified to add automatic QA filtering and HCOH readout
+%                 use case 3 as defualt
+%------------------------------------------------------------------------------
+version_set('1.5');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -185,6 +188,8 @@ if (Mode==2)
             gas_name_str = 'O3';
         case 3
             gas_name_str = 'NO2';
+        case 4
+            gas_name_str = 'HCOH';    
     end
 end
 
@@ -270,8 +275,11 @@ elseif strcmp(gas_name_str,'O3')
     input_param = gas.o3DU;
     std_param   = gas.o3resiDU;
 elseif strcmp(gas_name_str,'NO2')
-    input_param = gas.no2_molec_cm2;
-    std_param   = gas.no2err_molec_cm2;
+    input_param = gas.no2DU;
+    std_param   = gas.no2resiDU;
+elseif strcmp(gas_name_str,'HCOH')
+    input_param = gas.hcoh_DU;
+    std_param   = gas.hcohresi;
 end
 
 aod_500nm_max=3;
@@ -338,13 +346,25 @@ if (Mode==2)
             reset_flags=false;
         case 3 %Previous flags:Yes from starsun, your own pre-screening:Yes
             %User needs to modify what's below
+            % define here pre-screened std criteria
             flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
-            if exist('darkstd','var')
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
-            else
-                flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
-            end
+            %flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+            %if exist('darkstd','var')
+            %    flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+            %else
+                % original: flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                if strcmp(gas_name_str,'CWV')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>0.4 |  std_param==0 | ~isfinite(input_param) | isnan(input_param) | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'O3')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<200 | std_param>2 |  std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'NO2')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'HCOH')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>5e-3 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                 
+                end
+            %end
+            flags_str.unspecified_clouds = '';
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
@@ -463,6 +483,8 @@ if (Mode==2)
     ylims.panel_2 = [min(input_param) max(input_param)];
     ylims.panel_3 = [min(std_param) max(std_param)];
     ylims.panel_4 = [0,8000];
+    ylims.tau_fig = [min(input_param) max(input_param)];
+    ylims.tau2_fig= [min(input_param) max(input_param)];
     figs.tau_fig.h = 1;
     figs.tau2_fig.h = 2;
     figs.leg_fig.h = 3;
@@ -492,9 +514,9 @@ if (Mode==2)
     
     % define which param to send to main screen
     
-    [flags, screen, good, figs] = visi_screen_v10(t,input_param,'time_choice',2,'flags',flags,'no_mask',no_mask,'figs',figs,...
+    [flags, screen, good, figs] = visi_screen_gases(t,input_param,'time_choice',2,'flags',flags,'no_mask',no_mask,'figs',figs,...
         'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,...
-        'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
+        'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit','gas',gas_name_str);
     % returns:
     %   flags: struct of logicals (from flags inarg) of length(time)
     %           Also contains time, and settings in "manual_flags", and
