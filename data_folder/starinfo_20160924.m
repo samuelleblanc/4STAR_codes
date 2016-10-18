@@ -24,8 +24,10 @@ s.NO2col=2.0e15; % %
 
 % flags
 s.flagfilename = '20160924_starflag_man_created20160926_1939by_KP.mat'; 
-%s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';
-%s.flagfilenameCWV = '20160530_starflag_CWV_man_created20160701_1609by_MS.mat';
+s.flagfilenameCWV  = '20160924_starflag_CWV_man_created20161017_2140by_MS.mat';
+s.flagfilenameO3   = '20160924_starflag_O3_man_created20161017_2141by_MS.mat';
+s.flagfilenameNO2  = '20160924_starflag_NO2_man_created20161017_2145by_MS.mat';
+s.flagfilenameHCOH = '20160924_starflag_HCOH_man_created20161017_2147by_MS.mat';
 
  
 % other tweaks 
