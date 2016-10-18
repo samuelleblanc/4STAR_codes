@@ -25,6 +25,7 @@ function ORACLESstarbasicplots(daystr, platform, savefigure)
 % MS   , 2016/01/09, modified to accomodate MLO campaign data.
 % MS   , 2016/04/06, modified to accomodate KORUS-AQ campaign data.
 % MS   , 2016/08/26, updated plotting gas fields for ORACLES
+% MS   , 2016/10/18, updating gas plots
 %********************
 % set parameters
 %********************
@@ -90,16 +91,18 @@ end;
 
 % upload gases if 'gas'/'cwv' does not exist in starsun
 if exist('gas','var')
-    Loschmidt=2.686763e19;                   % molec/cm3*atm
+    %Loschmidt=2.686763e19;                   % molec/cm3*atm
     cwv2plot  = cwv.cwv940m1;
     o32plot   = gas.o3.o3DU;
-    no22plot  = gas.no2.no2_molec_cm2/(Loschmidt/1000);
+    no22plot  = gas.no2.no2DU;
+    hcoh2plot = gas.hcoh.hcoh_DU;
 else
     try;
         gas   = load(strcat(starpaths,daystr,'_gas_summary.mat'));
         cwv2plot =gas.cwv;
         o32plot  =gas.o3DU;
         no22plot =gas.no2DU;
+        hcoh2plot =gas.hcoh_DU;
     catch;
         disp('No gases')
     end;
@@ -124,20 +127,35 @@ end
 
 
     % Load the flag file and see if gas flags exist
-    if isfield(s, 'flagfilenameO3');
-        disp(['Loading flag file: ' s.flagfilenameO3])
-        flagO3 = load(s.flagfilenameO3); 
+    if isfield(s, 'flagfilenameCWV');
         disp(['Loading flag file: ' s.flagfilenameCWV])
         flagCWV = load(s.flagfilenameCWV); 
+        disp(['Loading flag file: ' s.flagfilenameO3])
+        flagO3 = load(s.flagfilenameO3); 
+        disp(['Loading flag file: ' s.flagfilenameNO2])
+        flagNO2 = load(s.flagfilenameNO2); 
+        disp(['Loading flag file: ' s.flagfilenameHCOH])
+        flagHCOH = load(s.flagfilenameHCOH);  
         % read flags
-        flagO3  = flagO3.manual_flags.screen;
-        flagCWV = flagCWV.manual_flags.screen;
-        flagNO2 = zeros(length(t),1);
+        %cwv
+        QA_CWV = bitor(flagCWV.before_or_after_flight,flagCWV.bad_aod);
+        QA_CWV = bitor(QA_CWV,flagCWV.unspecified_clouds);
+        %o3
+        QA_O3 = bitor(flagO3.before_or_after_flight,flagO3.bad_aod);
+        QA_O3 = bitor(QA_O3,flagO3.unspecified_clouds);
+        %no2
+        QA_NO2 = bitor(flagNO2.before_or_after_flight,flagNO2.bad_aod);
+        QA_NO2 = bitor(QA_NO2,flagNO2.unspecified_clouds);
+        %hcoh
+        QA_HCOH = bitor(flagHCOH.before_or_after_flight,flagHCOH.bad_aod);
+        QA_HCOH = bitor(QA_HCOH,flagHCOH.unspecified_clouds);
+        
     else
         % don't flag
-        flagO3   = zeros(length(t),1);
-        flagCWV  = zeros(length(t),1);
-        flagNO2  = zeros(length(t),1);
+        QA_CWV  = zeros(length(t),1)+10;
+        QA_O3   = zeros(length(t),1)+10;
+        QA_NO2  = zeros(length(t),1)+10;
+        QA_HCOH = zeros(length(t),1)+10;
     end   
 
 
@@ -352,9 +370,6 @@ end;
 
 if exist('cwv2plot');
     
-    % apply flags
-    cwv2plot(flagCWV==1) = NaN;
-    
     figure;
     %         [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
     [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
@@ -362,6 +377,21 @@ if exist('cwv2plot');
         'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
         'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
     pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    
+    if QA_CWV(1)~=10
+        % apply flags
+        cwv2plot(QA_CWV==1) = NaN;
+        
+         figure;
+        %         [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
+        [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
+            vars.xtlim{:},mods{:}, ...
+            'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2] screened', ...
+            'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
+        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        
+    end
+    
 end;
 
 
@@ -369,9 +399,6 @@ end;
 
 if exist('o32plot');
     
-    % apply flags
-    o32plot(flagO3==1) = NaN;
-   
     figure;
 %     [h,filename]=spsun(daystr, 't', gas.o3.o3DU, '.', vars.Alt1e4{:}, 'ylim', [0 500], ...
 [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, 'ylim', [200 700], ...
@@ -379,20 +406,83 @@ if exist('o32plot');
         'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
         'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
     pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    
+    
+    if QA_O3(1)~=10
+        % apply flags
+        o32plot(QA_O3==1) = NaN;
+        
+         figure;
+        %         [h,filename]=spsun(daystr, 't', cwv.cwv940m1, '.', vars.Alt1e4{:}, mods{:}, ...
+        [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
+            vars.xtlim{:},mods{:}, ...
+            'cols', colslist{k,2}, 'ylabel', 'O_{3} [DU] screened', ...
+            'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
+        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        
+    end
+    
+    
+    
 end;
 
 % NO2
 
 if exist('no22plot');
     
-       % apply flags
-       no22plot(flagNO2==1) = NaN;
        
        figure;
        [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, 'ylim', [-0.5 1],...
            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+       
+       
+        if QA_NO2(1)~=10
+            % apply flags
+            no22plot(QA_NO2==1) = NaN;
+
+             figure;
+            
+            [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
+                vars.xtlim{:},mods{:}, ...
+                'cols', colslist{k,2}, 'ylabel', 'NO_{2} [DU] screened', ...
+                'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
+            pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        
+        end
+       
+       
+end;
+
+
+% HCOH
+
+if exist('hcoh2plot');
+    
+       
+       figure;
+       [h,filename]=spsun(daystr, 't', hcoh2plot, '.', vars.Alt1e4{:}, mods{:}, 'ylim', [-0.5 1],...
+           'cols', colslist{k,2}, 'ylabel', 'HCOH [DU]', ...
+           'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+       pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+       
+       
+        if QA_HCOH(1)~=10
+            % apply flags
+            hcoh2plot(QA_HCOH==1) = NaN;
+
+             figure;
+            
+            [h,filename]=spsun(daystr, 't', hcoh2plot, '.', vars.Alt1e4{:}, 'ylim', [0 1], ...
+                vars.xtlim{:},mods{:}, ...
+                'cols', colslist{k,2}, 'ylabel', 'HCOH [DU] screened', ...
+                'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
+            pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        
+        end
+       
+       
 end;
 
 
