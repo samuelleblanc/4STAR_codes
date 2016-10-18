@@ -61,7 +61,6 @@ catch
 end
 
 %% get the relevant values in the starinfo
-UTCflight = t2utch(s.flight);
 try
     sdirty.UTC = t2utch(s.dirty);
     sclean.UTC = t2utch(s.clean);
@@ -137,7 +136,12 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  legend('Dirty - Clean','Dirty - std','Dirty + std');
  title(['Normalized difference for flight on' daystr]);
  ylabel('Rate difference [%]');
- ylim([0,20]);
+ 
+ if sdiff.normdiff(600)>8.0;
+     ylim([0,20]);
+ else
+     ylim([0,8]);
+ end;
  xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
  grid on;
  linkaxes([ax1,ax2],'x')
