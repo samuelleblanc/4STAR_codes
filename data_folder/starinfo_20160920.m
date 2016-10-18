@@ -18,10 +18,10 @@ s.flight =[datenum(2016,9,20,6,58,17) datenum(2016,9,20,14,59,08)];
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
 %s.flagfilename    = '20160501_starflag_man_created20160503_2330by_JR.mat';
-s.flagfilenameCWV  = '20160918_starflag_CWV_man_created20161017_2117by_MS.mat';
-s.flagfilenameO3   = '20160918_starflag_O3_man_created20161017_2118by_MS.mat';
-s.flagfilenameNO2  = '20160918_starflag_NO2_man_created20161017_2123by_MS.mat';
-s.flagfilenameHCOH = '20160918_starflag_HCOH_man_created20161017_2125by_MS.mat';
+s.flagfilenameCWV  = '20160920_starflag_CWV_man_created20161017_2130by_MS.mat';
+s.flagfilenameO3   = '20160920_starflag_O3_man_created20161017_2130by_MS.mat';
+s.flagfilenameNO2  = '20160920_starflag_NO2_man_created20161017_2134by_MS.mat';
+s.flagfilenameHCOH = '20160920_starflag_HCOH_man_created20161017_2138by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 
