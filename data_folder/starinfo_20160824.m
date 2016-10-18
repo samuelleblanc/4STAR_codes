@@ -17,6 +17,13 @@ end
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 %s.langley=[datenum(2016,8,23,10,52,00) datenum(2016,8,23,11,47,00)];
 s.flight=[datenum(2016,8,24,11,51,25) datenum(2016,8,24,17,41,47)];
+
+% flags
+%s.flagfilename = '20160918_starflag_man_created20160920_1358by_SL.mat'; 
+s.flagfilenameCWV  = '20160824_starflag_CWV_man_created20161017_2221by_MS.mat';
+s.flagfilenameO3   = '20160824_starflag_O3_man_created20161017_2222by_MS.mat';
+s.flagfilenameNO2  = '20160824_starflag_NO2_man_created20161017_2223by_MS.mat';
+s.flagfilenameHCOH = '20160824_starflag_HCOH_man_created20161017_2225by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
