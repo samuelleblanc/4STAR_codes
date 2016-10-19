@@ -52,7 +52,11 @@ if asktopause
       return
   else;
       s=dbstack;
-      eval(['dbclear in ' s(2).name ' at ' num2str(s(2).line+1)])
+      try
+        eval(['dbclear in ' s(2).name ' at ' num2str(s(2).line+1)])
+      catch
+        nul=0;
+      end
   end;
   if OK==2;
       return
