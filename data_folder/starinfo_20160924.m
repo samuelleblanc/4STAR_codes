@@ -16,6 +16,8 @@ end
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 % s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+s.dirty = [datenum(2016,9,24,16,01,00) datenum(2016,9,24,16,03,45)];
+s.clean = [datenum(2016,9,24,16,19,30) datenum(2016,9,24,16,22,30)];
  
 % Ozone and other gases 
 s.O3h=21; % 
