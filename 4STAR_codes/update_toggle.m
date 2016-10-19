@@ -26,7 +26,7 @@ toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 
 if exist('toggle_in', 'var')
-   toggle_out = catstruct(toggle_in, toggle_out);
+   toggle_out = catstruct(toggle_out, toggle_in);
 end
 
 return
