@@ -19,6 +19,8 @@ s.flagfilenameHCOH = '20160902_starflag_HCOH_man_created20161017_1402by_MS.mat';
 s.flight=[datenum(2016,9,2,7,01,54) datenum(2016,9,2,14,58,31)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+s.dirty = [datenum(2016,9,02,15,31,40) datenum(2016,9,02,15,32,10)];
+s.clean = [datenum(2016,9,02,15,33,15) datenum(2016,9,02,15,34,20)];
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 

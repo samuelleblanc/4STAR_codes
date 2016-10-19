@@ -16,6 +16,8 @@ s.flight=[datenum(2016,9,14,07,49,00) datenum(2016,9,14,15,54,54)]; % estimated
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 % s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+s.dirty = [datenum(2016,9,15,09,33,00) datenum(2016,9,15,09,42,00)];
+s.clean = [datenum(2016,9,15,10,04,00) datenum(2016,9,15,10,11,00)];
  
 % Ozone and other gases 
 s.O3h=21; % 
