@@ -218,11 +218,13 @@ dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
     if toggle.dostarflag
-        try
-            edit(infofile_) ; % open infofile in case user wants to edit it.
-        catch me
-            disp(['Problem editing starinfo file. Please open manually: ' infofile_])
-        end
+        if toggle.editstarinfo
+            try
+                edit(infofile_) ; % open infofile in case user wants to edit it.
+            catch me
+                disp(['Problem editing starinfo file. Please open manually: ' infofile_])
+            end
+        end;
         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
         try
             s = infofnt(s);
@@ -231,7 +233,13 @@ if exist(infofile_)==2;
             %     s = eval([infofile2,'(s)']);
         end
     else
-        run(infofile);
+        infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+        try
+            s = infofnt(s);
+        catch
+            eval([infofile_(1:end-2),'(s)']);
+            %     s = eval([infofile2,'(s)']);
+        end
     end;
 elseif exist(infofile2)==2;
     try
