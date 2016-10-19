@@ -1,12 +1,12 @@
-function stardirty_KORUS(dir)
+function stardirty_KORUS()
 %% PURPOSE:
 %   Conglomerate of dirty window analysis for KORUS-AQ
 %
 % CALLING SEQUENCE:
-%   stardirty_KORUS(dir)
+%   stardirty_KORUS()
 %
 % INPUT:
-%   - dir: directory of where to find the star.mat data (defaults for Sam)
+%   - None 
 %
 % OUTPUT:
 %  Plots of dirty and clean window differences
@@ -113,7 +113,7 @@ days = [];
 if true;
     for i=1:length(fld);
         try
-            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,false);
+            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,true);
             spc_diff = [spc_diff;d.(fld{i}).diff.normdiff];
             spc_tx = [spc_tx;d.(fld{i}).diff.transmit];
         catch
