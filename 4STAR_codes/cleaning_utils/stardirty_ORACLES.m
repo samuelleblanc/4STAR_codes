@@ -98,19 +98,22 @@ d.f16.daystr = '20160930';
 %% Now run through each day
 fld = fields(d)
 spc_diff = [];
+spc_tx = [];
 days = [];
 if true;
     for i=1:length(fld);
         try
             [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,false);
             spc_diff = [spc_diff;d.(fld{i}).diff.normdiff];
+            spc_tx = [spc_tx;d.(fld{i}).diff.transmit];
         catch
             spc_diff = [spc_diff;spc_diff(end,:).*NaN];
+            spc_tx = [spc_tx;spc_tx(end,:).*NaN];
         end;
         days = [days;d.(fld{i}).daystr];
     end;
     
-    save([fp 'ORACLES_dirty_summary.mat'],'spc_diff','d','days')
+    save([fp 'ORACLES_dirty_summary.mat'],'spc_diff','d','days','spc_tx')
 else;
     load([fp 'ORACLES_dirty_summary.mat']);
 end;
@@ -119,9 +122,11 @@ figure(2);
 try
     [nul,i630] = min(abs(d.f01.dirty.w-0.630));
     [nul,i550] = min(abs(d.f01.dirty.w-0.550));
+    [nul,i450] = min(abs(d.f01.dirty.w-0.450));
 catch
     [nul,i630] = min(abs(d.f03.dirty.w-0.630));
     [nul,i550] = min(abs(d.f03.dirty.w-0.550));
+    [nul,i450] = min(abs(d.f03.dirty.w-0.450));
 end;
 %plot(spc_diff(:,i630),'rx');
 %hold on;
@@ -143,5 +148,30 @@ c=get(gca,'YTick');
 th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right','rotation',90);
 set(h,'Position',get(h,'Position')+[0 0.05 0 -0.05])
 
-save_fig(2,[fp 'dirty_clean_summary'])
+save_fig(2,[fp 'ORACLES_dirty_clean_summary'])
+
+%% Now make the figure f transmittance
+figure(3);
+
+bar([abs(spc_tx(:,i630)),abs(spc_tx(:,i550)),abs(spc_tx(:,i450))],'EdgeColor','None','BarWidth',1.4)
+
+set(gca,'XTick',1:length(days),'XTickLabel',days)
+ylabel('Transmission')
+title('Clean dirty comparison for ORACLES')
+%xlabel('Flight days')
+%hold off;
+legend('630 nm','550 nm','450 nm')
+ylim([0.9,1]);
+% rotate the xlabels
+h = gca;
+a=get(h,'XTickLabel');
+set(gca,'XTickLabel',[]);
+b=get(gca,'XTick');
+c=get(gca,'YTick');
+th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right','rotation',90);
+set(h,'Position',get(h,'Position')+[0 0.05 0 -0.05])
+
+save_fig(3,[fp 'ORACLES_dirty_clean_summary_transmittance'])
+
+end
 

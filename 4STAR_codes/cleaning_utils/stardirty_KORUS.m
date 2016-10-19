@@ -34,9 +34,10 @@ function stardirty_KORUS(dir)
 %% Start of function
 version_set('1.0');
 
+campaign = 'KORUS-AQ'
 
 %% set up the different data for the flights.
-fp = 'C:\Users\sleblan2\Research\KORUS-AQ\data\FORJ\';
+fp = ['C:\Users\sleblan2\Research\' campaign '\data\FORJ\'];
 
 d.t02.f = [fp '4STAR_KORUSstar_FORJ.mat'];
 d.t02.daystr = '20160427';
@@ -107,35 +108,45 @@ d.t03.daystr = '20160614';
 %% Now run through each day
 fld = fields(d)
 spc_diff = [];
+spc_tx = [];
 days = [];
-if false;
+if true;
     for i=1:length(fld);
         try
-            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f);
+            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,false);
             spc_diff = [spc_diff;d.(fld{i}).diff.normdiff];
+            spc_tx = [spc_tx;d.(fld{i}).diff.transmit];
         catch
             spc_diff = [spc_diff;spc_diff(end,:).*NaN];
+            spc_tx = [spc_tx;spc_tx(end,:).*NaN];
         end;
         days = [days;d.(fld{i}).daystr];
     end;
     
-    save([fp 'KORUS_dirty_summary.mat'],'spc_diff','d','days')
+    save([fp campaign '_dirty_summary.mat'],'spc_diff','d','days','spc_tx')
 else;
-    load([fp 'KORUS_dirty_summary.mat']);
+    load([fp campaign '_dirty_summary.mat']);
 end;
+
 %% Now make the figure
 figure(2);
-[nul,i630] = min(abs(d.f01.dirty.w-0.630));
-[nul,i550] = min(abs(d.f01.dirty.w-0.550));
-
+try
+    [nul,i630] = min(abs(d.f01.dirty.w-0.630));
+    [nul,i550] = min(abs(d.f01.dirty.w-0.550));
+    [nul,i450] = min(abs(d.f01.dirty.w-0.450));
+catch
+    [nul,i630] = min(abs(d.f03.dirty.w-0.630));
+    [nul,i550] = min(abs(d.f03.dirty.w-0.550));
+    [nul,i450] = min(abs(d.f03.dirty.w-0.450));
+end;
 %plot(spc_diff(:,i630),'rx');
 %hold on;
 %plot(spc_diff(:,i550),'gx');
-bar([spc_diff(:,i630),spc_diff(:,i550)],'EdgeColor','None','BarWidth',1.4)
+bar([abs(spc_diff(:,i630)),abs(spc_diff(:,i550))],'EdgeColor','None','BarWidth',1.4)
 
 set(gca,'XTick',1:length(days),'XTickLabel',days)
 ylabel('Rate difference [%]')
-title('Clean dirty comparison for KORUS-AQ')
+title(['Clean dirty comparison for ' campaign])
 %xlabel('Flight days')
 %hold off;
 legend('630 nm','550 nm')
@@ -148,5 +159,29 @@ c=get(gca,'YTick');
 th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right','rotation',90);
 set(h,'Position',get(h,'Position')+[0 0.05 0 -0.05])
 
-save_fig(2,[fp 'dirty_clean_summary'])
+save_fig(2,[fp campaign '_dirty_clean_summary'])
 
+%% Now make the figure f transmittance
+figure(3);
+
+bar([abs(spc_tx(:,i630)),abs(spc_tx(:,i550)),abs(spc_tx(:,i450))],'EdgeColor','None','BarWidth',1.4)
+
+set(gca,'XTick',1:length(days),'XTickLabel',days)
+ylabel('Transmission')
+title(['Clean dirty comparison for ' campaign])
+%xlabel('Flight days')
+%hold off;
+legend('630 nm','550 nm','450 nm')
+ylim([0.9,1]);
+% rotate the xlabels
+h = gca;
+a=get(h,'XTickLabel');
+set(gca,'XTickLabel',[]);
+b=get(gca,'XTick');
+c=get(gca,'YTick');
+th=text(b,repmat(c(1)-.1*(c(2)-c(1)),length(b),1),a,'HorizontalAlignment','right','rotation',90);
+set(h,'Position',get(h,'Position')+[0 0.05 0 -0.05])
+
+save_fig(3,[fp campaign '_dirty_clean_summary_transmittance'])
+
+end
