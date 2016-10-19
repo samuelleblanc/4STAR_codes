@@ -23,6 +23,7 @@ toggle_out.lampcalib  = false;
 toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
+toggle_out.editstarinfo = false;
 
 if exist('toggle_in', 'var')
    toggle_out = catstruct(toggle_in, toggle_out);
