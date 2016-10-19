@@ -114,12 +114,13 @@ sdirty.t = s1.t(sdirty.fl); sclean.t = s1.t(sclean.fl);
 sdiff.w = s1.w;
 sdiff.diff = sclean.mean-sdirty.mean;
 sdiff.normdiff = sdiff.diff./sclean.mean*100.0;
+sdiff.transmit = sdirty.mean./sclean.mean;
 sdiff.daystr = daystr;
 
 %% Now plot the appropriate spectra
 startup_plotting
 figure(1);
-ax1=subplot(3,1,1);
+ax1=subplot(4,1,1);
 plot(s1.w,sdirty.mean,'r',s1.w,sclean.mean,'b')
 hold on;
 plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
@@ -130,37 +131,50 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  legend('Dirty','Clean');
  title(['Dirty and clean average spectra and stddev for ' daystr]);
  ylabel('Rate [cts/ms]');
- xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
+ %xlabel('Wavelength [\mum]'); 
+ xlim([0.4,0.8]);
  grid on;
  
- axr=subplot(3,1,2);
+ axr=subplot(4,1,2);
  plot(s1.w,(sclean.mean-sdirty.mean),'r')  
  hold on;
  plot(s1.w,(sclean.mean-(sdirty.mean-sdirty.stdev)),'g.',...
-     s1.w,(sclean.mean-(sdirty.mean+sdirty.stdev)),'c.');
+      s1.w,(sclean.mean-(sdirty.mean+sdirty.stdev)),'c.');
  hold off;
- legend('Dirty - Clean','Dirty - std','Dirty + std');
+ legend('Clean - Dirty','Dirty - std','Dirty + std');
  title(['Difference for flight on' daystr]);
  ylabel('Rate difference [cts/ms]');
  
- ax2=subplot(3,1,3);
+ ax2=subplot(4,1,3);
  plot(s1.w,(sclean.mean-sdirty.mean)./sclean.mean*100.0,'r')  
  hold on;
  plot(s1.w,(sclean.mean-(sdirty.mean-sdirty.stdev))./sclean.mean*100.0,'g.',...
-     s1.w,(sclean.mean-(sdirty.mean+sdirty.stdev))./sclean.mean*100.0,'c.');
+      s1.w,(sclean.mean-(sdirty.mean+sdirty.stdev))./sclean.mean*100.0,'c.');
  hold off;
- legend('Dirty - Clean','Dirty - std','Dirty + std');
- title(['Normalized difference for flight on' daystr]);
+ legend('Clean - Dirty','Dirty - std','Dirty + std');
+ title(['Normalized difference for flight on ' daystr]);
  ylabel('Rate difference [%]');
- 
  if sdiff.normdiff(600)>8.0;
      ylim([0,20]);
  else
      ylim([0,8]);
  end;
+ grid on;
+ 
+ ax4=subplot(4,1,4);
+ plot(s1.w,sdirty.mean./sclean.mean,'r')  
+ hold on;
+ plot(s1.w,(sdirty.mean-sdirty.stdev)./sclean.mean,'g.',...
+     s1.w,(sdirty.mean+sdirty.stdev)./sclean.mean,'c.');
+ hold off;
+ legend('Dirty','Dirty - std','Dirty + std');
+ title(['Transmittance of dirt on window for flight on ' daystr]);
+ ylabel('Transmittance');
+ ylim([0.8,1]);
+
  xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
  grid on;
- linkaxes([ax1,axr,ax2],'x')
+ linkaxes([ax1,axr,ax2,ax4],'x')
  save_fig(1,[p filesep daystr '_dirty_clean_spc'],ask_to_save_fig);
   
  [nul,i]=min(abs(s1.w-0.44));
