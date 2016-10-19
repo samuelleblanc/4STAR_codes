@@ -1,8 +1,8 @@
 
-flight=[datenum(2016,8,25,10,46,18) datenum(2016,8,25,20,15,42)];
+flight=[datenum(2016,8,24,11,51,25) datenum(2016,8,24,17,41,47)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55)
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];
-langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+
 
 % Ozone and other gases
 s.O3h=21; % 

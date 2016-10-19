@@ -16,6 +16,8 @@ if nargin<2;
     file=fullfile(pathname,filename);
 elseif exist(source)==2
     file=source;
+elseif exist(fullfile(starpaths(source), ['4STAR_' source filetype '.mat']))==2;
+    file=fullfile(starpaths(source), ['4STAR_' source filetype '.mat']);    
 elseif exist(fullfile(starpaths(source), [source filetype '.mat']))==2;
     file=fullfile(starpaths(source), [source filetype '.mat']);
 elseif exist(fullfile(starpaths(source), [source '.mat']))==2;
