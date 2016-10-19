@@ -1,4 +1,4 @@
-function [sdirty,sclean,sdiff]=stardirty(daystr,fname)
+function [sdirty,sclean,sdiff]=stardirty(daystr,fname,ask_to_save_fig)
 %% PURPOSE:
 %   Analysis software for window cleaning effect
 %
@@ -9,6 +9,8 @@ function [sdirty,sclean,sdiff]=stardirty(daystr,fname)
 %   - daystr: the string representing the utc day of the flight
 %   - fname: the full path of the file to load containing the dirty and
 %            clean measurements
+%   - ask_to_save_fig: (optional, default to true) if set to false, then
+%   will no ask to save the figure, and will just save
 % 
 % OUTPUT:
 %  - sclean: variable structure for the clean window file
@@ -34,10 +36,12 @@ function [sdirty,sclean,sdiff]=stardirty(daystr,fname)
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Santa Cruz, CA, 2016-10-17
+% Mdodifed (v1.1): Samuel LeBlanc, Santa Cruz, CA, 2016-10-18
+%                   - added value on the plot. and ask to save fig keyword
 % -------------------------------------------------------------------------
 
 %% Start of function
-version_set('1.0');
+version_set('1.1');
 
 %% sanitize input
 if ~exist('daystr','var') || isempty(daystr)
@@ -47,6 +51,9 @@ if ~exist('daystr','var') || isempty(daystr)
     daystr = f(end-9:end-2)
 end
 
+if ~exist('ask_to_save_fig','var') || isempty(ask_to_save_fig)
+    ask_to_save_fig = true;
+end
 %% Now load the starinfo 
 infofile_ = ['starinfo_' daystr '.m'];
 infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
@@ -90,7 +97,7 @@ sdirty.type = s.dirty_type;
 sclean.type = s.dirty_type;
 
 s1 = load(fname);
-s1 = starwrapper(s1.(['vis_' s.dirty_type]),s1.(['nir_' s.dirty_type]));
+s1 = starwrapper(s1.(['vis_' s.dirty_type]),s1.(['nir_' s.dirty_type]),'verbose',false);
     
 %% calculate the mean and stddev of the rate for clean and dirty
 sdirty.fl = find(s1.t>=s.dirty(1) & s1.t<=s.dirty(2));
@@ -112,7 +119,7 @@ sdiff.daystr = daystr;
 %% Now plot the appropriate spectra
 startup_plotting
 figure(1);
-ax1=subplot(2,1,1);
+ax1=subplot(3,1,1);
 plot(s1.w,sdirty.mean,'r',s1.w,sclean.mean,'b')
 hold on;
 plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
@@ -126,8 +133,17 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
  grid on;
  
+ axr=subplot(3,1,2);
+ plot(s1.w,(sclean.mean-sdirty.mean),'r')  
+ hold on;
+ plot(s1.w,(sclean.mean-(sdirty.mean-sdirty.stdev)),'g.',...
+     s1.w,(sclean.mean-(sdirty.mean+sdirty.stdev)),'c.');
+ hold off;
+ legend('Dirty - Clean','Dirty - std','Dirty + std');
+ title(['Difference for flight on' daystr]);
+ ylabel('Rate difference [cts/ms]');
  
- ax2=subplot(2,1,2);
+ ax2=subplot(3,1,3);
  plot(s1.w,(sclean.mean-sdirty.mean)./sclean.mean*100.0,'r')  
  hold on;
  plot(s1.w,(sclean.mean-(sdirty.mean-sdirty.stdev))./sclean.mean*100.0,'g.',...
@@ -144,8 +160,8 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  end;
  xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
  grid on;
- linkaxes([ax1,ax2],'x')
- save_fig(1,[p filesep daystr '_dirty_clean_spc']);
+ linkaxes([ax1,axr,ax2],'x')
+ save_fig(1,[p filesep daystr '_dirty_clean_spc'],ask_to_save_fig);
   
  [nul,i]=min(abs(s1.w-0.44));
  disp(['Diff at 440 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
