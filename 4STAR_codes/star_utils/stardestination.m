@@ -42,7 +42,7 @@ function lastDir = get_last_used_path()
 pname = strrep(userpath,';',filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
-    mkdir(pname, 'filepaths');
+    mkdir(fullfile(pname), 'filepaths');
 end
 % pathdir = [pathdir,filesep];
 
@@ -71,7 +71,7 @@ function updateLastUsedPath(savefolder);
 pname = strrep(userpath,';',filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
-    mkdir(pname, 'filepaths');
+    mkdir(fullfile(pname), 'filepaths');
 end
 lastDirMat = [pathdir, 'lastUsedDir.mat'];
 
