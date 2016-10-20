@@ -1,5 +1,5 @@
 
-flight=[datenum(2016,9,14,07,49,00) datenum(2016,9,14,15,54,54)]; % estimated
+flight=[datenum(2016,9,30,10,56,49) datenum(2016,9,30,17,55,50)]; % estimated
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55)
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];
 
