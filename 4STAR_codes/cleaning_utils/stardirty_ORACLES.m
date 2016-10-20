@@ -103,7 +103,7 @@ days = [];
 if true;
     for i=1:length(fld);
         try
-            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,false);
+            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,true);
             spc_diff = [spc_diff;d.(fld{i}).diff.normdiff];
             spc_tx = [spc_tx;d.(fld{i}).diff.transmit];
         catch
@@ -162,6 +162,7 @@ title('Clean dirty comparison for ORACLES')
 %hold off;
 legend('630 nm','550 nm','450 nm')
 ylim([0.9,1]);
+xlim([0,length(days)+1]);
 % rotate the xlabels
 h = gca;
 a=get(h,'XTickLabel');

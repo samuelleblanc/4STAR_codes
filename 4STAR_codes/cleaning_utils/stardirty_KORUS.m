@@ -110,7 +110,7 @@ fld = fields(d)
 spc_diff = [];
 spc_tx = [];
 days = [];
-if true;
+if false;
     for i=1:length(fld);
         try
             [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,true);
@@ -172,7 +172,8 @@ title(['Clean dirty comparison for ' campaign])
 %xlabel('Flight days')
 %hold off;
 legend('630 nm','550 nm','450 nm')
-ylim([0.9,1]);
+ylim([0.7,1]);
+xlim([0,length(days)+1])
 % rotate the xlabels
 h = gca;
 a=get(h,'XTickLabel');

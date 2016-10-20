@@ -72,7 +72,7 @@ try
     sdirty.UTC = t2utch(s.dirty);
     sclean.UTC = t2utch(s.clean);
 catch
-    edit(infofile_)
+    %edit(infofile_)
     error(['No dirty and clean values found in the starinfo file... please edit and rerun:' infofile_])
 end
 
