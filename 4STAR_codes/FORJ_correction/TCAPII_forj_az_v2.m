@@ -195,6 +195,16 @@ title({'Total LED signal dependence on Azimuth axis (FORJ).';forj_vis.fname},'in
 ylabel('normalized')
 xlabel('Az degrees (zero is toward nose)');
 tots_v(bar,:) = tots_bar;
+
+% calculate difference and location
+cw_values  = (tots_v(good&~dark&CW,9)./(ones([sum(good&~dark&CW),1])*mean_tots_v_CW(9)));
+ccw_values = (tots_v(good&~dark&CCW,9)./(ones([sum(good&~dark&CCW),1])*mean_tots_v_CCW(9)));
+diff_values= (cw_values - ccw_values)*100;
+%figure;plot(mod(forj_vis.t.Az_deg(good&~dark&CW),360),diff_values,'oc');
+% azimutal location
+[max_val max_az] = max(abs(diff_values)); max_val = max_val;
+[min_val min_az] = min(abs(diff_values)); min_val = min_val;
+%disp(['Max abs diff (%) is ', num2str(max_val), ' in Az ', num2str(max_az), ' for ', vis ]);
 %%
 % OK = menu('Save or skip?','Save','Skip')
 % if OK==1
