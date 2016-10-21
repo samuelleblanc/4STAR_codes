@@ -4,6 +4,7 @@
 %-----------------------------------------------------
 % MS, 2016-05-19, modified to add to forj_all.mat under data_folder and not
 % under individual folders
+% MS, 2016-10-20, saving more plots
 %--------------------------------------------------------------------------
 
 function create_all_forj
@@ -15,6 +16,13 @@ matdir = [pname_,filesep, 'mat']
 if ~exist(matdir,'dir')
     mkdir(matdir);
 end
+
+plot_dir = [pname_,filesep,'plots']; 
+if ~exist(plot_dir,'dir');
+    mkdir(plot_dir);
+end
+plot_dir = [plot_dir,filesep];
+
 % check if forj_all exist in forj dir
 % if exist([matdir,filesep,'forj_all.mat'],'file')
 %     forj_out = load([matdir,filesep,'forj_all.mat']);
@@ -48,6 +56,13 @@ for f = 1:length(files)
             forj_out.meas = forj_out.meas(ij);
             save([starpaths,'forj_all.mat'],'-struct','forj_out');
             %save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
+            % save some more figures
+            %LED stability
+            f3 = [plot_dir,files(f).name(1:end-4), '_LEDstability'];
+            save_fig(3,f3,false);
+            % normalized signals
+            f4 = [plot_dir,files(f).name(1:end-4), '_NormalizedSignal'];
+            save_fig(4,f4,false);
         end
         else
             disp('forj_out_ was empty')
