@@ -21,7 +21,7 @@ s.dirty = [datenum(2016,8,25,09,30,00) datenum(2016,8,25,09,41,00)];
 s.clean = [datenum(2016,8,25,09,54,00) datenum(2016,8,25,09,54,45)];
 
 % flags
-%s.flagfilename = '20160918_starflag_man_created20160920_1358by_SL.mat'; 
+s.flagfilename = '20160824_starflag_man_created20161021_1535by_SL.mat'; 
 s.flagfilenameCWV  = '20160824_starflag_CWV_man_created20161017_2221by_MS.mat';
 s.flagfilenameO3   = '20160824_starflag_O3_man_created20161017_2222by_MS.mat';
 s.flagfilenameNO2  = '20160824_starflag_NO2_man_created20161017_2223by_MS.mat';
