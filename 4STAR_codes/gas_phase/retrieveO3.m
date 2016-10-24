@@ -47,6 +47,7 @@ function [o3] = retrieveO3(s,wstart,wend,mode)
 % MS, 2016-08-24, corrected bug to read correct scd reference
 % MS, 2016-09-06, added selection between pre-ORACLEs and ORACLES
 % MS, 2016-10-13, tweaked code to be compatible with no2 code
+% MS, 2016-10-24, tweaked processing routine post-oracles to be as pre
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -109,8 +110,8 @@ loadCrossSections_global;
  % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
-  if     s.t(1) < datenum([2016 8 26 0 0 0]); 
-      % pre-ORACLES
+  if     s.t(1) < datenum([2016 8 26 0 0 0])  || s.t(1) > datenum([2016 9 27 0 0 0]); 
+      % pre-ORACLES or post-ORACLES
 %       rate = s.rateslant; 
 %       rate = rate(:,wln); 
 %       basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
