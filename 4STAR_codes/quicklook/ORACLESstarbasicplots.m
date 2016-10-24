@@ -172,6 +172,7 @@ if isequal(platform, 'flight');
 elseif isequal(platform, 'ground');
     vars.xtlim={'xlim', t([1 end])'+60/86400*[-1 1]};
     vars.Alt={};
+    vars.Alt2e1={'t', Alt/2e1, '-k'};
     vars.Alt1e4={};
     vars.Alt1e5={};
 end;
