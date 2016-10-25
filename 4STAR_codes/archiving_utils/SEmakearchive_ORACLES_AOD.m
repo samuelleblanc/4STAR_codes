@@ -130,7 +130,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0           0           0          0          0          0          1          0          1          1          1          1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0           0           0          0          0          0          0          0          1          1          1          1] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -223,13 +223,34 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.frost);
         qual_flag = bitor(qual_flag,flag.flags.low_cloud);
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
-    else;
+    elseif isfield(flag,'before_or_after_flight');
         % only for automatic flagging
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        %qual_flag = bitor(qual_flag,flag.cirrus);
-        %qual_flag = bitor(qual_flag,flag.frost);
-        %qual_flag = bitor(qual_flag,flag.low_cloud);
-        %qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        try
+            qual_flag = bitor(qual_flag,flag.cirrus);
+            qual_flag = bitor(qual_flag,flag.frost);
+            qual_flag = bitor(qual_flag,flag.low_cloud);
+            qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        catch
+            disp('No flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
+        end
+    elseif isfield(flag,'screened')
+       flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
+       flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
+                     'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
+        for tag = 1:length(flag_tags)
+            flag.(flag_names{tag}) = flag.screened==flag_tags(tag);
+        end  
+        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
+        qual_flag = bitor(qual_flag,flag.cirrus);
+        qual_flag = bitor(qual_flag,flag.frost);
+        qual_flag = bitor(qual_flag,flag.low_cloud);
+        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        if length(flag.screened)==length(t);
+           flag.time.t = t; 
+        end
+    else
+        error('No flagfile that are useable')
     end
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     % tweak for different flag files
