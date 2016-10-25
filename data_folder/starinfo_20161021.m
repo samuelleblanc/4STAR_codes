@@ -11,18 +11,18 @@ else
     s.toggle = update_toggle;
 end
 %s.flagfilename = '20160902_starflag_man_created20160904_1850by_SL.mat';
-%s.flagfilenameCWV  = '20160902_starflag_CWV_man_created20161017_1353by_MS.mat';
-%s.flagfilenameO3   = '20160902_starflag_O3_man_created20161017_1354by_MS.mat';
-%s.flagfilenameNO2  = '20160902_starflag_NO2_man_created20161017_1359by_MS.mat';
-%s.flagfilenameHCOH = '20160902_starflag_HCOH_man_created20161017_1402by_MS.mat';
+s.flagfilenameCWV  = '20161021_starflag_CWV_man_created20161024_1518by_MS.mat';
+s.flagfilenameO3   = '20161021_starflag_O3_man_created20161024_1519by_MS.mat';
+s.flagfilenameNO2  = '20161021_starflag_NO2_man_created20161024_1520by_MS.mat';
+s.flagfilenameHCOH = '20161021_starflag_HCOH_man_created20161024_1522by_MS.mat';
  
 s.ground=[datenum(2016,10,21,20,44,56) datenum(2016,10,22,00,14,34)]; 
 
  
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.268; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3h=21; % 
+s.O3col=0.270; % OMI    
+s.NO2col=2.0e15; %   
  
 % other tweaks 
 if isfield(s, 'Pst'); 
