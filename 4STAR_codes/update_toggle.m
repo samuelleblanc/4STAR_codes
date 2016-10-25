@@ -10,7 +10,7 @@ toggle_out.pca_filter = false;
 toggle_out.verbose=true;
 toggle_out.saveadditionalvariables=true;
 toggle_out.savefigure=false;
-toggle_out.computeerror=true;
+toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
@@ -25,6 +25,7 @@ toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
+toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
 
 if exist('toggle_in', 'var')
    toggle_out = catstruct(toggle_out, toggle_in);

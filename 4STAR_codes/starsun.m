@@ -57,8 +57,14 @@ load(sourcefile,contents0{:},'program_version');
 % combine the two structures.
 s=starwrapper(vis_sun, nir_sun,toggle);
 
+%% Change the types of variables to make smaller variables
+if toggle.reduce_variable_size;
+    if toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+    s = make_starsun_single(s);
+end;
+
 %********************
-% save
+%% save
 %********************
 if exist('program_version','var');
    s.program_version = catstruct(program_version,evalin('base','program_version'));
