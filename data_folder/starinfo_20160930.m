@@ -23,7 +23,7 @@ s.O3col=0.300; % Michal's guess
 s.NO2col=2.0e15; % % 
 
 % flags
-%s.flagfilename = '20160918_starflag_man_created20160920_1358by_SL.mat'; 
+s.flagfilename = '20160930_starflag_man_created20161020_1728by_CF.mat'; 
 s.flagfilenameCWV  = '20160930_starflag_CWV_man_created20161017_2212by_MS.mat';
 s.flagfilenameO3   = '20160930_starflag_O3_man_created20161017_2213by_MS.mat';
 s.flagfilenameNO2  = '20160930_starflag_NO2_man_created20161017_2217by_MS.mat';
