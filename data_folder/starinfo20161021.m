@@ -2,9 +2,9 @@
 ground=[datenum(2016,10,21,20,44,56) datenum(2016,10,22,00,14,34)];
 
 % Ozone and other gases
-s.O3h=21; % Yohei's guess
-s.O3col=0.268; % Yohei's guess    
-s.NO2col=2.0e15; % Yohei's guess 
+s.O3h=21; % 
+s.O3col=0.270; % OMI overhead    
+s.NO2col=2.0e15; %  
 
 % other tweaks
 if isfield(s, 'Pst');
