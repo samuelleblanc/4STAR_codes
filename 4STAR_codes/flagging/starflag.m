@@ -32,9 +32,11 @@ function [flags, good, flagfile] = starflag(s, Mode)
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
 % SL, v1.4, 2016-05-04, added special function buttons to visi_screen
 % SL, v1.5, 2016-09-19, modified code to use the smaller starsun files for starflag use
+% SL, v1.6, 2016-10-24, modified code for using files of different format
+%                       and doing some checks for already available starflag files defined in starinfo 
 
 %% Start
-version_set('1.5');
+version_set('1.6');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -132,7 +134,7 @@ if ~isempty(s)
     end;
     if isfield(s,'darkstd')
         darkstd=s.darkstd;
-    end    
+    end
     sd_aero_crit = s.sd_aero_crit;
 end
 
@@ -140,20 +142,27 @@ if ~exist('Mode','var')||Mode==0
     Mode = 2;
 end
 if (Mode==3);
-    files = ls([starpaths,daystr,'_starflag_man_*']);
-    if ~isempty(files);
-        flagfile=files(end,:);
-        disp(['loading file:' starpaths flagfile])
-        flags = load([starpaths flagfile]);
+    reset_flags=false;
+    if isfield(s,'flagfilename')
+        flags = load(s.flagfilename);
+        flagfile = s.flagfilename;
+        disp(['... Using flag file:' flagfile])
     else
-        files = ls([starpaths,daystr,'_starflag_auto_*']);
+        files = ls([starpaths,daystr,'_starflag_man_*']);
         if ~isempty(files);
             flagfile=files(end,:);
             disp(['loading file:' starpaths flagfile])
             flags = load([starpaths flagfile]);
         else
-            flagfile=getfullname([daystr,'*_starflag_*.mat'],'starflag','Select starflag file');
-            flags = load(flagfile);
+            files = ls([starpaths,daystr,'_starflag_auto_*']);
+            if ~isempty(files);
+                flagfile=files(end,:);
+                disp(['loading file:' starpaths flagfile])
+                flags = load([starpaths flagfile]);
+            else
+                flagfile=getfullname([daystr,'*_starflag_*.mat'],'starflag','Select starflag file');
+                flags = load(flagfile);
+            end;
         end;
     end;
     if isfield(flags, 'flags')
@@ -162,6 +171,7 @@ if (Mode==3);
     if isequal(flagfile,0)
         Mode = menu('No file selected, which mode do you want to operate?','Automatic','Manual');
     end;
+    
 end;
 %define operator for manual screening mode (mode=2)
 if (Mode==2)
@@ -203,13 +213,16 @@ switch Mode
         disp(['Starflag mode 2 to output to:' flagfile])
 end
 
-flags_matio = matfile(outputfile,'Writable',true);
-flags_matio.flagfile = flagfile;
+if ~(Mode==3) 
+    flags_matio = matfile(outputfile,'Writable',true);
+    flags_matio.flagfile = flagfile;
 
- mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
- disp(['Corresponding "marks" m-file to: ',mark_fname])
+    mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
+    disp(['Corresponding "marks" m-file to: ',mark_fname])
 
-[flags,flag_info] = cnvt_ng2flags(ng,t);
+    [flags,flag_info] = cnvt_ng2flags(ng,t);
+end;
+
 if isfield(s,'flight')
     flight = s.flight;
 elseif any(Alt>0)
@@ -240,7 +253,7 @@ end
 % for r = 1:size(groundtest,1)
 %     flags.groundtest = flags.groundtest | (t>=groundtest(r,1)&t<=groundtest(r,2));
 % end
-% 
+%
 
 flags.before_or_after_flight = t<flight(1) | t>flight(2);
 if ~isfield(flags, 'bad_aod')
@@ -277,7 +290,7 @@ else;
     aod_865nm = tau_aero_noscreening(:,nm_865);
     aod_500nm_max=3;
     m_aero_max=15;
-
+    
     %calculate quantity [1-cos(roll angle)]
     roll_proxy=1-cos(s.roll*pi/180);
 end;
@@ -305,7 +318,7 @@ if (Mode==1)
     flags_str.cirrus = '';
     flags_str.low_cloud = '';
     flags_str.hor_legs = '';
-%     flags_str.vert_legs = '';
+    %     flags_str.vert_legs = '';
     flags_str.unspecified_aerosol = '';
     flags_str.frost = '';
     reset_flags=true;
@@ -334,7 +347,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-%             flags_str.vert_legs = '';
+            %             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -350,13 +363,13 @@ if (Mode==2)
                 flags_str.bad_aod = 'aod_500nm<min_aod | aod_865nm<min_aod | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
             end
             %                 flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
-
+            
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-%             flags_str.vert_legs = '';
+            %             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -375,7 +388,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-%             flags_str.vert_legs = '';
+            %             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             
@@ -398,6 +411,17 @@ if (Mode==2)
             if isfield(flags,'time')&&isfield(flags.time,'t')
                 t=flags.time.t;
             end
+            if isfield(flags,'screened');
+                flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
+                flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
+                    'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
+                for tag = 1:length(flag_tags)
+                    flags.(flag_names{tag}) = flags.screened==flag_tags(tag);
+                end
+                if length(flags.screened)==length(t);
+                    flags.time.t = t;
+                end;
+            end;
             reset_flags=false;
         case 6 %'Previous flags:Yes separate file, your own pre-screening:Yes');
             clear('flags')
@@ -411,6 +435,17 @@ if (Mode==2)
             if isfield(flags,'flags')
                 flags = flags.flags;
             end
+            if isfield(flags,'screened');
+                flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
+                flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
+                    'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
+                for tag = 1:length(flag_tags)
+                    flags.(flag_names{tag}) = flags.screened==flag_tags(tag);
+                end
+                if length(flags.screened)==length(t);
+                    flags.time.t = t;
+                end;
+            end;
             %Users need to modify what's below:
             flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
             flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>aod_500nm_max) | rawrelstd(:,1)>sd_aero_crit';
@@ -424,7 +459,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-%             flags_str.vert_legs = '';
+            %             flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -441,7 +476,7 @@ if (reset_flags)
     if ~isempty(flags_str.cirrus) flags.cirrus=eval(flags_str.cirrus);else flags.cirrus = []; end
     if ~isempty(flags_str.low_cloud) flags.low_cloud=eval(flags_str.low_cloud);else flags.low_cloud = []; end
     if ~isempty(flags_str.hor_legs) flags.hor_legs=eval(flags_str.hor_legs);else flags.hor_legs = []; end
-%     if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
+    %     if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
     if ~isempty(flags_str.unspecified_aerosol) flags.unspecified_aerosol=eval(flags_str.unspecified_aerosol);else flags.unspecified_aerosol = []; end
     if ~isempty(flags_str.frost) flags.frost=eval(flags_str.frost);else flags.frost = []; end
     auto_settings = flags_str;
@@ -454,6 +489,9 @@ end
 % %     flags.aerosol_init_auto=(~flags.before_or_after_flight & ~flags.bad_aod & ~flags.unspecified_clouds);
 %     flags.aerosol_init_auto= flags.bad_aod | flags.unspecified_clouds;
 % end
+
+% Define flags which do not flag data as "bad".
+no_mask = {'smoke','dust','before_or_after_flight','hor_legs','vert_legs','unspecified_aerosol'};
 
 if (Mode==2)
     %Run visi_screen in manual mode (mode=2)
@@ -481,8 +519,6 @@ if (Mode==2)
     figs.leg_fig.pos =   [ 0.1109    0.5731    0.1776    0.3611];
     figs.aux_fig.pos = [0.6167 0.0769 0.2917 0.8306];
     
-    % Define flags which do not flag data as "bad".
-    no_mask = {'smoke','dust','before_or_after_flight','hor_legs'};
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
     if isfield(flags,'aerosol_init_auto')
@@ -500,7 +536,7 @@ if (Mode==2)
     screen_bad_list = F_t(~test_good);
     [flags, screen, good, figs] = visi_screen_v12(t,aod_500nm,'time_choice',2,'flags',flags,'flags_matio',flags_matio,'no_mask',no_mask,'figs',figs,...
         'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,'field_name','aod 500nm');%,...
-%         'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
+    %         'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
     % returns:
     %   flags: struct of logicals (from flags inarg) of length(time)
     %           Also contains time, and settings in "manual_flags", and
@@ -512,9 +548,9 @@ if (Mode==2)
     manual_flags.nomask_list=no_mask;
     manual_flags.screen_bad_list=screen_bad_list;
     manual_flags.good=good; % These are only those records not marked by tests in screen_bad_list
-%     manual_flags.screen=logical(screen); % bitwise mapping of flags not in screen_bad_list into uint32.
+    %     manual_flags.screen=logical(screen); % bitwise mapping of flags not in screen_bad_list into uint32.
     manual_flags.screen=screen; % bitwise mapping of flags not in screen_bad_list into uint32.
-        
+    
     if exist('auto_settings','var')
         manual_flags.auto_settings = auto_settings;
     end
@@ -618,21 +654,40 @@ if (Mode==2)
     end
 end
 
-%Write output file:
-%Mode 1: YYYYMMDD_auto_starflag_createdYYYYMMDD_HHMM.mat
-%Mode 2: YYYYMMDD_man_starflag_createdYYYYMMDD_HHMM_by_Op.mat
-flags.flagfile = flagfile; % make it so that we save the flagfile name.
-[~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
-if ~exist(outputfile,'file')
-    disp(['Creating ',outmat]);
-    save(outputfile,'-struct','flags');
-else
-    disp(['Appending to ',outmat]);
-    save(outputfile,'-append','-struct','flags');
-end
+if ~(Mode==3);
+    %Write output file:
+    %Mode 1: YYYYMMDD_auto_starflag_createdYYYYMMDD_HHMM.mat
+    %Mode 2: YYYYMMDD_man_starflag_createdYYYYMMDD_HHMM_by_Op.mat
+    flags.flagfile = flagfile; % make it so that we save the flagfile name.
+    [~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
+    if ~exist(outputfile,'file')
+        disp(['Creating ',outmat]);
+        save(outputfile,'-struct','flags');
+    else
+        disp(['Appending to ',outmat]);
+        save(outputfile,'-append','-struct','flags');
+    end
+end;
 
 if ~exist('good','var')
-    good = [];
+    qual_flag = bitor(flags.before_or_after_flight,flags.bad_aod);
+    try
+        qual_flag = bitor(qual_flag,flags.cirrus);
+    catch
+    end
+    try
+        qual_flag = bitor(qual_flag,flags.frost);
+    catch
+    end
+    try
+        qual_flag = bitor(qual_flag,flags.low_cloud);
+    catch
+    end
+    try
+        qual_flag = bitor(qual_flag,flags.unspecified_clouds);
+    catch
+    end
+    good = qual_flag;
 end
 
 % write_to_starinfo = menu('Write the name of this flagfile inside the starinfo file?','Yes','No')

@@ -990,14 +990,24 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     %************************************************************
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
+        if isfield(s,'flagfilename')
+            [fnul,pnul] = fileparts(s.flagfilename);
+            dnul = strsplit(pnul,'_');
+            if dnul{1}==daystr;
+                if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
+                if toggle.starflag_mode==1;
+                    toggle.starflag_mode = 3;
+                end;
+            end
+        end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [s.flags, good]=starflag(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        [s.flags, good]=starflag(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
     end;
     %************************************************************
     
     %% apply flags to the calculated tau_aero_noscreening
     s.tau_aero=s.tau_aero_noscreening;
-    if toggle.dostarflag && toggle.flagging==1;
+    if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3);
         s.tau_aero(s.flags.bad_aod,:)=NaN;
     end;
     % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
