@@ -26,7 +26,8 @@
 
 version_set('1.0');
 
-alldays={'20160630','20160702','20160703','20160704','20160705'};
+alldays={'20160910'}; %
+% alldays={'20160630','20160702','20160703','20160704','20160705'};
 daycolor={'c',      'r',        'g',        'b',        'k',        'm'};
 langmark={'.','+','x','o','s','^'};
 %********************
@@ -63,7 +64,8 @@ for daynum=1:length(alldays)%=5
     % elseif isequal(daystr, '20160426')
     %     source = '20160426starsun_constO3.mat';
     else
-        source=[daystr 'starsun.mat'];
+        source=['4STAR_' daystr 'starsun.mat'];
+%         source=[daystr 'starsun.mat'];
         %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
         % source='20140917starsunLangley.mat';% this is the original file made
         % in field
@@ -175,58 +177,58 @@ for daynum=1:length(alldays)%=5
     %             starsas(['star' daystr 'latlonvaz' num2str(stdev_mult(k), '%0.1f') 'xSTD_Langley',num2str(langnum),'.fig, starLangley.m']);
     %         end;
     %     end;
-%         % plot 500 nm count rate with Tst
-%         for k=1;
-%             figure;
-%             h2=scatter(m_aero(ok), rateaero(ok,cols(4)),6,Tst(ok),'filled');
-%             colorbar;
-%             ch=colorbarlabeled('Tst');
-%             xlabel('aerosol Airmass','FontSize',14);
-%             ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
-%             set(gca,'FontSize',14);
-%             set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
-%             starttstr=datestr(langley(1), 31);
-%             stoptstr=datestr(langley(2), 13);
-%             grid on;
-%             title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
-%             if savefigure;
-%                 starsas(['star' daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD_Langley',num2str(langnum),'.fig, starLangley.m']);
-%             end;
-%         end;
-%         % plot 500 nm count rate with Az_deg
-%         for k=1;
-%             figure;
-%             h1=scatter(m_aero(ok), rateaero(ok,cols(4)),6,AZ_deg(ok),'filled');
-%             colorbar;
-%             ch=colorbarlabeled('AZdeg');
-%             xlabel('aerosol Airmass','FontSize',14);
-%             ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
-%             set(gca,'FontSize',14);
-%             set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
-%             starttstr=datestr(langley(1), 31);
-%             stoptstr=datestr(langley(2), 13);
-%             y = rateaero(ok,cols(4));
-%             ylim([min(y(:)) max([max(y(:)) data0])]);
-%             grid on;
-%             title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
-%             if savefigure;
-%                 starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD_Langley',num2str(langnum),'.fig, starLangley.m']);
-%             end;
-%         end;
-% 
-%         % % show 501 nm only
-%         % set(h0([1 2 3 5 6:10],:),'visible','off','linestyle','none')
-%         % set(h([1 2 3 5 6:10],:),'visible','off','linestyle','none')
-%         % yy=get(gco,'ydata');
-%         % xx=get(gco,'xdata');
-%         % plot(xx, yy.*(100-0.8)/100, '--','color', get(gco,'color'))
-%         % xlabel('Airmass Factor for Aerosols');
-%         % ylabel('Count Rate (/millisecond) for Aerosols');
-%         % title([datestr(langley(1),31) ' - ' datestr(langley(2),13)]);
-%         % if savefigure;
-%         %     versionn=11;
-%         %     starsas(['star' daystr 'Langleyplot501nm_v' num2str(versionn) '.fig, starLangley.m']);
-%         % end;
+        % plot 500 nm count rate with Tst
+        for k=1;
+            figure;
+            h2=scatter(m_aero(ok), rateaero(ok,cols(4)),6,Tst(ok),'filled');
+            colorbar;
+            ch=colorbarlabeled('Tst');
+            xlabel('aerosol Airmass','FontSize',14);
+            ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+            set(gca,'FontSize',14);
+            set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+            starttstr=datestr(langley(1), 31);
+            stoptstr=datestr(langley(2), 13);
+            grid on;
+            title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+            if savefigure;
+                starsas(['star' daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD_Langley',num2str(langnum),'.fig, starLangley.m']);
+            end;
+        end;
+        % plot 500 nm count rate with Az_deg
+        for k=1;
+            figure;
+            h1=scatter(m_aero(ok), rateaero(ok,cols(4)),6,AZ_deg(ok),'filled');
+            colorbar;
+            ch=colorbarlabeled('AZdeg');
+            xlabel('aerosol Airmass','FontSize',14);
+            ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+            set(gca,'FontSize',14);
+            set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
+            starttstr=datestr(langley(1), 31);
+            stoptstr=datestr(langley(2), 13);
+            y = rateaero(ok,cols(4));
+            ylim([min(y(:)) max([max(y(:)) data0])]);
+            grid on;
+            title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+            if savefigure;
+                starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD_Langley',num2str(langnum),'.fig, starLangley.m']);
+            end;
+        end;
+
+        % % show 501 nm only
+        % set(h0([1 2 3 5 6:10],:),'visible','off','linestyle','none')
+        % set(h([1 2 3 5 6:10],:),'visible','off','linestyle','none')
+        % yy=get(gco,'ydata');
+        % xx=get(gco,'xdata');
+        % plot(xx, yy.*(100-0.8)/100, '--','color', get(gco,'color'))
+        % xlabel('Airmass Factor for Aerosols');
+        % ylabel('Count Rate (/millisecond) for Aerosols');
+        % title([datestr(langley(1),31) ' - ' datestr(langley(2),13)]);
+        % if savefigure;
+        %     versionn=11;
+        %     starsas(['star' daystr 'Langleyplot501nm_v' num2str(versionn) '.fig, starLangley.m']);
+        % end;
 
         %********************
         % estimate unc
@@ -421,8 +423,8 @@ for daynum=1:length(alldays)%=5
             visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
             nirfilename=fullfile(starpaths, [daystr '_NIR_C0_' filesuffix '.dat']);
             additionalnotes='';
-            starsavec0(visfilename, source, additionalnotes, w(viscols), ones(size(viscols))*-1, ones(size(viscols))*-1);
-            starsavec0(nirfilename, source, additionalnotes, w(nircols), ones(size(nircols))*-1, ones(size(nircols))*-1);
+%             starsavec0(visfilename, source, additionalnotes, w(viscols), ones(size(viscols))*-1, ones(size(viscols))*-1);
+%             starsavec0(nirfilename, source, additionalnotes, w(nircols), ones(size(nircols))*-1, ones(size(nircols))*-1);
         end;
     end
 end
