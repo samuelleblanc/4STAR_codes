@@ -90,6 +90,9 @@ if ~isempty(col_for_plot);
         sh2=plot(repmat(m,1,qq), fliplr(y), '.');
         h=[flipud(sh2);h];
         clear sh2;
+%         disp(['size log(data0)=' num2str(size(log(data0)))]) %%%for troubleshooting
+%         disp(['size od=' num2str(size(od))]) %%%for troubleshooting
+%         disp(['size max(m)=' num2str(size(max(m)))]) %%%for troubleshooting
         h(1:end-1,2)=plot([0 max(m)], [data0' exp(log(data0)'-od'*max(m))], '-');
         col_for_plot=1:qq;
     end;

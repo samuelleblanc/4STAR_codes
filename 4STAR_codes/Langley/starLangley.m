@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160825';
+daystr='20160910';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -46,7 +46,7 @@ source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
 % elseif isequal(daystr, '20160426')
 %     source = '20160426starsun_constO3.mat';
 else
-    source=[daystr 'starsun.mat'];
+    source=['4STAR_' daystr 'starsun.mat'];
     %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
     % source='20140917starsunLangley.mat';% this is the original file made
     % in field
