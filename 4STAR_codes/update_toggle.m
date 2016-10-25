@@ -16,7 +16,8 @@ toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
 toggle_out.gassubtract = true;
 toggle_out.booleanflagging = true;
-toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
 toggle_out.doflagging = true; % for running any Yohei style flagging
 toggle_out.dostarflag = true; 
 toggle_out.lampcalib  = false; 
