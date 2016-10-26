@@ -105,13 +105,13 @@ starsas('c0spectra_differencefrommean_072016.fig','plot_Langleys_all.m')
 %subplot per wavelength
 figure; 
 for j=1:length(goodlangleys)
-    disp([num2str(1000*w(cols(i))),' nm'])
     eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
     eval(['slope=-slope_',goodlangleys{j},'(1,:);']) %NB: switched the negative sign here.
     eval(['rateaero=rateaero_',goodlangleys{j},';']) %count rate, for the bin i (= at wavelength w(cols(i)) (y axis of scatter)-- *** the saved variables above
     eval(['m_aero=m_aero_',goodlangleys{j},';']) %airmass (x axis of scatter)
     
     for i=1:length(cols)
+    disp([num2str(1000*w(cols(i))),' nm'])
     subplot(3,5,i); hold on;
         h=plot(m_aero,log(rateaero(:,cols(i))),'.','color',daycolor{j},'linestyle','none');
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');

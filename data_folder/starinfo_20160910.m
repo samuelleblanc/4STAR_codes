@@ -15,7 +15,7 @@ s.flight=[datenum(2016,9,10,7,31,25) datenum(2016,9,10,15,24,55)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 s.langley=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)];
-langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)];
+langley1=[datenum(2016,9,10,05,26,00) datenum(2016,9,10,06,52,00)];% langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
 
 s.dirty = [datenum(2016,9,10,06,24,00) datenum(2016,9,10,06,28,30)];
 s.clean = [datenum(2016,9,10,06,44,00) datenum(2016,9,10,06,47,00)];

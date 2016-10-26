@@ -122,7 +122,7 @@ elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on plei
         %if nargin>1; matfolder=[matfolder raw filesep]; end;
     end;
 elseif ~isempty(strfind(lower(userpath),'kpistone'))
-    matfolder='C:\Users\kpistone\Documents\4STAR\data' ;
+    matfolder='C:\Users\kpistone\Documents\4STAR\data\' ;
     figurefolder='C:\Users\kpistone\Documents\4STAR\data\figs\';
     author='Kristina';
 else
