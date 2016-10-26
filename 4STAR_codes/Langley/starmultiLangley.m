@@ -38,7 +38,7 @@ stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
 cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
-savefigure=0;
+savefigure=1;
 
     multilangleyfig=figure; %can we put all the langleys on one?
     hold on;
@@ -351,6 +351,7 @@ for daynum=1:length(alldays)%=5
             %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
     %         filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
             filesuffix=['refined_Langley_MLO_June2016_',num2str(langnum)]; %exactly what it sounds like?
+            filesuffix=['refined_Langley_ORACLES2016']; %exactly what it sounds like?
             % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
             additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
             % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
@@ -410,8 +411,8 @@ for daynum=1:length(alldays)%=5
         end;
         visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
         nirfilename=fullfile(starpaths, [daystr '_NIR_C0_' filesuffix '.dat']);
-% % % % %         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
-% % % % %         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new(k,nircols), c0unc(:,nircols));
+        starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
+        starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new(k,nircols), c0unc(:,nircols));
         % be sure to modify starc0.m so that starsun.m will read the new c0 files.
 
         %********************

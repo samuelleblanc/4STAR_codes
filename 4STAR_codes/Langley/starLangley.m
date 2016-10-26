@@ -115,8 +115,8 @@ elseif isequal(daystr, '20160426')
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
     if savefigure;
-        title('20160702 evening with FORJ correction')
-        starsas(['star' daystr 'evening_Langleyplot_stdevs.fig, starLangley.m']);
+        title([daystr ' with FORJ correction'])
+        starsas(['star' daystr '_Langleyplot_stdevs.fig, starLangley.m']);
     end;
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
