@@ -11,10 +11,10 @@ else
     s.toggle = update_toggle;
 end
 %s.flagfilename = '20160902_starflag_man_created20160904_1850by_SL.mat';
-%s.flagfilenameCWV  = '20161021_starflag_CWV_man_created20161024_1518by_MS.mat';
-%s.flagfilenameO3   = '20161021_starflag_O3_man_created20161024_1519by_MS.mat';
-%s.flagfilenameNO2  = '20161021_starflag_NO2_man_created20161024_1520by_MS.mat';
-%s.flagfilenameHCOH = '20161021_starflag_HCOH_man_created20161024_1522by_MS.mat';
+s.flagfilenameCWV  = '20161026_starflag_CWV_man_created20161026_2314by_MS.mat';
+s.flagfilenameO3   = '20161026_starflag_O3_man_created20161026_2317by_MS.mat';
+s.flagfilenameNO2  = '20161026_starflag_NO2_man_created20161026_2318by_MS.mat';
+s.flagfilenameHCOH = '20161026_starflag_HCOH_man_created20161026_2319by_MS.mat';
  
 s.ground=[datenum(2016,10,26,16,09,23) datenum(2016,10,26,23,10,21)]; 
 
