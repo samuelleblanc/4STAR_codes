@@ -41,8 +41,13 @@ if ~exist('marks_file','var')||~isstruct(marks_file)
     end
 end
 marked = get_starinfo_parts(marks_file);
-marks = marked.data;
-
+try
+    marks = marked.data;
+    starinfo = false;
+catch
+    marks = marked.ng;
+    starinfo = true;
+end
 %% load the time variable from the starsun
 if ~exist('starsun_file','var')||~isstruct(starsun_file)
     if ~exist('starsun_file','var')||~exist(starsun_file,'file')
@@ -73,8 +78,14 @@ f.vert_legs = [];
 flag = catstruct(f,flags);
 
 %% create name a save the file
-hh = strsplit(marks_file,'_');
-flag.flagfile = [hh{2},'_starflag_man_created', hh{6}, '_', hh{end}(1:4), 'by_', hh{3}, '_from_marks.mat']
+if starinfo
+    daystr = datestr(s.t(1),'yyyymmdd');
+    dnow = datestr(now,'yyyymmdd_HHMM');
+    flag.flagfile = [daystr,'_starflag_man_created', dnow, '_from_starinfo.mat']
+else
+    hh = strsplit(marks_file,'_');
+    flag.flagfile = [hh{2},'_starflag_man_created', hh{6}, '_', hh{end}(1:4), 'by_', hh{3}, '_from_marks.mat']
+end
 save(flag.flagfile,'-struct','flag');
 
 

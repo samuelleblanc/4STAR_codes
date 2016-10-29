@@ -38,7 +38,7 @@ if ~isempty(ng)
     for tag = 1:length(tags)
         tag_ii = find(flag_tags==tags(tag));
         flags.(flag_names{tag_ii}) = false(size(t));
-        flag_info.flag_names(tag) = {flag_names{tag_ii}}
+        flag_info.flag_names(tag) = {flag_names{tag_ii}};
     end
     
     for N = 1:size(ng,1)
