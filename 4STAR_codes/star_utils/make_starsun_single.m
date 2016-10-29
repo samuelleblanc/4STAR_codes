@@ -75,6 +75,10 @@ for i=1:length(flds);
     end;
 end;
 
-s.program_version = catstruct(program_version,s_in.program_version);
+try;
+    s.program_version = catstruct(program_version,s_in.program_version);
+catch
+    s.program_version = program_version;
+end
 
 return;
