@@ -1,4 +1,4 @@
-function qual_flag = get_starflags(daystr)
+function [qual_flag,t] = get_starflags(daystr,t_in)
 %% Details of the program:
 % NAME:
 %   get_starflags
@@ -8,13 +8,15 @@ function qual_flag = get_starflags(daystr)
 %   starinfo files
 %
 % CALLING SEQUENCE:
-%   qual_flag = get_starflags(daystr)
+%   qual_flag = get_starflags(daystr,t_in)
 %
 % INPUT:
 %  daystr: the daystr of the day to get the flight
+%  t_in: input time which is used to match the flags.
 %
 % OUTPUT:
-%  QAflag: binary flags for the flight
+%  qual_flag: binary flags for the flight
+%  t: time of the qual_flag
 %
 % DEPENDENCIES:
 %  - version_set.m
@@ -48,22 +50,25 @@ if isfield(s, 'flagfilename');
     disp(['Loading flag file: ' s.flagfilename])
     flag = load(s.flagfilename); 
 else
-    files = ls([starpaths,daystr,'_starflag_man_*']);
-    if ~isempty(files);
-        flagfile=files(end,:);
-        disp(['loading file:' starpaths flagfile])
-        flag = load([starpaths flagfile]);
-    else
-        files = ls([starpaths,daystr,'_starflag_auto_*']);
+    OK =menu('flagfilename not defined in starinfo','Use the most recent starflag file?','Abort');
+    if OK ==1;
+        files = ls([starpaths,daystr,'_starflag_man_*']);
         if ~isempty(files);
             flagfile=files(end,:);
             disp(['loading file:' starpaths flagfile])
             flag = load([starpaths flagfile]);
         else
-            flagfile=getfullname([daystr,'*_starflag_*.mat'],'starflag','Select starflag file');
-            flag = load(flagfile);
+            files = ls([starpaths,daystr,'_starflag_auto_*']);
+            if ~isempty(files);
+                flagfile=files(end,:);
+                disp(['loading file:' starpaths flagfile])
+                flag = load([starpaths flagfile]);
+            else
+                flagfile=getfullname([daystr,'*_starflag_*.mat'],'starflag','Select starflag file');
+                flag = load(flagfile);
+            end;
         end;
-    end;
+    end
 end
 
 %% Combine the flag values
@@ -105,11 +110,70 @@ elseif isfield(flag,'screened')
     qual_flag = bitor(qual_flag,flag.frost);
     qual_flag = bitor(qual_flag,flag.low_cloud);
     qual_flag = bitor(qual_flag,flag.unspecified_clouds);
-    if length(flag.screened)==length(t);
-       flag.time.t = t; 
-    end
 else
     error('No flagfile that are useable')
 end
 
+if exist('t_in','var')
+    % t_in exists, so we should compare the time of the flag to the one
+    % supplied
+    if isfield(flag,'time')
+        t = flag.time.t;
+    elseif isfield(flag,'flags')
+        if isfield(flag.flags,'t');
+            t = flag.flags.t;
+        elseif isfield(flag.flags,'time')
+            t = flag.flags.time.t;
+        end;
+    elseif isfield(flag,'t')
+        t = flag.t;
+    else
+        error('*** No time defined in the flag file ***')
+    end;
+    
+    if ~(length(t_in)==length(t))
+        if length(t_in)<length(t)
+            disp('Time variable is smaller than flagged variables. reducing the dimension and matching the times')
+            [te,ite] = intersect(t,t_in);
+            if length(te)==length(t_in); % the t_in is simply a subset of t
+                qual_flag = qual_flag(ite);
+                t = t(ite);
+            else % bruteforce get the closest values using a knn member isolation
+                disp('...Not all times match exactly, getting the nearest neighbor, within 2 seconds')
+                [ii,dt] = knnsearch(t,t_in);
+                idd = dt<2.0/3600.0/24.0; % Distance no greater than two seconds.
+                if length(ii(idd))<length(t_in)
+                    error('The time differences are larger than 2 seconds, need to reflag')
+                end;
+                qual_flag = qual_flag(ii(idd));
+                t = t(ii(idd));
+            end
+        elseif (length(t_in)-length(t))<600 %about 5 minutes
+            disp('Time variable is larger than flagged. Finding closes times, and extrapolating')
+            [te,ite] = intersect(t_in,t);
+            if length(te)==length(t); % the t_in encompasses the flag t, simply need to extrapolate a bit
+                qflag = logical(t_in);
+                qflag(ite) = qual_flag;
+                if ite(1)>1; % the first values starts after
+                    qflag(1:ite(1)) = qflag(ite(1));
+                end;
+                if ite(end)<(length(t)-ite(1)) % the last values are past the ending 
+                    qflag(ite(end):end) = qflag(ite(end));
+                end;
+                qual_flag = qflag;
+                t = t_in;
+            else % bruteforce knn nearest neighbor
+                [ii,dt] = knnsearch(t,t_in);
+                idd = dt<2.0/3600.0/24.0; % Distance no greater than two seconds.
+                if length(ii(idd))<length(t_in)
+                    error('The time differences are larger than 2 seconds, need to reflag')
+                end;
+                qual_flag = qual_flag(ii(idd));
+                t = t_in;
+            end;
+        else
+            error('Time variable input is much larger than flag file. Must reflag')
+        end;
+    end
+end;
 return;
