@@ -31,10 +31,13 @@
 %
 % MODIFICATION HISTORY:
 % Written: Samuel LeBlanc, NASA Ames, October 10th, 2014
-% Modified: 
+% Modified: Samuel LeBlanc, Santa Cruz, CA, 2016-10-28
+%           put in warning ignore for the catstruct command.
 %
 % -------------------------------------------------------------------------
 function version_set(v_in);
+
+warning('off', 'catstruct:DuplicatesFound');
 
 % get the calling script file name and path
 pppp=dbstack;
