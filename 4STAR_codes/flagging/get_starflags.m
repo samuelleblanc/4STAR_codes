@@ -89,14 +89,21 @@ elseif isfield(flag,'flags');
     qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
 elseif isfield(flag,'before_or_after_flight');
     % only for automatic flagging
-    qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-    try
-        qual_flag = bitor(qual_flag,flag.cirrus);
-        qual_flag = bitor(qual_flag,flag.frost);
-        qual_flag = bitor(qual_flag,flag.low_cloud);
-        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
-    catch
-        disp('No flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
+    fld = fields(flag);
+    ii = [0];
+    for i=1:length(fld)
+        if length(flag.(fld{i}))>1 && ~strcmp(fld{i},'flagfile')  && ~strcmp(fld{i},'t')
+           ii = [ii;i];
+        end    
+    end;
+    ii = ii(2:end);
+    if length(ii)>1
+        qual_flag = flag.(fld{ii(1)});
+        for j=2:length(ii)
+           qual_flag = bitor(qual_flag,flag.(fld{ii(j)}));
+        end
+    else
+       qual_flag = flag.(fld{ii});
     end
 elseif isfield(flag,'screened')
    flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
@@ -113,24 +120,23 @@ elseif isfield(flag,'screened')
 else
     error('No flagfile that are useable')
 end
-
+if isfield(flag,'time')
+    t = flag.time.t;
+elseif isfield(flag,'flags')
+    if isfield(flag.flags,'t');
+        t = flag.flags.t;
+    elseif isfield(flag.flags,'time')
+        t = flag.flags.time.t;
+    end;
+elseif isfield(flag,'t')
+    t = flag.t;
+else
+    warning('*** No time defined in the flag file ***')
+    t = [0.0];
+end;
 if exist('t_in','var')
     % t_in exists, so we should compare the time of the flag to the one
-    % supplied
-    if isfield(flag,'time')
-        t = flag.time.t;
-    elseif isfield(flag,'flags')
-        if isfield(flag.flags,'t');
-            t = flag.flags.t;
-        elseif isfield(flag.flags,'time')
-            t = flag.flags.time.t;
-        end;
-    elseif isfield(flag,'t')
-        t = flag.t;
-    else
-        error('*** No time defined in the flag file ***')
-    end;
-    
+    % supplied    
     if ~(length(t_in)==length(t))
         if length(t_in)<length(t)
             disp('Time variable is smaller than flagged variables. reducing the dimension and matching the times')
