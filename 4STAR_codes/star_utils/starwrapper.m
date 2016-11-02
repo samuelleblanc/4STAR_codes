@@ -1029,8 +1029,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
     s.tau_aero_polynomial=[a2 a1 a0];
     
-    % derive optical depths and gas mixing ratios
-    % Michal's code TO BE PLUGGED IN HERE.
+    
     
 end; % End of sun-specific processing
 
