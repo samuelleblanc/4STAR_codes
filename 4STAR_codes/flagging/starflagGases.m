@@ -287,15 +287,15 @@ if Mode == 1
             input_param = s.cwv.cwv940m1;
             std_param   = s.cwv.cwv940m1std;
         elseif strcmp(gas_name_str,'O3')
-            input_param = s.gas.o3DU;
-            std_param   = s.gas.o3resiDU;
+            input_param = s.gas.o3.o3DU;
+            std_param   = s.gas.o3.o3resiDU;
         elseif strcmp(gas_name_str,'NO2')
             Loschmidt=2.686763e19;                   % molec/cm3*atm
-            input_param = (s.gas.no2_molec_cm2)/(Loschmidt/1000);
-            std_param   = s.gas.no2resi;
+            input_param = (s.gas.no2.no2_molec_cm2)/(Loschmidt/1000);
+            std_param   = s.gas.no2.no2resi;
         elseif strcmp(gas_name_str,'HCOH')
-            input_param = s.gas.hcoh_DU;
-            std_param   = s.gas.hcohresi;
+            input_param = s.gas.hcoh.hcoh_DU;
+            std_param   = s.gas.hcoh.hcohresi;
         end
     
 elseif Mode == 2
