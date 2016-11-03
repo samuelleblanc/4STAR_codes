@@ -50,6 +50,7 @@
 % MS: 2016-01-10  fixed some bugs related to cwv retrieval for model atm=1
 % MS: 2016-02-23: re-editing changes that were made after MLO and deleted
 % MS: 2016-09-02: tweaked to account for erroneous altitudes
+% MS: 2016-11-02: fixing bug in calculating cwv.tau_OD_wvsubtract
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
@@ -664,7 +665,7 @@ for i = 1:length(s.t)
     afit_H2Os = afit_H2Os'; bfit_H2Os = bfit_H2Os';
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
-    cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount;% this is a structure with o2-o2 NIR subtracted
+    cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount';% this is a structure with o2-o2 NIR subtracted
     end
     
     % QA plot of tau_OD_wvsubtract vs.tau_ODslant
