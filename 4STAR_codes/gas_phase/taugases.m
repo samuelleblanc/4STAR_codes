@@ -39,9 +39,9 @@ elseif strcmp(datestr(t(1),'yyyymmdd'),'20160426')
     coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
     
 else
-     % all other cases - yes, KORUS-AQ, 'no' OMI seems to be over-cloaded
-     flag_interpOMIno2  = 'no';% this is new no2 interpolation, from L2 gridded product
-     flag_interpOMIo3   = 'no';% this is new o3 interpolation, from L2 gridded product
+     % all other cases - yes, KORUS-AQ, 'no' OMI seems to be over-clouded
+     flag_interpOMIno2  = 'yes';% this is new no2 interpolation, from L2 gridded product
+     flag_interpOMIo3   = 'yes';% this is new o3 interpolation, from L2 gridded product
      
      % mid-lat July
      % coeff_polyfit_tauO3model=[8.60377e-007  -3.26194e-005   3.54396e-004  -1.30386e-003  -5.67021e-003   9.99948e-001];
@@ -108,7 +108,7 @@ end;
 Loschmidt=2.686763e19; %molecules/cm3xatm
 if nargin<8 || isempty(NO2col);
     NO2col=2.0e15; % molec/cm2
-    O3col =0.250;  % atm x cm
+    O3col =0.300;  % atm x cm
 end
 
 % calculate from OMI or from default value
