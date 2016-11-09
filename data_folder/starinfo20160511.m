@@ -4,8 +4,8 @@ flight=[datenum(2016,5,11,23,03,06) datenum(2016,5,12,7,3,42)];
 
 % Ozone and other gases
 s.O3h=21; % Yohei's guess
-s.O3col=0.300; % Yohei's guess    
-s.NO2col=2.0e15; % Yohei's guess 
+s.O3col=0.279; % omi    
+s.NO2col=2.0e15; %  
 
 s.sd_aero_crit=0.01; 
 
