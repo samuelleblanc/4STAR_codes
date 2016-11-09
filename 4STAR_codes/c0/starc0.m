@@ -26,7 +26,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016. 
 % MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 
-version_set('1.8');
+version_set('1.9');
 if ~exist('verbose','var')
     verbose=true;
 end;
