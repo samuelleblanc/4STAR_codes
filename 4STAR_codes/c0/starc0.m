@@ -24,6 +24,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.7, 2016-05-01, updated c0 from korus-aq transit flight 1
 % MS, v1.7, 2016-05-02, updated c0 from korus-aq transit 1, o3 corrected
 % SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016. 
+% MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 
 version_set('1.8');
 if ~exist('verbose','var')
@@ -58,16 +59,28 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            daystr='20160426';
+            %daystr='20160426';
             %korus-aq transit section 1
-            filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
+            %filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
+            
+            daystr='20160707';
+            filesuffix='Langley_MLO_June2016_mean';
+            
         elseif now>=datenum([2016 1 19 0 0 0]);
             %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+            
+            daystr='20160707';
+            filesuffix='Langley_MLO_June2016_mean';
+            
         elseif now>=datenum([2016 1 9 0 0 0]);
-            daystr='20160109';
-            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+            %daystr='20160109';
+            %filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+            
+            daystr='20160707';
+            filesuffix='Langley_MLO_June2016_mean';
+            
         end;  
         % transferred from Yohei's laptop, for record keeping
         if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
