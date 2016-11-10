@@ -20,8 +20,8 @@ s.flagfilenameCWV = '20160510_starflag_CWV_man_created20160512_1427by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.300; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3col=0.279; %    omi
+s.NO2col=2.0e15; % no omi 
  
 s.sd_aero_crit=0.01;  
  

@@ -249,7 +249,7 @@ function [g] = processOMIdata4compare(daystr,gas)
                
                % plot omi
                figure;
-               scatter3(star.lon,star.lat,g.omi,20,g.omi,'filled');
+               scatter3(Lon,Lat,g.omi,20,g.omi,'filled');
                xlabel('lon');ylabel('lat');zlabel('omi O3');
                
                figure;
