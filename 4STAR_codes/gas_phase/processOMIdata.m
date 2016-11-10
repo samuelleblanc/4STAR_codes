@@ -168,8 +168,8 @@ function [g] = processOMIdata(Lat,Lon,daystr,gas)
                 
                 % QA
                 
-                no2(    no2s>=2e15)=NaN;      % this is 0.075 DU
-                no2trop(no2tropS>=0.5e16)=NaN;% this is 0.187 DU
+                %no2(    no2s>=2e15)=NaN;      % this is 0.075 DU
+                %no2trop(no2tropS>=0.5e16)=NaN;% this is 0.187 DU
                 
                 param = no2;
                 paramS= no2strat;
