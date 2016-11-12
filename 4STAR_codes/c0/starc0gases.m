@@ -11,6 +11,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2016-05-18, adding HCOH ref spec
 % Modified, MS, 2016-08-23, added June 2016 MLO gases c0
 % Modified, MS, 2016-08-24, applied refSpec to c0gases
+% Modified, MS, 2016-10-28, changed KORUS O2 c0 to 0702
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -42,9 +43,11 @@ end;
                 elseif mode==1
                     % use ref_spec
                     try
-                        tmp = load(['20160113O3refspec.mat']);
+                        %tmp = load(['20160113O3refspec.mat']);
+                        tmp = load(['20160702O3refspec.mat']);
                     catch
-                        tmp = load([starpaths,'20160113O3refspec.mat']);
+                        %tmp = load([starpaths,'20160113O3refspec.mat']);
+                        tmp = load([starpaths,'20160702O3refspec.mat']);
                     end
                     c0gases = tmp;%.o3refspec;
                 end

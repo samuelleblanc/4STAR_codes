@@ -126,7 +126,7 @@ loadCrossSections_global;
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1)];% 
     
   elseif s.t(1) > datenum([2016 8 26 0 0 0]) && s.t(1) < datenum([2016 10 01 0 0 0])
-      % ORACLES
+      % ORACLES and some date in KORUS-AQ (with high RH)
       % rate = s.ratetot;% this is Ray subtracted
       rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
       
@@ -207,7 +207,7 @@ loadCrossSections_global;
        % load reference spectrum
        % ref_spec = load([starpaths,'20160113O3refspec.mat']);
        o3SCD = real((((ccoef(1,:))*1000))') + tmp.o3scdref;%ref_spec.o3col*ref_spec.mean_m;
-       tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
+       tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [o3SCDsmooth, sn] = boxxfilt(tplot, o3SCD, xts);
        o3vcd_smooth = real(o3SCDsmooth)./s.m_O3;
    end
