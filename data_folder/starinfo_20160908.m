@@ -18,6 +18,7 @@ s.flight=[datenum(2016,9,8,7,05,08) datenum(2016,9,8,15,01,20)];
 s.dirty = [datenum(2016,9,09,08,37,00) datenum(2016,9,09,08,39,00)];
 s.clean = [datenum(2016,9,09,13,59,00) datenum(2016,9,09,14,02,00)];
 
+s.flagfilename = '20160908_starflag_man_created20161028_1638_from_starinfo.mat'; 
 s.flagfilenameCWV  = '20160908_starflag_CWV_man_created20161017_1454by_MS.mat';
 s.flagfilenameO3   = '20160908_starflag_O3_man_created20161017_1455by_MS.mat';
 s.flagfilenameNO2  = '20160908_starflag_NO2_man_created20161017_1457by_MS.mat';

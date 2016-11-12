@@ -1,8 +1,10 @@
-function [flags, good, flagfile] = starflagGases(s, Mode)
+function [flags, qual_flag, flagfile] = starflagGases(s, Mode,gas_name_str)
 % [flags, good, flagfile] = starflag(s, Mode)
 % s is 4STAR struct containing data and optional toggle field
 % Mode is optional. 1 = automatic flags, 2 = manual flags, 3 = load
 % previous flag file and optionally augment with new automated or manual
+% gas_name_str - 'CWV', or 'O3', or 'NO2', or 'HCOH'
+%---------------------------------------------------------------------------
 %% Function to generate flags for 4STAR data
 % uses different modes:
 % Mode = 1 "Automatic" aerosol (except strong events) versus clouds;
@@ -35,6 +37,10 @@ function [flags, good, flagfile] = starflagGases(s, Mode)
 % MS, 2016-10-17, modified to add automatic QA filtering and HCOH readout
 %                 use case 3 as defualt
 %                 minimizing variables read from starsun
+% MS, 2016-11-02, updating starflag for automatic gas flagging in
+%                 starwrapper
+% MS, 2016-11-02, gas_name_str - added gas name to use in starsun
+%                 twaeking to read gas variables from s structure
 %------------------------------------------------------------------------------
 version_set('1.5');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
@@ -48,15 +54,20 @@ end % done loading starinfo file
 
 daystr = datestr(s.t(1),'yyyymmdd');
 
-% load gas file
-try
-    %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
-    gas = load(getfullname('*_gas_summary.mat','gas_summary','Select gas_summary file to flag.'));
-catch
-    if strcmp(daystr,'20160426')
-        %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_1.mat']);
-        gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_2.mat']);
-    end
+% load gas_summary file, else use s structure
+if Mode == 2
+        
+        % upload gas_summary
+        
+        try
+            %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary.mat']);
+            gas = load(getfullname('*_gas_summary.mat','gas_summary','Select gas_summary file to flag.'));
+        catch
+            if strcmp(daystr,'20160426')
+                %gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_1.mat']);
+                gas = load(['E:\KORUS-AQ\gas_summary\',daystr,'_gas_summary_2.mat']);
+            end
+        end
 end
 
 
@@ -201,7 +212,7 @@ starinfo_name = which(['starinfo_',daystr,'.m']); pname = fileparts(starinfo_nam
 now_str = datestr(now,'yyyymmdd_HHMM');
 switch Mode
     case 1
-        flagfile = [daystr,'_starflag_auto_created',now_str,'.mat'];
+        flagfile = [daystr,'_starflag_auto_created_for_',gas_name_str,'_',now_str,'.mat'];
         outputfile=[starpaths,filesep,flagfile];%This has to be starsun.mat
         op_name_str = 'auto';
         disp(['Starflag mode 1 to output to:' flagfile])
@@ -270,19 +281,39 @@ aod_500nm = tau_aero_noscreening(:,nm_500);
 aod_865nm = tau_aero_noscreening(:,nm_865);
 
 % define input param to flag
+if Mode == 1
+    
+        if strcmp(gas_name_str,'CWV')
+            input_param = s.cwv.cwv940m1;
+            std_param   = s.cwv.cwv940m1std;
+        elseif strcmp(gas_name_str,'O3')
+            input_param = s.gas.o3.o3DU;
+            std_param   = s.gas.o3.o3resiDU;
+        elseif strcmp(gas_name_str,'NO2')
+            Loschmidt=2.686763e19;                   % molec/cm3*atm
+            input_param = (s.gas.no2.no2_molec_cm2)/(Loschmidt/1000);
+            std_param   = s.gas.no2.no2resi;
+        elseif strcmp(gas_name_str,'HCOH')
+            input_param = s.gas.hcoh.hcoh_DU;
+            std_param   = s.gas.hcoh.hcohresi;
+        end
+    
+elseif Mode == 2
+    
+        if strcmp(gas_name_str,'CWV')
+            input_param = gas.cwv;
+            std_param   = gas.cwv_std;
+        elseif strcmp(gas_name_str,'O3')
+            input_param = gas.o3DU;
+            std_param   = gas.o3resiDU;
+        elseif strcmp(gas_name_str,'NO2')
+            input_param = gas.no2DU;
+            std_param   = gas.no2resiDU;
+        elseif strcmp(gas_name_str,'HCOH')
+            input_param = gas.hcoh_DU;
+            std_param   = gas.hcohresi;
+        end
 
-if strcmp(gas_name_str,'CWV')
-    input_param = gas.cwv;
-    std_param   = gas.cwv_std;
-elseif strcmp(gas_name_str,'O3')
-    input_param = gas.o3DU;
-    std_param   = gas.o3resiDU;
-elseif strcmp(gas_name_str,'NO2')
-    input_param = gas.no2DU;
-    std_param   = gas.no2resiDU;
-elseif strcmp(gas_name_str,'HCOH')
-    input_param = gas.hcoh_DU;
-    std_param   = gas.hcohresi;
 end
 
 aod_500nm_max=3;
@@ -299,23 +330,30 @@ m_aero_max=15;
 
 
 %Fixed pre-screening in the case of Mode 1 automatic
-if (Mode==1)
-    flags_str.before_or_after_flight = '(t<flight(1)|t>flight(2))';
-    flags_str.unspecified_clouds = 'aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
-    if exist('darkstd','var')
-        flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
-    else
-        flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
-    end
-    flags_str.smoke = '';
-    flags_str.dust = '';
-    flags_str.cirrus = '';
-    flags_str.low_cloud = '';
-    flags_str.hor_legs = '';
-    flags_str.vert_legs = '';
-    flags_str.unspecified_aerosol = '';
-    flags_str.frost = '';
-    reset_flags=true;
+% this is very stringent flagging
+if (Mode==1)    
+     flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
+                if strcmp(gas_name_str,'CWV')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>0.1 |  std_param==0 | ~isfinite(input_param) | isnan(input_param) | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'O3')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<200 | std_param>0.5 |  std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'NO2')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'HCOH')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                 
+                end
+            %end
+            flags_str.unspecified_clouds = '';
+            flags_str.smoke = '';
+            flags_str.dust = '';
+            flags_str.cirrus = '';
+            flags_str.low_cloud = '';
+            flags_str.hor_legs = '';
+            flags_str.vert_legs = '';
+            flags_str.unspecified_aerosol = '';
+            flags_str.frost = '';
+            reset_flags=true;
 end
 
 
@@ -363,7 +401,7 @@ if (Mode==2)
                 elseif strcmp(gas_name_str,'NO2')
                         flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
                 elseif strcmp(gas_name_str,'HCOH')
-                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>5e-3 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
                  
                 end
             %end
@@ -463,6 +501,8 @@ if (reset_flags)
     if ~isempty(flags_str.frost) flags.frost=eval(flags_str.frost);else flags.frost = []; end
     auto_settings = flags_str;
 end
+
+qual_flag = bitor(flags.before_or_after_flight,flags.bad_aod);
 
 % I think we don't need "aerosol_init_auto" flag at all.
 % if (Mode==1)

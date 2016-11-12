@@ -25,7 +25,7 @@ toggle_out.runwatervapor = true;
 toggle_out.applyforjcorr = false;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
-toggle_out.reduce_variable_size = false; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
+toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
 
 if exist('toggle_in', 'var')
    toggle_out = catstruct(toggle_out, toggle_in);

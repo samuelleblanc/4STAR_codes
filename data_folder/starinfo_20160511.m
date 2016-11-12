@@ -23,8 +23,8 @@ s.flagfilenameCWV = '20160511_starflag_CWV_man_created20160513_0550by_MS.mat';
 %s.flag = starflags_20160511_CWV_MS_marks_ALL_20160523_0126;% runs a function.
 % Ozone and other gases 
 s.O3h=21; % guess 
-s.O3col=0.300; % guess     
-s.NO2col=2.0e15; % guess  
+s.O3col=0.279; % omi  
+s.NO2col=2.0e15; % no omi data 
  
 s.sd_aero_crit=0.01;  
  

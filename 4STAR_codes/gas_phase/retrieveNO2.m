@@ -209,7 +209,7 @@ end
              figure(8882);
              %plot(s.w((wln)),eta1(i,:),'-y','linewidth',2);hold on;
              plot(s.w((wln)),eta(i,:),'--k','linewidth',2);hold on;
-             plot(s.w((wln)),s.tau_aero(i,wln).*s.m_aero(i),'--m','linewidth',2);hold on;
+             %plot(s.w((wln)),s.tau_aero(i,wln).*s.m_aero(i),'--m','linewidth',2);hold on;
              plot(s.w((wln)),RR_d(:,i),'--c','linewidth',2);hold on;
              plot(s.w((wln)),no2spectrum(i,:),'-k','linewidth',2);hold on;
              plot(s.w((wln)),no2fit(i,:),'--r','linewidth',2);hold on;
@@ -218,7 +218,8 @@ end
                     'fontsize',14,'fontweight','bold');
              ylabel('OD','fontsize',14,'fontweight','bold');
              %legend('measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
-             legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             %legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
+             legend('total spectrum baseline and rayliegh subtracted','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
              set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
              pause;
          end

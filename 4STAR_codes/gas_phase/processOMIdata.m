@@ -168,8 +168,8 @@ function [g] = processOMIdata(Lat,Lon,daystr,gas)
                 
                 % QA
                 
-                no2(    no2s>=2e15)=NaN;      % this is 0.075 DU
-                no2trop(no2tropS>=0.5e16)=NaN;% this is 0.187 DU
+                %no2(    no2s>=2e15)=NaN;      % this is 0.075 DU
+                %no2trop(no2tropS>=0.5e16)=NaN;% this is 0.187 DU
                 
                 param = no2;
                 paramS= no2strat;
@@ -190,7 +190,7 @@ function [g] = processOMIdata(Lat,Lon,daystr,gas)
            
            Fparam  = TriScatteredInterp(double(longrid),...
                                         double(latgrid),...
-                                        double(paramgrid),'nearest');
+                                        double(paramgrid),'natural');
            
            
            % evaluate at aircraft locations
@@ -207,10 +207,10 @@ function [g] = processOMIdata(Lat,Lon,daystr,gas)
                
                FparamS  = TriScatteredInterp(double(longrid),...
                                         double(latgrid),...
-                                        double(paramS),'nearest');
+                                        double(paramS),'natural');
                FparamT  = TriScatteredInterp(double(longrid),...
                                         double(latgrid),...
-                                        double(paramT),'nearest');
+                                        double(paramT),'natural');
                                     
                g.omino2S  = FparamS(   Lon,...
                                        Lat);

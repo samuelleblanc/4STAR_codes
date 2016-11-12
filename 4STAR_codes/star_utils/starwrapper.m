@@ -1002,6 +1002,11 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         [s.flags, good]=starflag(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        % apply auto gas flagging
+        [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
+        [~ , s.flagsO3,  flagfile] = starflagGases(s, 1,'O3');
+        [~ , s.flagsNO2, flagfile] = starflagGases(s, 1,'NO2');
+        [~ ,s.flagsHCOH, flagfile] = starflagGases(s, 1,'HCOH');
     end;
     %************************************************************
     
@@ -1029,8 +1034,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
     s.tau_aero_polynomial=[a2 a1 a0];
     
-    % derive optical depths and gas mixing ratios
-    % Michal's code TO BE PLUGGED IN HERE.
+    
     
 end; % End of sun-specific processing
 

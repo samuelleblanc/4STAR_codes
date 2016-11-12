@@ -59,7 +59,7 @@ else;
 end;
 clear i;
 slsun(daystr, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
-    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas'); % sun data and nav data associated with them
+    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas','flagsCWV','flagsO3','flagsNO2','flagsHCOH'); % sun data and nav data associated with them
 [visc,nirc,viscrange,nircrange]=starchannelsatAATS(t);
 c=[visc(1:10) nirc(11:13)+1044];
 colslist={'' c 1:13
@@ -150,6 +150,11 @@ end
         QA_HCOH = bitor(flagHCOH.before_or_after_flight,flagHCOH.bad_aod);
         QA_HCOH = bitor(QA_HCOH,flagHCOH.unspecified_clouds);
         
+    elseif exist('flagsCWV')
+        QA_CWV  = flagsCWV;
+        QA_O3   = flagsO3;
+        QA_NO2  = flagsNO2;
+        QA_HCOH = flagsHCOH;
     else
         % don't flag
         QA_CWV  = zeros(length(t),1)+10;
