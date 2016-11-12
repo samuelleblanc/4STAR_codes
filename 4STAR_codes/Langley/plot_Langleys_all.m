@@ -15,7 +15,7 @@ for j=1:length(goodlangleys)
     eval(['c0new_all(:,j)=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
     
 end
-daycolor = {'c'    'r'    'g'    'b'    'k'    'm'    [0.5 0.5 0.5]    [0.2 1 0.8]    [0.9 0.9 0]};
+daycolor = {'c'    'r'    'g'    'b'    'k'    'm'    [0.5 0.5 0.5]    [0.2 1 0.8]    [0.9 0.8 0]};
 %%%adding c0s between MLO June and November 2016 (cannibalized from
 %%%Michal's plotLangleyCompare.m thanks!)
 filelistVIS = {'20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2_v2','20160910_VIS_C0_refined_Langley_ORACLES2016_gnd'};
@@ -97,15 +97,15 @@ for j=1:length(goodlangleys)
     plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
 end
 subplot(2,1,1); legend(goodlangleys)
-set(gca,'fontsize',14); title('C0 VIS normalized to 9-Langley mean (in %)'); xlabel('\lambda')
+set(gca,'fontsize',14); title('C0 VIS normalized to 6-Langley mean (in %)'); xlabel('\lambda')
 ylim([-30 30]); 
 xlim([100 1000])
 subplot(2,1,2)
-set(gca,'fontsize',14); title('C0 NIR normalized to 9-Langley mean (in %)'); xlabel('\lambda')
+set(gca,'fontsize',14); title('C0 NIR normalized to 6-Langley mean (in %)'); xlabel('\lambda')
 ylim([-100 100])
-starsas('c0spectra_normalizedtomean_MLOtoORACLES2016.fig','plot_Langleys_all.m')
-% oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
-% print -dpdf c0spectra_normalizedtomean_072016.pdf
+starsas('c0spectra_normalizedtoMLOmean_MLOtoORACLES2016.fig','plot_Langleys_all.m')
+oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
+print -dpdf c0spectra_normalizedtoMLOmean_MLOtoORACLES2016.pdf
 
 %plot THE DIFFERENCE between all the spectra versus the mean spectrum, one line per Langley
 figure;
@@ -182,7 +182,7 @@ set(gca,'fontsize',14)
 legend('353.3nm', '380.0nm', '451.7nm', '500.7nm', '519.9nm', '605.3nm', '675.2nm', '780.6nm', '864.6nm', '941.4nm', '1019.9nm', '1064.2nm', '1235.8nm', '1558.7nm', '1640.3nm')
 ax=gca;
 set(ax,'XTick',[1:1:length(goodlangleys)]);
-xlim([0.7 10.3])
+xlim([0.7 10.8])
 set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910'})
 starsas('c0timeseries_Langleys_2016_bywavelength.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);

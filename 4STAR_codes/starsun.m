@@ -58,10 +58,10 @@ load(sourcefile,contents0{:},'program_version');
 s=starwrapper(vis_sun, nir_sun,toggle);
 
 %% Change the types of variables to make smaller variables
-if toggle.reduce_variable_size;
-    if toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
-    s = make_starsun_single(s);
-end;
+% if toggle.reduce_variable_size;
+%     if toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+%     s = make_starsun_single(s);
+% end;
 
 %********************
 %% save

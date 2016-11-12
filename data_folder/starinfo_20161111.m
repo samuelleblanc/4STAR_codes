@@ -6,29 +6,20 @@ else
 end
 
 if isfield(s, 'toggle')
+    disp('it went to the first one')
     s.toggle = update_toggle(s.toggle);
 else
+    disp('it went to the second one')
     s.toggle = update_toggle;
 end
+disp(s.toggle)
+s.langley=[datenum(2016,11,11,16,45,00) datenum(2016,11,11,23,59,00)];
+langley1=[datenum(2016,11,11,16,45,00) datenum(2016,11,11,23,59,00)];% langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
 
- s.flight=[datenum(2016,9,25,7,57,27) datenum(2016,9,25,16,35,18)]; 
-
-% spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
-% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-% s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
- 
 % Ozone and other gases 
 s.O3h=21; % 
 s.O3col=0.300; % Michal's guess     
 s.NO2col=2.0e15; % % 
-
-% flags
-s.flagfilename = '20160925_starflag_man_created20161024_1938by_SL.mat'; 
-s.flagfilenameCWV  = '20160925_starflag_CWV_man_created20161017_2151by_MS.mat';
-s.flagfilenameO3   = '20160925_starflag_O3_man_created20161017_2149by_MS.mat';
-s.flagfilenameNO2  = '20160925_starflag_NO2_man_created20161017_2152by_MS.mat';
-s.flagfilenameHCOH = '20160925_starflag_HCOH_man_created20161017_2153by_MS.mat';
-
  
 % other tweaks 
 if isfield(s, 'Pst'); 
@@ -61,18 +52,18 @@ end;
 
 return
 
+
 function toggle_out = update_toggle(toggle_in)
 % toggle_out = update_toggle(toggle_in)
 % Merge the optional "toggle_in" with user-supplied values in toggle_out
 % Frequently this instance will be shadowed by the internal function
 % of the same name defined beneath starinfo files.
 % un-test commit michal 2016-05-08
-
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
 toggle_out.verbose=true;
 toggle_out.saveadditionalvariables=true;
-toggle_out.savefigure=false;
+toggle_out.savefigure=true;
 toggle_out.computeerror=false;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
@@ -90,8 +81,12 @@ toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
 
+disp(toggle_out)
+disp(toggle_in)
+
 if exist('toggle_in', 'var')
-   toggle_out = catstruct(toggle_out, toggle_in);
+   toggle_out = catstruct(toggle_in,toggle_out);
 end
 
+disp(toggle_out)
 return

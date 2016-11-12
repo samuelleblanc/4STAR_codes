@@ -1,4 +1,4 @@
-% C0 (TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from 4STAR_20160910starsun.mat and recorded on 2016-10-28 11:22:49.
+% C0 (TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from 4STAR_20160910starsun.mat and recorded on 2016-10-28 10:24:38.
 % Data outside 2.0x the STD of 501 nm Langley residuals were screened out.
 Pix Wavelength C0 C0err
 0 173.18 -1.00000000e+00 -1.00000000e+00 
