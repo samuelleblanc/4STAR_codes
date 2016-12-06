@@ -113,7 +113,7 @@ days = [];
 if false;
     for i=1:length(fld);
         try
-            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,true);
+            [d.(fld{i}).dirty,d.(fld{i}).clean,d.(fld{i}).diff] = stardirty(d.(fld{i}).daystr,d.(fld{i}).f,false);
             spc_diff = [spc_diff;d.(fld{i}).diff.normdiff];
             spc_tx = [spc_tx;d.(fld{i}).diff.transmit];
         catch
@@ -172,7 +172,7 @@ title(['Clean dirty comparison for ' campaign])
 %xlabel('Flight days')
 %hold off;
 legend('630 nm','550 nm','450 nm')
-ylim([0.7,1]);
+ylim([0.55,1]);
 xlim([0,length(days)+1])
 % rotate the xlabels
 h = gca;
