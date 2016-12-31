@@ -49,6 +49,7 @@ function [o3] = retrieveO3(s,wstart,wend,mode)
 % MS, 2016-10-13, tweaked code to be compatible with no2 code
 % MS, 2016-10-24, tweaked processing routine post-oracles to be as pre
 % MS, 2016-10-27, tweaked processing to match RH signals in spectrometer
+% MS, 2016-12-31, assigned specific processing for KORUS high RH days
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -112,8 +113,8 @@ loadCrossSections_global;
  % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
  % c0  = c0_.data(wln,3);
   
-   if     s.t(1) < datenum([2016 8 26 0 0 0]) || s.t(1) >= datenum([2016 10 26 0 0 0]);  
-      % pre-ORACLES - check if applicable to KORUS!!! and post-after RH
+   if     s.t(1) < datenum([2016 5 06 0 0 0]) || s.t(1) > datenum([2016 6 02 0 0 0])  && s.t(1) < datenum([2016 8 26 0 0 0]) || s.t(1) >= datenum([2016 10 26 0 0 0]);  
+      % pre-ORACLES - and some KORUS flights with low RH
       % fixed
 %       rate = s.rateslant; 
 %       rate = rate(:,wln); 
@@ -125,7 +126,7 @@ loadCrossSections_global;
     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
         ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1)];% 
     
-  elseif s.t(1) > datenum([2016 8 26 0 0 0]) && s.t(1) < datenum([2016 10 01 0 0 0])
+  elseif s.t(1) > datenum([2016 8 26 0 0 0]) && s.t(1) < datenum([2016 10 01 0 0 0]) || s.t(1) >= datenum([2016 5 06 0 0 0]) && s.t(1) <= datenum([2016 6 02 0 0 0]) 
       % ORACLES and some date in KORUS-AQ (with high RH)
       % rate = s.ratetot;% this is Ray subtracted
       rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
