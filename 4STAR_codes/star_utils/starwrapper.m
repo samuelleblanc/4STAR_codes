@@ -285,9 +285,9 @@ end;
 if isempty(s.NO2col);
     warning(['Enter nitric dioxide column density in starinfo' daystr '.m.']);
 end;
-if isfield(s,'toggle')
-    toggle = s.toggle;
-end
+%if isfield(s,'toggle')
+%    toggle = s.toggle;
+%end
 
 %********************
 %% add related variables, derive count rate and combine structures
@@ -879,7 +879,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     % water vapor retrieval (940fit+c0 method)
     %-----------------------------------------
     if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
-        toggle.runwatervapor = false;
+        toggle.runwatervapor = true;
         warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
     end;
         
