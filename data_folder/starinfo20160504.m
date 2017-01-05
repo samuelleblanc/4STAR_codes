@@ -1,4 +1,5 @@
-flight=[datenum(2016,5,3,23,03,08) datenum(2016,5,4,7,17,30)]; !!! to be updated
+% flight=[datenum(2016,5,3,23,03,08) datenum(2016,5,4,7,17,30)]; !!! to be updated
+flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55)
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];
 
