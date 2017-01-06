@@ -9,6 +9,15 @@ version_set('v1.0')
 % smaller file used for starflag.
 s = load(f_in,'w','Alt','Lat','Lon','tau_aero_noscreening','m_aero','t','roll',...
               'rawrelstd','Md','Str','raw','dark','c0','darkstd','QdVlr','QdVtot','ng','program_version','sd_aero_crit');
+try;          
+    fs = load(f_in,'flagsCWV','flagsO3','flagsNO2','flagsHCOH');
+    gas_note = ' ** created with gas flags';
+    gases = true;
+catch;
+    disp('gas flags not found')
+    gas_note = ' ** does not contain gas flags';
+    gases = false;  
+end;
 
 g.Alt = s.Alt; g.Lat=s.Lat; g.Lon=s.Lon; g.t = s.t;
 g.m_aero = s.m_aero; g.rawrelstd = s.rawrelstd; g.Md = s.Md; g.Str = s.Str;
@@ -44,7 +53,11 @@ g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
 g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;g.nm_1215 = 6; 
 g.save_for_starflag = true;
 
+if gases; 
+    g.flagsCWV = fs.flagsCWV; g.flagsO3 = fs.flagsO3; g.flagsNO2 = fs.flagsNO2; g.flagsHCOH = fs.flagsHCOH;
+end;
+
 f_out = strrep(f_in,'.mat', '_for_starflag.mat');
-disp(['creating file for smaller size flagging: ' f_out])
+disp(['creating file for smaller size flagging: ' f_out gas_note])
 save(f_out,'-struct','g','-mat','-v7.3');
 end
