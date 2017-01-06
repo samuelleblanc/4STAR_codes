@@ -106,6 +106,8 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
             if t>datenum([2015 11 23 0 0 0])
                 daystr='20151123';
+                %daystr='20151104';
+                %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';
                 filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
             elseif t>datenum([2015 11 18 0 0 0])
                 daystr='20151118';
@@ -262,7 +264,11 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
+            try;
             a=importdata(which(visfilename));
+            catch;
+                error(['Cant open file: ' visfilename])
+            end;
 %             a=importdata(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
