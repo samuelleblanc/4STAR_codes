@@ -18,13 +18,16 @@ s.dirty = [datenum(2016,5,30,08,30,30) datenum(2016,5,30,08,32,30)];
 s.clean = [datenum(2016,5,30,21,43,15) datenum(2016,5,30,21,45,45)];
 
 s.flagfilename = '20160529_starflag_man_created20160613_0916by_JL.mat'; 
-s.flagfilenameO3 = '20160529_starflag_O3_man_created20160701_1357by_MS.mat';
-s.flagfilenameCWV = '20160529_starflag_CWV_man_created20160701_1347by_MS.mat';
+% gases flags
+s.flagfilenameCWV   = '20160529_starflag_CWV_man_created20170109_0921by_MS.mat';
+s.flagfilenameO3    = '20160529_starflag_O3_man_created20170109_0924by_MS.mat';
+s.flagfilenameNO2   = '20160529_starflag_NO2_man_created20170109_0928by_MS.mat';
+s.flagfilenameHCOH  = '20160529_starflag_HCOH_man_created20170109_0935by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.300; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+s.O3col=0.300; %     
+s.NO2col=2.0e15; %  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
