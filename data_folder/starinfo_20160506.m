@@ -26,10 +26,10 @@ s.NO2col=2.0e15; % Yohei's guess
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160506_starflag_man_created20160509_0102by_MS.mat';
 % gases flags
-s.flagfilenameCWV   = '20160504_starflag_CWV_man_created20170109_0416by_MS.mat';
-s.flagfilenameO3    = '20160504_starflag_O3_man_created20170109_0418by_MS.mat';
-s.flagfilenameNO2   = '20160504_starflag_NO2_man_created20170109_0422by_MS.mat';
-s.flagfilenameHCOH  = '20160504_starflag_HCOH_man_created20170109_0428by_MS.mat';
+s.flagfilenameCWV   = '20160506_starflag_CWV_man_created20170109_0431by_MS.mat';
+s.flagfilenameO3    = '20160506_starflag_O3_man_created20170109_0432by_MS.mat';
+s.flagfilenameNO2   = '20160506_starflag_NO2_man_created20170109_0438by_MS.mat';
+s.flagfilenameHCOH  = '20160506_starflag_HCOH_man_created20170109_0442by_MS.mat';
 
  
  
