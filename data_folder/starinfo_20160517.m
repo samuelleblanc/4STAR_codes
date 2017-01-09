@@ -16,8 +16,11 @@ s.dirty = [datenum(2016,5,19,2,6,30) datenum(2016,5,19,2,11,30)];
 s.clean = [datenum(2016,5,19,2,31,20) datenum(2016,5,19,2,34,30)];
 
 s.flagfilename = '20160517_starflag_man_created20160520_2349by_MS.mat'; 
-s.flagfilenameO3 = '20160517_starflag_O3_man_created20160520_2342by_MS.mat';
-s.flagfilenameCWV = '20160517_starflag_CWV_man_created20160520_2329by_MS.mat';
+% gases flags
+s.flagfilenameCWV   = '20160517_starflag_CWV_man_created20170109_0707by_MS.mat';
+s.flagfilenameO3    = '20160517_starflag_O3_man_created20170109_0714by_MS.mat';
+s.flagfilenameNO2   = '20160517_starflag_NO2_man_created20170109_0721by_MS.mat';
+s.flagfilenameHCOH  = '20160517_starflag_HCOH_man_created20170109_0741by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % guess 
