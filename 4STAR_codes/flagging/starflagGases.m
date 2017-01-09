@@ -47,9 +47,11 @@ if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
     sunfile = getfullname('*starsun*.mat','starsun','Select starsun file to flag.');
-    s = load(sunfile,'tau_aero','m_aero','flags','t','w','rawrelstd','Lon','Lat','Alt','Pst','Tst','aerosolcols','viscols','nircols','rateaero','c0','QdVlr','QdVtb','QdVtot','ng','Md','raw','Str','dark',...
-                     'tau_aero_noscreening','darkstd','sd_aero_crit');
-
+    s = load(sunfile);%,'tau_aero','m_aero','flags','t','w','rawrelstd','Lon','Lat','Alt','Pst','Tst','aerosolcols','viscols','nircols','rateaero','c0','QdVlr','QdVtb','QdVtot','ng','Md','raw','Str','dark',...
+                      %'tau_aero_noscreening','darkstd','sd_aero_crit');
+                 
+    tmp = load('w.mat');             
+    s.w = double(tmp.w);
 end % done loading starinfo file
 
 daystr = datestr(s.t(1),'yyyymmdd');
@@ -107,9 +109,8 @@ if ~isfield(s,'sd_aero_crit') % read starinfo file
     end;
 end
 if ~isempty(s)
-    t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
-    viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
-    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtb=s.QdVtb;QdVtot=s.QdVtot;ng=s.ng;Md=s.Md;
+    t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;
+    c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtot=s.QdVtot;ng=s.ng;Md=s.Md;
     try;
         rawrelstd=s.rawrelstd;
     catch;
@@ -129,11 +130,11 @@ if ~isempty(s)
         rawrelstd=s.rawrelstd;
     end;
     Str=s.Str;raw=s.raw;dark=s.dark;
-    if isfield(s,'tau_aero_noscreening')
-        tau_aero_noscreening=s.tau_aero_noscreening;
-    else
-        tau_aero_noscreening = s.tau_aero;
-    end
+%     if isfield(s,'tau_aero_noscreening')
+%         tau_aero_noscreening=s.tau_aero_noscreening;
+%     else
+%         tau_aero_noscreening = s.tau_aero;
+%     end
     if isfield(s,'darkstd')
         darkstd=s.darkstd;
     end
@@ -275,10 +276,10 @@ nm_500 = interp1(w,[1:length(w)],.5, 'nearest');
 nm_870 = interp1(w,[1:length(w)],.87, 'nearest');
 nm_452 = interp1(w,[1:length(w)],.452, 'nearest');
 nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
-colsang=[nm_452 nm_865];
-ang_noscreening=sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
-aod_500nm = tau_aero_noscreening(:,nm_500);
-aod_865nm = tau_aero_noscreening(:,nm_865);
+%colsang=[nm_452 nm_865];
+ang_noscreening=s.ang_noscreening;%sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+aod_500nm = s.aod_500nm;%tau_aero_noscreening(:,nm_500);
+aod_865nm = s.aod_865nm;%tau_aero_noscreening(:,nm_865);
 
 % define input param to flag
 if Mode == 1
@@ -316,7 +317,7 @@ elseif Mode == 2
 
 end
 
-aod_500nm_max=3;
+aod_500nm_max=s.aod_500nm_max;%3
 m_aero_max=15;
 
 % % initializing a logical field
@@ -394,10 +395,12 @@ if (Mode==2)
             %    flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
             %else
                 % original: flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                % previously std_param for CWV was 0.4, and O3 was 2 (less
+                % stringent)
                 if strcmp(gas_name_str,'CWV')
-                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>0.4 |  std_param==0 | ~isfinite(input_param) | isnan(input_param) | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>0.1 |  std_param==0 | ~isfinite(input_param) | isnan(input_param) | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
                 elseif strcmp(gas_name_str,'O3')
-                        flags_str.bad_aod = 'flags.bad_aod | input_param<200 | std_param>2 |  std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<200 | std_param>0.5 |  std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
                 elseif strcmp(gas_name_str,'NO2')
                         flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
                 elseif strcmp(gas_name_str,'HCOH')

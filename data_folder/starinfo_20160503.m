@@ -23,8 +23,11 @@ s.NO2col=2.0e15; % guess
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160503_starflag_man_created20160509_0026by_MS.mat';
-s.flagfilenameO3  = '20160503_starflag_O3_man_created20160510_0128by_MS.mat';
-s.flagfilenameCWV = '20160503_starflag_CWV_man_created20160512_1818by_MS.mat';
+% gases flags
+s.flagfilenameCWV   = '20160503_starflag_CWV_man_created20170109_0312by_MS.mat';
+s.flagfilenameO3    = '20160503_starflag_O3_man_created20170109_0314by_MS.mat';
+s.flagfilenameNO2   = '20160503_starflag_NO2_man_created20170109_0317by_MS.mat';
+s.flagfilenameHCOH  = '20160503_starflag_HCOH_man_created20170109_0322by_MS.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
