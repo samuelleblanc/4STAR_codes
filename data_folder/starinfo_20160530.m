@@ -19,10 +19,10 @@ s.clean = [datenum(2016,5,31,08,10,30) datenum(2016,5,31,08,15,00)];
 
 s.flagfilename = '20160530_starflag_man_created20160718_1149by_CF.mat';%20160530_starflag_auto_created20160714_1615.mat'; 
 % gases flags
-s.flagfilenameCWV   = '20160529_starflag_CWV_man_created20170109_0921by_MS.mat';
-s.flagfilenameO3    = '20160529_starflag_O3_man_created20170109_0924by_MS.mat';
-s.flagfilenameNO2   = '20160529_starflag_NO2_man_created20170109_0928by_MS.mat';
-s.flagfilenameHCOH  = '20160529_starflag_HCOH_man_created20170109_0935by_MS.mat';
+s.flagfilenameCWV   = '20160530_starflag_CWV_man_created20170109_1112by_MS.mat';
+s.flagfilenameO3    = '20160530_starflag_O3_man_created20170109_1120by_MS.mat';
+s.flagfilenameNO2   = '20160530_starflag_NO2_man_created20170109_1123by_MS.mat';
+s.flagfilenameHCOH  = '20160530_starflag_HCOH_man_created20170109_1132by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
