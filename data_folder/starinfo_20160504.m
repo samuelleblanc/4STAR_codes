@@ -15,8 +15,11 @@ s.flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)];
 s.sd_aero_crit = 0.01;
 %s.flagfilename  ='20160504_starflag_man_created20160510_2053by_SL.mat'; 
 s.flagfilename  ='20160504_starflag_man_created20160523_1708by_JR.mat';
-s.flagfilenameO3='20160504_starflag_O3_man_created20160510_0723by_MS.mat'; 
-s.flagfilenameCWV='20160504_starflag_CWV_man_created20160512_1830by_MS.mat';
+% gases flags
+s.flagfilenameCWV   = '20160504_starflag_CWV_man_created20170109_0416by_MS.mat';
+s.flagfilenameO3    = '20160504_starflag_O3_man_created20170109_0418by_MS.mat';
+s.flagfilenameNO2   = '20160504_starflag_NO2_man_created20170109_0422by_MS.mat';
+s.flagfilenameHCOH  = '20160504_starflag_HCOH_man_created20170109_0428by_MS.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
