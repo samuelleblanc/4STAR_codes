@@ -13,8 +13,12 @@ end
 
 s.flight=[datenum(2016,5,21,22,56,17) datenum(2016,5,22,08,18,22)];
 s.flagfilename = '20160521_starflag_man_created20160530_0057by_MS.mat'; 
-s.flagfilenameO3 = '20160521_starflag_O3_man_created20160530_0109by_MS.mat';
-s.flagfilenameCWV = '20160521_starflag_CWV_man_created20160530_0103by_MS.mat';
+% gases flags
+s.flagfilenameCWV   = '20160521_starflag_CWV_man_created20170109_0805by_MS.mat';
+s.flagfilenameO3    = '20160521_starflag_O3_man_created20170109_0806by_MS.mat';
+s.flagfilenameNO2   = '20160521_starflag_NO2_man_created20170109_0816by_MS.mat';
+s.flagfilenameHCOH  = '20160521_starflag_HCOH_man_created20170109_0832by_MS.mat';
+
 s.dirty = [datenum(2016,5,23,03,35,00) datenum(2016,5,23,03,41,00)];
 s.clean = [datenum(2016,5,23,04,26,00) datenum(2016,5,23,04,29,15)];
 
