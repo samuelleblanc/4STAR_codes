@@ -1,0 +1,91 @@
+function marks = starflags_20160604_CWV_MS_marks_NOT_GOOD_AEROSOL_20170109_2059  
+ % starflags file for 20160604 created by MS on 20170109_2059 to mark NOT_GOOD_AEROSOL conditions 
+ version_set('20170109_2059'); 
+ daystr = '20160604';  
+ % tag = 700: bad_aod 
+ marks=[ 
+ datenum('00:03:40') datenum('00:03:56') 700 
+datenum('01:21:41') datenum('01:21:41') 700 
+datenum('01:21:43') datenum('01:21:44') 700 
+datenum('01:23:40') datenum('01:23:40') 700 
+datenum('01:23:44') datenum('01:23:44') 700 
+datenum('01:27:09') datenum('01:27:10') 700 
+datenum('01:29:09') datenum('01:29:09') 700 
+datenum('01:29:11') datenum('01:29:13') 700 
+datenum('01:40:21') datenum('01:40:22') 700 
+datenum('01:44:47') datenum('01:44:47') 700 
+datenum('01:53:13') datenum('01:53:14') 700 
+datenum('01:53:18') datenum('01:53:18') 700 
+datenum('01:57:09') datenum('01:57:12') 700 
+datenum('01:57:29') datenum('01:57:35') 700 
+datenum('02:01:58') datenum('02:01:58') 700 
+datenum('02:04:29') datenum('02:04:29') 700 
+datenum('02:09:11') datenum('02:09:11') 700 
+datenum('02:09:16') datenum('02:09:18') 700 
+datenum('02:15:54') datenum('02:15:55') 700 
+datenum('02:27:03') datenum('02:27:03') 700 
+datenum('02:27:10') datenum('02:27:11') 700 
+datenum('02:28:14') datenum('02:28:14') 700 
+datenum('02:33:13') datenum('02:33:13') 700 
+datenum('02:33:20') datenum('02:33:21') 700 
+datenum('02:35:54') datenum('02:35:58') 700 
+datenum('02:57:58') datenum('02:57:58') 700 
+datenum('03:10:05') datenum('03:10:05') 700 
+datenum('03:10:40') datenum('03:10:41') 700 
+datenum('03:10:43') datenum('03:11:54') 700 
+datenum('03:11:58') datenum('03:12:19') 700 
+datenum('03:12:23') datenum('03:12:40') 700 
+datenum('03:45:47') datenum('03:45:49') 700 
+datenum('04:06:49') datenum('04:06:59') 700 
+datenum('04:07:01') datenum('04:07:09') 700 
+datenum('04:07:11') datenum('04:07:13') 700 
+datenum('04:07:16') datenum('04:07:39') 700 
+datenum('04:07:41') datenum('04:07:41') 700 
+datenum('04:07:43') datenum('04:07:59') 700 
+datenum('04:08:01') datenum('04:08:06') 700 
+datenum('04:08:09') datenum('04:08:33') 700 
+datenum('04:08:36') datenum('04:08:56') 700 
+datenum('04:09:29') datenum('04:10:07') 700 
+datenum('04:10:12') datenum('04:10:26') 700 
+datenum('04:10:31') datenum('04:11:23') 700 
+datenum('04:11:27') datenum('04:12:37') 700 
+datenum('04:12:42') datenum('04:18:51') 700 
+datenum('04:18:54') datenum('04:23:38') 700 
+datenum('04:23:43') datenum('04:27:38') 700 
+datenum('04:27:43') datenum('04:31:06') 700 
+datenum('04:31:15') datenum('04:31:35') 700 
+datenum('04:31:41') datenum('04:35:48') 700 
+datenum('04:35:53') datenum('04:36:15') 700 
+datenum('04:36:18') datenum('04:41:29') 700 
+datenum('04:41:41') datenum('04:41:41') 700 
+datenum('04:42:11') datenum('04:42:12') 700 
+datenum('04:42:33') datenum('04:42:37') 700 
+datenum('04:45:03') datenum('04:45:09') 700 
+datenum('04:45:32') datenum('04:45:34') 700 
+datenum('04:45:40') datenum('04:45:42') 700 
+datenum('04:45:51') datenum('04:45:56') 700 
+datenum('04:47:04') datenum('04:47:24') 700 
+datenum('04:48:25') datenum('04:48:26') 700 
+datenum('04:48:28') datenum('04:48:33') 700 
+datenum('04:49:40') datenum('04:49:41') 700 
+datenum('04:49:45') datenum('04:49:47') 700 
+datenum('04:57:13') datenum('04:57:39') 700 
+datenum('04:57:44') datenum('04:57:57') 700 
+datenum('04:58:02') datenum('04:58:04') 700 
+datenum('04:58:09') datenum('04:59:02') 700 
+datenum('04:59:06') datenum('04:59:13') 700 
+datenum('04:59:20') datenum('04:59:59') 700 
+datenum('05:00:04') datenum('05:00:06') 700 
+datenum('05:01:56') datenum('05:02:00') 700 
+datenum('05:02:13') datenum('05:02:14') 700 
+datenum('05:03:53') datenum('05:03:56') 700 
+datenum('05:17:54') datenum('05:18:00') 700 
+datenum('05:44:19') datenum('05:44:19') 700 
+datenum('05:44:22') datenum('05:44:22') 700 
+datenum('05:44:25') datenum('05:44:25') 700 
+datenum('05:49:13') datenum('05:49:13') 700 
+datenum('05:49:15') datenum('05:49:21') 700 
+datenum('05:57:46') datenum('05:57:46') 700 
+];  
+marks(:,1:2)=marks(:,1:2)-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
+return
