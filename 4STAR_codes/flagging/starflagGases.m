@@ -461,22 +461,35 @@ if (Mode==2)
             clear('flags')
             source='ask';
             [sourcefile, ext, ~,filen]=starsource(source, 'sun');
-            if exist('sourcefile','var') && ~isempty(sourcefile) && exist(sourcefile{1},'file')
-                flags = load(sourcefile{1});
-            else
+%             if exist('sourcefile','var') && ~isempty(sourcefile) && exist(sourcefile{1},'file')
+%                 flags = load(sourcefile{1});
+%             else
                 flags = load(getfullname([daystr,'*_starflag_*.mat'],'starflag','Select starflag file'));
-            end
+            %end
             if isfield(flags,'flags')
                 flags = flags.flags;
             end
             %Users need to modify what's below:
-            flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
-            flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
-            if exist('darkstd','var')
-                flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
-            else
-                flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
-            end
+              flags_str.before_or_after_flight = 'flags.before_or_after_flight | (t<flight(1)|t>flight(2))';
+            %flags_str.unspecified_clouds = 'flags.unspecified_clouds | aod_500nm>aod_500nm_max | (ang_noscreening<.2 & aod_500nm>0.08) | rawrelstd(:,1)>sd_aero_crit';
+            %if exist('darkstd','var')
+            %    flags_str.bad_aod = 'aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | raw(:,nm_500)-dark(:,nm_500)<=darkstd(:,nm_500) | c0(:,nm_500)<=0';
+            %else
+                % original: flags_str.bad_aod = 'flags.bad_aod | aod_500nm<0 | aod_865nm<0 | ~isfinite(aod_500nm) | ~isfinite(aod_865nm) | ~(Md==1) | ~(Str==1) | (m_aero>m_aero_max) | c0(:,nm_500)<=0';
+                % previously std_param for CWV was 0.4, and O3 was 2 (less
+                % stringent)
+                if strcmp(gas_name_str,'CWV')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>0.1 |  std_param==0 | ~isfinite(input_param) | isnan(input_param) | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'O3')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<200 | std_param>0.5 |  std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'NO2')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                elseif strcmp(gas_name_str,'HCOH')
+                        flags_str.bad_aod = 'flags.bad_aod | input_param<0 | std_param>4e-4 | std_param==0 |~isfinite(input_param) | isnan(input_param)  | ~isfinite(std_param) | isnan(std_param) | (m_aero>m_aero_max)';
+                 
+                end
+            %end
+            flags_str.unspecified_clouds = '';
             flags_str.smoke = '';
             flags_str.dust = '';
             flags_str.cirrus = '';
