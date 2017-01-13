@@ -15,7 +15,7 @@ s.flight=[datenum(2016,5,26,03,00,38) datenum(2016,5,26,07,10,32)];
 % gases flags
 s.flagfilenameCWV   = '20160526_starflag_CWV_man_created20170109_0904by_MS.mat';
 s.flagfilenameO3    = '20160526_starflag_O3_man_created20170109_0906by_MS.mat';
-s.flagfilenameNO2   = '20160526_starflag_NO2_man_created20170109_0911by_MS.mat';
+s.flagfilenameNO2   = '20160526_starflag_NO2_man_created20170111_1358by_MS.mat';%'20160526_starflag_NO2_man_created20170109_0911by_MS.mat';
 s.flagfilenameHCOH  = '20160526_starflag_HCOH_man_created20170109_0916by_MS.mat';
 
 s.dirty = [datenum(2016,5,26,08,08,15) datenum(2016,5,26,08,10,40)];

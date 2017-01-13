@@ -20,7 +20,7 @@ s.clean = [datenum(2016,6,9,08,58,15) datenum(2016,6,9,09,00,00)];
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160608_starflag_man_created20160718_1706by_CF.mat';%'20160608_starflag_auto_created20160609_1302.mat';
 % gases flags
-s.flagfilenameCWV   = '20160608_starflag_CWV_man_created20170110_0356by_MS.mat';
+s.flagfilenameCWV   = '20160608_starflag_CWV_man_created20170111_2339by_MS.mat';%'20160608_starflag_CWV_man_created20170110_0356by_MS.mat';
 s.flagfilenameO3    = '20160608_starflag_O3_man_created20170110_0401by_MS.mat';
 s.flagfilenameNO2   = '20160608_starflag_NO2_man_created20170110_0417by_MS.mat';
 s.flagfilenameHCOH  = '20160608_starflag_HCOH_man_created20170110_0432by_MS.mat';
