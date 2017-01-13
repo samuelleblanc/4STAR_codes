@@ -20,8 +20,8 @@ s.clean = [datenum(2016,5,12,8,04,30) datenum(2016,5,12,8,07,00)];
 s.flagfilename = '20160511_starflag_man_created20160513_0415by_MS.mat'; 
 % gases flags
 s.flagfilenameCWV   = '20160511_starflag_CWV_man_created20170109_0459by_MS.mat';
-s.flagfilenameO3    = '20160511_starflag_O3_man_created20170109_0501by_MS.mat';
-s.flagfilenameNO2   = '20160511_starflag_NO2_man_created20170109_0512by_MS.mat';
+s.flagfilenameO3    = '20160511_starflag_O3_man_created20170111_1342by_MS.mat';%'20160511_starflag_O3_man_created20170109_0501by_MS.mat';
+s.flagfilenameNO2   = '20160511_starflag_NO2_man_created20170111_1346by_MS.mat';%'20160511_starflag_NO2_man_created20170109_0512by_MS.mat';
 s.flagfilenameHCOH  = '20160511_starflag_HCOH_man_created20170109_0518by_MS.mat';
 
 %s.flag = starflags_20160511_CWV_MS_marks_ALL_20160523_0126;% runs a function.

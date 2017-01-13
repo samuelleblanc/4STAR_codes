@@ -22,9 +22,9 @@ s.clean = [datenum(2016,6,4,02,40,15) datenum(2016,6,4,02,42,30)];
 s.sd_aero_crit=0.01; 
 s.flagfilename    = '20160602_starflag_man_created20160718_1638by_CF.mat';%'20160602_starflag_auto_created20160714_1702.mat';
 % gases flags
-s.flagfilenameCWV   = '20160602_starflag_CWV_man_created20170109_1225by_MS.mat';
+s.flagfilenameCWV   = '20160602_starflag_CWV_man_created20170111_2315by_MS.mat';%'20160602_starflag_CWV_man_created20170109_1225by_MS.mat';
 s.flagfilenameO3    = '20160602_starflag_O3_man_created20170109_1234by_MS.mat';%O3 has very high values; maybe it is related to the high RH/dirty-clean?
-s.flagfilenameNO2   = '20160602_starflag_NO2_man_created20170109_1251by_MS.mat';
+s.flagfilenameNO2   = '20160602_starflag_NO2_man_created20170111_2323by_MS.mat';%'20160602_starflag_NO2_man_created20170109_1251by_MS.mat';
 s.flagfilenameHCOH  = '20160602_starflag_HCOH_man_created20170109_1257by_MS.mat';
  
 % Ozone and other gases 

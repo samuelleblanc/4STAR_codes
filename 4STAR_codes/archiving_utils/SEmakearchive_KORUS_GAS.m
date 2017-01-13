@@ -136,7 +136,7 @@ form.std_CWV   = '%2.3f';
 %% prepare list of details for each flight
 dslist={'20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          1          0          0          0          0          0          0]  ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          1          0]  ; %set=1 to process
 
 
 %% run through each flight, load and process
