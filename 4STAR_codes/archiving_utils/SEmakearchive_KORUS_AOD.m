@@ -36,19 +36,23 @@
 % MS, updated starinfo files path
 % 2016-07-01, MS, tweaked for certain flag days for KORUS
 % 2016-07-14, MS, twaeked to accept automatic flags
+% 2017-01-12, SL, v2.0, changed to archive R0 version, added uncertainty fields 
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
-version_set('v1.0')
+version_set('v2.0')
 %% set variables
-ICTdir = 'D:\KORUS-AQ\aod_ict\';
-starinfo_path = 'D:\KORUS-AQ\starinfo\';
-starsun_path = 'D:\KORUS-AQ\starsun\';
+ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
 
-
+%% prepare list of details for each flight
+dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
+%Values of jproc: 1=archive 0=do not archive
+jproc=[         0          1          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -68,7 +72,7 @@ NormalComments = {...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research';...
     'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
-    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent, for in-field archiving can be up to 0.03';...
+    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent';...
     'ULOD_FLAG: -7777';...
     'ULOD_VALUE: N/A';...
     'LLOD_FLAG: -8888';...
@@ -80,6 +84,7 @@ NormalComments = {...
     };
 
 revComments = {...
+    'R0: The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included. \n';...
     'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
 
@@ -109,6 +114,24 @@ info.AOD1236 = 'unitless, Aerosol optical depth at 1235.8 nm';
 info.AOD1559 = 'unitless, Aerosol optical depth at 1558.7 nm';
 info.AOD1627 = 'unitless, Aerosol optical depth at 1626.6 nm';
 
+info.UNCAOD0380 = 'unitless, Uncertainty in aerosol optical depth at 380.0 nm';
+info.UNCAOD0452 = 'unitless, Uncertainty in aerosol optical depth at 451.7 nm';
+info.UNCAOD0501 = 'unitless, Uncertainty in aerosol optical depth at 500.7 nm';
+info.UNCAOD0520 = 'unitless, Uncertainty in aerosol optical depth at 520.0 nm';
+info.UNCAOD0532 = 'unitless, Uncertainty in aerosol optical depth at 532.0 nm';
+info.UNCAOD0550 = 'unitless, Uncertainty in aerosol optical depth at 550.3 nm';
+info.UNCAOD0606 = 'unitless, Uncertainty in aerosol optical depth at 605.5 nm';
+info.UNCAOD0620 = 'unitless, Uncertainty in aerosol optical depth at 619.7 nm';
+info.UNCAOD0675 = 'unitless, Uncertainty in aerosol optical depth at 675.2 nm';
+info.UNCAOD0781 = 'unitless, Uncertainty in aerosol optical depth at 780.6 nm';
+info.UNCAOD0865 = 'unitless, Uncertainty in aerosol optical depth at 864.6 nm';
+info.UNCAOD1020 = 'unitless, Uncertainty in aerosol optical depth at 1019.9 nm';
+info.UNCAOD1040 = 'unitless, Uncertainty in aerosol optical depth at 1039.6 nm';
+info.UNCAOD1064 = 'unitless, Uncertainty in aerosol optical depth at 1064.2 nm';
+info.UNCAOD1236 = 'unitless, Uncertainty in aerosol optical depth at 1235.8 nm';
+info.UNCAOD1559 = 'unitless, Uncertainty in aerosol optical depth at 1558.7 nm';
+info.UNCAOD1627 = 'unitless, Uncertainty in aerosol optical depth at 1626.6 nm';
+
 save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6];
 iradstart = 6; % the start of the field names related to wavelengths
 
@@ -120,11 +143,6 @@ form.GPS_Alt = '%7.1f';
 form.Latitude = '%3.7f';
 form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
-
-%% prepare list of details for each flight
-dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
-%Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          1          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -162,8 +180,17 @@ for i=idx_file_proc
     
     %% read file to be saved
     starfile = fullfile(starsun_path, [daystr 'starsun.mat']);
+    if ~exist(starfile);
+        starfile = fullfile(starsun_path, ['4STAR_' daystr 'starsun.mat']);
+    end;
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
+    
+    try;
+        load(starfile, 't','tau_aero_err');
+    catch;
+        error(['Problem loading the uncertainties in file:' starfile])
+    end;
     
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
@@ -232,18 +259,25 @@ for i=idx_file_proc
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));
     
-    %% Now go through the times of radiances, and fill up the related variables
+    %% Now go through the times of radiances/aod, and fill up the related variables
     disp('filing up the data')
     for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
-    for nn=iradstart:length(names)
+    for nn=iradstart:iradstart+length(save_wvls)-1;
         ii = nn-iradstart+1;
         % make sure to only have unique values
         [tutc_unique,itutc_unique] = unique(tutc);
         data.(names{nn}) = interp1(tutc_unique,tau_aero_noscreening(itutc_unique,save_iwvls(ii)),UTC,'nearest');
     end;
     
+    % do the same but for uncertainty
+    for nn=iradstart+length(save_wvls):length(names);
+        ii = nn-iradstart-length(save_wvls)+1;
+        [tutc_unique,itutc_unique] = unique(tutc);
+        data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+    end;
+    
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
-    inans = find(isnan(data.AOD0501));
+    inans = find(isnan(data.(names{iradstart+2})));
     %data.UTC(inans) = NaN;
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;

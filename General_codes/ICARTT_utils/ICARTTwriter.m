@@ -203,6 +203,9 @@ end
 
 %%%%% DATA HANDLING %%%%%
 data = struct2cell(data);
+for i=1:length(data);
+    data{i} = double(data{i});
+end;
 data = cell2mat(data'); %single matrix, with one column for each variable
 data(isnan(data)) = missing_data_val; %replace missing data
 
