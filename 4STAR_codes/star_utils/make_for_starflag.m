@@ -19,6 +19,11 @@ catch;
     gases = false;  
 end;
 
+if ~isfield(fs, 'falgsCWV');
+    gas_note = ' ** does not contain gas flags';
+    gases = false; 
+end;
+
 g.Alt = s.Alt; g.Lat=s.Lat; g.Lon=s.Lon; g.t = s.t;
 g.m_aero = s.m_aero; g.rawrelstd = s.rawrelstd; g.Md = s.Md; g.Str = s.Str;
 g.QdVlr = s.QdVlr; g.QdVtot = s.QdVtot; g.ng = s.ng; g.c0=s.c0;

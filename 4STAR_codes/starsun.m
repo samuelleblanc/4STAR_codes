@@ -58,13 +58,13 @@ load(sourcefile,contents0{:},'program_version');
 s=starwrapper(vis_sun, nir_sun,toggle);
 
 %% Change the types of variables to make smaller variables
-if isfield(toggle, 'reduce_variable_size'); 
-    if toggle.verbose; disp('reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
-    toggle.reduce_variable_size = true;
+if ~isfield(s.toggle, 'reduce_variable_size'); 
+    if s.toggle.verbose; disp('reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
+    s.toggle.reduce_variable_size = true;
 end;
 
-if toggle.reduce_variable_size;
-  if toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+if s.toggle.reduce_variable_size;
+  if s.toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
   s = make_starsun_single(s);
 end;
 
