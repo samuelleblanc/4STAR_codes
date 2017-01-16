@@ -89,6 +89,7 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v2.7, 2016-08-23, Added information about the instrument name and
 %                       auto turn off of the running watervapor if the Optimization Toolbox is
 %                       not found.
+% MS, 2016-01-16, refined auto flags for gases statements (Lines 1006-1014)
 
 version_set('2.7');  
 %********************
@@ -1005,6 +1006,8 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         if toggle.runwatervapor;
             % apply auto gas flagging
             [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
+        end
+        if toggle.gassubtract;
             [~ , s.flagsO3,  flagfile] = starflagGases(s, 1,'O3');
             [~ , s.flagsNO2, flagfile] = starflagGases(s, 1,'NO2');
             [~ ,s.flagsHCOH, flagfile] = starflagGases(s, 1,'HCOH');
