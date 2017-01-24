@@ -1,5 +1,5 @@
 % C0 (TOA Count Rate, /ms) for 4STAR NIR spectrometer (512 channels) derived from MLONov2016 and recorded on 2017-01-23 19:05:54.
-% Based on mean of the c0s from 20161115AM, 20161115PM, and 20161117, which was after the weirdness started on the 14th, and excludes the 16th, where both AM and PM had VIS issues.  C0err=2*stdev the variability within these 3 langleys.
+% Based on mean of the c0s (1.8-12 airmass) from 20161115AM, 20161115PM, and 20161117, which was after the weirdness started on the 14th, and excludes the 16th, where both AM and PM had VIS issues.  C0err=2*stdev the variability within these 3 langleys.
 Pix Wavelength C0 C0err
 511 949.79 5.14884944e+00 4.14389274e-01 
 510 949.79 5.34463642e+00 3.31337964e-01 

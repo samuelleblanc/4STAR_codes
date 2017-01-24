@@ -101,7 +101,7 @@ ax=gca;
 set(ax,'XTick',[1:1:length(goodlangleys)]);
 %  title('c0 timeseries, 2016')
  title('c0 timeseries normalized to November mean, first half')
-xlim([0.7 23.8])
+xlim([0.7 21.8])
 ylim([0.9 1.1])
 grid on
 set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})

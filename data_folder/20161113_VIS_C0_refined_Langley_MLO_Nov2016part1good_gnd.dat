@@ -1,5 +1,5 @@
 % C0 (TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from MLONov2016 and recorded on 2017-01-23 18:47:50.
-% Based on mean of the c0s from 20161110, 20161111, 20161112, and 20161113, which was before the weird drop and spectro issues we saw.  C0err=2*stdev the variability within these 4 langleys.
+% Based on mean of the c0s (1.8-12 airmass) from 20161110, 20161111, 20161112, and 20161113, which was before the weird drop and spectro issues we saw.  C0err=2*stdev the variability within these 4 langleys.
 Pix Wavelength C0 C0err
 0 173.18 -1.00000000e+00 -1.00000000e+00 
 1 173.97 1.89783093e+05 3.67355940e+05 
