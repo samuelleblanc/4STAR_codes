@@ -8,18 +8,18 @@
 
 
 % load('c0s_fits_allLangleys_June2016.mat') % all the fits for the langleys, plus important housekeeping like wavelengths (w) and 
-clear all
-load('c0s_fits_allgoodLangleys_July2016_2-12.mat')
+% clear all
+% load('c0s_fits_allgoodLangleys_July2016_1.8-12.mat')
 %come up with means of c0s:
 for j=1:length(goodlangleys)
     eval(['c0new_all(:,j)=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
     
 end
-daycolor = {'c'    'r'    'g'    'b'    'k'    'm'    [0.5 0.5 0.5]    [0.2 1 0.8]    [0.9 0.8 0]};
+daycolor = {'c'    'r'    'g'    'b'    'k'    'm'   [0.47 0.31 0.45] [0.87 0.49 0] [.75 0.75 0] [0.5 0.5 0.5]    [0.2 1 0.8]    [0.9 0.8 0] [0.5 1 0] [1 0.5 0.2] [0 0.7 0.9] [0.2 0.5 0.7] };
 %%%adding c0s between MLO June and November 2016 (cannibalized from
 %%%Michal's plotLangleyCompare.m thanks!)
-filelistVIS = {'20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2_v2','20160910_VIS_C0_refined_Langley_ORACLES2016_gnd'};
-filelistNIR = {'20160823_NIR_C0_refined_Langley_ORACLES_WFF_gnd','20160825_NIR_C0_refined_Langley_ORACLES_transit2_v2','20160910_NIR_C0_refined_Langley_ORACLES2016_gnd'};
+% filelistVIS = {'20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2_v2','20160910_VIS_C0_refined_Langley_ORACLES2016_gnd','20161110_VIS_C0_refined_Langley_MLO_Nov2016','20161111_VIS_C0_refined_Langley_MLO_Nov2016'};
+% filelistNIR = {'20160823_NIR_C0_refined_Langley_ORACLES_WFF_gnd','20160825_NIR_C0_refined_Langley_ORACLES_transit2_v2','20160910_NIR_C0_refined_Langley_ORACLES2016_gnd','20161110_NIR_C0_refined_Langley_MLO_Nov2016','20161111_NIR_C0_refined_Langley_MLO_Nov2016'};
 % 
 % % prepare for plotting
 % colorlist_ = varycolor(140);
@@ -27,25 +27,26 @@ filelistNIR = {'20160823_NIR_C0_refined_Langley_ORACLES_WFF_gnd','20160825_NIR_C
 
 %%%mean is JUST of the last MLO set...
 c0new_mean=nanmean(c0new_all,2)'; %flip it so its dimensions match the other c0s
+if exist('filelistVIS')
+    for i=1:length(filelistVIS)
 
-for i=1:length(filelistVIS)
-    
-    tmp = importdata(strcat(starpaths,filelistVIS{:,i},'.dat'));
-    wln = tmp.data(:,2);
-    lang.(strcat('c0_',filelistVIS{:,i})) = tmp.data(:,3);
-    
-    tmp = importdata(strcat(starpaths,filelistNIR{:,i},'.dat'));
-    wln = tmp.data(:,2);
-    lang.(strcat('c0_',filelistNIR{:,i})) = tmp.data(:,3);
+        tmp = importdata(strcat(starpaths,filelistVIS{:,i},'.dat'));
+        wln = tmp.data(:,2);
+        lang.(strcat('c0_',filelistVIS{:,i})) = tmp.data(:,3);
 
-    eval(['newORc0s(:,i)=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},'];'])
-    moregoodlangleys{i}=filelistVIS{i}(1:8);
-    eval(['c0new_',filelistVIS{i}(1:8),'=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},']'';'])
-end
+        tmp = importdata(strcat(starpaths,filelistNIR{:,i},'.dat'));
+        wln = tmp.data(:,2);
+        lang.(strcat('c0_',filelistNIR{:,i})) = tmp.data(:,3);
 
+        eval(['newORc0s(:,i)=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},'];'])
+        moregoodlangleys{i}=filelistVIS{i}(1:8);
+        eval(['c0new_',filelistVIS{i}(1:8),'=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},']'';'])
+    end
 c0new_all=[c0new_all newORc0s];
 goodlangleys=[goodlangleys,moregoodlangleys];
 
+end
+    
 c0new_mean=nanmean(c0new_all,2)'; %flip it so its dimensions match the other c0s
 c0new_unc1=2*nanstd(c0new_all,[],2)'; %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
 
@@ -60,12 +61,13 @@ for j=1:length(goodlangleys)
     hold on;
     plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
 end
-subplot(2,1,1); legend(goodlangleys)
+subplot(2,1,1); legend(goodlangleys,'location','northwest')
 set(gca,'fontsize',14); title('C0 VIS'); xlabel('\lambda')
 ylim([0 800]); xlim([100 1000])
 subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR'); xlabel('\lambda')
 ylim([0 20])
+starsas('c0allspectra_MLONov2016.fig','plot_Langleys_all.m')
 
 
 %a plot just showing the spectrum of the mean
@@ -79,7 +81,7 @@ plot(1000*w((length(viscols)+1):end),c0new_mean((length(viscols)+1):end),'-','co
 plot(1000*w((length(viscols)+1):end),c0new_unc1((length(viscols)+1):end),'--','color','k','linewidth',3)
 set(gca,'fontsize',14); title('C0 NIR mean'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0meanspectrum_MLOtoORACLES2016.fig','plot_Langleys_all.m')
+starsas('c0meanspectrum_MLONov2016.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0meanspectrum_072016.pdf
 
@@ -92,20 +94,24 @@ for j=1:length(goodlangleys)
     subplot(2,1,1)
     hold on;
     plot(1000*w(1:length(viscols)),c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+    grid on
+    ylim([-4.8 4.8])
     subplot(2,1,2)
     hold on;
     plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+    grid on
+    ylim([-4.8 4.8])
 end
-subplot(2,1,1); legend(goodlangleys)
-set(gca,'fontsize',14); title('C0 VIS normalized to 6-Langley mean (in %)'); xlabel('\lambda')
-ylim([-30 30]); 
+subplot(2,1,1); legend(goodlangleys,'location','northwest')
+set(gca,'fontsize',14); title('C0 VIS normalized to mean Langley (in %)'); xlabel('\lambda')
+% ylim([-30 30]); 
 xlim([100 1000])
 subplot(2,1,2)
-set(gca,'fontsize',14); title('C0 NIR normalized to 6-Langley mean (in %)'); xlabel('\lambda')
-ylim([-100 100])
-starsas('c0spectra_normalizedtoMLOmean_MLOtoORACLES2016.fig','plot_Langleys_all.m')
+set(gca,'fontsize',14); title('C0 NIR normalized to mean Langley (in %)'); xlabel('\lambda')
+% ylim([-100 100])
+starsas('c0spectra_normalizedtoMLOmean_MLONov2016.fig','plot_Langleys_all.m')
 oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
-print -dpdf c0spectra_normalizedtoMLOmean_MLOtoORACLES2016.pdf
+% print -dpdf c0spectra_normalizedtoMLOmean_MLONov2016.pdf
 
 %plot THE DIFFERENCE between all the spectra versus the mean spectrum, one line per Langley
 figure;
@@ -118,7 +124,7 @@ for j=1:length(goodlangleys)
     hold on;
     plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
 end
-subplot(2,1,1); legend(goodlangleys)
+subplot(2,1,1); legend(goodlangleys,'location','northwest')
 set(gca,'fontsize',14); title('C0 VIS difference from 9-Langley mean'); xlabel('\lambda')
 ylim([-10 10]); 
 xlim([100 1000])
@@ -126,11 +132,37 @@ subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR difference from 9-Langley mean'); xlabel('\lambda')
 % ylim([-100 100])
 
-starsas('c0spectra_differencefrommean_MLOtoORACLES2016.fig','plot_Langleys_all.m')
+starsas('c0spectra_differencefrommean_MLONov2016.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0spectra_differencefrommean_072016.pdf
 
 
+
+%%plot one figure per langley, all wavelengths, normalized, for that
+%%langley.
+figure; 
+for j=7:length(goodlangleys)
+    subplot(2,2,j-6); hold on;
+    eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
+    eval(['slope=-slope_',goodlangleys{j},'(1,:);']) %NB: switched the negative sign here.
+    eval(['rateaero=rateaero_',goodlangleys{j},';']) %count rate, for the bin i (= at wavelength w(cols(i)) (y axis of scatter)-- *** the saved variables above
+    eval(['m_aero=m_aero_',goodlangleys{j},';']) %airmass (x axis of scatter)
+    
+    for i=1:length(cols)
+%     disp([num2str(1000*w(cols(i))),' nm'])
+        plot(m_aero,log(rateaero(:,cols(i))./c0new(cols(i))),'.','color',daycolor{i},'linestyle','none');
+%         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         plot(0:15,((0:15).*slope(:,cols(i))+log(c0new(:,cols(i)))),'-','color',daycolor{i},'linewidth',2);
+        set(gca,'fontsize',14);
+        title(goodlangleys{j}); xlabel('airmass'); ylabel('count rate')
+         xlim([1.5 12.5]); ylim([-0.2 0.05]);
+    end
+    axis square
+end
+legend('353.329',        '379.976',        '451.695',        '500.682',        '519.913',        '605.341',        '675.182',        '780.644',        '864.635',        '941.421',      '1019.9101',      '1064.2268',      '1235.8351',       '1558.728',      '1640.2518') %([num2str(1000*w(cols)),' nm'])
+starsas('Langleys_Nov2016_Part3_normalized.fig','plot_Langleys_all.m')
+% oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
+% print -dpdf Langleys_all072016_multiwavelength.pdf
 
 
 %plot all the Langleys (airmass v counts), one color per Langley, one
@@ -182,11 +214,12 @@ set(gca,'fontsize',14)
 legend('353.3nm', '380.0nm', '451.7nm', '500.7nm', '519.9nm', '605.3nm', '675.2nm', '780.6nm', '864.6nm', '941.4nm', '1019.9nm', '1064.2nm', '1235.8nm', '1558.7nm', '1640.3nm')
 ax=gca;
 set(ax,'XTick',[1:1:length(goodlangleys)]);
-xlim([0.7 10.8])
-set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910'})
-starsas('c0timeseries_Langleys_2016_bywavelength.fig','plot_Langleys_all.m')
+xlim([0.7 11.8])
+% set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112'})
+set(ax,'XTickLabel',{'1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})
+starsas('c0timeseries_Langleys_Nov2016_bywavelength.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
-% print -dpdf c0timeseries_Langleys_all072016_bywavelength.pdf
+% print -dpdf c0timeseries_Langleys_Nov2016_bywavelength.pdf
 
 
 % visfilename=fullfile(starpaths, 'June2016_VIS_C0_mean.dat');
