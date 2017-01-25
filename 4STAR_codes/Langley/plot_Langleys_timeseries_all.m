@@ -60,11 +60,14 @@ goodlangleys=[goodlangleys,mlo2.goodlangleys];
 %10th-13th (4 langleys; before it went all weird).  We will do a second one from the
 %15th-17th (5 langleys, AM+PMs) just to see.
 c0new_mean=nanmean(c0new_all(:,10:13),2); %flip it so its dimensions match the other c0s
-c0new_unc1=2*nanstd(c0new_all(:,10:13),[],2)'; %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
+c0new_unc1=2*nanstd(c0new_all(:,10:13),[],2); %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
 
-%append these to the "all" for the figure below
-c0new_mean11MLO2=nanmean(c0new_all(:,[15:16,19]),2)'; %flip it so its dimensions match the other c0s
-c0new_unc111MLO2=2*nanstd(c0new_all(:,[15:16,19]),[],2)'; %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
+%
+c0new_mean11MLO2=nanmean(c0new_all(:,[15:16,19]),2); %flip it so its dimensions match the other c0s
+c0new_unc111MLO2=2*nanstd(c0new_all(:,[15:16,19]),[],2); %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
+%July MLO trip average
+c0new_meanJul=nanmean(c0new_all(:,1:6),2); %flip it so its dimensions match the other c0s
+c0new_unc1Jul=2*nanstd(c0new_all(:,1:6),[],2); %take the first shot at uncertainty by taking 2-sigma of the variability between the different c0 iterations
 
 
 markershapeses={'.','x','+','^','v','>','<','s','d','p'};
@@ -73,7 +76,7 @@ cols=mlo1.cols;
 w=mlo1.w; %these should be the same for both mlos...
 
 
-figure; 
+figure; %%%%NORMALIZED FIGURE
 colornum=1;
 markernum=1;
 for i=1:length(cols)
@@ -104,10 +107,50 @@ set(ax,'XTick',[1:1:length(goodlangleys)]);
 xlim([0.7 21.8])
 ylim([0.9 1.1])
 grid on
-set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})
+% set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})
+set(ax,'XTickLabel',{'0702AM','0702PM','0703','0704','0705','0707','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})
 %starsas('c0timeseries_Langleys_June-Nov2016_bywavelength.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0timeseries_Langleys_all2016_bywavelength.pdf
+
+
+figure; %%%ABSOLUTE VALUES FIGURE
+colornum=1;
+markernum=1;
+for i=1:length(cols)
+    for j=1:size(c0new_all,2)
+        eval(['c0new_timeseries_',num2str(floor(1000*w(cols(i)))),'(j)=c0new_all(cols(i),j);'])
+        eval(['c0new_timeseries(j)=c0new_all(cols(i),j);'])
+    end
+%      plot(c0new_timeseries./c0new_mean(cols(i)),'marker',markershapeses{markernum},'color',daycolor{colornum},'linewidth',2); hold on;
+   plot(c0new_timeseries,'marker',markershapeses{markernum},'color',daycolor{colornum},'linewidth',2); hold on;
+    if colornum==(length(daycolor))
+        colornum=1;
+    else colornum=colornum+1;
+    end    
+    if markernum==(length(markershapeses))
+        markernum=1;
+    else markernum=markernum+1;
+    end
+%     errorbar(20.5,c0new_mean(cols(i)),c0new_unc1(cols(i)),'marker','s','color','k','markerfacecolor',daycolor{colornum},'markersize',10) %%FOR REAL VALUES
+%     plot(20.5,c0new_mean(cols(i)),'marker','s','color','k','markerfacecolor',daycolor{colornum},'markersize',10) %%FOR PERCENTAGES
+%     plot(21.5,c0new_mean11MLO2(cols(i)),'marker','+','color','k','markerfacecolor',daycolor{colornum},'markersize',10) %%FOR PERCENTAGES
+end
+set(gca,'fontsize',14)
+legend('353.3nm', '380.0nm', '451.7nm', '500.7nm', '519.9nm', '605.3nm', '675.2nm', '780.6nm', '864.6nm', '941.4nm', '1019.9nm', '1064.2nm', '1235.8nm', '1558.7nm', '1640.3nm')
+ax=gca;
+set(ax,'XTick',[1:1:length(goodlangleys)]);
+%  title('c0 timeseries, 2016')
+ title('c0 timeseries')
+xlim([0.7 21.8])
+grid on
+% set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})
+set(ax,'XTickLabel',{'0702AM','0702PM','0703','0704','0705','0707','0823','0825','0910','1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})%,'Nov(mean,1)','Nov(mean,2)'})
+starsas('c0timeseries_Langleys_June-Nov2016_final_bywavelength.fig','plot_Langleys_timeseries_all.m')
+oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [21 13]);
+print -dpdf c0timeseries_Langleys_all2016_final_bywavelength.pdf
+
+
 
 viscols=1:1044;
             nircols=1044+(1:512);
@@ -118,8 +161,8 @@ source='MLONov2016';
 %         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols)', c0new_unc1(:,viscols));
 %         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols)', c0new_unc1(:,nircols));
 
-        visfilename=fullfile(starpaths, 'Nov2016part2_nogood_VIS_C0_mean.dat');
-        nirfilename=fullfile(starpaths, 'Nov2016part2_nogood_NIR_C0_mean.dat');
-additionalnotes='Based on mean of the c0s from 20161115AM, 20161115PM, and 20161117, which was after the weirdness started on the 14th, and excludes the 16th, where both AM and PM had VIS issues.  C0err=2*stdev the variability within these 3 langleys.';
-        starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean11MLO2(viscols), c0new_unc111MLO2(:,viscols));
-        starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean11MLO2(nircols), c0new_unc111MLO2(:,nircols));
+%         visfilename=fullfile(starpaths, 'Nov2016part2_nogood_VIS_C0_mean.dat');
+%         nirfilename=fullfile(starpaths, 'Nov2016part2_nogood_NIR_C0_mean.dat');
+% additionalnotes='Based on mean of the c0s from 20161115AM, 20161115PM, and 20161117, which was after the weirdness started on the 14th, and excludes the 16th, where both AM and PM had VIS issues.  C0err=2*stdev the variability within these 3 langleys.';
+%         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean11MLO2(viscols), c0new_unc111MLO2(:,viscols));
+%         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean11MLO2(nircols), c0new_unc111MLO2(:,nircols));
