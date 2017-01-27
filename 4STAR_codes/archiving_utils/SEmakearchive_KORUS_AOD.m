@@ -45,9 +45,9 @@
 function SEmakearchive_KORUS_AOD
 version_set('v2.1')
 %% set variables
-ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
-starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
@@ -55,7 +55,7 @@ platform = 'DC8';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          1          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          1          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...

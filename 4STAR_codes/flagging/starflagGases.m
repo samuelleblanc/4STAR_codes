@@ -41,6 +41,7 @@ function [flags, qual_flag, flagfile] = starflagGases(s, Mode,gas_name_str)
 %                 starwrapper
 % MS, 2016-11-02, gas_name_str - added gas name to use in starsun
 %                 twaeking to read gas variables from s structure
+% MS, 2016-01-16, fixing bugs related to Mode==1 gas flags
 %------------------------------------------------------------------------------
 version_set('1.5');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
@@ -111,6 +112,13 @@ end
 if ~isempty(s)
     t=s.t;w=s.w;Lon=s.Lon;Lat=s.Lat;Alt=s.Alt;
     c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtot=s.QdVtot;ng=s.ng;Md=s.Md;
+    try;
+        Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
+        viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
+        w = s.w;
+    catch;
+        disp('Missing some variables, trying anyway')
+    end;
     try;
         rawrelstd=s.rawrelstd;
     catch;
@@ -276,10 +284,18 @@ nm_500 = interp1(w,[1:length(w)],.5, 'nearest');
 nm_870 = interp1(w,[1:length(w)],.87, 'nearest');
 nm_452 = interp1(w,[1:length(w)],.452, 'nearest');
 nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
-%colsang=[nm_452 nm_865];
-ang_noscreening=s.ang_noscreening;%sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
-aod_500nm = s.aod_500nm;%tau_aero_noscreening(:,nm_500);
-aod_865nm = s.aod_865nm;%tau_aero_noscreening(:,nm_865);
+colsang=[nm_452 nm_865];
+if Mode==1
+    % reading from s strcture
+    ang_noscreening=sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+    aod_500nm = tau_aero_noscreening(:,nm_500);
+    aod_865nm = tau_aero_noscreening(:,nm_865);
+else
+    % reading from reduced starsun_for_starflag structure
+    ang_noscreening=s.ang_noscreening;%sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+    aod_500nm = s.aod_500nm;%tau_aero_noscreening(:,nm_500);
+    aod_865nm = s.aod_865nm;%tau_aero_noscreening(:,nm_865);
+end
 
 % define input param to flag
 if Mode == 1
@@ -317,7 +333,7 @@ elseif Mode == 2
 
 end
 
-aod_500nm_max=s.aod_500nm_max;%3
+aod_500nm_max=3;%s.aod_500nm_max;%3
 m_aero_max=15;
 
 % % initializing a logical field
