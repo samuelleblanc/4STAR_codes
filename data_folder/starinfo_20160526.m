@@ -5,13 +5,16 @@ else
    daystr=evalin('caller','daystr');
 end
 
-if isfield(s, 'toggle')
-    s.toggle = update_toggle(s.toggle);
-else
-    s.toggle = update_toggle;
-end
+%if isfield(s, 'toggle')
+%    s.toggle = update_toggle(s.toggle);
+%else
+%    s.toggle = update_toggle;
+%end
 
 s.flight=[datenum(2016,5,26,03,00,38) datenum(2016,5,26,07,10,32)];
+
+s. flagfilename     = '20160526_starflag_man_created20160613_1008by_JL.mat';
+
 % gases flags
 s.flagfilenameCWV   = '20160526_starflag_CWV_man_created20170109_0904by_MS.mat';
 s.flagfilenameO3    = '20160526_starflag_O3_man_created20170109_0906by_MS.mat';
@@ -66,27 +69,27 @@ function toggle_out = update_toggle(toggle_in)
 % Frequently this instance will be shadowed by the internal function
 % of the same name defined beneath starinfo files.
 
-toggle_out.subsetting_Tint = true;
-toggle_out.pca_filter = false;
-toggle_out.verbose=true;
-toggle_out.saveadditionalvariables=true;
-toggle_out.savefigure=false;
-toggle_out.computeerror=false;
-toggle_out.inspectresults=false;
-toggle_out.applynonlinearcorr=true;
-toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = false;
-toggle_out.booleanflagging = true;
-toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
-toggle_out.doflagging = true; % for running any Yohei style flagging
-toggle_out.dostarflag = true; 
-toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = false;
-toggle_out.applyforjcorr = false;
-toggle_out.applystraycorr = false;
+%toggle_out.subsetting_Tint = true;
+%toggle_out.pca_filter = false;
+%toggle_out.verbose=true;
+%toggle_out.saveadditionalvariables=true;
+%toggle_out.savefigure=false;
+%toggle_out.computeerror=false;
+%toggle_out.inspectresults=false;
+%toggle_out.applynonlinearcorr=true;
+%toggle_out.applytempcorr=false;% true is for SEAC4RS data
+%toggle_out.gassubtract = false;
+%toggle_out.booleanflagging = true;
+%toggle_out.flagging = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+%toggle_out.doflagging = true; % for running any Yohei style flagging
+%toggle_out.dostarflag = true; 
+%toggle_out.lampcalib  = false; 
+%toggle_out.runwatervapor = false;
+%toggle_out.applyforjcorr = false;
+%toggle_out.applystraycorr = false;
 
-if exist('toggle_in', 'var')
-   toggle_out = catstruct(toggle_in, toggle_out);
-end
+%if exist('toggle_in', 'var')
+%   toggle_out = catstruct(toggle_in, toggle_out);
+%end
 
 return
