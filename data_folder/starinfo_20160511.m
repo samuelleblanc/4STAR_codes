@@ -24,6 +24,10 @@ s.flagfilenameO3    = '20160511_starflag_O3_man_created20170111_1342by_MS.mat';%
 s.flagfilenameNO2   = '20160511_starflag_NO2_man_created20170111_1346by_MS.mat';%'20160511_starflag_NO2_man_created20170109_0512by_MS.mat';
 s.flagfilenameHCOH  = '20160511_starflag_HCOH_man_created20170109_0518by_MS.mat';
 
+% extra uncertainty based on Connor's analysis
+% from 2017-01-26: I  might be inclined to flag the entire flight as having AOD uncertain to 0.1 at 452 nm, mayb2e half that at 865 nm or 1 um, and perhaps 0.03 at 1.6 um.  But it is really just an educated guess.  
+s.AODuncert_constant_extra = [0.1140    0.1000    0.0915    0.0884    0.0865    0.0838    0.0758    0.0740    0.0673    0.0566    0.0500    0.0414      0.0405    0.0396    0.0350    0.0309    0.0300];
+
 %s.flag = starflags_20160511_CWV_MS_marks_ALL_20160523_0126;% runs a function.
 % Ozone and other gases 
 s.O3h=21; % guess 
