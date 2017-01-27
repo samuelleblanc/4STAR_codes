@@ -37,10 +37,13 @@
 % 2016-07-01, MS, tweaked for certain flag days for KORUS
 % 2016-07-14, MS, twaeked to accept automatic flags
 % 2017-01-12, SL, v2.0, changed to archive R0 version, added uncertainty fields 
+% 2017-01-27, SL, v2.1, added AOD uncertainty modification for certain
+%                       flights. based on Connor's merge marks files, identified
+%                       in starinfo files
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
-version_set('v2.0')
+version_set('v2.1')
 %% set variables
 ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
 starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
@@ -52,7 +55,7 @@ platform = 'DC8';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          1          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          1          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -87,6 +90,8 @@ revComments = {...
     'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included. \n';...
     'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
+
+specComments_extra_uncertainty = 'Uncertainty in this file has been adjusted to reflect estimated AOD impact of deposition on window. AOD values has not been corrected in this release. Future revisions will include corrected AODs.\n'; 
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -192,6 +197,20 @@ for i=idx_file_proc
         error(['Problem loading the uncertainties in file:' starfile])
     end;
     
+    %% Update the uncertainties with merge marks file saved in the starinfo
+    add_uncert = false;
+    if isfield(s,'AODuncert_mergemark_file');
+        disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
+        d = load(s.AODuncert_mergemark_file);
+        specComments{end+1} = specComments_extra_uncertainty;
+        add_uncert = true;
+    elseif isfield(s,'AODuncert_constant_extra');
+        disp(['Applying constant AOD factor to existing AOD'])
+        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
+        specComments{end+1} = specComments_extra_uncertainty;
+        add_uncert = true;
+    end
+    
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
         temp_cells = strfind(note,'C0');
@@ -274,6 +293,9 @@ for i=idx_file_proc
         ii = nn-iradstart-length(save_wvls)+1;
         [tutc_unique,itutc_unique] = unique(tutc);
         data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+        if add_uncert;  % if the add uncertainty exists then run that also.
+            data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+        end;
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
