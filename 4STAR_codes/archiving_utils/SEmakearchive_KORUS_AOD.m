@@ -45,9 +45,19 @@
 function SEmakearchive_KORUS_AOD
 version_set('v2.1')
 %% set variables
-ICTdir = 'E:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
-starinfo_path = 'E:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-starsun_path = 'E:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+if ~isempty(strfind(lower(userpath),'msegalro')); %
+    ICTdir = 'E:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = 'E:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+    starsun_path = 'E:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+elseif ~isempty(strfind(lower(userpath),'sleblan2'));
+    ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+    starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+else
+    ICTdir = 'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = 'D:\KORUS-AQ\starinfo\';
+    starsun_path = 'D:\KORUS-AQ\starsun\';
+end
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'DC8';
@@ -55,7 +65,7 @@ platform = 'DC8';
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          1          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          1          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -312,7 +322,13 @@ for i=idx_file_proc
              
                 data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
                 if add_uncert;  % if the add uncertainty exists then run that also.
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+                    try;
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+                    catch;
+                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                    end;
                 end;
         
          %end
