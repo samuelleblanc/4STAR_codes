@@ -25,6 +25,9 @@ s.flagfilenameO3    = '20160608_starflag_O3_man_created20170110_0401by_MS.mat';
 s.flagfilenameNO2   = '20160608_starflag_NO2_man_created20170110_0417by_MS.mat';
 s.flagfilenameHCOH  = '20160608_starflag_HCOH_man_created20170110_0432by_MS.mat';
  
+% AOD uncertainty correction file from Connor sent on 2017-01-31
+s.AODuncert_mergemark_file = '20160608_AOD_merge_marks.mat'; 
+
 % Ozone and other gases 
 s.O3h=21; 
 s.O3col=0.360;    % Michal's guess based on forecast 
