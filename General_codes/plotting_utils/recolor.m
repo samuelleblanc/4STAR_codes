@@ -22,7 +22,13 @@ function lines = recolor(lines, z,cv);
        mc = min([length(map).*ones(size(map_color)),map_color],[],2);
        map_color = mc;
    end
-   for c = 1:length(colors)
+   if length(size(colors))>1;
+       c_endt = size(colors);
+       c_end = c_endt(1);
+   else
+       c_end = length(colors);
+   end;
+   for c = 1:c_end;
       set(lines(c),'color',map(map_color(c),:));
    end
       caxis(cv);
