@@ -25,6 +25,9 @@ s.flagfilenameCWV   = '20160609_starflag_CWV_man_created20170110_0436by_MS.mat';
 s.flagfilenameO3    = '20160609_starflag_O3_man_created20170111_2349by_MS.mat';%'20160609_starflag_O3_man_created20170110_0444by_MS.mat';
 s.flagfilenameNO2   = '20160609_starflag_NO2_man_created20170111_2356by_MS.mat';%'20160609_starflag_NO2_man_created20170110_0519by_MS.mat';
 s.flagfilenameHCOH  = '20160609_starflag_HCOH_man_created20170110_0528by_MS.mat';
+
+% AOD uncertainty correction file from Sam 2017-02-01 
+s.AODuncert_mergemark_file = '20160609_AOD_merge_marks.mat';
  
 % Ozone and other gases 
 s.O3h=21; 

@@ -29,6 +29,10 @@ s.flagfilenameO3    = '20160503_starflag_O3_man_created20170109_0314by_MS.mat';
 s.flagfilenameNO2   = '20160503_starflag_NO2_man_created20170109_0317by_MS.mat';
 s.flagfilenameHCOH  = '20160503_starflag_HCOH_man_created20170109_0322by_MS.mat';
  
+% AOD uncertainty correction file from Sam 2017-02-01 
+s.AODuncert_mergemark_file = '20160503_AOD_merge_marks.mat'; 
+
+
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=1013.25;  
