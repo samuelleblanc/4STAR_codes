@@ -22,6 +22,9 @@ s.flagfilenameHCOH  = '20160521_starflag_HCOH_man_created20170109_0832by_MS.mat'
 s.dirty = [datenum(2016,5,23,03,35,00) datenum(2016,5,23,03,41,00)];
 s.clean = [datenum(2016,5,23,04,26,00) datenum(2016,5,23,04,29,15)];
 
+% AOD uncertainty correction file from Sam 2017-02-01 
+s.AODuncert_mergemark_file = '20160521_AOD_merge_marks.mat';
+
 % Ozone and other gases 
 s.O3h=21; % guess 
 s.O3col=0.300; % guess     
