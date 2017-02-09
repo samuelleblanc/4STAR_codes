@@ -6,10 +6,11 @@ if ~exist('t','var')||isempty(t)
 end
 in_time = [min(t), max(t)];
 n = 0;
-aip_files = getfullname('*.dubovik','aip','Select aip files');
+aip_files = {getfullname('*.dubovik','aip','Select aip files')}
 aip = []
 for f = 1:length(aip_files)
-%    disp(['File number ',num2str(f)])
+   disp(['File number ',num2str(f)])
+   disp(aip_files{f})
    tmp = read_cimel_aip(aip_files{f});
    time_ = tmp.time>in_time(1)&tmp.time<in_time(2);
    if sum(time_)>0
