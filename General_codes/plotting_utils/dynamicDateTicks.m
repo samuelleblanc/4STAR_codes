@@ -91,12 +91,12 @@ end
         axesInfo = get(axHandle, 'UserData'); % Get the axes info for that axes
         try % If it is a date axes, create a date-friendly data tip
             if strcmp(axesInfo.Type, 'dateaxes')
-                output_txt = sprintf('X: %s\nY: %0.4g', datestr(pos(1)), pos(2));
+                output_txt = sprintf('X: %s\nY: %0.6g', datestr(pos(1)), pos(2));
             else
-                output_txt = sprintf('X: %0.4g\nY: %0.4g', pos(1), pos(2));
+                output_txt = sprintf('X: %0.4g\nY: %0.6g', pos(1), pos(2));
             end
         catch % It's not a date axes, create a generic data tip
-            output_txt = sprintf('X: %0.4g\nY: %0.4g', pos(1), pos(2));
+            output_txt = sprintf('X: %0.4g\nY: %0.6g', pos(1), pos(2));
         end
     end
 
