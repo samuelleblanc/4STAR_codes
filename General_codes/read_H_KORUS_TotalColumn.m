@@ -30,9 +30,8 @@ aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod.csv'
 gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
-qual_flag_o3 = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
 % find vh indices for altitudes of below 500m
@@ -40,15 +39,17 @@ ok  = [];
 
 for i=1:length(horilegs_utc)
     
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160503
 
@@ -90,7 +91,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -132,7 +133,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -178,7 +179,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -223,7 +224,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -268,7 +269,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -312,7 +313,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -359,7 +360,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -403,7 +404,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -448,7 +449,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -488,7 +489,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -530,7 +531,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -575,7 +576,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -620,7 +621,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -668,7 +669,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -712,7 +713,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -758,7 +759,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -806,7 +807,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -850,7 +851,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -896,7 +897,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -936,7 +937,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -982,7 +983,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
@@ -1022,7 +1023,7 @@ end
 
 % save .txt file
 
-aod_dat_halt     = aod_ict.data(ok,:);
+aod_dat_tc     = aod_ict.data(ok,:);
 
 save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
 
