@@ -16,33 +16,25 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
         savematfile=unconfirmed_savematfile;
     end;
 else % ask for a full path
-    if (strcmp(getUserName,'sleblan2'));
-        defaultsavefolder=get_last_used_path();
+    if ~isempty(which('starpaths')); % look into pre-set path
+        [defaultsavefolder, figurefolder, askforsourcefolder, author]=starpaths;
     else
-        if ~isempty(which('starpaths')); % look into pre-set path
-            [defaultsavefolder, figurefolder, askforsourcefolder, author]=starpaths;
-        else
-            defaultsavefolder='';
-        end;
+        defaultsavefolder='';
     end;
     [savematfile, defaultsavefolder] = uiputfile(fullfile(defaultsavefolder, unconfirmed_savematfile), ...
         'Save file as');
     if ~isequal(savematfile,0);
         savematfile=fullfile(defaultsavefolder,savematfile);
-        if (strcmp(getUserName,'sleblan2')); % special for Sam
-            updateLastUsedPath(defaultsavefolder);
-        end;
     end;
 end;
 
-%% function to get the last used path
 function lastDir = get_last_used_path()
 
 % name of mat file to save last used directory information
 pname = strrep(userpath,';',filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
-    mkdir(fullfile(pname), 'filepaths');
+    mkdir(pname, 'filepaths');
 end
 % pathdir = [pathdir,filesep];
 
@@ -63,27 +55,4 @@ if exist(lastDirMat, 'file') ~= 0
         lastDir = lastUsedDir;
     end
 end;
-return
-
-%% function to save the last used path
-function updateLastUsedPath(savefolder);
-% name of mat file to save last used directory information
-pname = strrep(userpath,';',filesep);
-pathdir = [pname, 'filepaths',filesep];
-if ~exist(pathdir,'dir')
-    mkdir(fullfile(pname), 'filepaths');
-end
-lastDirMat = [pathdir, 'lastUsedDir.mat'];
-
-if ~isequal(savefolder,0)
-    try
-        % save last folder used to lastDirMat mat file
-        lastUsedDir = savefolder;
-        save(lastDirMat, 'lastUsedDir');
-    catch
-        % error saving lastDirMat mat file, display warning, the folder
-        % will not be remembered
-        disp(['Warning: Could not save file ''', lastDirMat, '''']);
-    end
-end
 return

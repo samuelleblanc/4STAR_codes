@@ -73,17 +73,18 @@ if exist('vis_skya','var')
     for si = length(vis_skya):-1:1
         if ~isempty(vis_skya(si).t)
             filen = num2str(vis_skya(si).filen);
-            s=starwrapper(vis_skya(si), nir_skya(si));
+            s=starwrapper_(vis_skya(si), nir_skya(si));
             [~,fname,~] = fileparts(strrep(s.filename{1},'\',filesep));
             out = [strrep(fname,'_VIS_SKY','_STARSKY'),'.mat'];
             disp('Ready for sky scan stuff')
+            close('all')
             try
-                s_out = starsky_scan(s); % vis_pix restrictions in here
-                %                 [~,fname,~] = fileparts(ss.filename{1});
-                %                s_out = ss;
-                %                save([mat_dir,filesep,out],'-struct','s_out');
+               s_out = starsky_scan(s); % vis_pix restrictions in here
+               %                 [~,fname,~] = fileparts(ss.filename{1});
+               %                s_out = ss;
+               %                save([mat_dir,filesep,out],'-struct','s_out');
                 %               save(strrep(savematfile,'__starsky.mat',['_',filen,'_starsky.mat']), '-struct','s_out')
-                save([matdir, out],'s_out');
+                save([matdir, out],'-struct','s_out');
                 fig_out = [imgdir,strrep(out,'.mat','.fig')];
                 if exist(fig_out,'file')
                     delete(fig_out);
@@ -101,7 +102,7 @@ if exist('vis_skya','var')
             catch
                 save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
-            close('all')
+%             pause(2);
         end
     end
     %     clear ss;
@@ -112,15 +113,16 @@ if exist('vis_skyp','var')
     for si = length(vis_skyp):-1:1
         if ~isempty(vis_skyp(si).t)
             filen = num2str(vis_skyp(si).filen);
-            s=starwrapper(vis_skyp(si), nir_skyp(si));
+            s=starwrapper_(vis_skyp(si), nir_skyp(si));
             disp('Ready for sky scan stuff')
             [~,fname,~] = fileparts(strrep(s.filename{1},'\',filesep));
             out = [strrep(fname,'_VIS_SKY','_STARSKY'),'.mat'];
+            close('all')
             try
                 s_out = starsky_scan(s); % vis_pix restrictions in here
                 %                 [~,fname,~] = fileparts(ss.filename{1});
                 %             s_out = ss;
-                save([matdir, out],'s_out');
+                save([matdir, out],'-struct','s_out');
                 
                 %            save(strrep(savematfile,'__starsky.mat',['_',filen,'_starsky.mat']), '-struct','s_out')
                 %             save(savematfile, '-struct','s_out')
@@ -143,7 +145,7 @@ if exist('vis_skyp','var')
             catch
                 save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
-            close('all')
+%             pause(2);
         end
     end
     %    clear ss;

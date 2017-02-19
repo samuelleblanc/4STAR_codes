@@ -1,3 +1,4 @@
+function [o3] = retrieveO3_(s,wstart,wend,mode)
 %% Details of the function:
 % NAME:
 %   retrieveO3
@@ -45,7 +46,7 @@
 %                              added option to use linear/lin_constrained
 % -------------------------------------------------------------------------
 %% function routine
-function [o3] = retrieveO3_(s,wstart,wend,mode)
+
 
 plotting = 0;
 linear   = 1;% do only linear inversion
@@ -187,9 +188,9 @@ end
 %             tau_OD = log(repmat(c0,length(s.t),1)./s.ratetot(:,(wln)));
 %     end
 %
-o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
-o3fit          = ccoef(1,:)'*basis(:,1)';
-o3residual     = tau_OD-RR';
+% o3spectrum     = tau_OD-RR' + ccoef(1,:)'*basis(:,1)';
+% o3fit          = ccoef(1,:)'*basis(:,1)';
+% o3residual     = tau_OD-RR';
 
 %RMSEo3_new     = sqrt(sum(sum((o3residual.^2)))/(length(wln)-8));
 
@@ -292,8 +293,5 @@ end;
 % flag
 o3relstd=o3std./o3mean;
 o3.flag(o3relstd>sd_o3_crit)=1;
-
-
-
 
 return;

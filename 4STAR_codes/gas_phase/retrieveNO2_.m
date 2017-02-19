@@ -1,3 +1,4 @@
+function [no2] = retrieveNO2(s,wstart,wend,mode)
 %% Details of the function:
 % NAME:
 %   retrieveNO2
@@ -40,42 +41,33 @@
 % MS, 2016-05-05, added usage of reference spectrum
 % -------------------------------------------------------------------------
 %% function routine
-function [no2] = retrieveNO2(s,wstart,wend,mode)
-
 plotting = 0;
 % load cross-sections
 loadCrossSections_global_;
-
- Loschmidt=2.686763e19;                   % molec/cm3*atm
- % find wavelength range index
- w = s.w; t = s.t; toggle = s.toggle;
- tau_ray = s.tau_ray; rateslant = s.rateslant;
- 
- istart = interp1(w,[1:length(w)],wstart, 'nearest');
- iend   = interp1(w,[1:length(w)],wend  , 'nearest');
- 
- wln = find(w<=w(iend)&w>=w(istart)); 
- 
+Loschmidt=2.686763e19;                   % molec/cm3*atm
+% find wavelength range index
+%  rateslant = s.rateslant;
+ istart = interp1(s.w,[1:length(s.w)],wstart, 'nearest');
+ iend   = interp1(s.w,[1:length(s.w)],wend  , 'nearest');
+ wln = find(s.w<=s.w(iend)&s.w>=s.w(istart)); 
 
   % select NO2 absorbing band to plot residuals for
- ires   = interp1(w(wln),[1:length(w(wln))],0.470  ,'nearest');
+%  ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
  
  % apply specified NO2 gas c0
  % decide which c0 to use
  % mode = 1;%0-MLO c0; 1-MLO ref spec
   
-  [c0]=starc0gases(nanmean(t),toggle.verbose,'NO2',mode);
+  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
   
   if mode==0
       % when mode==0 need to choose wln
-      c0 = c0(wln)';
+      c0 = tmp(wln)';
   elseif mode==1
-      c0 = c0.no2refspec;
+      c0 = tmp.no2refspec;
   end
-  
- 
  % calculate residual spectrum (Rayleigh subtracted)
-eta = repmat(log(c0),length(t),1) - log(rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*tau_ray(:,wln);
+eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
 
 if plotting
 % plot residual to fit (ind 12 in wln, which is 459nm).
@@ -85,11 +77,8 @@ if plotting
 end
 
 % do linear retrieval first (no wavelength shift) 
-
-
     % this is end member array (original cross sections)
-    
-    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), w(wln)'.*ones(length(wln),1), ((w(wln)').^2).*ones(length(wln),1)];
+    basis = [no2_298Kcoef(wln), no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1)];
 
     % solve
     % x = real(Abasis\spectrum_sub');
@@ -97,7 +86,7 @@ end
     ccoef_d=[];
     RR_d=[];
     % vectorize
-    for k = length(t):-1:1
+    for k = length(s.t):-1:1
 
         coef=real(basis\eta(k,:)');
         % coef=real(Abasis\spectrum_sub(k,:)');
@@ -127,15 +116,13 @@ end
        % load reference spectrum
        ref_spec = load(which('20160113NO2refspec.mat'));
        no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + ref_spec.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
-       tplot = serial2Hh(t); tplot(tplot<10) = tplot(tplot<10)+24;
+       tplot = serial2Hh(s.t); tplot(tplot<10) = tplot(tplot<10)+24;
        [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
        no2vcd_smooth = real(no2SCDsmooth)./s.m_NO2;
-   end
-    
-    
+   end        
    % calculate error
    tau_OD  = s.tau_tot_slant;
-   no2Err  = (tau_OD(:,wln)'-RR_d(:,:))./repmat((no2_298Kcoef(wln)),1,length(t)); 
+   no2Err  = (tau_OD(:,wln)'-RR_d(:,:))./repmat((no2_298Kcoef(wln)),1,length(s.t)); 
    MSEno2DU = real(((1/length(wln)-7)*sum(no2Err.^2))');                          
    RMSEno2  = real(sqrt(real(MSEno2DU)))./s.m_NO2; % convert to vertical
           
@@ -148,10 +135,9 @@ end
 %    no2fit      = exp(-(ccoef_d(1,:)')*basis(:,1)');
 %    no2residual = spectrum_sub - exp(-(ccoef_d(1,:)')*basis(:,1)' - (ccoef_d(2,:)')*basis(:,2)' - (ccoef_d(3,:)')*basis(:,3)' - ccoef_d(4,:)'*basis(:,4)' - ccoef_d(5,:)'*basis(:,5)');
 %    
-
    if plotting
    % plot fitted and "measured" no2 spectrum
-         for i=1:100:length(t)
+         for i=1:100:length(s.t)
              figure(8882);
              %plot(w((wln)),spectrum_sub(i,:),'--k','linewidth',2);hold on;
              %plot(w((wln)),no2meas(i,:),'-y','linewidth',2);hold on;
@@ -168,26 +154,22 @@ end
              pause(0.001);
          end
    end
-   
-   
+     
    if plotting
        figure;subplot(211);%plot(tplot,no2VCD,'.r');hold on;
-              plot(tplot,no2vcd_smooth,'.g');hold on;
-              axis([tplot(1) tplot(end) 0 5e15]);
-              xlabel('time');ylabel('no2 [molec/cm^{2}]');title(datestr(t(1),'yyyymmdd'));
-              %legend('linear inversion','linear inversion smooth');
-              legend('linear inversion smooth');
-              subplot(212);plot(tplot,RMSres,'.r');hold on;
-              axis([tplot(1) tplot(end) 0 0.005]);
-              xlabel('time');ylabel('no2 RMSE');
+       plot(tplot,no2vcd_smooth,'.g');hold on;
+       axis([tplot(1) tplot(end) 0 5e15]);
+       xlabel('time');ylabel('no2 [molec/cm^{2}]');title(datestr(t(1),'yyyymmdd'));
+       %legend('linear inversion','linear inversion smooth');
+       legend('linear inversion smooth');
+       subplot(212);plot(tplot,RMSres,'.r');hold on;
+       axis([tplot(1) tplot(end) 0 0.005]);
+       xlabel('time');ylabel('no2 RMSE');
    end
-
    % no2OD is the spectrum portion to subtract
     no2.no2_molec_cm2    = no2vcd_smooth;
     no2.no2resi          = RMSres;
-    no2.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+    no2.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
     no2.no2SCD           = no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
-
-
 
 return;

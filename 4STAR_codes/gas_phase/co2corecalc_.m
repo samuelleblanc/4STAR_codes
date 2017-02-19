@@ -1,4 +1,4 @@
-function [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc(starsun,ch4coef,co2coef,wln,tau_OD)
+function [CH4conc, CO2conc, CO2resi, co2OD,tau_co2ch4_subtract] = co2corecalc(starsun,ch4coef,co2coef,wln,tau_co2ch4_subtract)
 % retrieve using 1.555-1.630 region (CH4 and CO2)
 %------------------------------------------------
 % MS, Mar 11, 2014
@@ -7,7 +7,7 @@ function [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc(stars
 %------------------------------------------------
 w = starsun.w; t = starsun.t;
 ODfit = zeros(length(t),length(w));
-tau_co2ch4_subtract = tau_OD;
+% tau_co2ch4_subtract = tau_OD;
 %------------------------------------------------
 
 sc=[];
@@ -16,7 +16,7 @@ sc_residual = [];
 for i = length(t):-1:1
            
     x0 = [500 500 0.75 0.8 -2]; 
-    y = (tau_OD(i,wln));
+    y = (tau_co2ch4_subtract(i,wln));
     meas = [w(wln)' y'];
     PAR  = [ch4coef(wln) co2coef(wln)];
        % Set Options

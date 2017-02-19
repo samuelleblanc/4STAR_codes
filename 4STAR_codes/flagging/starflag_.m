@@ -10,6 +10,7 @@ function [flags, good, flagfile] = starflag_(s, Mode)
 %       and starflags_YYYYMMDD_marks_not_aerosol_created_YYYYMMDD_by_Op.m
 %       and starflags_YYYYMMDD_marks_smoke_created_YYYYMMDD_by_Op.m
 %       and starflags_YYYYMMDD_marks_cirrus_created_YYYYMMDD_vy_Op.m, etc...
+% REMOVED MODE 3 (load file) in favor of support via menu option
 
 % Modification history:
 % SL, v1.0, 20141013, added my name to the list of flaggers and added version control of this m script with version_set
@@ -21,6 +22,10 @@ function [flags, good, flagfile] = starflag_(s, Mode)
 % CJF, 2016-01-17, added more write_starflags_mark_file examples
 % SL, 2016-05-04, added special function buttons to visi_screen
 % CJF, 2016-06-07, many structural changes
+% CJF, 2016-11-10, have augmented to support import of flags. Need to test
+% further.  Want to modify to use a static named "last_flags" file that
+% will be copied into a date-stamped user-tagged file at the end.
+% 
 version_set('1.4');
 
 while ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
@@ -59,6 +64,12 @@ if ~isempty(flag_all)
     [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
 end
 
+if ((isstruct(s) && isfield(s,'flags')) || (isobject(s)&&any(strcmp(properties(s),'flags'))))
+    flags_new = s.flags;
+    flags = merge_flags(flags, flags_new);
+end
+
+
 if Mode~=1
     op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
         'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
@@ -82,19 +93,17 @@ if Mode~=1
             op_name_str = 'KP';
     end
 
-
     % Define flags which do not flag data as "bad".
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
 
-    
     %We define several fields to plot in the auxiliary panels
     panel_1.aod_380nm = inp.aod_380nm;
     panel_1.aod_452nm = inp.aod_452nm;
     panel_1.aod_865nm = inp.aod_865nm;
     
     panel_2.ang = inp.ang_noscreening;
-    panel_2.Quad = sqrt(s.QdVlr.^2 + s.QdVtb.^2)./s.QdVtot;
+    panel_3.Quad = sqrt(s.QdVlr.^2 + s.QdVtb.^2)./s.QdVtot;
     panel_3.rawrelstd = inp.rawrelstd(:,1);
     panel_4.Alt = s.Alt;
     
@@ -133,8 +142,9 @@ if Mode~=1
     end
     screen_bad_list = F_t(~test_good);
             
-    flagfile = [daystr,'_starflag_man_created',now_str, 'by_',op_name_str,'.mat'];
-    outputfile=[starpaths,flagfile];
+    flagfile = [daystr,'_starflag_man_created_',now_str, 'by_',op_name_str,'.mat'];
+    lastflagfile = [daystr,'_starflag_man_created_last_by_',op_name_str,'.mat'];;
+    outputfile=[starpaths,lastflagfile];
     disp(['Starflag mode 2 to output to:' flagfile])
     
     flags_matio = matfile(outputfile,'Writable',true);
@@ -169,13 +179,22 @@ if Mode~=1
     manual_flags.flagfile = flagfile;
     flags.manual_flags = manual_flags;
     flags.flagfile = flagfile; % make it so that we save the flagfile name.
+    
+    flagfile = [daystr,'_starflag_man_created_',now_str, 'by_',op_name_str,'.mat'];
+    lastflagfile = [daystr,'_starflag_man_created_last_by_',op_name_str,'.mat'];;
+    outputfile=[starpaths,lastflagfile];
+    
     [~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
+    
+    
     if ~exist(outputfile,'file')
         disp(['Creating ',outmat]);
         save(outputfile,'-struct','flags','-v7.3');
+        save([starpaths,flagfile],'-struct','flags','-v7.3');
     else
         disp(['Appending to ',outmat]);
         save(outputfile,'-append','-struct','flags');
+        save([starpaths,flagfile],'-append','-struct','flags');
     end
     
     % Output an m-file representing all these flags in "ng" format

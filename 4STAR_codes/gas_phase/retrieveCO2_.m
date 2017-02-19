@@ -40,7 +40,7 @@
 %% function routine
 function [co2] = retrieveCO2(s,wstart,wend)
 
-plotting = 0;
+% plotting = 0;
 % load cross-sections
 loadCrossSections_global_;
 w = s.w; 
@@ -79,7 +79,7 @@ w = s.w;
 %    
    % perform constrained retrieval
   
-   [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc_(s,ch4coef,co2coef,wln,s.tau_aero);
+   [CH4conc, CO2conc, CO2resi, co2OD, tau_co2ch4_subtract] = co2corecalc_(s,ch4coef,co2coef,wln,s.tau_aero);
    co2.co2 = CO2conc./s.m_ray;       % this is vertical column amount
    co2.ch4 = CH4conc./s.m_ray;       % this is vertical column amount
    co2.co2resi= CO2resi;

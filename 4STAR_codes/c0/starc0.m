@@ -24,9 +24,8 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.7, 2016-05-01, updated c0 from korus-aq transit flight 1
 % MS, v1.7, 2016-05-02, updated c0 from korus-aq transit 1, o3 corrected
 % SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016. 
-% MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 
-version_set('1.9');
+version_set('1.8');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -41,7 +40,7 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
-        if t>=datenum([2016 8 26 0 0 0]);
+        if t>=datenum([2016 8 24 0 0 0]);
             daystr='20160825';
             filesuffix='refined_Langley_ORACLES_transit2';
         elseif t>=datenum([2016 8 23 0 0 0]);
@@ -59,28 +58,16 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            %daystr='20160426';
+            daystr='20160426';
             %korus-aq transit section 1
-            %filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
+            filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
         elseif now>=datenum([2016 1 19 0 0 0]);
             %daystr='20160109';
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
             %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
         elseif now>=datenum([2016 1 9 0 0 0]);
-            %daystr='20160109';
-            %filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
+            daystr='20160109';
+            filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
         end;  
         % transferred from Yohei's laptop, for record keeping
         if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
@@ -106,8 +93,6 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
             if t>datenum([2015 11 23 0 0 0])
                 daystr='20151123';
-                %daystr='20151104';
-                %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';
                 filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
             elseif t>datenum([2015 11 18 0 0 0])
                 daystr='20151118';
@@ -264,11 +249,7 @@ if ~exist('visc0')
         visfilename=[daystr{i} '_VIS_C0_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            try;
             a=importdata(which(visfilename));
-            catch;
-                error(['Cant open file: ' visfilename])
-            end;
 %             a=importdata(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
@@ -315,7 +296,6 @@ if ~exist('visc0')
     visnote=[visnote(1:end-2) '.'];
     nirnote=[nirnote(1:end-2) '.'];
 end;
-if verbose; disp(['Using the C0 from ' visfilename]), end;
 
 % return channels used for AOD fitting
 [visc,nirc]=starchannelsatAATS(t);

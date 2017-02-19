@@ -1,5 +1,5 @@
-function [flags_out,inp] = define_starflags_20160605(s, flags_in);
-% [flags_out,inp] = define_starflags_20160605(s, flags_in);
+function [flags_out,inp] = define_starflags_20160605(s);
+% [flags_out,inp] = define_starflags_20160605(s);
 % define flags for use in visiscreen.  This includes initial population
 % of "auto" screens as well as manual flags.
 
@@ -8,9 +8,6 @@ function [flags_out,inp] = define_starflags_20160605(s, flags_in);
 % or purposes. In conjunction with changes in this function, there may also
 % be date-specific changes in the set_starflags_yyyymmdd function below.  
 
-if ~exist('flags_in','var')
-    flags_in = [];
-end
 
 % First load some fields that should always exist in starsun
 w=s.w; Lon=s.Lon; Lat=s.Lat; Alt=s.Alt; Pst=s.Pst; Tst=s.Tst; aerosolcols=s.aerosolcols;

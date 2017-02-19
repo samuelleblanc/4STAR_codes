@@ -1,4 +1,4 @@
-%% Details of the function:
+function [gas] = retrieveGases_(s)
 % NAME:
 %   retrieveGases
 % 
@@ -37,7 +37,6 @@
 % -------------------------------------------------------------------------
 %% function routine
 
-function [gas] = retrieveGases_(s)
 %----------------------------------------------------------------------
  version_set('1.0');
  showfigure = 0;
@@ -58,7 +57,6 @@ tic; [gas.co2]  = retrieveCO2_(s,1.555,1.630);
 if toggle.verbose disp({['In retrieveCO2:'],toc}); end
 %% retrieve O2
 %  TBD
-
 %% retrieve HCOH
 tic;[gas.hcoh] = retrieveHCOH_(s,0.335,0.359,1);
 if toggle.verbose disp({['In retrieveHCOH:'],toc}); end
@@ -79,19 +77,16 @@ if toggle.verbose disp({['In retrieveHCOH:'],toc}); end
    d.o3resiDU         = gas.o3.o3resiDU;
    d.hcoh_DU          = gas.hcoh.hcoh_DU;
    d.hcohresi         = gas.hcoh.hcohresi;
-   cwv = s.cwv;
-   d.cwv              = cwv.cwv940m1;
-   d.cwv_std          = cwv.cwv940m1std;
+   d.cwv              = s.cwv.cwv940m1;
+   d.cwv_std          = s.cwv.cwv940m1std;
    d.lat              = s.Lat;
    d.lon              = s.Lon;
    d.alt              = s.Alt;
    d.sza              = s.sza;
    d.tUTC             = serial2hs(s.t);
    
-
    fi = strcat(datestr(d.t(1),'yyyymmdd'),'_gas_summary.mat');
    save([starpaths fi],'-struct','d');
-   
-  
+     
 %---------------------------------------------------------------------
  return;

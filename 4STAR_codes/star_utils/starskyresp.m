@@ -1,3 +1,6 @@
+function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
+version_set('1.7');
+
 %% Details of the program:
 % NAME:
 %   starskyresp
@@ -64,8 +67,6 @@
 % -------------------------------------------------------------------------
 
 %% start of function
-function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.7');
 
 % control the input
 if nargin==0;
@@ -98,19 +99,13 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % with SEAC4RS fiber (not the long one going on ARISE)
         daystr = '20140624'; % date of cal
         filesuffix = 'from_20140624_016_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 9 18 0 0 0]);
+    elseif t >= datenum([2014 7 16 0 0 0]) && t < datenum([2014 10 23 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20140716';
         filesuffix = 'from_20140716_003_VIS_park_with_20140606091700HISS';
         %filesuffix = 'from_20140716_004_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 9 18 0 0 0]) && t < datenum([2014 09 26 0 0 0]);
-        % for using calibration from second lab sphere cal
-        % with long fiber for the ARISE field campaign
-        daystr = '20140926';
-        filesuffix = 'from_20140926_004_NIR_park_with_20140716_small_sphere_rad';
-        %filesuffix = 'from_20141024_009_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2014 9 26 0 0 0]) && t < datenum([2015 09 14 0 0 0]);
+    elseif t >= datenum([2014 10 23 0 0 0]) && t < datenum([2015 09 14 0 0 0]);
         % for using calibration from second lab sphere cal
         % with long fiber for the ARISE field campaign
         daystr = '20141024';
@@ -121,9 +116,12 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % cal
         daystr = '20150915';
         filesuffix = 'from_20150915_012_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2016 03 30 0 0 0]);
+    elseif t >= datenum([2016 03 30 0 0 0]) && t < datenum([2016 9 1 0 0 0 ]);
         daystr = '20160330';
         filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
+    elseif t >= datenum([2016 9 1 0 0 0 ])
+       daystr = '20160923';
+       filesuffix = 'from_4STAR_20160923_008_VIS_park_with_20160330_small_sphere_rad';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
@@ -137,7 +135,7 @@ end;
 if ~exist('visresp')
     if ~exist('filesuffix');
         error('Update starskyresp.m');
-    elseif isstr(filesuffix);
+    elseif ischar(filesuffix);
         daystr={daystr};
         filesuffix={filesuffix};
     end;
@@ -149,7 +147,7 @@ if ~exist('visresp')
         visfilename=[daystr{i} '_VIS_SKY_Resp_' filesuffix{i} '.dat'];
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
-            if not(exist(which(visfilename)));
+            if ~exist(which(visfilename));
                 warning(['*** File not found:' which(visfilename)])
             end;
             a=importdata(which(visfilename));
@@ -228,7 +226,8 @@ end;
 return
 
 function [visaerosolcols,niraerosolcols] = starchannelsatANET(t)
-anet_wl = [440, 673, 873, 1022];
+% These are the values displayed on AERONET inversion page
+anet_wl = [440, 670, 870, 1020];
 [visw, nirw]=starwavelengths(nanmean(t));
 visaerosolcols = interp1(1000.*visw, [1:length(visw)],anet_wl,'nearest');
 niraerosolcols = interp1(1000.*nirw, [1:length(nirw)],anet_wl,'nearest')+1044;

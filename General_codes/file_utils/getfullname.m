@@ -1,4 +1,4 @@
-function [fullname] = getfullname(fspec,pathfile,dialog)
+function [fullname] = getfullname(fspec,pathfile,dialog);
 % function [fullname] = getfullname(fspec,pathfile,dialog);
 % fspec is a string indicating the file mask to be used with uigetfile
 % pathfile is a string indicating the filename stem of the mat-file to use
@@ -8,19 +8,15 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 % 2009-01-08, CJF: Uploading to 4STAR matlab_files repository
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
-DRV = [];
-usrpath = userpath;
-if ~isempty(usrpath)&&strcmp(usrpath(2),':')
-   DRV = usrpath(1:2), usrpath = usrpath(3:end);
-end
-pname = strrep(strrep(usrpath,';',filesep),':',filesep);
-pathdir = [DRV,pname,filesep, 'filepaths',filesep];
+
+
+pname = strrep(strrep(userpath,';',filesep),':',filesep);
+pathdir = [pname, filesep,'filepaths',filesep];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
 end
 pathdir = [pathdir,filesep];
-pathdir = strrep(pathdir,[filesep filesep],filesep);
-
+pathdir = strrep(pathdir, [filesep filesep], filesep);
 if ~exist('dialog','var')||isempty(dialog)
     if exist('pathfile','var')&&~isempty(pathfile)
         dialog = ['Select a file for ',pathfile,'.'];

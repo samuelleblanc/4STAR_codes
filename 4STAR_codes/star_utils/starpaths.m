@@ -26,10 +26,8 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 %                  - added check for linux, for use on pleaides
 % Modified (v1.5): by Kristina Pistone, 2016-06-29: added data path for my
 %                   machine
-% Modified (v1.6): by Samuel LeBlanc, 2016-10-28
-%                   - added time dependent paths
 %---------------------------------------------------------------------
-version_set('1.6');
+version_set('1.5');
 
 % get the version of matlab
 vv = version('-release');
@@ -94,31 +92,24 @@ elseif ~isempty(strfind(lower(userpath),'samuel'))
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'))
     if isunix;
-        matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
-        figurefolder='/home5/sleblan2/4STAR/figs/';
-        author='Samuel';
-        if nargin>0;
-            matfolder = '/nobackupp8/sleblan2/SEAC4RS/dc8/SEAC4RS/';
-            %pp='/nobackupp8/sleblan2/ARISE/c130/';
-            %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
-            %if nargin>1; matfolder=[matfolder raw filesep]; end;
-        end;
+      matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
+      figurefolder='/home5/sleblan2/4STAR/figs/';
+      author='Samuel';
+      if nargin>0;
+        matfolder = '/nobackupp8/sleblan2/SEAC4RS/dc8/SEAC4RS/';
+        %pp='/nobackupp8/sleblan2/ARISE/c130/';
+        %matfolder=[pp ls([pp '*ARISE*' source]) filesep];
+        %if nargin>1; matfolder=[matfolder raw filesep]; end;
+      end;
     else
-        matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
-        figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
-        author='Samuel';
-        if nargin>0;
-            try
-                if str2num(source)>20160711.0;
-                    pp = 'C:\Users\sleblan2\Research\ORACLES\data\';
-                    matfolder = [pp];
-                end;
-            catch
-                pp='C:\Users\sleblan2\Research\ARISE\c130\';
-                matfolder=[pp ls([pp '*ARISE*' source]) filesep];
-                if nargin>1; matfolder=[matfolder raw filesep]; end;
-            end;
-        end;
+      matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
+      figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
+      author='Samuel';
+      if nargin>0;
+        pp='C:\Users\sleblan2\Research\ARISE\c130\';
+        matfolder=[pp ls([pp '*ARISE*' source]) filesep];
+        if nargin>1; matfolder=[matfolder raw filesep]; end;
+      end;
     end
 elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
     matfolder='/home5/sleblan2/4STAR/4STAR_codes/data_folder/' ;
@@ -131,7 +122,7 @@ elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on plei
         %if nargin>1; matfolder=[matfolder raw filesep]; end;
     end;
 elseif ~isempty(strfind(lower(userpath),'kpistone'))
-    matfolder='C:\Users\kpistone\Documents\4STAR\data\' ;
+    matfolder='C:\Users\kpistone\Documents\4STAR\data' ;
     figurefolder='C:\Users\kpistone\Documents\4STAR\data\figs\';
     author='Kristina';
 else
