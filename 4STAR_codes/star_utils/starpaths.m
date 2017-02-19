@@ -66,8 +66,8 @@ elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(user
         matfolder = '/Users/d3k014/Desktop/data/4STAR/processed/';
         figurefolder = '/Users/d3k014/Desktop/data/4STAR/img/';
     else
-    matfolder='C:\Users\d3k014\Documents\GitHub\4STAR_codes\data_folder\';
-    figurefolder='D:\data\4STAR\yohei\img\';
+       matfolder='Y:\case_studies\4STAR\data\mat\';
+       figurefolder='Y:\case_studies\4STAR\figs\';
     end
 
 elseif ~isempty(strfind(lower(userpath),'jredeman'));

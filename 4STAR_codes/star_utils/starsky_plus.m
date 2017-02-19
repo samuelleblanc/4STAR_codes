@@ -13,21 +13,27 @@ if ~exist('s','var')
     end
 end
 if isfield(s,'filename')
-    [p,skytag,x] = fileparts(strrep(s.filename{1},'\',filesep));
+    if iscell(s.filename)
+        filename = s.filename{1};
+    else
+        filename = s.filename;
+    end
+    [p,skytag,x] = fileparts(strrep(filename,'\',filesep));
     skytag = strrep(skytag,'_VIS_','_');skytag = strrep(skytag,'_NIR_','_');
 end
-if ~exist('sfile','var')
-    sfile = s.filename{1};
+if isfield(s,'good_sky')&&~all(size(s.t)==size(s.good_sky))
+    s.good_sky = s.good_sky';
 end
+
 ! This is the wrong location to save mat files.
-[pname_mat,~,~] = fileparts(sfile);
+[pname_mat,~,~] = fileparts(filename);
 if ~exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
 end
 % Determine if on ground or airborne
 if geodist(s.Lat(1),s.Lon(1),s.Lat(end),s.Lon(end)) > 1000
    % We are in the air so use ssfr or MODIS if no SSFR and below ???km
-[s.sfc_alb, time_out] = get_ssfr_flight_albedo(mean(s.t), s.w);
+[s.sfc_alb, time_out] = get_ssfr_flight_albedo(mean(s.t), 1000.*s.w);
 else 
    % Eventually pass in time or doy, but for now hardcode for SEACRS
    % s.brdf = get_modis_brdf(s.Lat(1),s.Lon(1),doy);
@@ -37,7 +43,7 @@ else
    % We are on ground so use supplied or MODIS
 end
 
-sunfile = (getfullname_([datestr(s.t(1),'yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
+sunfile = (getfullname(['4STAR_',datestr(s.t(1),'yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
 if ~isempty(sunfile)
     if ~exist('fig3','var')
         fig3 = figure;
@@ -107,7 +113,9 @@ if ~isempty(sunfile)
     else
         
         plot((sun.t), real(tau_aero(:,anet)), 'o'); legend('440 nm','673 nm','873 nm', 'Location','EastOutside'); yl= ylim;
-        plot((sun.t), real(tau_aero(:,anet)), 'o',[mean(s.t), mean(s.t)], yl,'r--'); yl= ylim;
+        plot((sun.t), real(tau_aero(:,anet)), 'o',[mean(s.t), mean(s.t)], yl,'r--', ...
+            s.t([1 end]), ones([2,1])*s.tau_aero_skyscan, '-')
+        yl= ylim;
         title('4STAR AODs')
         %                 dynamicDateTicks;
         ax3(1) = gca;
@@ -121,21 +129,21 @@ if ~isempty(sunfile)
     if K <4
         xl = xlim;
         good_aod = startime>=xl(1) & startime<=xl(2) & tau_aero(:,anet(1))>0 &  tau_aero(:,anet(2))>0 &  tau_aero(:,anet(3))>0 ...
-            & tau_aero(:,anet(1))<2& tau_aero(:,anet(2))<2& tau_aero(:,anet(3))<2&~isNaN(tau_aero(:,anet(1)))&...
-            ~isNaN(tau_aero(:,anet(2)))&~isNaN(tau_aero(:,anet(3)));
+            & tau_aero(:,anet(1))<2& tau_aero(:,anet(2))<2& tau_aero(:,anet(3))<2&~isnan(tau_aero(:,anet(1)))&...
+            ~isnan(tau_aero(:,anet(2)))&~isnan(tau_aero(:,anet(3)));
         s.tau_aero = mean(tau_aero(good_aod,:));
         if sum(good_aod)==0
             
             good_aod = startime>=xl(1) & startime<=xl(2) & tau_aero_ns(:,anet(1))>0 &  tau_aero_ns(:,anet(2))>0 &  tau_aero_ns(:,anet(3))>0 ...
-                & tau_aero_ns(:,anet(1))<2& tau_aero_ns(:,anet(2))<2& tau_aero_ns(:,anet(3))<2&~isNaN(tau_aero_ns(:,anet(1)))&...
-                ~isNaN(tau_aero_ns(:,anet(2)))&~isNaN(tau_aero_ns(:,anet(3)));
+                & tau_aero_ns(:,anet(1))<2& tau_aero_ns(:,anet(2))<2& tau_aero_ns(:,anet(3))<2&~isnan(tau_aero_ns(:,anet(1)))&...
+                ~isnan(tau_aero_ns(:,anet(2)))&~isnan(tau_aero_ns(:,anet(3)));
             s.tau_aero = mean(tau_aero_ns(good_aod,:));
         end
 
         s.tau = mean(tau(good_aod,:));
         s.tau_O3 = mean(tau_O3(good_aod,:));
         if ~isempty(CWV)
-            good_cwv = startime>=xl(1) & startime<=xl(2) & CWV>0 &~isNaN(CWV);
+            good_cwv = startime>=xl(1) & startime<=xl(2) & CWV>0 &~isnan(CWV);
             s.PWV = mean(CWV(good_cwv));
         end
     end
@@ -164,7 +172,7 @@ s.flight_level = mean(s.Alt); % picking very low "ground level" sufficient for s
 % Should replace this with an actual determination based on a land-surface mapping.
 % Both gen_sky_inp_4STAR and gen_aip_cimel_need to be modified.
 
-[pname_mat,~,~] = fileparts(sfile);
+[pname_mat,~,~] = fileparts(filename);
 if exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     delete([pname_mat, filesep,skytag,'_starsky.mat']);
 end
