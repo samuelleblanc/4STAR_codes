@@ -26,8 +26,8 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
 ict_alt = aod_ict.data(:,4);% this is in meters
@@ -68,32 +68,35 @@ datenum('2016-05-04 05:59:32') datenum('2016-05-04 06:24:25')];
 % convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = 24+t2utch(horilegs_t(:,2));
+horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
 
 % 20160504
 
@@ -114,28 +117,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160506
 
@@ -155,33 +160,34 @@ datenum('2016-05-07 05:27:52') datenum('2016-05-07 06:02:37')];
 % convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = 24+t2utch(horilegs_t(:,2));
+horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
     
-    %ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1));
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160510
 
@@ -205,28 +211,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160511
 
@@ -250,28 +258,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160512
 
@@ -294,28 +304,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160516
 
@@ -341,28 +353,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160517
 
@@ -377,36 +391,37 @@ datenum('2016-05-18 04:32:09') datenum('2016-05-18 04:43:38'); ...
 datenum('2016-05-18 04:49:56') datenum('2016-05-18 04:53:21'); ...
 datenum('2016-05-18 04:55:20') datenum('2016-05-18 06:51:23')];
 
-
 % convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = 24 + t2utch(horilegs_t(:,2));
+horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160519
 
@@ -430,28 +445,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160521
 
@@ -464,37 +481,39 @@ datenum('2016-05-22 04:58:01') datenum('2016-05-22 05:13:38'); ...
 datenum('2016-05-22 06:42:47') datenum('2016-05-22 07:43:55')];
 
 % convert t to utcHr
+% convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
 horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160524
-
 daystr='20160524';
 
 horilegs_t=[datenum('2016-05-24 22:59:03') datenum('2016-05-24 23:04:55'); ...
@@ -512,28 +531,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160526
 
@@ -557,28 +578,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160529
 
@@ -602,28 +625,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160530
 
@@ -650,28 +675,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160601
 
@@ -694,28 +721,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160602
 
@@ -740,28 +769,30 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160604
 
@@ -782,34 +813,37 @@ datenum('2016-06-05 06:41:22') datenum('2016-06-05 06:45:34'); ...
 datenum('2016-06-05 07:11:29') datenum('2016-06-05 07:17:01')];
 
 % convert t to utcHr
+% convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
 horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160608
 
@@ -826,34 +860,37 @@ datenum('2016-06-09 05:43:50') datenum('2016-06-09 06:28:20'); ...
 datenum('2016-06-09 06:32:24') datenum('2016-06-09 06:33:53')];
 
 % convert t to utcHr
+% convert t to utcHr
 horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
 horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
 horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 % 20160609
 
@@ -878,154 +915,163 @@ horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
 
 % load ict.csv files:
 
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
+aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
 
 ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
+ict_alt = aod_ict.data(:,4);% this is in meters
+%qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+% find vh indices for altitudes of below 500m
 ok  = [];
 
 for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
+    
+    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
     ok = [ok;ok_];
 end
 
 % save .txt file
 
 aod_dat_tc     = aod_ict.data(ok,:);
+gas_dat_tc     = gas_ict.data(ok,:);
 
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
 
 % 20160614
 
-daystr='20160614';
-
-horilegs_t=[datenum('0000-06-14 06:31:44') datenum('0000-06-14 07:33:54'); ...
-datenum('0000-06-14 07:39:47') datenum('0000-06-14 13:29:21'); ...
-datenum('0000-06-14 14:25:56') datenum('0000-06-14 16:52:17'); ...
-datenum('0000-06-14 17:17:42') datenum('0000-06-14 21:05:05')];
-
-% convert t to utcHr
-horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
-horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
-
-% load ict.csv files:
-
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
-
-ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
-
-
-% find vh indices for altitudes of above 4000m
-ok  = [];
-
-for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
-    ok = [ok;ok_];
-end
-
-% save .txt file
-
-aod_dat_tc     = aod_ict.data(ok,:);
-
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
-
-% 20160617
-
-daystr='20160617';
-
-horilegs_t=[datenum('2016-06-17 17:27:53') datenum('2016-06-17 17:34:05'); ...
-datenum('2016-06-17 17:54:39') datenum('2016-06-17 18:01:31'); ...
-datenum('2016-06-17 18:23:11') datenum('2016-06-17 18:29:18'); ...
-datenum('2016-06-17 18:43:34') datenum('2016-06-17 18:50:08'); ...
-datenum('2016-06-17 19:01:23') datenum('2016-06-17 19:06:13'); ...
-datenum('2016-06-17 19:13:17') datenum('2016-06-17 19:19:29'); ...
-datenum('2016-06-17 19:49:57') datenum('2016-06-17 19:57:14'); ...
-datenum('2016-06-17 20:18:40') datenum('2016-06-17 20:25:09'); ...
-datenum('2016-06-17 20:43:31') datenum('2016-06-17 20:57:47'); ...
-datenum('2016-06-17 21:26:26') datenum('2016-06-17 21:29:38'); ...
-datenum('2016-06-17 21:46:17') datenum('2016-06-17 22:00:15')];
-
-% convert t to utcHr
-horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
-horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
-
-% load ict.csv files:
-
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
-
-ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
-
-
-% find vh indices for altitudes of above 4000m
-ok  = [];
-
-for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
-    ok = [ok;ok_];
-end
-
-% save .txt file
-
-aod_dat_tc     = aod_ict.data(ok,:);
-
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
-
-% 20160618
-
-daystr='20160618';
-
-horilegs_t=[datenum('2016-06-18 17:12:25') datenum('2016-06-18 17:45:10'); ...
-datenum('2016-06-18 17:58:28') datenum('2016-06-18 20:39:24'); ...
-datenum('2016-06-18 20:43:21') datenum('2016-06-18 20:49:45'); ...
-datenum('2016-06-18 20:58:44') datenum('2016-06-18 21:20:32'); ...
-datenum('2016-06-18 22:23:04') datenum('2016-06-18 22:34:41')];
-
-% convert t to utcHr
-horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
-horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
-horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
-
-% load ict.csv files:
-
-aod_ict = importdata(strcat('E:\KORUS-AQ\aod_ict\',daystr,'_aod.csv'));
-%gas_ict = importdata(strcat('E:\KORUS-AQ\gas_ict\',daystr,'_gas.csv'));
-
-ict_utc = (aod_ict.data(:,1)/86400)*24;
-ict_alt = aod_ict.data(:,4);
-qual_flag = aod_ict.data(:,5);
-
-
-% find vh indices for altitudes of above 4000m
-ok  = [];
-
-for i=1:length(horilegs_utc)
-    % ac - above cloud data
-    ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=15000&ict_alt>=4000&qual_flag==0);
-    ok = [ok;ok_];
-end
-
-% save .txt file
-
-aod_dat_tc     = aod_ict.data(ok,:);
-
-save(strcat('E:\KORUS-AQ\dirty_clean\halt_aod\',daystr,'_halt_aod.dat'),'-ASCII','aod_dat_halt');
-
-
-
+% daystr='20160614';
+% 
+% horilegs_t=[datenum('0000-06-14 06:31:44') datenum('0000-06-14 07:33:54'); ...
+% datenum('0000-06-14 07:39:47') datenum('0000-06-14 13:29:21'); ...
+% datenum('0000-06-14 14:25:56') datenum('0000-06-14 16:52:17'); ...
+% datenum('0000-06-14 17:17:42') datenum('0000-06-14 21:05:05')];
+% 
+% % convert t to utcHr
+% horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
+% horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
+% horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
+% 
+% % load ict.csv files:
+% 
+% aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+% gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
+% 
+% ict_utc = (aod_ict.data(:,1)/86400)*24;
+% ict_alt = aod_ict.data(:,4);% this is in meters
+% %qual_flag = aod_ict.data(:,5);
+% 
+% 
+% % find vh indices for altitudes of below 500m
+% ok  = [];
+% 
+% for i=1:length(horilegs_utc)
+%     
+%     ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
+%     ok = [ok;ok_];
+% end
+% 
+% % save .txt file
+% 
+% aod_dat_tc     = aod_ict.data(ok,:);
+% gas_dat_tc     = gas_ict.data(ok,:);
+% 
+% save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+% save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+% 
+% % 20160617
+% 
+% daystr='20160617';
+% 
+% horilegs_t=[datenum('2016-06-17 17:27:53') datenum('2016-06-17 17:34:05'); ...
+% datenum('2016-06-17 17:54:39') datenum('2016-06-17 18:01:31'); ...
+% datenum('2016-06-17 18:23:11') datenum('2016-06-17 18:29:18'); ...
+% datenum('2016-06-17 18:43:34') datenum('2016-06-17 18:50:08'); ...
+% datenum('2016-06-17 19:01:23') datenum('2016-06-17 19:06:13'); ...
+% datenum('2016-06-17 19:13:17') datenum('2016-06-17 19:19:29'); ...
+% datenum('2016-06-17 19:49:57') datenum('2016-06-17 19:57:14'); ...
+% datenum('2016-06-17 20:18:40') datenum('2016-06-17 20:25:09'); ...
+% datenum('2016-06-17 20:43:31') datenum('2016-06-17 20:57:47'); ...
+% datenum('2016-06-17 21:26:26') datenum('2016-06-17 21:29:38'); ...
+% datenum('2016-06-17 21:46:17') datenum('2016-06-17 22:00:15')];
+% 
+% % convert t to utcHr
+% horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
+% horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
+% horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
+% 
+% % load ict.csv files:
+% 
+% aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+% gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
+% 
+% ict_utc = (aod_ict.data(:,1)/86400)*24;
+% ict_alt = aod_ict.data(:,4);% this is in meters
+% %qual_flag = aod_ict.data(:,5);
+% 
+% 
+% % find vh indices for altitudes of below 500m
+% ok  = [];
+% 
+% for i=1:length(horilegs_utc)
+%     
+%     ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
+%     ok = [ok;ok_];
+% end
+% 
+% % save .txt file
+% 
+% aod_dat_tc     = aod_ict.data(ok,:);
+% gas_dat_tc     = gas_ict.data(ok,:);
+% 
+% save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+% save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+% 
+% % 20160618
+% 
+% daystr='20160618';
+% 
+% horilegs_t=[datenum('2016-06-18 17:12:25') datenum('2016-06-18 17:45:10'); ...
+% datenum('2016-06-18 17:58:28') datenum('2016-06-18 20:39:24'); ...
+% datenum('2016-06-18 20:43:21') datenum('2016-06-18 20:49:45'); ...
+% datenum('2016-06-18 20:58:44') datenum('2016-06-18 21:20:32'); ...
+% datenum('2016-06-18 22:23:04') datenum('2016-06-18 22:34:41')];
+% 
+% % convert t to utcHr
+% horilegs_utc      = zeros(size(horilegs_t,1),size(horilegs_t,2));
+% horilegs_utc(:,1) = t2utch(horilegs_t(:,1));
+% horilegs_utc(:,2) = t2utch(horilegs_t(:,2));
+% 
+% % load ict.csv files:
+% 
+% aod_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_R0aod.csv'));
+% gas_ict = importdata(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_R0gas.csv'));
+% 
+% ict_utc = (aod_ict.data(:,1)/86400)*24;
+% ict_alt = aod_ict.data(:,4);% this is in meters
+% %qual_flag = aod_ict.data(:,5);
+% 
+% 
+% % find vh indices for altitudes of below 500m
+% ok  = [];
+% 
+% for i=1:length(horilegs_utc)
+%     
+%     ok_ = find(ict_utc<=horilegs_utc(i,2)&ict_utc>=horilegs_utc(i,1)&ict_alt<=500);
+%     ok = [ok;ok_];
+% end
+% 
+% % save .txt file
+% 
+% aod_dat_tc     = aod_ict.data(ok,:);
+% gas_dat_tc     = gas_ict.data(ok,:);
+% 
+% save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
+% save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+% 
+% 
+% 
+% 
