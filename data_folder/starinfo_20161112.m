@@ -6,17 +6,17 @@ else
 end
 
 if isfield(s, 'toggle')
+    disp('it went to the first one')
     s.toggle = update_toggle(s.toggle);
 else
+    disp('it went to the second one')
     s.toggle = update_toggle;
 end
+disp(s.toggle)
+s.langley=[datenum(2016,11,12,16,53,20) datenum(2016,11,12,19,15,35)];  %whole thing: datenum(2016,11,11,16,52,25) datenum(2016,11,11,22,05,00)
+% langley1=[datenum(2016,11,12,16,53,20) datenum(2016,11,12,18,55,35)];% TO TWO AIRMASS
+langley1=[datenum(2016,11,12,16,53,20) datenum(2016,11,12,19,15,35)];% TO 1.8 AIRMASS %langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
 
-% s.flight=[datenum(2016,9,10,7,31,25) datenum(2016,9,10,15,24,55)]; 
-% spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
-% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-s.langley=[datenum(2016,11,10,16,52,10) datenum(2016,11,10,19,12,35)]; %whole thing: datenum(2016,11,10,16,51,35) datenum(2016,11,10,20,00,20)
-% langley1=[datenum(2016,11,10,16,52,10) datenum(2016,11,10,18,53,40)]; %LANGLEY TO 2 AIRMASS
-langley1=[datenum(2016,11,10,16,52,10) datenum(2016,11,10,19,12,35)];% LANGLEY TO 1.8 AIRMASS %langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
 % Ozone and other gases 
 s.O3h=21; % 
 s.O3col=0.300; % Michal's guess     
@@ -60,7 +60,6 @@ function toggle_out = update_toggle(toggle_in)
 % Frequently this instance will be shadowed by the internal function
 % of the same name defined beneath starinfo files.
 % un-test commit michal 2016-05-08
-
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
 toggle_out.verbose=true;
@@ -83,8 +82,11 @@ toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
 
+disp(toggle_out)
+disp(toggle_in)
+
 if exist('toggle_in', 'var')
-   toggle_out = catstruct(toggle_in, toggle_out);
+   toggle_out = catstruct(toggle_in,toggle_out);
 end
 
 return

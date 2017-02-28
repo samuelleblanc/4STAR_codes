@@ -13,9 +13,9 @@ else
     s.toggle = update_toggle;
 end
 disp(s.toggle)
-s.langley=[datenum(2016,11,11,16,45,00) datenum(2016,11,11,23,59,00)];
-langley1=[datenum(2016,11,11,16,45,00) datenum(2016,11,11,23,59,00)];% langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
-
+s.langley=[datenum(2016,11,11,16,52,45) datenum(2016,11,11,19,14,32)];  %whole thing: datenum(2016,11,11,16,52,25) datenum(2016,11,11,22,05,00)
+% langley1=[datenum(2016,11,11,16,52,45) datenum(2016,11,11,18,55,35)];%LANGLEY TO 2 AIRMASS
+langley1=[datenum(2016,11,11,16,52,45) datenum(2016,11,11,19,14,32)];%LANGLEY TO 1.8 AIRMASS % langley1=[datenum(2016,9,10,05,20,00) datenum(2016,9,10,06,52,00)]; %full langley-- airmass ~15?
 % Ozone and other gases 
 s.O3h=21; % 
 s.O3col=0.300; % Michal's guess     
@@ -72,8 +72,8 @@ toggle_out.gassubtract = true;
 toggle_out.booleanflagging = true;
 toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
-toggle_out.doflagging = true; % for running any Yohei style flagging
-toggle_out.dostarflag = true; 
+toggle_out.doflagging = false; % for running any Yohei style flagging
+toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
 toggle_out.runwatervapor = false;
 toggle_out.applyforjcorr = true;
@@ -88,5 +88,4 @@ if exist('toggle_in', 'var')
    toggle_out = catstruct(toggle_in,toggle_out);
 end
 
-disp(toggle_out)
 return

@@ -127,10 +127,10 @@ for daynum=1:length(alldays)%=5
             ok = ok(m_aero(ok)>=4);
         end
         [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
-            if savefigure;            
             starttstr=datestr(langley(1), 31);
             stoptstr=datestr(langley(2), 13);
                 title([daystr ' Langley #' num2str(langnum) ' with FORJ correction, ' starttstr ' - ' stoptstr])
+            if savefigure;            
                 starsas(['Langley_' daystr '_',num2str(langnum),'_allstdevs.fig, starLangley.m']);
             end;
         for k=1:numel(stdev_mult);
