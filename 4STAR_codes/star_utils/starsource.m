@@ -53,7 +53,8 @@ if isequal(lower(source), 'ask');
     % ask now
     filenames={};
     if askforsourcefolder
-        sourcefolder = uigetdir(defaultsourcefolder, 'Pick a source directory (or cancel to pick files).');
+       sourcefolder = getnamedpath('4STAR_raw_data','4STAR raw data');
+%         sourcefolder = uigetdir(defaultsourcefolder, 'Pick a source directory (or cancel to pick files).');
         if ~isequal(sourcefolder,0);
             filenames0=struct2cell(dir(sourcefolder));
             for i=1:size(filenames0,2);

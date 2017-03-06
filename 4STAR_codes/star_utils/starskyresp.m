@@ -124,7 +124,10 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
     elseif t >= datenum([2016 03 30 0 0 0]);
         daystr = '20160330';
         filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
-    end;  
+    elseif t >= datenum([2016 9 1 0 0 0 ])
+       daystr = '20160923';
+       filesuffix = 'from_4STAR_20160923_008_VIS_park_with_20160330_small_sphere_rad';
+    end;    
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
     if isequal(t, 'MLO201205') || isequal(t, 'MLO2012May')

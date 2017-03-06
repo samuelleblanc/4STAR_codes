@@ -13,11 +13,14 @@ if ~exist('s','var')
     end
 end
 if isfield(s,'filename')
-    [p,skytag,x] = fileparts(strrep(s.filename{1},'\',filesep));
+   if iscell(s.filename)
+      s.filename = s.filename{1};
+   end
+    [p,skytag,x] = fileparts(strrep(strrep(s.filename,'\',filesep),'/',filesep));
     skytag = strrep(skytag,'_VIS_','_');skytag = strrep(skytag,'_NIR_','_');
 end
 if ~exist('sfile','var')
-    sfile = s.filename{1};
+    sfile = s.filename;
 end
 ! This is the wrong location to save mat files.
 [pname_mat,~,~] = fileparts(sfile);
@@ -37,7 +40,7 @@ else
    % We are on ground so use supplied or MODIS
 end
 
-sunfile = (getfullname_([datestr(s.t(1),'yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
+sunfile = (getfullname(['4STAR_',datestr(s.t(1),'yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
 if ~isempty(sunfile)
     if ~exist('fig3','var')
         fig3 = figure;

@@ -1,4 +1,4 @@
-function	s=starwrapper(s, s2, toggle)
+function	s=starwrapper(s, s2, toggle,savematfile)
 
 %% STARWRAPPER, called in the middle of a 4STAR processing code (e.g.,
 % starsun.m, starsky.m), adds variables and makes adjustments common among
@@ -127,9 +127,12 @@ s2.note={};
 
 %% get data type
 if toggle.verbose; disp('get data types'), end;
-[daystr, filen, datatype]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
+[daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
 if exist('s2','var')
-    [daystr2, filen2, datatype2]=starfilenames2daystr(s2.filename, 1);s2.datatype = datatype2;
+    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);s2.datatype = datatype2;
+    if instrumentname~=instrumentname2;
+        error('Instrument name on files from both structures do not match')
+    end;
 end;
 
 %********************
@@ -139,7 +142,8 @@ if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
-infofile_ = ['starinfo_' daystr '.m']; data_folder = getfilepath('4STAR_git_data_folder','Select 4STAR GitHub data folder.');
+infofile_ = ['starinfo_' daystr '.m']; 
+data_folder = getnamedpath('4STAR_Github_data_folder','Select 4STAR GitHub data folder.');
 infofile = fullfile(data_folder, ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
@@ -154,7 +158,7 @@ if exist(infofile_)==2;
         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
         try
             s = infofnt(s);
-        catch
+        catch me
             eval([infofile_(1:end-2),'(s)']);
             %     s = eval([infofile2,'(s)']);
         end
@@ -170,7 +174,7 @@ elseif exist(infofile2)==2;
     try
         infofnt = str2func(infofile2(1:end-2)); % Use function handle instead of eval for compiler compatibility
         s = infofnt(s);
-    catch
+    catch me
         disp('*Problem with executing as script, converting to starinfo function*')
         modify_starinfo(which(infofile2));
         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
@@ -208,21 +212,21 @@ end;
 if isfield(s,'toggle')
     toggle = s.toggle;
 end
-
 %********************
 %% add related variables, derive count rate and combine structures
 %********************
 %% include wavelengths in um and flip NIR raw data
+in_time = nanmean(s.t);
 if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
-[visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
+[visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(in_time); % wavelengths
 if ~toggle.lampcalib % choose Langley c0
-    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose);     % C0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(in_time,toggle.verbose);     % C0
 else                 % choose lamp adjusted c0
-    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(nanmean(s.t),toggle.verbose); % C0 adjusted with lamp values
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(in_time,toggle.verbose); % C0 adjusted with lamp values
 end
-[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose);% this is for calling modified c0 file
+[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(in_time,toggle.verbose);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
-[visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
+[visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(in_time);
 if ~isempty(strfind(lower(datatype),'vis'));
     s.w=visw;
     s.c0=visc0;
@@ -313,7 +317,7 @@ if toggle.verbose; disp('substract darks and divide by integration time'), end;
 
 s.note(end+1,1)={note};
 if exist('s2','var')
-    [s2.rate, s2.dark, s2.darkstd, note2]=starrate(s2);
+    [s2.rate, s2.dark, s2.darkstd, ~]=starrate(s2);
     s2.note(end+1,1)={note};
 end;
 %sum_isnan=sum(isnan(s.rate(1,:)))
@@ -333,13 +337,8 @@ end
 pp=numel(s.t);
 qq=size(s.raw,2);
 
-%% get solar zenith angle, airmass, temperatures, etc.
-v=datevec(s.t);
-[s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
-s.sza=90-s.sunel;
-s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
-clear v;
-[s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
+s.AZ_deg = s.AZstep/(-50);
+
 if isfield(s, 'RHprecon'); % Yohei, 2012/10/19
     s.RHprecon_percent=s.RHprecon*20;
 end;
@@ -369,6 +368,44 @@ if isfield(s, 'nirVdettemp'); % Yohei, 2013/07/23, from Livingston's plot_4STAR_
     s.nirVdettemp_C=NaN(size(s.t));
     s.nirVdettemp_C(ig3)=1./denom_nir(ig3) - 273.16;
 end;
+
+%% get solar zenith angle, airmass, temperatures, etc.
+v=datevec(s.t);
+[s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
+s.sza=90-s.sunel;
+s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
+clear v;
+[s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
+%% Account for offsets between sun and sky optics to define Az_sky and El_sky
+
+% These will be used to determine ground-referenced values by apply Euler
+% angle rotations and/or offsets to yield Az_gnd and El_gnd;
+s.sun_sky_El_offset = 3.5; %This represents the known mechanical offset between the sun and sky FOV in elevation.
+s.sun_sky_Az_offset = 0;
+s.Az_deg = s.AZstep/(-50); 
+s.Az_sky = s.AZstep/(-50); 
+s.El_sky = s.El_deg; s.El_sky(s.Str==2) = s.El_sky(s.Str==2) - s.sun_sky_El_offset;
+
+% Now we'll determind if we're on the ground or in the air, and if we trust
+% the nav data.  If we are in the air and trust the nav then we'll apply
+% Euler angle rotations.
+
+% First, determine if we're in the air.  Eliminate duplicated coords.
+dist_moved = sqrt(real(geodist(s.Lat(1), s.Lon(1),s.Lat, s.Lon)).^2 + (s.Alt(1)-s.Alt).^2);
+course_changed = false(size(s.t));
+course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
+if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
+   s.airborne = true;warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
+else
+   s.airborne = false;
+   s.Az_gnd = s.Az_sky;  s.El_gnd = s.El_sky;
+end
+s.Az_gnd = mod(s.Az_gnd,360);
+% Then, in starsky_scan whether airborne or not, good nav or bad nav, we'll use good 
+% sun tracking (Str==1, balanced quads, high enough Qd_tot) to determine an
+% offset between where we thought we were pointing and the ephemeris.  And
+% correct our Az_true and El_true to agree with the ephemeris 
 
 %********************
 %% adjust the count rate
@@ -420,31 +457,26 @@ if toggle.doflagging;
         %warning('Boolean flagging is under development. Please report any bug to Yohei.');
         if toggle.verbose; disp('in the boolean flagging system'), end;
         % prepare for flagging
-        if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+        if strcmpi('sun', datatype(end-2:end)); % screening only for SUN data
             if toggle.verbose; disp('In the boolean flagging area'), end;
             % compute STD for auto cloud screening
             ti=9/86400;
-            if strmatch('vis', lower(datatype(1:3)));
+            if strcmpi('vis', datatype(1:3));
                 cc=408;
-            elseif strmatch('nir', lower(datatype(1:3)));
+            elseif strcmpi('nir', datatype(1:3));
                 cc=169;
-            else;
+            else
                 cc=[408 169+1044];
             end;
-            rawstd=NaN(pp, numel(cc));
-            rawmean=NaN(pp, numel(cc));
-            t = s.t;
-            raw = s.raw;
- 
+            s.rawstd=NaN(pp, numel(cc));
+            s.rawmean=NaN(pp, numel(cc));
             for i=1:pp;
-                rows=(t>=t(i)-ti/2&t<=t(i)+ti/2 & Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-                if sum(rows)>1;
-                    rawstd(i,:)=nanstd(raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                    rawmean(i,:)=nanmean(raw(rows,cc),1);
+                rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
+                if numel(rows)>0;
+                    s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
+                    s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
                 end;
             end;
-            s.rawstd = rawstd; s.rawmean =rawmean; clear rawstd ; clear rawmean
-            clear raw 
             s.rawrelstd=s.rawstd./s.rawmean;
         end;
         
@@ -454,47 +486,43 @@ if toggle.doflagging;
         flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
         flagallcols(Str~=1,:,1)=true; flagallcolsitems(1)={'darks or sky scans'};
        
-        if strmatch('sun', lower(datatype(end-2:end)));
+        if strcmpi('sun', datatype(end-2:end));
             flagallcols(s.Md~=1,:,2)=true; flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
             flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; flagallcolsitems(3)={'high standard deviation'};
         end;
         flagallcols(s.m_aero>m_aero_max,:,4)=true; flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
-        sng = s.ng;
-        for i=1:size(sng,1);
-            ng=incl(t,sng(i,1:2));
+        s.flagallcols(s.m_aero>m_aero_max,:,4)=true; s.flagallcolsitems(4)={['aerosol airmass higher than ' num2str(m_aero_max)]};
+        for i=1:size(s.ng,1);
+            ng=incl(s.t,s.ng(i,1:2));
             if isempty(ng);
-            elseif sng(i,3)<10;
-                flagallcols(ng,:,5)=true; flagallcolsitems(5)={'unknown or others (manual flag)'};
-            elseif sng(i,3)<100;
-                flagallcols(ng,:,6)=true; flagallcolsitems(6)={'clouds (manual flag)'};
-            elseif sng(i,3)<1000;
-                flagallcols(ng,:,7)=true; flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
+            elseif s.ng(i,3)<10;
+                s.flagallcols(ng,:,5)=true; s.flagallcolsitems(5)={'unknown or others (manual flag)'};
+            elseif s.ng(i,3)<100;
+                s.flagallcols(ng,:,6)=true; s.flagallcolsitems(6)={'clouds (manual flag)'};
+            elseif s.ng(i,3)<1000;
+                s.flagallcols(ng,:,7)=true; s.flagallcolsitems(7)={'instrument tests or issues (manual flag)'};
             end;
         end;
         if size(flagallcols,3)~=nflagallcolsitems;
             error('Update starwrapper.m.');
         end;
-        s.flagallcolsitems = flagallcolsitems; clear flagallcolsitems
-        s.flagallcols = flagallcols; clear flagallcols
-        
+
         % flag specific columns
         nflagitems=1;
-        flagitems=repmat({},nflagitems,1);
-        flag=false(pp,qq,nflagitems); % flags applied to each column separately
-        flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
+        s.flagitems=repmat({},nflagitems,1);
+        s.flag=false(pp,qq,nflagitems); % flags applied to each column separately
+        s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=true; s.flagitems(1)={'<=1 signal-to-noise ratio or non-positive c0'};
         if size(flag,3)~=nflagitems;
             error('Update starwrapper.m.');
         end;
-        s.flag = flag; clear flag
-        s.flagitems = flagitems; clear flagitems
         
     else; % the old flagging system
         % execute manual flags to screen out data for clouds and other unfavorable conditions
         if toggle.verbose; disp('in the old flagging system'), end;
-        flag=zeros(size(s.rate));
+        s.flag=zeros(size(s.rate));
         for i=1:size(s.ng,1);
             ng=incl(s.t,s.ng(i,1:2));
-            flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
+            s.flag(ng,:)=s.flag(ng,:)+s.ng(i,3);
         end;
         
         % auto screening
@@ -503,23 +531,23 @@ if toggle.doflagging;
         % YS: agreed. And different screens mean they should be applied in starsun
         % and starsky, not in starwrapper.
         autoscrnote='Auto-screening was applied for ';
-        flag(s.Str~=1,:)=flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
+        s.flag(s.Str~=1,:)=s.flag(s.Str~=1,:)+0.1; % Yohei 2012/10/08 darks and sky scans % s.flag(s.Str==0,:)=s.flag(s.Str==0,:)+0.1; % darks
         autoscrnote=[autoscrnote 'darks or sky scans, '];
-        flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
+        s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)=s.flag(s.raw-s.dark<=s.darkstd | repmat(s.c0,size(s.t))<=0)+0.4;  % YS 2012/10/09
         autoscrnote=[autoscrnote '<=1 signal-to-noise ratio or non-positive c0, ']; % YS 2012/10/09
-        flag(s.m_aero>m_aero_max,:)=flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
+        s.flag(s.m_aero>m_aero_max,:)=s.flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
         autoscrnote=[autoscrnote 'aerosol airmass higher than ' num2str(m_aero_max) ', ']; % YS 2012/10/09
-        if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+        if strcmpi('sun', datatype(end-2:end)); % screening only for SUN data
             % non-tracking mode - is this redundant with the Str-based screening?
-            flag(s.Md~=1,:)=flag(s.Md~=1,:)+0.2;
+            s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
             autoscrnote=[autoscrnote 'non-tracking modes, '];
             % STD-based cloud screening
             ti=9/86400;
-            if strmatch('vis', lower(datatype(1:3)));
+            if strcmpi('vis', datatype(1:3));
                 cc=408;
-            elseif strmatch('nir', lower(datatype(1:3)));
+            elseif strcmpi('nir', datatype(1:3));
                 cc=169;
-            else;
+            else
                 cc=[408 169+1044];
             end;
             s.rawstd=NaN(pp, numel(cc));
@@ -532,10 +560,9 @@ if toggle.doflagging;
                 end;
             end;
             s.rawrelstd=s.rawstd./s.rawmean;
-            flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
+            s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
             autoscrnote=[autoscrnote 'STD higher than ' num2str(s.sd_aero_crit) ' at columns #' num2str(cc) ', '];
         end;
-        s.flag = flag; clear flag
         s.note=[autoscrnote(1:end-2) '. ' s.note];
     end;
 end; % toggle.doflagging
@@ -573,52 +600,21 @@ end; % toggle.doflagging
 % mode of gas retrieval proc
 % gasmode=menu('Select gas retrieval mode:','1: CWV only','2: PCA, hyperspectral');
 
-if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));
-    % || ~isempty(strfind(lower(datatype),'sky')); % not for FOV, ZEN, PARK data
-    
-    %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
-    % derive optical depths by the traditional method
     [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
     [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
-    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col); % gases
- 
-    % cjf: Alternative with tr
-    %     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
-    %         s.skyrad = s.rate./repmat(s.skyresp,pp,1);
-    %         s.skyrad(s.Str==0|s.Md==1,:) = NaN; % sky radiance not defined when shutter is closed or when actively tracking the sun
-    %     end;
+    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, ...
+       s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=...
+       taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col); % gases
     
-    
-    % MS added gas retrieval Nov 19 2013
-    %     if gasmode==1
-    %         % Yohei's original...
-    %         s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O); % rate adjusted for the aerosol component
-    %         s.tau_aero_noscreening=-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq); % aerosol optical depth before flags are applied
-    %
-    %     elseif gasmode==2
-    %         % use retrieved O3/NO2 to subtract
-    %         % reconstruct filtered data using PCA
-    %         % Yohei's original...!!!should be optimized to not include twice...
-    %         s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O); % rate adjusted for the aerosol component
-    %         s.tau_aero_noscreening=-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq); % aerosol optical depth before flags are applied
-    %         s.tau_aero=s.tau_aero_noscreening;                                %!!! this is non-screened but not used in gas code
-    %
-    %         [s.tau_O3 s.o3VCD s.tau_NO2 s.no2VCD s.mse_O3 s.mse_NO2 s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrieveo3no2cwv(s,cross_sections);    % s.tau_O3/NO2 are columnar OD
-    %         [s.pcadata s.pcavisdata s.pcanirdata s.pcvis s.pcnir s.eigvis s.eignir s.pcanote] =starPCAshort(s);
-    %         % original:s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O); % rate adjusted for the aerosol component
-    %         s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2)./tr(s.m_ray, s.tau_CH4);
-    %         s.tau_aero_noscreening=-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq); % aerosol optical depth before flags are applied
-    %         s.rateaero_woh2o=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2)./tr(s.m_ray, s.tau_CH4)./...
-    %             tr(s.m_H2O, s.tau_H2Oa); % rate adjusted for the aerosol component with water vapor subtraction
-    %         s.tau_aero_noscreening_woh2o=-log(s.rateaero_woh2o./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq); % aerosol optical depth before flags are applied
-    %     end
-    % MS added water-vapor only gas retrieval Jan 17, 2014
-    %if gasmode==1 && ~isempty(strfind(lower(datatype),'sun'))
-    % Yohei's original...
-    s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
-    s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-    s.tau_aero=s.tau_aero_noscreening;
-    
+    s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./...
+       tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./...
+       tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
+    s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); 
+    % aerosol optical depth before flags are applied
+    sun_ = s.Str==1;
+    s.rateaero(~sun_,:) = NaN;
+    s.tau_aero_noscreening(~sun_,:) = NaN; 
+    s.tau_aero=s.tau_aero_noscreening; 
     % total optical depth (Rayleigh subtracted) needed for gas processing
     % if toggle.gassubtract
         tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
@@ -626,116 +622,28 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-    % end;
-    
-    % compare rate structures:
-    
-    %     figure;
-    %     plot(s.w,s.tau_O4([9850 9860 9890],:),'-');
-    %
-    %     wi = [1084,1109,1213,1439,1503];
-    %     le = {'1020 nm';'1064 nm';'1236 nm';'1559 nm';'1640 nm'};
-    %     figure;
-    %     for ll=1:length(wi)
-    %         subplot(length(wi),1,ll);
-    %         plot(serial2Hh(s.t),s.rateaero(:,wi(ll)) - ...
-    %              s.ratetot(:,wi(ll)), 'ok','markersize',8);hold on;
-    %
-    %          if ll==3
-    %          xlabel('time [UTC]');
-    %          ylabel('\Delta (rate-aero - rate-aero minus O4)');
-    %          end
-    %         legend(le{ll,:});
-    %         axis([min(serial2Hh(s.t)) max(serial2Hh(s.t)) -0.005 0.005]);
-    %         plot(serial2Hh(s.t),zeros(length(serial2Hh(s.t)),1),'-m');hold off;
-    %     end
-    %
-    %     figure;
-    %     plot(s.w,s.rateaero(9850,:) - s.ratetot(9850,:),'-.b');
-    %     axis([0.3 1.7 0 10]);
-    %     legend('rateaero-ratetot(O4nir sub)')
-    %
-    %     figure;
-    %     plot(s.w,s.tau_aero_noscreening(9850,:) - ...
-    %          s.tau_tot_vertical(9850,:),'-.b');hold on;
-    %
-    %     legend('tau-aero-noscreening - tau-aero-minus-nirO4');
-    %     axis([0.3 1.7 0 1]);
-    %
-    %     figure;
-    %     plot(s.w,s.tau_aero_noscreening([9850 9900,9950 9980],:),'-.');hold on;
-    %     plot(s.w,s.tau_tot_vertical([9850 9900,9950 9980],:),    ':'); hold on;
-    %     plot(s.w,s.dark([9850 9900,9950 9980],:)/10000,'-k');hold on;
-    %     legend('tau-aero-noscreening','tau-aero-minus-nirO4');
-    %
-    %     figure;
-    %     plot(s.UTHh,s.dark(:,1083),'ob');hold on;
-    %     plot(s.UTHh,s.dark(:,1085),'og');hold on;
-    %     legend('dark at peak (1.018)','dark at valley (1.022)');
-    %
-    %     figure;
-    %     plot(s.UTHh,s.rate(:,1083),'ob');hold on;
-    %     plot(s.UTHh,s.rate(:,1085),'og');hold on;
-    %     legend('rate at peak (1.018)','rate at valley (1.022)');
-    %
-    %     figure;
-    %     plot(s.UTHh,s.ratetot(:,1083),'ob');hold on;
-    %     plot(s.UTHh,s.ratetot(:,1085),'og');hold on;
-    %     legend('ratetot at peak (1.018)','ratetot at valley (1.022)');
-    %
-    %     figure;
-    %     plot(s.w,s.c0-s.rateaero(9850,:),'-b');hold on;
-    %     plot(s.w,s.c0-s.ratetot(9850,:) ,'-g');hold on;
-    %     axis([0.3 1.7 -1 1]);
-    %     xlabel('wavelength');ylabel('c0-rate');
-    %     legend('rateaero','ratetot');
-    %
-    %     figure;
-    %     plot(s.w,s.c0,'-b');hold on;
-    %     plot(s.w,s.rateaero(9850,:),':g');hold on;
-    %     %plot(s.w,s.ratetot(9850,:),':m');hold on;
-    %     plot(s.w,smooth(s.c0),'--b','linewidth',2);hold on;
-    %     plot(s.w,smooth(s.rateaero(9850,:)),'.-g','linewidth',2);hold on;
-    %     %plot(s.w,smooth(s.ratetot(9850,:)), '.-m','linewidth',2);hold on;
-    %     legend('c0','rateaero','smooth c0','smooth rateaero');
-    %     xlabel('wavelength');ylabel('dark subtracted, corrected counts');
-    %     axis([0.3 1.7 0 10]);
-    %
-    %     figure;
-    %     plot(s.w,s.tau_aero_noscreening([9850:9855],:),'-');
-    %     xlabel('wavelength');ylabel('tau-aero-noscreening');title('2014-09-02');
-    
-    % apply screening here
-    %flags bad_aod, unspecified_clouds and before_and_after_flight
-    %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
-    %s.flagallcols
-    %************************************************************
-    %[s.flags]=starflag(daystr,1,s);
-    % Does not seem to work for MLO ground-based data, perhaps because
-    % starflag.m assumes attempts to read "flight" from starinfo. Yohei,
-    % 2014/07/18.
-    %************************************************************
-    
-    % calculate CWV from 940 nm band and subtract other regions
-    % tavg=3;
-    % [s] = spec_aveg_cwv(s,tavg);
-    
-    %[s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrievecwv(s,cross_sections);%original version
-    %         if verbose; disp('calculating water vapor amount and subtracting'), end;
-    %         [s.tau_aero_wvsubtract s.CWV s.CWVunc] = cwvsubtract(s,cross_sections,visc0mod, nirc0mod, vislampc0, nirlampc0);
-    %[s.tau_aero_fitsubtract s.tau_aero_specsubtract s.gas] = gasescorecalc(s,visc0mod',nirc0mod',model_atmosphere);
-    %[s.tau_aero_fitsubtract s.gas] = gasessubtract(s,visc0mod',nirc0mod',model_atmosphere);
-    % water vapor retrieval (940fit+c0 method)
-    %-----------------------------------------
+        s.rateslant(~sun_,:) = NaN; 
+        s.ratetot(~sun_,:) = NaN; 
+        s.tau_tot_slant(~sun_,:) = NaN; 
+        s.tau_tot_vertical(~sun_,:) = NaN; 
+        
+            %-----------------------------------------
     if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
         toggle.runwatervapor = false;
         warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
-    end;
+    end
+ % fit a polynomial curve to the non-strongly-absorbing wavelengths
+
+    a2 = NaN(size(s.t)); a1 = a2; a0 = a2; 
+    [a2(~sun_),a1(~sun_),a0(~sun_)]=...
+       polyfitaod(s.w(s.aerosolcols),s.tau_aero(~sun_,s.aerosolcols)); % polynomial separated into components for historic reasons
+    s.tau_aero_polynomial=[a2 a1 a0];
+    s.tau_ang_polynomial = [2*a2 a1];
+if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));
     
     if toggle.runwatervapor;
         tic_water = tic; if toggle.verbose; disp('water vapor retrieval start'), end;
-        
-        [cwv] = cwvcorecalc_(s,model_atmosphere);
+        [cwv] = cwvcorecalc_(s,s.c0mod,model_atmosphere);
         if toggle.verbose; disp({['Water vapor retrieval duration:'],toc}); end;
         
         % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
@@ -761,33 +669,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
-        end;
-               
+        end;               
     end;
-    %elseif gasmode==2 && ~isempty(strfind(lower(datatype),'sun'))
-    % use retrieved O3/NO2 to subtract
-    % reconstruct filtered data using PCA
-    % Yohei's original...!!!should be optimized to not include twice...
-    %         s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
-    %         s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-    %         s.tau_aero=s.tau_aero_noscreening;                                %!!! this is non-screened but not used in gas code
-    
-    % original O3/NO2 retrieval - leave in to compare
-    %         [s.flags]=starflag(daystr,1,s);
-    %         %-----------------------------------------------------
-    %         if verbose; disp('o3/no2 standard retrieval start'), end;
-    %         [s.pcadata s.pcavisdata s.pcanirdata s.pcvis s.pcnir s.eigvis s.eignir s.pcanote] =starPCAshort(s);
-    %         [s.tau_O3 s.o3VCD s.tau_NO2 s.no2VCD s.mse_O3 s.mse_NO2 s.tau_H2Oa s.tau_H2Ob s.CWV] = gasretrieveo3no2cwvs.(s,cross_sections);    % s.tau_O3/NO2 are columnar OD
-    %         if verbose; disp('o3/no2 standard retrieval end'), end;
-    % original:s.rateaero=s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O); % rate adjusted for the aerosol component
-    %         s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2)./tr(s.m_ray, s.tau_CH4));
-    %         s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-    %         s.rateaero_woh2o=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2)./tr(s.m_ray, s.tau_CH4)./...
-    %             tr(s.m_H2O, s.tau_H2Oa)); % rate adjusted for the aerosol component with water vapor subtraction
-    %         s.tau_aero_noscreening_woh2o=real(-log(s.rateaero_woh2o./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-    %end
-    
-    
     
     % cjf: Reformulation in terms of atmos transmittance tr. I prefer this to
     % using "rateaero", since it eliminates arbitrary units (cts/ms, etc) and
@@ -802,6 +685,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % rateaero over tr. I use rateaero for Langley plots, but have not used
     % tr for any purpose so far. But I can be persuaded to include tr if
     % there is a practical use in it to justify a modest increase in file size.
+    
     tau=real(-log(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % tau, just for the error analysis below
     warning('Diffuse light correction and its uncertainty (tau_aero_err10) to be amended.');
     % % % s=rmfield(s, 'rate'); YS 2012/10/09
@@ -845,15 +729,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     if toggle.dostarflag;
         if toggle.verbose; disp('Starting the starflag'), end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
-        [flags, good]=starflag_(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
-        s.flags = flags;
+        [s.flags, good]=starflag_(s,toggle.flagging); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
     end;
     %************************************************************
     
     %% apply flags to the calculated tau_aero_noscreening
-    tau_aero=s.tau_aero_noscreening;
+    s.tau_aero=s.tau_aero_noscreening;
     if toggle.dostarflag && toggle.flagging==1;
-        tau_aero(flags.bad_aod,:)=NaN;
+        s.tau_aero(s.flags.bad_aod,:)=NaN;
     end;
     % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
     % 2014/07/18.
@@ -861,29 +744,27 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % apply flags to the calculated tau_aero_noscreening
     if toggle.doflagging;
         if toggle.booleanflagging;
-            tau_aero(any(s.flagallcols,3),:)=NaN;
-            tau_aero(any(s.flag,3))=NaN;
+            s.tau_aero(any(s.flagallcols,3),:)=NaN;
+            s.tau_aero(any(s.flag,3))=NaN;
         else
-            tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
+            s.tau_aero(s.flag~=0)=NaN; % the flags come starinfo########.m and starwrapper.m.
         end;
     end;
     % The end of "The lines below used to be around here. But recent
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
     
-    % fit a polynomial curve to the non-strongly-absorbing wavelengths
-    w = s.w; 
-    [a2,a1,a0,ang,curvature]=polyfitaod(w(s.aerosolcols),tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
-    s.tau_aero_polynomial=[a2 a1 a0];
-    s.tau_aero = tau_aero; clear tau_aero;
+   
     
     % derive optical depths and gas mixing ratios
     % Michal's code TO BE PLUGGED IN HERE.
     
 end; % End of sun-specific processing
 
-if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
+if ~isempty(strfind(lower(datatype),'sky'))||~isempty(strfind(lower(datatype),'zen'))||...
+      ~isempty(strfind(lower(datatype),'cld')); % if clause added by Yohei, 2012/10/22
     s.skyrad = s.rate./repmat(s.skyresp,pp,1);
-    s.skyrad(s.Str==0|s.Md==1,:) = NaN; % sky radiance not defined when shutter is closed or when actively tracking the sun
+    s.skyrad(s.Str==1|s.Str==0|s.Md==1,:) = NaN; % sky radiance not defined when shutter is closed or when actively tracking the sun
+    s.skyrad(s.sat_ij) = NaN;
 end;
 
 
@@ -930,7 +811,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
     cols=cols(isfinite(cols)==1);
     colsang=cols([3 7]);
     ang=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
-    daystr=starfilenames2daystr(s.filename);
+    [daystr,~,~,instrumentname]=starfilenames2daystr(s.filename);
     figure;
     for ii=unique(yypanel);
         subplot(max(yypanel), 1, ii);
