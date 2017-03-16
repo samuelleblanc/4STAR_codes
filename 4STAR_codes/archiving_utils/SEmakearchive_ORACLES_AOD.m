@@ -38,10 +38,15 @@
 % 2016-07-14, MS, twaeked to accept automatic flags
 % 2016-09-04, SL,v2.0 ported from KORUS
 % 2016-09-18, SL,v2.1, added variable paths depending on the user
+% 2017-03-15, SL,v2.2, Fixed issue with altitude and some other value
+%                      interpolation. Was doing nearest neighbor
+%                      interpolation without maximum time distance, now set
+%                      to only use nearest neighbor if less than 1 second
+%                      away. Set new revision for R1
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
-version_set('v2.1')
+version_set('v2.2')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
@@ -52,7 +57,7 @@ if getUserName=='sleblan2';
     starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\';
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
 
 
@@ -86,6 +91,7 @@ NormalComments = {...
     };
 
 revComments = {...
+    'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Same comments pertaining to AOD uncertainties and caveats as R0';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
 
@@ -130,7 +136,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0           0           0          0          0          0          0          0          1          1          1          1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          1           0           0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -272,11 +278,14 @@ for i=idx_file_proc
     %% Now go through the times of radiances, and fill up the related variables
     disp('filing up the data')
     for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
+    % make sure to only have unique values
+    [tutc_unique,itutc_unique] = unique(tutc);
+    [idat,datdt] = knnsearch(tutc_unique,UTC');
+    iidat = datdt<1.0/3600.0; % Distance no greater than 1.0 seconds.
     for nn=iradstart:length(names)
         ii = nn-iradstart+1;
-        % make sure to only have unique values
-        [tutc_unique,itutc_unique] = unique(tutc);
-        data.(names{nn}) = interp1(tutc_unique,tau_aero_noscreening(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+        data.(names{nn}) = UTC*0.0+NaN;
+        data.(names{nn})(iidat) = tau_aero_noscreening(itutc_unique(idat(iidat)),save_iwvls(ii));
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
