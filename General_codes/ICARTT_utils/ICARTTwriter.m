@@ -285,7 +285,7 @@ fprintf(fid, [NormalComments{14} '\n']);
 fprintf(fid, [NormalComments{15} '\n']);
 fprintf(fid,['REVISION:' rev '\n']);
 for i=1:numrev
-    if endsWith(revComments{i},'\n'),
+    if any(regexp(revComments{i},'\n$')),
         fprintf(fid,revComments{i});
     else
         fprintf(fid,[revComments{i} '\n']); 
