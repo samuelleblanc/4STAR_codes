@@ -284,7 +284,13 @@ fprintf(fid, [NormalComments{13} '\n']);
 fprintf(fid, [NormalComments{14} '\n']);
 fprintf(fid, [NormalComments{15} '\n']);
 fprintf(fid,['REVISION:' rev '\n']);
-for i=1:numrev, fprintf(fid,[revComments{i} '\n']); end %revision comments
+for i=1:numrev
+    if endsWith(revComments{i},'\n'),
+        fprintf(fid,revComments{i});
+    else
+        fprintf(fid,[revComments{i} '\n']); 
+    end
+end %revision comments
 
 %%%%% PRINT DATA %%%%%%
 %build variable names string and formatting string
