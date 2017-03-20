@@ -81,9 +81,15 @@ elseif ~isempty(strfind(lower(userpath),'livings'));
     figurefolder=cd;
     author='John';
 elseif ~isempty(strfind(lower(userpath),'ys')) | ~isempty(strfind(lower(userpath),'yohei'))
-    matfolder=fullfile(paths, '4star','data');
-    figurefolder=fullfile(paths, '4star','figures');
-    author='Yohei';
+    if now > datenum(2016,10,10,0,0,0);
+        matfolder=fullfile(paths, 'data');
+        figurefolder=fullfile(paths, 'figures');
+        author='Yohei';
+    else;
+        matfolder=fullfile(paths, '4star','data');
+        figurefolder=fullfile(paths, '4star','figures');
+        author='Yohei';
+    end;
 elseif ~isempty(strfind(lower(userpath1),'yohei')); % Yohei's laptop
     matfolder=fullfile(paths, 'code\4STAR_codes\data_folder');
     figurefolder=fullfile(paths, '4star','figures');
