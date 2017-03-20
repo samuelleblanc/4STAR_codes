@@ -30,7 +30,9 @@ disp(sourcefile)
 contents=[];
 if isempty(contents0);
     savematfile=[];
-    disp('no sky files')   
+    disp('no sky files')
+    disp('no sky files')
+    
     return;
 end;
 
@@ -61,8 +63,8 @@ load(sourcefile,contents0{:});
 
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
-matdir = getnamedpath('4STAR_data_mats','4STAR data dir');
-imgdir = getnamedpath('4STAR_img', '4STAR images');
+[mat_dir, fname, ext] = fileparts(savematfile);
+[matdir,imgdir] = starpaths;
 sky_str = {'skya';'skyp'}';
 % clear contents0
 if exist('vis_skya','var')
@@ -71,22 +73,17 @@ if exist('vis_skya','var')
     for si = length(vis_skya):-1:1
         if ~isempty(vis_skya(si).t)
             filen = num2str(vis_skya(si).filen);
-            s=starwrapper_(vis_skya(si), nir_skya(si));
+            s=starwrapper(vis_skya(si), nir_skya(si));
             [~,fname,~] = fileparts(strrep(s.filename{1},'\',filesep));
             out = [strrep(fname,'_VIS_SKY','_STARSKY'),'.mat'];
             disp('Ready for sky scan stuff')
             try
                 s_out = starsky_scan(s); % vis_pix restrictions in here
-                s_out.filename = [matdir, out];
                 %                 [~,fname,~] = fileparts(ss.filename{1});
                 %                s_out = ss;
                 %                save([mat_dir,filesep,out],'-struct','s_out');
                 %               save(strrep(savematfile,'__starsky.mat',['_',filen,'_starsky.mat']), '-struct','s_out')
-                try 
-                   save([matdir, out],'-struct','s_out');
-                catch me
-                   save([matdir, out],'s_out');
-                end
+                save([matdir, out],'s_out');
                 fig_out = [imgdir,strrep(out,'.mat','.fig')];
                 if exist(fig_out,'file')
                     delete(fig_out);
@@ -101,8 +98,8 @@ if exist('vis_skya','var')
                 saveas(gcf,png_out);
                 
                 %                 saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
-            catch me
-                save([matdir,filesep,out,'.bad'],'-struct','s');
+            catch
+                save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
             close('all')
         end
@@ -115,18 +112,20 @@ if exist('vis_skyp','var')
     for si = length(vis_skyp):-1:1
         if ~isempty(vis_skyp(si).t)
             filen = num2str(vis_skyp(si).filen);
-            s=starwrapper_(vis_skyp(si), nir_skyp(si));
+            s=starwrapper(vis_skyp(si), nir_skyp(si));
             disp('Ready for sky scan stuff')
             [~,fname,~] = fileparts(strrep(s.filename{1},'\',filesep));
             out = [strrep(fname,'_VIS_SKY','_STARSKY'),'.mat'];
             try
                 s_out = starsky_scan(s); % vis_pix restrictions in here
-                s_out.filename = [matdir, out];
-                try 
-                   save([matdir, out],'-struct','s_out');
-                catch me
-                   save([matdir, out],'s_out');
-                end
+                %                 [~,fname,~] = fileparts(ss.filename{1});
+                %             s_out = ss;
+                save([matdir, out],'s_out');
+                
+                %            save(strrep(savematfile,'__starsky.mat',['_',filen,'_starsky.mat']), '-struct','s_out')
+                %             save(savematfile, '-struct','s_out')
+                %             save([mat_dir,filesep,s_out],'-struct','s_out');
+                
                 fig_out = [imgdir,strrep(out,'.mat','.fig')];
                 if exist(fig_out,'file')
                     delete(fig_out);
@@ -141,8 +140,8 @@ if exist('vis_skyp','var')
                 
                 %             saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
                 %             saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
-            catch me
-                save([matdir,filesep,out,'.bad'],'-struct','s');
+            catch
+                save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
             close('all')
         end
@@ -160,7 +159,7 @@ end
 %         save([mat_dir,filesep,out],'-struct','s_out');
 %         saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
 %         saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
-%         catch me
+%         catch
 %             save([mat_dir,filesep,out,'.bad'],'-struct','s_out');
 %         end
 %         close('all')
