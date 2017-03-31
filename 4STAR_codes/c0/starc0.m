@@ -41,7 +41,10 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
-        if t>=datenum([2016 8 26 0 0 0]);
+        if t>=datenum([2016 8 27 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts 
+            daystr='20161113';
+            filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+        elseif t>=datenum([2016 8 26 0 0 0]);
             daystr='20160825';
             filesuffix='refined_Langley_ORACLES_transit2';
         elseif t>=datenum([2016 8 23 0 0 0]);
