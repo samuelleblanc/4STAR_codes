@@ -43,10 +43,12 @@
 %                      interpolation without maximum time distance, now set
 %                      to only use nearest neighbor if less than 1 second
 %                      away. Set new revision for R1
+% 2017-04-05, SL,v2.3, Added reading of the tau_aero_subtract_all to use
+%                      aod with gas subtracted
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
-version_set('v2.2')
+version_set('v2.3')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
@@ -91,7 +93,7 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Same comments pertaining to AOD uncertainties and caveats as R0.';...
+    'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
@@ -176,6 +178,13 @@ for i=idx_file_proc
     starfile = fullfile(starsun_path, ['4STAR_' daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
+    try;
+        load(starfile,'tau_aero_subtract_all'); 
+        tau = tau_aero_subtract_all;
+    catch;
+        disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+        tau = tau_aero_noscreening; 
+    end;
     
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
@@ -285,7 +294,7 @@ for i=idx_file_proc
     for nn=iradstart:length(names)
         ii = nn-iradstart+1;
         data.(names{nn}) = UTC*0.0+NaN;
-        data.(names{nn})(iidat) = tau_aero_noscreening(itutc_unique(idat(iidat)),save_iwvls(ii));
+        data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
