@@ -34,7 +34,7 @@ ict_alt = aod_ict.data(:,4);
 qual_flag = aod_ict.data(:,5);
 
 
-% find vh indices for altitudes of above 4000m
+
 ok  = [];
 
 for i=1:length(horilegs_utc)

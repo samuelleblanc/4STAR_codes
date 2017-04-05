@@ -51,6 +51,17 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 % 20160503
 
 daystr='20160503';
@@ -97,6 +108,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 
 % 20160504
 
@@ -141,6 +164,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160506
 
@@ -189,6 +224,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160510
 
 daystr='20160510';
@@ -235,6 +282,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160511
 
@@ -283,6 +342,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160512
 
 daystr='20160512';
@@ -328,6 +399,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160516
 
@@ -378,6 +461,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160517
 
 daystr='20160517';
@@ -422,6 +517,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160519
 
@@ -470,6 +577,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160521
 
 daystr='20160521';
@@ -513,6 +632,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160524
 daystr='20160524';
 
@@ -555,6 +686,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160526
 
@@ -603,6 +746,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160529
 
 daystr='20160529';
@@ -649,6 +804,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160530
 
@@ -700,6 +867,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160601
 
 daystr='20160601';
@@ -745,6 +924,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160602
 
@@ -793,6 +984,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160604
 
@@ -845,6 +1048,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
 
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
+
 % 20160608
 
 daystr='20160608';
@@ -891,6 +1106,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 % 20160609
 
@@ -939,6 +1166,18 @@ gas_dat_tc     = gas_ict.data(ok,:);
 
 save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc.dat'),'-ASCII','aod_dat_tc');
 save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc.dat'),'-ASCII','gas_dat_tc');
+
+% find all data below 500m
+ok2 = find(ict_alt<=500);
+
+% save .txt file
+
+aod_dat_tc_full     = aod_ict.data(ok2,:);
+gas_dat_tc_full     = gas_ict.data(ok2,:);
+
+save(strcat('E:\MichalsData\KORUS-AQ\aod_ict\',daystr,'_aod_tc_full.dat'),'-ASCII','aod_dat_tc_full');
+save(strcat('E:\MichalsData\KORUS-AQ\gas_ict\',daystr,'_gas_tc_full.dat'),'-ASCII','gas_dat_tc_full');
+
 
 
 % 20160614
