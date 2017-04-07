@@ -54,14 +54,20 @@ ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
 if getUserName=='sleblan2';
-    ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
-    starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-    starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\';
+    if isunix;
+        ICTdir = '/u/sleblan2/ORACLES/aod_ict/v3/';
+        starinfo_path = '/u/sleblan2/4STAR/4STAR_codes/data_folder\';
+        starsun_path = '/nobackup/sleblan2/ORACLES/data/v3/';
+    else;
+        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
+        starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v2\';
+    end;
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
-
+gas_subtract = false;
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -93,7 +99,8 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
+   % 'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
+   'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission and minimal column trace gas impacts on certain wavelengths.';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
@@ -138,7 +145,7 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          1           0           0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          1          0          0          0          0          1           0           0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -178,12 +185,16 @@ for i=idx_file_proc
     starfile = fullfile(starsun_path, ['4STAR_' daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
-    try;
-        load(starfile,'tau_aero_subtract_all'); 
-        tau = tau_aero_subtract_all;
-    catch;
-        disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
-        tau = tau_aero_noscreening; 
+    if gas_subtract;
+        try;
+            load(starfile,'tau_aero_subtract_all'); 
+            tau = tau_aero_subtract_all;
+        catch;
+            disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+            tau = tau_aero_noscreening; 
+        end;
+    else;
+        tau = tau_aero_noscreening;
     end;
     
     %% extract special comments about response functions from note
