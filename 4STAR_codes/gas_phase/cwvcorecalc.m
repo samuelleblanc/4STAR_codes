@@ -51,6 +51,7 @@
 % MS: 2016-02-23: re-editing changes that were made after MLO and deleted
 % MS: 2016-09-02: tweaked to account for erroneous altitudes
 % MS: 2016-11-02: fixing bug in calculating cwv.tau_OD_wvsubtract
+% SL: 2017-04-07: fix calculation of cwv.tau_OD_wvsubtract to be set to 0 when NaN or inf
 % -------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
@@ -665,6 +666,7 @@ for i = 1:length(s.t)
     afit_H2Os = afit_H2Os'; bfit_H2Os = bfit_H2Os';
     wvamount = -log(exp(-afit_H2Os.*(real(swv_opt(i,1))).^bfit_H2Os));
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
+    wvamount(isNaN(wvamount)) = 0; wvamount(isinf(wvamount)) = 0; % added by SL, 2017-04-07, to ensure that tau_OD_wvsubtract is always real
     cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount;% this is a structure with o2-o2 NIR subtracted
     end
     
