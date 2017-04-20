@@ -66,6 +66,8 @@ function A = catstruct(varargin)
 %                  ML. Unique(...,'last') is no longer the deafult.
 %                  (thanks to Isabel P)
 
+warning('off','MATLAB:nargchk:deprecated')
+
 error(nargchk(1,Inf,nargin)) ;
 N = nargin ;
 
