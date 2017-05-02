@@ -62,12 +62,7 @@ AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 %starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 starinfofile_=['starinfo_' daystr(1:8)];
-s=importdata(starinfofile);
-%s1=s(strmatch('langley',s));
-s1=s(strncmp('langley',s,1));
 try;
-    eval(s1{:});
-catch;
     try;
         infofnt = str2func(starinfofile_);
         try;
@@ -81,6 +76,11 @@ catch;
         edit(starinfofile)
         error('No Langley time defined in starinfo file')
     end;
+catch;
+    s0=importdata(starinfofile);
+    %s1=s(strmatch('langley',s));
+    s1=s0(strncmp('langley',s0,1));
+    eval(s1{:});
 end;
 ok=incl(t,langley);
 % perform different QA filtering
