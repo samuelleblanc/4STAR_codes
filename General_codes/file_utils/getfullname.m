@@ -11,7 +11,7 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 DRV = [];
 usrpath = userpath;
 if ~isempty(usrpath)&&strcmp(usrpath(2),':')
-   DRV = usrpath(1:2), usrpath = usrpath(3:end);
+   DRV = usrpath(1:2); usrpath = usrpath(3:end);
 end
 pname = strrep(strrep(usrpath,';',filesep),':',filesep);
 pathdir = [DRV,pname,filesep, 'filepaths',filesep];
