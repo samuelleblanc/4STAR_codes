@@ -27,6 +27,9 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 
 version_set('1.9');
+% SL, v1.10, 2017-04-07, updated c0 from mean MLO 2016 November for ORACLES
+
+version_set('1.10');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -45,6 +48,11 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20161113';
             filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
         elseif t>=datenum([2016 8 26 0 0 0]);
+        if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts 
+            daystr='20161115';
+            %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+            filesuffix='refined_Langley_Nov2016part1.5incl1115_good_mean';
+        elseif t>=datenum([2016 8 23 0 0 0]);
             daystr='20160825';
             filesuffix='refined_Langley_ORACLES_transit2';
         elseif t>=datenum([2016 8 23 0 0 0]);
