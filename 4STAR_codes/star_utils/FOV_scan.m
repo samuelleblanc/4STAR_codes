@@ -186,6 +186,10 @@ end;
 %scat_ang_degs(sza, saz, za, az) 
 %sza = 90-interp1(abs(ins.El_deg(icenter)).*ones(size(ins.AZ_deg));
 %sza = interp1(ins.t(tracking),90-abs(ins.El_deg(tracking)),ins.t,'linear','extrap')
+if ~isfield(ins,'sunel');
+    v = datevec(ins.t(1));
+    [ins.sunaz, ins.sunel, refract]=sun(ins.Lon, ins.Lat,v(3), v(2), v(1), rem(ins.t,1)*24,ins.t*0.0+298.15,ins.t*0.0+1013.15);
+end;
 dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
 sza = (90-abs(ins.sunel)) + dza
 %saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));

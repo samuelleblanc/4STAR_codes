@@ -8,9 +8,14 @@ function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivi
 % MS: 2014-08-22: added SEAC4RS FOV dates
 % SL: v1.0, 2014-10-13: added version control of this m-script via version_set
 % MS: v1.1, added Yohei's FOV updates
+% SL: v1.2, 2017-05-09, added FOV for ORACLES, and modified load for using 4STAR's name in the file
 
 % specify FOV data source
-if t>datenum([2013 7 16 0 0 0]); % SEAC4RS. NAAMES #1 data processing relies on this FOV too. More notes below.
+if t>datenum([2016 8 1 0 0 0]); %ORACLES
+    daystr = '20160923';
+    fova_filen=3; % filenumber of 15
+    fovp_filen=1; % filenumber of 11
+elseif t>datenum([2013 7 16 0 0 0]); % SEAC4RS. NAAMES #1 data processing relies on this FOV too. More notes below.
     daystr='20130805';
     fova_filen=13; % file number for almucantar FOV
     fovp_filen=12; % file number for principal plane FOV
@@ -31,9 +36,12 @@ elseif t>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking e
 end;
 
 % load FOV data
-load(which( [daystr 'starfov.mat']));
-
-version_set('1.1');
+if t>datenum([2016 6 15 0 0 0]);
+    load(which(['4STAR_' daystr 'starfov.mat']));
+else
+    load(which( [daystr 'starfov.mat']));
+end;
+version_set('1.2');
 
 if isequal(lower(datatype(1:3)), 'vis') || isequal(lower(datatype(1:3)), 'sun');
     if strcmp(daystr,'20130805')
