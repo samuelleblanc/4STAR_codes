@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160910';
+daystr='20160924';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -62,6 +62,7 @@ AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 %starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 starinfofile_=['starinfo_' daystr(1:8)];
+s.dummy = '';
 try;
     try;
         infofnt = str2func(starinfofile_);
@@ -320,13 +321,14 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';
     % filesuffix = 'refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';
     %filesuffix = 'refined_Langley_MLO';
-    filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
+    %filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
     %filesuffix = 'refined_Langley_MLOwFORJcorrection1';
     %filesuffix = 'refined_Langley_MLO_wstraylightcorr';
     %filesuffix = 'refined_Langley_MLO_wFORJcorr';
     %filesuffix='refined_Langley_korusaq_transit1_v1';constant omi data 
     %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
-    filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
+    %filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
+    filesuffix='refined_Langley_airborne_ORACLES_v2';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';

@@ -14,7 +14,8 @@ end
 s.flight=[datenum(2016,9,8,7,05,08) datenum(2016,9,8,15,01,20)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-%s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+s.langley=[[datenum(2016,9,08,7,32,30) datenum(2016,9,08,09,02,20)];...
+           [datenum(2016,9,08,09,33,40) datenum(2016,9,08,10,53,20)]]; % first part ends on 9:02:20, second starts at 9:33:40
 s.dirty = [datenum(2016,9,09,08,37,00) datenum(2016,9,09,08,39,00)];
 s.clean = [datenum(2016,9,09,13,59,00) datenum(2016,9,09,14,02,00)];
 

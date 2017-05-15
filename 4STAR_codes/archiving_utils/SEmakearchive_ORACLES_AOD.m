@@ -62,15 +62,16 @@ if getUserName=='sleblan2';
         starinfo_path = '/u/sleblan2/4STAR/4STAR_codes/data_folder\';
         starsun_path = '/nobackup/sleblan2/ORACLES/data/v3/';
     else;
-        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\v4\';
+        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\v5\';
         starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v4\';
+        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v5\';
     end;
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='3'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
 gas_subtract = true;
+avg_wvl = true;
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -148,10 +149,14 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
+<<<<<<< HEAD
 
 jproc=[         0          0          0          0          0          0          0          1           0           0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 jproc=[         0          0          0          0          0          0          0          0           0           0          1          0          0          0          0          0          0          0          0] ; %set=1 to process
+=======
+jproc=[         0          0          0          0          0          0          0          0           1           0          0          0          1          0          0          0          0          0          0] ; %set=1 to process
+>>>>>>> origin/master
 
 
 %% run through each flight, load and process
@@ -265,6 +270,14 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
     elseif isfield(flag,'before_or_after_flight');
         % only for automatic flagging
+        if length(flag.before_or_after_flight) <1;
+            flag.before_or_after_flight = t<s.flight(1) | t>s.flight(2);
+            try
+                flag.time.t = flag.t;
+            catch
+                flag.time.t = t;
+            end;
+        end
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
         try
             qual_flag = bitor(qual_flag,flag.cirrus);
@@ -319,7 +332,14 @@ for i=idx_file_proc
     for nn=iradstart:length(names)
         ii = nn-iradstart+1;
         data.(names{nn}) = UTC*0.0+NaN;
-        data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
+        if avg_wvl;
+            t_im = tau(itutc_unique(idat(iidat)),save_iwvls(ii)-1);
+            t_ii = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
+            t_ip = tau(itutc_unique(idat(iidat)),save_iwvls(ii)+1);
+            data.(names{nn})(iidat) = nanmean([t_im,t_ii,t_ip]')';
+        else;
+            data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
+        end;
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
