@@ -16,17 +16,15 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, 2015-01-15, changed ARISE c0 to recent one with Forj correction
 % SL, v1.3, 2015-07-22, updated the starc0 for special case testing of lower c0
 %                 from Yohei sent on 20150720, new c0 from 20130708
-% MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0 
+% MS, v1.3, 2015-10-20, updated starc0 with new ARISE c0
 % MS, v1,3, 2015-10-28, updated starc0 with new c0 (unc=0.03)
 % MS, v1.4, 2016-01-10, updated MLO c0
 % SL, v1.5, 2016-02-17, update to what we think should be used from Jan MLO
 % MS, v1.6, 2016-04-07, update latest c0 to WFF 20151104, which seems like our best bet.
 % MS, v1.7, 2016-05-01, updated c0 from korus-aq transit flight 1
 % MS, v1.7, 2016-05-02, updated c0 from korus-aq transit 1, o3 corrected
-% SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016. 
+% SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016.
 % MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
-
-version_set('1.9');
 % SL, v1.10, 2017-04-07, updated c0 from mean MLO 2016 November for ORACLES
 
 version_set('1.10');
@@ -44,11 +42,13 @@ end;
 % select a source file
 if isnumeric(t); % time of the measurement is given; return the C0 of the time.
     if t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
-        if t>=datenum([2016 8 27 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts 
-            daystr='20161113';
-            filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+        if t>=datenum([2016 8 27 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
+            %daystr='20161113';
+            %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+            daystr = '20160927';
+            filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
         elseif t>=datenum([2016 8 26 0 0 0]);
-        if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts 
+            %if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
             %daystr='20161115';
             daystr = '20160927';
             %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
@@ -64,8 +64,8 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         elseif t>=datenum([2016 6 30 0 0 0]); %MLO June 2016
             daystr='20160707';
             filesuffix='Langley_MLO_June2016_mean';
-        end;    
-    elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16 
+        end;
+    elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16
         if now>=datenum([2016 4 7 0 0 0]);
             %daystr='20151104';
             %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';      % ground-based sunrise measurements at WFF is our best bet for KORUS
@@ -95,7 +95,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20160707';
             filesuffix='Langley_MLO_June2016_mean';
             
-        end;  
+        end;
         % transferred from Yohei's laptop, for record keeping
         if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
             daystr='20160317';
@@ -115,7 +115,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
             %filesuffix='refined_Langley_MLOwFORJcorrection1';
             %filesuffix='refined_Langley_MLO_wstraylightcorr';
-        end;  
+        end;
     elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
         if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
             if t>datenum([2015 11 23 0 0 0])
@@ -157,7 +157,7 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
         elseif now>=datenum([2015 9 24 0 0 0]);
             daystr='20150916';
             filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
-        end;        
+        end;
     elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
         if now>=datenum([2014 9 1 0 0 0]);
             %daystr='20140830';
@@ -181,17 +181,17 @@ if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
-%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 10 17]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
-%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
             % use for separate starsun files to obtaine modified Langley
             %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
         elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
-%             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
         elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
             daystr='20130708';
             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
@@ -279,11 +279,11 @@ if ~exist('visc0')
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
             try;
-            a=importdata(which(visfilename));
+                a=importdata(which(visfilename));
             catch;
                 error(['Cant open file: ' visfilename])
             end;
-%             a=importdata(fullfile(starpaths,visfilename));
+            %             a=importdata(fullfile(starpaths,visfilename));
             visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
             if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                 visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -374,7 +374,7 @@ if 1==2; % never executed, just for record keeping
     if isequal(t, 'MLO201205') || isequal(t, 'MLO2012May')
         daystr={'20120525' '20120526' '20120528' '20120531' '20120601' '20120602' '20120603'};
         filesuffix=repmat({'refined_Langley_at_MLO'},size(daystr));
-        filesuffix=repmat({'refined_Langley_at_MLO_V2'},size(daystr));
+        filesuffix=repmat({'refined_Langley_at_M LO_V2'},size(daystr));
     elseif isequal(t, 'OLD_MLO201205') || isequal(t, 'OLD_MLO2012May')
         daystr={'20120420' '20120525' '20120526' '20120528' '20120531' '20120601' '20120602' '20120603'};
         filesuffix=repmat({'refined_Langley_at_MLO'},size(daystr));
