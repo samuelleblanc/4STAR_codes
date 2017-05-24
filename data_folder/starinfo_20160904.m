@@ -18,6 +18,7 @@ s.flagfilenameNO2  = '20160904_starflag_NO2_man_created20161017_1409by_MS.mat';
 s.flagfilenameHCOH = '20160902_starflag_HCOH_man_created20161017_1402by_MS.mat';
 
 s.flight=[datenum(2016,9,4,7,36,22) datenum(2016,9,4,15,23,27)]; 
+s.high_alt_c0 = [datenum(2016,9,4,12,10,0) datenum(2016,9,4,12,20,0)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 s.dirty = [datenum(2016,9,5,13,30,00) datenum(2016,9,5,13,35,00)];

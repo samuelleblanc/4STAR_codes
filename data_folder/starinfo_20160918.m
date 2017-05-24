@@ -12,6 +12,7 @@ else
 end
 
  s.flight=[datenum(2016,9,18,7,04,25) datenum(2016,9,18,15,03,30)]; 
+ s.high_alt_c0 = [datenum(2016,9,18,11,40,0) datenum(2016,9,18,11,50,0)];
 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 

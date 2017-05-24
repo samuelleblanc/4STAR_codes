@@ -13,6 +13,7 @@ end
 
  s.flight=[datenum(2016,9,27,11,35,34) datenum(2016,9,27,18,34,21)]; 
 
+ s.high_alt_c0 = [datenum(2016,9,27,12,20,0) datenum(2016,9,27,12,30,0)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
 % s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
