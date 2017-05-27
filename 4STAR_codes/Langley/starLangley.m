@@ -21,7 +21,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20160924';
+daystr='20170526';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -328,7 +328,8 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     %filesuffix='refined_Langley_korusaq_transit1_v1';constant omi data 
     %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
     %filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
-    filesuffix='refined_Langley_airborne_ORACLES_v2';
+    %filesuffix='refined_Langley_airborne_ORACLES_v2';
+    filesuffix = 'refined_Langley_MLO_May2017';
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';

@@ -35,26 +35,32 @@ function MLOstarbasicplots(daystr, platform, savefigure);
 %        is probably to get rid of the gas plots, since we're currently not
 %        running them because they take a long time and the retrievals the
 %        first days here are probably not good because of clouds.
+% SL   , 2017/05/26, modififed for easier plotting with data from MLO May 2017
 
 %********************
 % set parameters
 %********************
 if nargin<3;
-    savefigure=false;
+    savefigure=true;
 end;
 if ismember(lower(platform), {'f' 'flight' 'flt' 'dc8'});
     platform='flight';
 elseif ismember(lower(platform), {'g' 'ground' 'grd'});
     platform='ground';
 else
-    error('platform must be either flight or ground.');
+    platform = 'ground';
+    %error('platform must be either flight or ground.');
 end;
 
 %********************
 % prepare for plotting
 %********************
 % load frequently used variables
-starload(daystr, 'track');
+[a,f,p] = getfile(['*' daystr '*star.mat']);
+[as,fs,ps] = getfile(['*' daystr '*starsun.mat']);
+fp = [p f];
+fps = [ps fs];
+load(fp, 'track');
 track.T=[track.T1 track.T2 track.T3 track.T4];
 track.P=[track.P1 track.P2 track.P3 track.P4];
 bl=60/86400;
@@ -68,7 +74,7 @@ else;
     end;
 end;
 clear i;
-slsun(daystr, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
+load(fps, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
     'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas'); % sun data and nav data associated with them
 [visc,nirc,viscrange,nircrange]=starchannelsatAATS(t);
 c=[visc(1:10) nirc(11:13)+1044];
