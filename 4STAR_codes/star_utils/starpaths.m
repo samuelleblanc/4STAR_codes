@@ -111,7 +111,7 @@ elseif ~isempty(strfind(lower(userpath),'sleblan2'))
         end;
     else
         matfolder='C:\Users\sleblan2\Research\4STAR_codes\data_folder\' ;
-        figurefolder='C:\Users\sleblan2\Research\4STAR\figs\';
+        figurefolder='C:\Users\sleblan2\Research\MLO\2017_May\figs\';
         author='Samuel';
         if nargin>0;
             try
