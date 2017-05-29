@@ -32,6 +32,8 @@
 % Written: Samuel LeBlanc, NASA Ames, August 15th, 2014, Happy Acadian Day!
 % Modified v1.0: by Samuel LeBlanc, NASA Ames, 2014-11-24,
 %           -added version control
+% Modified v2.0: Samuel LeBlanc, 2017-05-28, Hilo, Hawaii
+%           - added multi instrument support
 % -------------------------------------------------------------------------
 
 %% Start of function
@@ -43,6 +45,7 @@ if nargin<1 || isempty(filein)
     filein=[sourcefolder filename];
 end;
 
+[daystr,filen,nul,instrumentname]=starfilenames2daystr({filein},1);
 s=load(filein);
 
 %% check the fields for the fov
@@ -62,7 +65,7 @@ if a(1)
     disp('doing the vis_fova')
   for i=1:length(s.vis_fova)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.vis_fova(i));
+      ins=FOV_scan(s.vis_fova(i),instrumentname);
   end;
 end
 
@@ -70,21 +73,21 @@ if a(2)
     disp('doing the nir_fova')
   for i=1:length(s.nir_fova)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.nir_fova(i));
+      ins=FOV_scan(s.nir_fova(i),instrumentname);
   end;
 end
 if p(1)
     disp('doing the vis_fovp')
   for i=1:length(s.vis_fovp)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.vis_fovp(i));
+      ins=FOV_scan(s.vis_fovp(i),instrumentname);
   end;
 end
 if p(2)
     disp('doing the nir_fovp')
   for i=1:length(s.nir_fovp)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.nir_fovp(i));
+      ins=FOV_scan(s.nir_fovp(i),instrumentname);
   end;
 end
 

@@ -23,7 +23,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20170526';
+daystr='20170528';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -180,7 +180,7 @@ for k=1;
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
     grid on;
-    title([instrumentname ' 'starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
         starsas([instrumentname daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
@@ -200,7 +200,7 @@ for k=1;
     y = rateaero(ok,cols(4));
     ylim([min(y(:)) max([max(y(:)) data0])]);
     grid on;
-    title([instrumentname ' 'starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
         starsas([instrumentname daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;

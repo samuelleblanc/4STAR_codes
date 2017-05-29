@@ -1,3 +1,4 @@
+function ins = FOV_scan(ins,instrumentname)
 %% Details of the program:
 % NAME:
 %   FOV_scan
@@ -11,6 +12,7 @@
 %
 % INPUT:
 %  - ins: vis or nir _fova or fovp data structure (vis_fovp)
+%  0 instrumentname: name of the instrument to quantify (defaults to 4STAR)
 % 
 % OUTPUT:
 %  - ins: output structure, with a few added fields
@@ -43,14 +45,20 @@
 %           - slight modifications to plotting of the line FOV.
 % Modified (v1.3): by Samuel LeBlanc, August 27th, 2015, NASA Ames
 %           - small bug fix in plotting
+% Modified (v2.0): Samuel LeBlanc, 2017-05-28, Hilo, Hawaii
+%           - added support for multiple instruments
 %
 % -------------------------------------------------------------------------
 
 %% Start of code
+version_set('2.0');
+if nargin<2;
+    instrumentname = '4STAR';
+end;
 
-function ins = FOV_scan(ins)
-version_set('1.3');
-
+if strcmp(instrumentname,'2STAR');
+    error('Not yet implemented for 2STAR')
+end;
 %% legacy code
 % 
 % if ~exist('infile','var')
@@ -68,27 +76,47 @@ version_set('1.3');
 
 %% Set correct variables
 % ins = ins.raw;
-ins.AZ_deg = -1.*ins.AZstep./50;
-ins.Az_deg = ins.AZ_deg;
-ins.El_deg = -1.*ins.Elstep*360/5e4;
-ins.minEl = min(ins.El_deg(ins.Str>0));
-ins.maxEl = max(ins.El_deg(ins.Str>0));
-ins.rangeEl = ins.maxEl-ins.minEl;
-ins.minAz = min(ins.AZ_deg(ins.Str>0));
-ins.maxAz = max(ins.AZ_deg(ins.Str>0));
-ins.rangeAz = ins.maxAz-ins.minAz;
-ins.Vscan = ins.rangeEl>ins.rangeAz;
-
+if strcmp(instrumentname,'4STAR');
+    ins.AZ_deg = -1.*ins.AZstep./50;
+    ins.Az_deg = ins.AZ_deg;
+    ins.El_deg = -1.*ins.Elstep*360/5e4;
+    ins.minEl = min(ins.El_deg(ins.Str>0));
+    ins.maxEl = max(ins.El_deg(ins.Str>0));
+    ins.rangeEl = ins.maxEl-ins.minEl;
+    ins.minAz = min(ins.AZ_deg(ins.Str>0));
+    ins.maxAz = max(ins.AZ_deg(ins.Str>0));
+    ins.rangeAz = ins.maxAz-ins.minAz;
+    ins.Vscan = ins.rangeEl>ins.rangeAz;
+elseif strcmp(instrumentname,'2STAR');
+    ins.AZ_deg = -1.*ins.AZstep./50;
+    ins.Az_deg = ins.AZ_deg;
+    ins.El_deg = -1.*ins.Elstep*360/5e4;
+    ins.minEl = min(ins.El_deg(ins.Md>0));
+    ins.maxEl = max(ins.El_deg(ins.Md>0));
+    ins.rangeEl = ins.maxEl-ins.minEl;
+    ins.minAz = min(ins.AZ_deg(ins.Md>0));
+    ins.maxAz = max(ins.AZ_deg(ins.Md>0));
+    ins.rangeAz = ins.maxAz-ins.minAz;
+    ins.Vscan = ins.rangeEl>ins.rangeAz;
+end;
 %% set variables from new 4STAR analysis software to match old code
 ins=convert_star_to_rd_spc(ins);
 
 %%
+if ~strcmp(instrumentname,'2STAR');
 tracking = (abs(ins.QdVlr./ins.QdVtot)<0.02) & (abs(ins.QdVtb./ins.QdVtot)<0.02) & (ins.QdVtot>.5)&(ins.Str==1) & (ins.Str>0);
+else;
+    tracking = (abs(ins.QdVlr./ins.QdVtot)<0.02) & (abs(ins.QdVtb./ins.QdVtot)<0.02) & (ins.QdVtot>.5)&(ins.Md==1) & (ins.Md>0);
+end;
 ic = find(tracking);
 icenter = ic(ceil(end/2));
 rec = [1:length(tracking)]';
 if any(tracking)
-    scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
+    if ~strcmp(instrumentname,'2STAR');
+        scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
+    else;
+        scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Md~=0;
+    end;
    % scan(icenter) = true;
 else
     scan = true(size(tracking));
