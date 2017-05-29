@@ -1,4 +1,4 @@
-function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose)
+function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(t,verbose,instrumentname)
 
 % returns the 4STAR c0 (TOA count rate) for the time (t) of the
 % measurement. t must be in the Matlab time format. Leave blank and now is
@@ -26,8 +26,10 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % SL, v1.8, 2016-08-22, updated c0 from mean MLO June 2016.
 % MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 % SL, v1.10, 2017-04-07, updated c0 from mean MLO 2016 November for ORACLES
+% SL, v2.0, 2017-05-27, Updates to use multiple different instruments,
+% defined via instrumentname variable, defaults to 4STAR
 
-version_set('1.10');
+version_set('2.0');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -37,231 +39,252 @@ if verbose; disp('In starc0'), end;
 % control the input
 if nargin==0;
     t=now;
+    instrumentname = '4STAR'; % by default use 4STAR
+elseif nargin<=2;
+    instrumentname = '4STAR'; % by default use 4STAR
 end;
 
-% select a source file
-if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-    if t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
-        if t>=datenum([2016 8 27 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
-            %daystr='20161113';
-            %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
-            daystr = '20160927';
-            filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
-        elseif t>=datenum([2016 8 26 0 0 0]);
-            %if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
-            %daystr='20161115';
-            daystr = '20160927';
-            %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
-            %filesuffix='refined_Langley_Nov2016part1.5incl1115_good_mean';
-            filesuffix = 'refined_Langley_airborne_ORACLES_averages_v1';
-            filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
-        elseif t>=datenum([2016 8 23 0 0 0]);
-            daystr='20160825';
-            filesuffix='refined_Langley_ORACLES_transit2';
-        elseif t>=datenum([2016 8 23 0 0 0]);
-            daystr='20160823';
-            filesuffix='refined_Langley_ORACLES_WFF_gnd';
-        elseif t>=datenum([2016 6 30 0 0 0]); %MLO June 2016
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-        end;
-    elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16
-        if now>=datenum([2016 4 7 0 0 0]);
-            %daystr='20151104';
-            %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';      % ground-based sunrise measurements at WFF is our best bet for KORUS
-            %filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
-            %daystr='20160109';
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            %daystr='20160426';
-            %korus-aq transit section 1
-            %filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
-        elseif now>=datenum([2016 1 19 0 0 0]);
-            %daystr='20160109';
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
-            %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
-        elseif now>=datenum([2016 1 9 0 0 0]);
-            %daystr='20160109';
-            %filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
-            
-            daystr='20160707';
-            filesuffix='Langley_MLO_June2016_mean';
-            
-        end;
-        % transferred from Yohei's laptop, for record keeping
-        if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
-            daystr='20160317';
-            filesuffix='compared_with_AATS_at_Ames'; % rooftop comparison with AATS, the local noon value
-        elseif now>=datenum([2016 3 18 8 45 0]) && now<=datenum([2016 3 18 9 45 0]); % just to make initial starsun files
-            daystr='20160109';
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-        end;
-        % end of transferred from Yohei's laptop, for record keeping
-    elseif t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
-        if now>=datenum([2016 1 19 0 0 0]);
-            daystr='20160109';
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-        elseif now>=datenum([2016 1 16 0 0 0]);
-            daystr='20160109';
-            %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
-            filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
-            %filesuffix='refined_Langley_MLOwFORJcorrection1';
-            %filesuffix='refined_Langley_MLO_wstraylightcorr';
-        end;
-    elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
-        if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
-            if t>datenum([2015 11 23 0 0 0])
-                daystr='20151123';
-                %daystr='20151104';
-                %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            elseif t>datenum([2015 11 18 0 0 0])
-                daystr='20151118';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            elseif t>datenum([2015 11 17 0 0 0])
-                daystr='20151117';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            elseif t>datenum([2015 11 14 0 0 0])
-                daystr='20151114';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            elseif t>datenum([2015 11 12 0 0 0])
-                daystr='20151112';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            elseif t>datenum([2015 11 09 0 0 0])
-                daystr='20151109';
-                filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
-            else
-                daystr='20151104';
-                filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
+switch instrumentname;
+    case {'4STAR'}
+        % select a source file
+        if isnumeric(t); % time of the measurement is given; return the C0 of the time.
+            if t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
+                if t>=datenum([2017 2 1 0 0 0]); % From November 2016 MLO, first half before spectrometer dropout7
+                    daystr = '20170527';
+                    filesuffix = 'refined_Langley_MLO_May2017';
+                end;
+            elseif t>=datenum([2016 6 30 0 0 0]); %for ORACLES 2016
+                if t>=datenum([2016 8 27 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
+                    %daystr='20161113';
+                    %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+                    daystr = '20160927';
+                    filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
+                elseif t>=datenum([2016 8 26 0 0 0]);
+                    %if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
+                    %daystr='20161115';
+                    daystr = '20160927';
+                    %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
+                    %filesuffix='refined_Langley_Nov2016part1.5incl1115_good_mean';
+                    filesuffix = 'refined_Langley_airborne_ORACLES_averages_v1';
+                    filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
+                elseif t>=datenum([2016 8 23 0 0 0]);
+                    daystr='20160825';
+                    filesuffix='refined_Langley_ORACLES_transit2';
+                elseif t>=datenum([2016 8 23 0 0 0]);
+                    daystr='20160823';
+                    filesuffix='refined_Langley_ORACLES_WFF_gnd';
+                elseif t>=datenum([2016 6 30 0 0 0]); %MLO June 2016
+                    daystr='20160707';
+                    filesuffix='Langley_MLO_June2016_mean';
+                end;
+            elseif t>=datenum([2016 2 11 0 0 0]); % modifications on diffusers, fiber cables, shutter, etc. ended on 2016/03/16
+                if now>=datenum([2016 4 7 0 0 0]);
+                    %daystr='20151104';
+                    %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';      % ground-based sunrise measurements at WFF is our best bet for KORUS
+                    %filesuffix='refined_Langley_at_WFF_Ground_screened_3correctO3'; % ground-based sunrise measurements at WFF is our best bet for KORUS
+                    %daystr='20160109';
+                    %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
+                    %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+                    %daystr='20160426';
+                    %korus-aq transit section 1
+                    %filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
+                    
+                    daystr='20160707';
+                    filesuffix='Langley_MLO_June2016_mean';
+                    
+                elseif now>=datenum([2016 1 19 0 0 0]);
+                    %daystr='20160109';
+                    %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
+                    %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+                    
+                    daystr='20160707';
+                    filesuffix='Langley_MLO_June2016_mean';
+                    
+                elseif now>=datenum([2016 1 9 0 0 0]);
+                    %daystr='20160109';
+                    %filesuffix='refined_Langley_MLO'; % adjust date for each of the calibration days
+                    
+                    daystr='20160707';
+                    filesuffix='Langley_MLO_June2016_mean';
+                    
+                end;
+                % transferred from Yohei's laptop, for record keeping
+                if now>=datenum([2016 3 19 0 0 0]) && now<=datenum([2016 4 28 0 0 0]);
+                    daystr='20160317';
+                    filesuffix='compared_with_AATS_at_Ames'; % rooftop comparison with AATS, the local noon value
+                elseif now>=datenum([2016 3 18 8 45 0]) && now<=datenum([2016 3 18 9 45 0]); % just to make initial starsun files
+                    daystr='20160109';
+                    filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+                end;
+                % end of transferred from Yohei's laptop, for record keeping
+            elseif t>=datenum([2016 1 09 0 0 0]); % MLO Jan-2016
+                if now>=datenum([2016 1 19 0 0 0]);
+                    daystr='20160109';
+                    filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
+                elseif now>=datenum([2016 1 16 0 0 0]);
+                    daystr='20160109';
+                    %filesuffix='refined_Langley_MLO_wFORJcorr'; % adjust date for each of the calibration days
+                    filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr';
+                    %filesuffix='refined_Langley_MLOwFORJcorrection1';
+                    %filesuffix='refined_Langley_MLO_wstraylightcorr';
+                end;
+            elseif t>=datenum([2015 9 16 0 0 0]); % NAAMES #1
+                if now>=datenum([2016 4 20 0 0 0]); % c0 adjusted for each flight; see NAAMESquickplots.m.
+                    if t>datenum([2015 11 23 0 0 0])
+                        daystr='20151123';
+                        %daystr='20151104';
+                        %filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    elseif t>datenum([2015 11 18 0 0 0])
+                        daystr='20151118';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    elseif t>datenum([2015 11 17 0 0 0])
+                        daystr='20151117';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    elseif t>datenum([2015 11 14 0 0 0])
+                        daystr='20151114';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    elseif t>datenum([2015 11 12 0 0 0])
+                        daystr='20151112';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    elseif t>datenum([2015 11 09 0 0 0])
+                        daystr='20151109';
+                        filesuffix='adjusted_for_minimum_intraday_changes_in_high_alt_AOD';
+                    else
+                        daystr='20151104';
+                        filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
+                    end;
+                elseif now>=datenum([2016 4 14 0 0 0]); % preliminary uncertainty values (2%) added
+                    daystr='20151118';
+                    filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc_varyingO3'; % ground-based sunrise measurements at WFF
+                elseif now>=datenum([2016 2 16 14 0 0]); % preliminary uncertainty values (2%) added
+                    daystr='20151118';
+                    filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc'; % ground-based sunrise measurements at WFF % WRONG NIR FORMATTING CORRECTED ON 2016/02/22
+                elseif now>=datenum([2015 11 23 0 0 0]);
+                    daystr='20151118';
+                    filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % WRONG NIR FORMATTING % ground-based sunrise measurements at WFF
+                elseif now>=datenum([2015 11 6 0 0 0]);
+                    daystr='20151104';
+                    filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
+                elseif now>=datenum([2015 9 24 0 0 0]);
+                    daystr='20150916';
+                    filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
+                end;
+            elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
+                if now>=datenum([2014 9 1 0 0 0]);
+                    %daystr='20140830';
+                    daystr='20141002';
+                    %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
+                    %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
+                    %before Oct-08-2015
+                    %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';% on Oct-20-2015
+                    filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';% on Oct-28-2015
+                    % use for separate starsun files to obtaine modified Langley
+                    %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+                end;
+                %     elseif t>=datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS and post-SEAC4RS latter days
+                %             daystr='20130708';
+                %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+                %     elseif t>=datenum([2013 6 18 0 0 0]) & t<datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS early days
+                %             daystr='20130708';
+                %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled2p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+            elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
+                if now>=datenum([2015 7 17]);
+                    daystr='20130708';
+                    filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
+                    filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
+                    %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+                elseif now>=datenum([2014 10 17]);
+                    daystr='20130708';
+                    filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
+                    %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+                    % use for separate starsun files to obtaine modified Langley
+                    %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+                elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
+                    daystr='20130708';
+                    filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
+                    %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+                elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
+                    daystr='20130708';
+                    filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
+                    % use for separate starsun files to obtaine modified Langley
+                    %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+                elseif now>=datenum([2013 7 14 0 0 0]);
+                    daystr='20130708';
+                    filesuffix='refined_Langley_at_MLO_mbnds_03.2_12.0_screened_3x_averagethru20130712';
+                    % use for separate starsun files to obtaine modified Langley
+                    %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+                elseif now>=datenum([2013 6 19 0 0 0]);
+                    warning('2013 cal is yet to be obtained.')
+                    daystr='20130212';
+                    filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone_averagedwith20130214';
+                end;
+            elseif t>=datenum([2013 1 16 0 0 0]); % y-fiber swapped on Jan 16, 2013 at PNNL (Pasco?).
+                if now>=datenum([2013 2 20 0 0 0]);
+                    daystr='20130212';
+                    filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone_averagedwith20130214';
+                elseif now>=datenum([2013 2 19 0 0 0]);
+                    daystr='20130212';
+                    filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone';
+                elseif now>=datenum([2013 2 13 0 0 0]);
+                    daystr='20130212';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
+                else; % record keeping
+                    warning('2013 cal is yet to be obtained.')
+                    daystr='99999999';
+                    filesuffix='invalid';
+                end;
+            elseif t>=datenum([2012 8 23 0 0 0]); % record keeping % 2012December MLO cal
+                warning('2012 December cal needs to be updated. Also determine since when this cal should be applied (Sept 2012?).')
+                daystr='20121218';
+                filesuffix='refined_Langley_at_MLO_screened_2.5x';
+            elseif t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012, i.e., the beginning of TCAP
+                if now>=datenum([2013 3 22 0 0 0]);
+                    daystr='20120722';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity_updatedunc';
+                elseif now>=datenum([2013 1 30 0 0 0]);
+                    daystr='20120722';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
+                elseif now>=datenum([2013 1 27 0 0 0]);
+                    daystr='20120722';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
+                elseif now>=datenum([2012 10 2 0 0 0]); % record keeping
+                    daystr='20120722';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x_averagedwith20120707';
+                elseif now>=datenum([2012 7 23 8 0 0]); % record keeping
+                    daystr='20120722';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
+                else; % record keeping
+                    daystr='20120707'; % temporary calibration, over m_aero over 1.2 - 1.8.
+                    %         filesuffix='refined_Langley_on_G1_screened_2x_with_gas_absorption_ignored';
+                    %         filesuffix='refined_Langley_on_G1_second_flight_screened_2x_with_gas_absorption_ignored';
+                    filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
+                end;
+            elseif  t>=datenum([2012 05 25]);
+                daystr='MLO2012May';
+                filesuffix='refined_Langley_at_MLO_V3';
+            else;
+                daystr='20120420';
+                filesuffix='refined_airborne_Langley_on_G1';
             end;
-        elseif now>=datenum([2016 4 14 0 0 0]); % preliminary uncertainty values (2%) added
-            daystr='20151118';
-            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc_varyingO3'; % ground-based sunrise measurements at WFF
-        elseif now>=datenum([2016 2 16 14 0 0]); % preliminary uncertainty values (2%) added
-            daystr='20151118';
-            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x_2percentunc'; % ground-based sunrise measurements at WFF % WRONG NIR FORMATTING CORRECTED ON 2016/02/22
-        elseif now>=datenum([2015 11 23 0 0 0]);
-            daystr='20151118';
-            filesuffix='sunrise_refined_Langley_on_C130_screened_3.0x'; % WRONG NIR FORMATTING % ground-based sunrise measurements at WFF
-        elseif now>=datenum([2015 11 6 0 0 0]);
-            daystr='20151104';
-            filesuffix='refined_Langley_at_WFF_Ground_screened_3.0x'; % ground-based sunrise measurements at WFF
-        elseif now>=datenum([2015 9 24 0 0 0]);
-            daystr='20150916';
-            filesuffix='compared_with_AATS_at_Ames'; % Tentative C0, to be replaced once Langley plot is made
+        else; % special collections
+            if isequal(t, 'MLO201205') || isequal(t, 'MLO2012May')
+                daystr={'20120525' '20120526' '20120528' '20120531' '20120601' '20120602' '20120603'};
+                filesuffix=repmat({'refined_Langley_at_MLO_V3'},size(daystr));
+            end;
         end;
-    elseif t>=datenum([2014 8 1 0 0 0]); % ARISE; note that the optical throughput was dropped ~20% before ARISE. This was, Yohei believes Roy said, upon cable swap.
-        if now>=datenum([2014 9 1 0 0 0]);
-            %daystr='20140830';
-            daystr='20141002';
-            %filesuffix='refined_Langley_on_C130_screened_3.0x'; % This is known to be ~10% low for the second half of ARISE>
-            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc';
-            %before Oct-08-2015
-            %filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes';% on Oct-20-2015
-            filesuffix='refined_Langley_on_C-130_calib_flight_screened_2x_wFORJcorrAODscreened_wunc_201510newcodes_unc003';% on Oct-28-2015
-            % use for separate starsun files to obtaine modified Langley
-            %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
+    case {'2STAR'}
+        if t>datenum([2017 04 10 0 0 0]); %2STAR c0 from MLO May 2017
+            daystr = '20170527';
+            filesuffix = 'refined_Langley_2STAR_MLO_May2017';
+        elseif t>datenum([2015 1 1 0 0 0]); % first 2STARc0
+            daystr = '20170527';
+            filesuffix = '2STAR_dummy_c0';
         end;
-        %     elseif t>=datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS and post-SEAC4RS latter days
-        %             daystr='20130708';
-        %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
-        %     elseif t>=datenum([2013 6 18 0 0 0]) & t<datenum([2013 9 1 0 0 0]) & now>=datenum([2014 10 13]) & now<=datenum([2014 10 16]); % SEAC4RS early days
-        %             daystr='20130708';
-        %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled2p20141013'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
-    elseif t>=datenum([2013 6 18 0 0 0]); % SEAC4RS and post-SEAC4RS; fiber swapped in the evening of June 17, 2013 at Dryden.
-        if now>=datenum([2015 7 17]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled3p20141013'; % sepcial case testing with lower c0
-            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
-        elseif now>=datenum([2014 10 17]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_20140718';
-            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
-            % use for separate starsun files to obtaine modified Langley
-            %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
-        elseif now>=datenum([2014 10 10]) & now<=datenum([2014 10 16]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_scaled20141010'; % This is not an average MLO cal; rather, it is chosen because the resulting 4STAR transmittance comes close to the AATS's for SEAC4RS ground comparisons (e.g., 20130819).
-            %             filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
-        elseif now>=datenum([2014 7 18 0 0 0]) & now<=datenum([2014 10 16]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_screened_3.0x_averagethru20130712_updated20140718';
-            % use for separate starsun files to obtaine modified Langley
-            %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
-        elseif now>=datenum([2013 7 14 0 0 0]);
-            daystr='20130708';
-            filesuffix='refined_Langley_at_MLO_mbnds_03.2_12.0_screened_3x_averagethru20130712';
-            % use for separate starsun files to obtaine modified Langley
-            %filesuffix='refined_Langley_MLO_constrained_airmass_screened_2x';
-        elseif now>=datenum([2013 6 19 0 0 0]);
-            warning('2013 cal is yet to be obtained.')
-            daystr='20130212';
-            filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone_averagedwith20130214';
-        end;
-    elseif t>=datenum([2013 1 16 0 0 0]); % y-fiber swapped on Jan 16, 2013 at PNNL (Pasco?).
-        if now>=datenum([2013 2 20 0 0 0]);
-            daystr='20130212';
-            filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone_averagedwith20130214';
-        elseif now>=datenum([2013 2 19 0 0 0]);
-            daystr='20130212';
-            filesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone';
-        elseif now>=datenum([2013 2 13 0 0 0]);
-            daystr='20130212';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
-        else; % record keeping
-            warning('2013 cal is yet to be obtained.')
-            daystr='99999999';
-            filesuffix='invalid';
-        end;
-    elseif t>=datenum([2012 8 23 0 0 0]); % record keeping % 2012December MLO cal
-        warning('2012 December cal needs to be updated. Also determine since when this cal should be applied (Sept 2012?).')
-        daystr='20121218';
-        filesuffix='refined_Langley_at_MLO_screened_2.5x';
-    elseif t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012, i.e., the beginning of TCAP
-        if now>=datenum([2013 3 22 0 0 0]);
-            daystr='20120722';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity_updatedunc';
-        elseif now>=datenum([2013 1 30 0 0 0]);
-            daystr='20120722';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity';
-        elseif now>=datenum([2013 1 27 0 0 0]);
-            daystr='20120722';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozone';
-        elseif now>=datenum([2012 10 2 0 0 0]); % record keeping
-            daystr='20120722';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x_averagedwith20120707';
-        elseif now>=datenum([2012 7 23 8 0 0]); % record keeping
-            daystr='20120722';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
-        else; % record keeping
-            daystr='20120707'; % temporary calibration, over m_aero over 1.2 - 1.8.
-            %         filesuffix='refined_Langley_on_G1_screened_2x_with_gas_absorption_ignored';
-            %         filesuffix='refined_Langley_on_G1_second_flight_screened_2x_with_gas_absorption_ignored';
-            filesuffix='refined_Langley_on_G1_second_flight_screened_2x';
-        end;
-    elseif  t>=datenum([2012 05 25]);
-        daystr='MLO2012May';
-        filesuffix='refined_Langley_at_MLO_V3';
-    else;
-        daystr='20120420';
-        filesuffix='refined_airborne_Langley_on_G1';
-    end;
-else; % special collections
-    if isequal(t, 'MLO201205') || isequal(t, 'MLO2012May')
-        daystr={'20120525' '20120526' '20120528' '20120531' '20120601' '20120602' '20120603'};
-        filesuffix=repmat({'refined_Langley_at_MLO_V3'},size(daystr));
-    end;
-end;
-
+        
+    case{'4STARB'}
+        error('4STARB starc0 not yet implemented')
+end; % case
 % read the file and return c0 values and notes
 if ~exist('visc0')
     if ~exist('filesuffix');
@@ -303,28 +326,35 @@ if ~exist('visc0')
         end;
         visnote=[visnote visfilename ', '];
         vislstr(i)={visfilename};
-        nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
-        if isequal(orientation,'vertical');
-            a=importdata(which(nirfilename));
-            nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
-            if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
-                nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
-            elseif sum(strcmp(lower(a.colheaders), 'c0errlo'))>0 & sum(strcmp(lower(a.colheaders), 'c0errhi'))>0;
-                if i~=i;
-                    error('This part of code to be developed.');
+        if ~strcmp(instrumentname, '2STAR');
+            nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
+            if isequal(orientation,'vertical');
+                a=importdata(which(nirfilename));
+                nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+                if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
+                    nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
+                elseif sum(strcmp(lower(a.colheaders), 'c0errlo'))>0 & sum(strcmp(lower(a.colheaders), 'c0errhi'))>0;
+                    if i~=i;
+                        error('This part of code to be developed.');
+                    end;
+                    nirc0err=[a.data(:,strcmp(lower(a.colheaders), 'c0errlo'))'; a.data(:,strcmp(lower(a.colheaders), 'c0errhi'))'];
+                else
+                    nirc0err(i,:)=NaN(1,size(nirc0,2));
                 end;
-                nirc0err=[a.data(:,strcmp(lower(a.colheaders), 'c0errlo'))'; a.data(:,strcmp(lower(a.colheaders), 'c0errhi'))'];
+                nirc0(nirc0==-1)=NaN;
+                nirc0err(nirc0err==-1)=NaN;
             else
+                nirc0(i,:)=load(which(nirfilename));
                 nirc0err(i,:)=NaN(1,size(nirc0,2));
             end;
-            nirc0(nirc0==-1)=NaN;
-            nirc0err(nirc0err==-1)=NaN;
-        else
-            nirc0(i,:)=load(which(nirfilename));
-            nirc0err(i,:)=NaN(1,size(nirc0,2));
-        end;
-        nirnote=[nirnote nirfilename ', '];
-        nirlstr(i)={nirfilename};
+            nirnote=[nirnote nirfilename ', '];
+            nirlstr(i)={nirfilename};
+        else;
+            nirc0 = [];
+            nirc0err = [];
+            nirnote = '';
+            nirlstr = '';
+        end;%if 2star
     end;
     visnote=[visnote(1:end-2) '.'];
     nirnote=[nirnote(1:end-2) '.'];
@@ -332,8 +362,8 @@ end;
 if verbose; disp(['Using the C0 from ' visfilename]), end;
 
 % return channels used for AOD fitting
-[visc,nirc]=starchannelsatAATS(t);
-cross_sections=taugases(t,'vis',0,0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
+[visc,nirc]=starchannelsatAATS(t,instrumentname);
+cross_sections=taugases(t,'vis',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
 visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
 h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
 h2ook=find(isfinite(h2o)==1 & imag(h2o)==0);
@@ -344,19 +374,23 @@ visaerosolcols=find(h2o>0.9997 & cross_sections.o2<1e-27); % Yohei 2013/01/28
 % visaerosolcols1=visaerosolcols1(visaerosolcols1<=1044);
 % visaerosolcols2=[repmat(visc(1:9),3,1)+repmat([-1 0 1]',1,9)];
 % visaerosolcols=union(visaerosolcols1,visaerosolcols2(:));
-cross_sections=taugases(t,'nir',0,0,0,0.27); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
-h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
-niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01/28
-% niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
-% niraerosolcols1=[];
-% !!! note the 1236 nm is excluded, as Beat says it's affected by gases??
-% niraerosolcols2=[repmat(nirc([11 13]),3,1)+1044+repmat([-1 0 1]',1,2)];
-% % niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+1044+repmat([-1 0 1]',1,1)];
-% niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+repmat([-1 0 1]',1,1)];
-% niraerosolcols=union(niraerosolcols1,niraerosolcols2(:)');
-% niraerosolcols=union(niraerosolcols,niraerosolcols3);
-aerosolcols =[visaerosolcols(:)' niraerosolcols(:)'];
-
+if ~strcmp(instrumentname,'2STAR');
+    cross_sections=taugases(t,'nir',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
+    h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
+    niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01/28
+    % niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
+    % niraerosolcols1=[];
+    % !!! note the 1236 nm is excluded, as Beat says it's affected by gases??
+    % niraerosolcols2=[repmat(nirc([11 13]),3,1)+1044+repmat([-1 0 1]',1,2)];
+    % % niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+1044+repmat([-1 0 1]',1,1)];
+    % niraerosolcols3=[repmat(interp1(cross_sections.wln/1000,1:numel(cross_sections.wln),1.640,'nearest'),3,1)+repmat([-1 0 1]',1,1)];
+    % niraerosolcols=union(niraerosolcols1,niraerosolcols2(:)');
+    % niraerosolcols=union(niraerosolcols,niraerosolcols3);
+    aerosolcols =[visaerosolcols(:)' niraerosolcols(:)'];
+else
+    aerosolcols =visaerosolcols';
+    niraerosolcols = [];
+end;
 % record keeping
 if 1==2; % never executed, just for record keeping
     % preliminary MLO C0, used until 20120625

@@ -1,10 +1,11 @@
-function [sourcefile, contents, savematfile]=startupbusiness(datatype, source, savematfile);
+function [sourcefile, contents, savematfile,instrumentname]=startupbusiness(datatype, source, savematfile);
 % STARTUPBUSINESS, called at the beginning of a 4STAR processing code (e.g.,
 % starsun.m, starfov.m), regulates the input and reads source data.
 % Yohei, 2012/04/11, 2012/06/27
 % CJF: v1.0, 2012/10/05, modified to include filen in saved mat file
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
 % SL: v1.1, 2016/08/23, added control and handling of the instrument name
+% SL: v1.2, 2017/05/27, 
 version_set('1.1');
 %********************
 % regulate input

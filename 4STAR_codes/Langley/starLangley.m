@@ -14,8 +14,10 @@
 % Michal,   2015-10-28, tweaked to adjust ARISE unc to 0.03
 % Michal,   2016-01-09, tweaked to accomodate MLO, Jan-2016 Langleys
 % Michal,   2016-01-21, updated to include MLO-Jan-2016 airmass constraints
+% Samuel,   2017-05-28, Updated and modified for using with 2STAR
 %--------------------------------------------------------------------------
-
+close all
+clear all
 version_set('1.1');
 
 %********************
@@ -25,7 +27,6 @@ daystr='20170526';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
-cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
 savefigure=1;
 
 %********************
@@ -38,27 +39,37 @@ elseif isequal(daystr, '20141002')
     %source='20141002starsun.mat';% this was using most accurate c0 wFORJ
     %(before Oct 2015)
     %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
-% elseif isequal(daystr, '20160112')
-%     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
-% elseif isequal(daystr, '20160113')
-% 
-source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
-% elseif isequal(daystr, '20160426')
-%     source = '20160426starsun_constO3.mat';
+    % elseif isequal(daystr, '20160112')
+    %     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
+    % elseif isequal(daystr, '20160113')
+    %
+    source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
+    % elseif isequal(daystr, '20160426')
+    %     source = '20160426starsun_constO3.mat';
 else
     source=['4STAR_' daystr 'starsun.mat'];
+    instrumentname = '4STAR';
     %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
     % source='20140917starsunLangley.mat';% this is the original file made
     % in field
 end;
 file=fullfile(starpaths, source);
 if ~exist(file);
-    [file, contents0, savematfile]=startupbusiness('langley');
-end;    
+    [file, contents0, savematfile,instrumentname]=startupbusiness('langley');
+end;
 load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero','tau_aero_noscreening');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
+if strcmp(instrumentname,'2STAR')
+    cols=[16   24   45   60   66   92   113   144   170   193];
+    col = 60;
+    info_title = '';
+elseif strcmp(instrumentname,'4STAR')
+    cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
+    col = 408;
+    info_title = ' with FORJ correction';
+end;
 %starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
 starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
 starinfofile_=['starinfo_' daystr(1:8)];
@@ -111,14 +122,15 @@ elseif isequal(daystr, '20160118')
     ok1 = ok(m_aero(ok)>=4);
     ok2 = ok(m_aero(ok)<=2);
     ok  = [ok1;ok2];
-elseif isequal(daystr, '20160426')   
+elseif isequal(daystr, '20160426')
     ok = ok(m_aero(ok)>=4);
 end
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
-    if savefigure;
-        title([daystr ' with FORJ correction'])
-        starsas(['star' daystr '_Langleyplot_stdevs.fig, starLangley.m']);
-    end;
+if savefigure;
+    ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
+    title([instrumentname ' - ' daystr info_title])
+    starsas([instrumentname daystr '_Langleyplot_stdevs.fig, starLangley.m']);
+end;
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
     [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
@@ -128,12 +140,12 @@ for k=1:numel(stdev_mult);
     h0=plot(m_aero(ok), rateaero(ok,cols(4)), '.','color',[.5 .5 .5]);
     chi=get(gca,'children');
     set(gca,'children',flipud(chi));
-    ylabel('Count Rate (/ms) for Aerosols');
+    ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
-    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
-        starsas(['star' daystr 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+        starsas([instrumentname daystr 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 
@@ -150,9 +162,9 @@ for k=1;
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
     grid on;
-    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
-        starsas(['star' daystr 'latlonvaz' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+        starsas([instrumentname daystr 'latlonvaz' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 % plot 500 nm count rate with Tst
@@ -162,15 +174,15 @@ for k=1;
     colorbar;
     ch=colorbarlabeled('Tst');
     xlabel('aerosol Airmass','FontSize',14);
-    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm'],'FontSize',14);
     set(gca,'FontSize',14);
     set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
     grid on;
-    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' 'starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
-        starsas(['star' daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+        starsas([instrumentname daystr 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 % plot 500 nm count rate with Az_deg
@@ -180,7 +192,7 @@ for k=1;
     colorbar;
     ch=colorbarlabeled('AZdeg');
     xlabel('aerosol Airmass','FontSize',14);
-    ylabel('Count Rate (/ms) for Aerosols','FontSize',14);
+    ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm'],'FontSize',14);
     set(gca,'FontSize',14);
     set(gca,'XTick',[0:2:14]); set(gca,'XTickLabel',[0:2:14]);
     starttstr=datestr(langley(1), 31);
@@ -188,9 +200,9 @@ for k=1;
     y = rateaero(ok,cols(4));
     ylim([min(y(:)) max([max(y(:)) data0])]);
     grid on;
-    title([starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' 'starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
-        starsas(['star' daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
+        starsas([instrumentname daystr 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 
@@ -303,8 +315,13 @@ end;
 %********************
 % save new c0
 %********************
-viscols=1:1044;
-nircols=1044+(1:512);
+if ~strcmp(instrumentname, '2STAR');
+    viscols=(1:1044)';
+    nircols=1044+(1:512)';
+else;
+    viscols=(1:256)';
+    nircols=(256:256)';
+end;
 k=1; % select one of the multiple screening criteria (stdev_mult), or NaN (see below).
 c0unc = real(c0unc(k,:));
 if isnumeric(k) && k>=1; % save results from the screening/regression above
@@ -325,13 +342,13 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     %filesuffix = 'refined_Langley_MLOwFORJcorrection1';
     %filesuffix = 'refined_Langley_MLO_wstraylightcorr';
     %filesuffix = 'refined_Langley_MLO_wFORJcorr';
-    %filesuffix='refined_Langley_korusaq_transit1_v1';constant omi data 
+    %filesuffix='refined_Langley_korusaq_transit1_v1';constant omi data
     %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
     %filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
     %filesuffix='refined_Langley_airborne_ORACLES_v2';
-    filesuffix = 'refined_Langley_MLO_May2017';
+    filesuffix = ['refined_Langley_' instrumentname '_MLO_May2017'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
-    additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out.'];
+    additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out. For instrument:' instrumentname];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
 elseif isequal(k, 'addunc'); % add unc to an existing c0 file
     daystr='20120722';
@@ -356,8 +373,13 @@ elseif isequal(k, 'addunc'); % add unc to an existing c0 file
     c0unc=c0new.*unc_TCAP1';
     additionalnotes='Uncertainty was given by combining 0.8% FORJ impact and difference/2 between Feb 12 and 14 2013 air Langley results. Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
     k=1;
-    viscols=(1:1044)';
-    nircols=1044+(1:512)';
+    if ~strcmp(instrumentname, '2STAR');
+        viscols=(1:1044)';
+        nircols=1044+(1:512)';
+    else;
+        viscols=(1:256)';
+        nircols=(256:256)';
+    end;
 elseif ~isfinite(k); % save after averaging
     daystr='20130212';
     originalfilesuffix='refined_Langley_on_G1_firstL_flight_screened_2x_withOMIozone';
@@ -372,11 +394,11 @@ elseif ~isfinite(k); % save after averaging
         filesuffix=[originalfilesuffix '_averagedwith20130214'];
         a=importdata(fullfile(starpaths, [daystr2 '_' spec '_C0_' originalfilesuffix2 '.dat']));
         if kk==1;fullfile(starpaths, [daystr '_' spec '_C0_' originalfilesuffix '.dat']);
-            w=(a.data(:,2)'+b.data(:,2)')/2;            
+            w=(a.data(:,2)'+b.data(:,2)')/2;
             c0new=(a.data(:,3)'+b.data(:,3)')/2;
             c0unc=(a.data(:,4)'+b.data(:,4)')/2;
         elseif kk==2;
-            w=[w (a.data(:,2)'+b.data(:,2)')/2];            
+            w=[w (a.data(:,2)'+b.data(:,2)')/2];
             c0new=[c0new (a.data(:,3)'+b.data(:,3)')/2];
             c0unc=[c0unc (a.data(:,4)'+b.data(:,4)')/2];
         end;
@@ -384,13 +406,20 @@ elseif ~isfinite(k); % save after averaging
     source='(SEE ORIGINAL FILES FOR SOURCES)';
     additionalnotes=['Average of the ' daystr ' and ' daystr2 ' Langley C0, ' originalfilesuffix ' and ' originalfilesuffix2 '.'];
     k=1;
-    viscols=(1:1044)';
-    nircols=1044+(1:512)';
+    if ~strcmp(instrumentname, '2STAR');
+        viscols=(1:1044)';
+        nircols=1044+(1:512)';
+    else;
+        viscols=(1:256)';
+        nircols=(256:256)';
+    end;
 end;
 visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
-nirfilename=fullfile(starpaths, [daystr '_NIR_C0_' filesuffix '.dat']);
 starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
-starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new(k,nircols), c0unc(:,nircols));
+if ~strcmp(instrumentname,'2STAR');
+    nirfilename=fullfile(starpaths, [daystr '_NIR_C0_' filesuffix '.dat']);
+    starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new(k,nircols), c0unc(:,nircols));
+end;
 % be sure to modify starc0.m so that starsun.m will read the new c0 files.
 
 %********************

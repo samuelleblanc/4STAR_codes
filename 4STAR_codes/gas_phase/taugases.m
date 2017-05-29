@@ -1,4 +1,4 @@
-function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr]=taugases(t, datatype, Alt, Pst, Lat, Lon, O3col, NO2col)
+function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr]=taugases(t, datatype, Alt, Pst, Lat, Lon, O3col, NO2col,instrumentname)
 
 % development
 % NO2, O3 concentrations should be input from starinfo or OMI gridded file
@@ -17,9 +17,14 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 % MS, modified, 2016-05-03  adjusted o3 vertical correction for omi
 % MS, modified, 2016-05-06  chnaged default flag_interpOMIno2='yes' to
 %                           'no' for KORUS-AQ
+% SL, modified, 2017-05-28  Modified codes to add multi-instrument
+%                           functionality via the instrumentname variable
 %----------------------------------------------------------------------
-
+version_set('v2.0')
 % set functionallity
+if ~exist('instrumentname'); % no instrumentname defaults to 4STAR
+    instrumentname = '4STAR'; 
+end;
 
 if length(Lat)==1
      % this is being called from starc0
@@ -48,6 +53,7 @@ else
      % this is for April, Lat bin 45
      coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
 end
+
 
 if t>=datenum([2012 7 3 0 0 0]);
     cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
@@ -102,6 +108,19 @@ else; % legacy cross sections that were separate between VIS and NIR; record kee
         cross_sections.no2=[cross_sections.no2 cross_sections_nir.no2];
     end;
 end;
+
+switch instrumentname; % defaults to use 4STAR, here you put special code to modify 4STAR
+    case {'4STARB'}
+        warning('Cross sections for 4STARB not yet calculated, using 4STAR')
+    case {'2STAR'}
+        warning('Gas phase cross sections for 2STAR not yet defined, using 4STAR and then convolving')
+        fn=fieldnames(cross_sections);
+        visw_4s = cross_sections.wln;
+        visw_2s = starwavelengths(t,'2STAR').*1000.0;
+        for ff=1:length(fn);
+            cross_sections.(fn{ff})=interp1(visw_4s,cross_sections.(fn{ff}),visw_2s);
+        end;
+end; %switch instrumentname
 
 %% get NO2 optical depth
 

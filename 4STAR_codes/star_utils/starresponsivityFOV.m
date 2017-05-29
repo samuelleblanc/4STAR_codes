@@ -1,4 +1,4 @@
-function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivityFOV(t, datatype, QdVlr,QdVtb,QdVtot)
+function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivityFOV(t, datatype, QdVlr,QdVtb,QdVtot,instrumentname)
 
 % returns the responsivity of 4STAR over pointing direction.
 % Yohei, 2012/10/04, 2013/02/13
@@ -9,8 +9,15 @@ function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivi
 % SL: v1.0, 2014-10-13: added version control of this m-script via version_set
 % MS: v1.1, added Yohei's FOV updates
 % SL: v1.2, 2017-05-09, added FOV for ORACLES, and modified load for using 4STAR's name in the file
+% SL: v2.0, 2017-05-28, modified for use with multiple instruments, added the instrumentname variable (defaults to 4STAR)
+
+if ~exist('instrumentname');
+    instrumentname = '4STAR';
+end;
 
 % specify FOV data source
+switch instrumentname;
+    case {'4STAR'}
 if t>datenum([2016 8 1 0 0 0]); %ORACLES
     daystr = '20160923';
     fova_filen=3; % filenumber of 15
@@ -34,14 +41,25 @@ elseif t>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking e
     fova_filen=18; % file number for almucantar FOV
     fovp_filen=17; % file number for principal plane FOV
 end;
-
+    case {'4STARB'}
+        warning('4STARB FOV not yet implemented, using recent 4STAR')
+        daystr = '20160923';
+        fova_filen=3; % filenumber of 15
+        fovp_filen=1; % filenumber of 11
+        instrumentname = '4STAR';
+    case {'2STAR'}
+        warning('2STAR FOV not yet implemented, using recent modified 4STAR')
+        daystr = '20160923';
+        fova_filen=3; % filenumber of 15
+        fovp_filen=1; % filenumber of 11
+end; %switch instrumentname
 % load FOV data
 if t>datenum([2016 6 15 0 0 0]);
-    load(which(['4STAR_' daystr 'starfov.mat']));
+    load(which([instrumentname '_' daystr 'starfov.mat']));
 else
     load(which( [daystr 'starfov.mat']));
 end;
-version_set('1.2');
+version_set('2.0');
 
 if isequal(lower(datatype(1:3)), 'vis') || isequal(lower(datatype(1:3)), 'sun');
     if strcmp(daystr,'20130805')
@@ -66,6 +84,12 @@ if isequal(lower(datatype(1:3)), 'sun') | isequal(lower(datatype(1:3)), 'sky'); 
         spn=nir_fovp;
         sa.nrate=[sa.nrate san.nrate];
         sp.nrate=[sp.nrate spn.nrate];
+    elseif strcmp(instrumentname,'2STAR')
+        if strcmp(daystr,'20160923'); %special case processing when FOV not yet defined
+            visw_2s = starwavelengths(t,'2STAR').*1000.0;
+            sa.nrate=interp1(sa.w,sa.nrate,visw_2s);
+            sp.nrate=interp1(sp.w,sp.nrate,visw_2s);
+        end
     else
         san=nir_fova(fova_filen);
         spn=nir_fovp(fovp_filen);

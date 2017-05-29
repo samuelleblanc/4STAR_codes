@@ -97,13 +97,18 @@ if ~isempty(s)
     t=s.t;Alt=s.Alt;
     c0=s.c0;m_aero=s.m_aero;QdVlr=s.QdVlr;QdVtot=s.QdVtot;Md=s.Md;ng=s.ng;
     try;
-        Pst=s.Pst;Tst=s.Tst;aerosolcols=s.aerosolcols;
-        viscols=s.viscols;nircols=s.nircols;rateaero=s.rateaero;
+        Pst=s.Pst;Tst=s.Tst;rateaero=s.rateaero;
         QdVtb=s.QdVtb;
         Lon=s.Lon;Lat=s.Lat;
         w = s.w;
     catch;
         disp('Missing some variables, trying anyway')
+    end;
+    try;
+        aerosolcols=s.aerosolcols;
+        viscols=s.viscols;nircols=s.nircols;
+    catch;
+        disp('Missing some variables (viscols,nircols, or aerosolcols), trying anyway')
     end;
     try;
         rawrelstd=s.rawrelstd;

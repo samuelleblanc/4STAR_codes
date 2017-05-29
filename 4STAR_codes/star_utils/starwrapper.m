@@ -97,7 +97,7 @@ version_set('2.7');
 %********************
 
 %% set default toggle switches
-toggle = update_toggle;
+toggle = update_toggle();
 
 if isfield(s, 'toggle')
     s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
@@ -112,7 +112,7 @@ if (~isempty(varargin))
         nnarg=1;
         if isa(varargin{1},'struct'); % check if its a toggle structure
             toggle = catstruct(toggle,varargin{1}); %concatenate the toggles, but with preference over the input toggle
-        end;
+        end;        
     else;
         nnarg=2;
         if mod(nargin,2); % varargin not paired
@@ -164,7 +164,8 @@ else
     if nargin==2;
         if ~isfield(s2,'t');
             nnarg=1;
-            toggle = catstruct(toggle,s2)
+            toggle = catstruct(toggle,s2);
+            s.toggle = toggle;
         end;
     end;
 end; % if
@@ -295,15 +296,15 @@ end;
 %********************
 %% include wavelengths in um and flip NIR raw data
 if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
-[visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t)); % wavelengths
+[visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t),instrumentname); % wavelengths
 if ~toggle.lampcalib % choose Langley c0
-    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose);     % C0
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose,instrumentname);     % C0
 else                 % choose lamp adjusted c0
-    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(nanmean(s.t),toggle.verbose); % C0 adjusted with lamp values
+    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0lamp(nanmean(s.t),toggle.verbose,instrumentname); % C0 adjusted with lamp values
 end
-[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose);% this is for calling modified c0 file
+[visc0mod, nirc0mod, visc0modnote, nirc0modnote, visc0moderr, nirc0moderr,model_atmosphere]=starc0mod(nanmean(s.t),toggle.verbose,instrumentname);% this is for calling modified c0 file
 s.c0mod = [visc0mod';nirc0mod'];% combine arrays
-[visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)));
+[visresp, nirresp, visnoteresp, nirnoteresp, ~, ~, visaeronetcols, niraeronetcols, visresperr, nirresperr] = starskyresp(nanmean(s.t(1)),instrumentname);
 if ~isempty(strfind(lower(datatype),'vis'));
     s.w=visw;
     s.c0=visc0;
@@ -314,6 +315,8 @@ if ~isempty(strfind(lower(datatype),'vis'));
     s.aeronetcols = visaeronetcols;
     s.skyresperr = visresperr;
     s.note(end+1,1)={visnote}; s.note(end+1,1)={visnotec0};s.note(end+1,1)={visnoteresp};
+    sat_val = 65535;
+    if strcmp(instrumentname,'2STAR'); sat_val=32767; end;
 elseif strmatch('nir', lower(datatype))
     s.raw=fliplr(s.raw); % ascending order of the wavelength (reverse of the wavenumber)
     s.w=nirw;
@@ -325,12 +328,9 @@ elseif strmatch('nir', lower(datatype))
     s.aeronetcols = niraeronetcols;
     s.skyresperr = nirresperr;
     s.note(end+1,1)={nirnote}; s.note(end+1,1)={nirnotec0}; s.note(end+1,1)={nirnoteresp};
-end;
-if size(s.raw,2)<1000
     sat_val = 32767;
-else
-    sat_val = 65535;
-end
+end;
+
 if toggle.verbose; disp('...calculating saturated points'); end;
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
@@ -390,7 +390,7 @@ end;
 
 %% subtract dark and divide by integration time
 if toggle.verbose; disp('substract darks and divide by integration time'), end;
-[s.rate, s.dark, s.darkstd, note]=starrate(s);
+[s.rate, s.dark, s.darkstd, note]=starrate(s,'bookends',instrumentname);
 
 s.note(end+1,1)={note};
 if nargin>=2+nnarg
@@ -494,8 +494,8 @@ if nargin>=2+nnarg
     s=rmfield(s, setdiff(fn,'t'));
     qq=qq+qq2;
     clear qq2 s2;
-    [daystr, filen, datatype, instrumentname]=starfilenames2daystr(s.filename, 1);
 end
+[daystr, filen, datatype, instrumentname]=starfilenames2daystr(s.filename, 1);
 
 %% get solar zenith angle, airmass, temperatures, etc.
 v=datevec(s.t);
@@ -732,7 +732,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     % derive optical depths by the traditional method
     [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
     [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
-    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col); % gases
+    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
  
     % cjf: Alternative with tr
     %     if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
@@ -772,13 +772,18 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     s.tau_aero=s.tau_aero_noscreening;
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    % if toggle.gassubtract
-        tau_O4nir          = s.tau_O4; tau_O4nir(:,1:1044)=0;
+    if toggle.gassubtract
+        tau_O4nir          = s.tau_O4; 
+        if ~strcmp(instrumentname,'2STAR');
+            tau_O4nir(:,1:1044)=0;
+        else;
+            tau_O4nir(:,1:256)=0;
+        end;
         s.rateslant        = real(s.rate./repmat(s.f,1,qq));
         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-    % end;
+    end;
     
     % compare rate structures:
     
@@ -972,7 +977,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         %s.tau_aero_err6=s.m_NO2./s.m_aero*s.tau_NO2_err*s.tau_NO2;
         s.tau_aero_err7=repmat(s.m_ray./s.m_aero,1,qq).*s.tau_O4_err.*s.tau_O4;
         s.tau_aero_err8=0; % legacy from the AATS code; reserve this variable for future H2O error estimate; % tau_aero_err8=tau_H2O_err*s.tau_H2O.* (ones(n(2),1)*(m_H2O./m_aero));
-        s.responsivityFOV=starresponsivityFOV(s.t,'SUN',s.QdVlr,s.QdVtb,s.QdVtot);
+        s.responsivityFOV=starresponsivityFOV(s.t,'SUN',s.QdVlr,s.QdVtb,s.QdVtot,instrumentname);
         s.track_err=abs(1-s.responsivityFOV);
         s.tau_aero_err9=s.track_err./repmat(s.m_aero,1,qq);
         s.tau_aero_err10=0; % reserved for error associated with diffuse light correction; tau_aero_err10=tau_aero.*runc_F'; %error of diffuse light correction

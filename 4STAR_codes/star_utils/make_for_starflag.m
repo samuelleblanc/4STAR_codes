@@ -43,19 +43,32 @@ g.aod_452nm = s.tau_aero_noscreening(:,nm_452);
 g.aod_500nm = s.tau_aero_noscreening(:,nm_500);
 g.aod_865nm = s.tau_aero_noscreening(:,nm_865);
 g.aod_1040nm = s.tau_aero_noscreening(:,nm_1040);
-g.aod_1215nm = s.tau_aero_noscreening(:,nm_1215);
+try;
+    g.aod_1215nm = s.tau_aero_noscreening(:,nm_1215);
+    not_nm_1215 = false;
+catch;
+    disp('No NIR in starsun_for_starflag')
+    not_nm_1215 = true;
+end;
+
 g.aod_500nm_max=3;
 g.m_aero_max=15;
 
 %calculate quantity [1-cos(roll angle)]
 g.roll_proxy=1-cos(s.roll*pi/180);
-
-g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040),s.raw(:,nm_1215)];
-g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040),s.dark(:,nm_1215)];
-g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
-             s.darkstd(:,nm_865),s.darkstd(:,nm_1040),s.darkstd(:,nm_1215)];
-         
-g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;g.nm_1215 = 6; 
+if not_nm_1215;
+    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040)];
+    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040)];
+    g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
+        s.darkstd(:,nm_865),s.darkstd(:,nm_1040)];
+    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;
+else;
+    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040),s.raw(:,nm_1215)];
+    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040),s.dark(:,nm_1215)];
+    g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
+        s.darkstd(:,nm_865),s.darkstd(:,nm_1040),s.darkstd(:,nm_1215)];
+    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;g.nm_1215 = 6;
+end;
 g.save_for_starflag = true;
 
 if gases; 

@@ -1,3 +1,5 @@
+function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t,instrumentname);
+
 %% Details of the program:
 % NAME:
 %   starskyresp
@@ -15,6 +17,8 @@
 % INPUT:
 %  t: time (in matlab format) of the measurements, to choose the correct
 %     response function, when omitted takes the current time
+%  instrumentname: (defaults to 4STAR), name of instrument that returns the
+%                   proper response function
 % 
 % OUTPUT:
 %  visresp: response function for the vis spectrometer
@@ -60,19 +64,25 @@
 %                  Update to NAAMES, put in the pre-NAAMES lab cal
 % Modified (v1.7): Samuel LeBlanc, NASA Ames, 2016-09-29
 %                  Update with pre KORUS radiance cal data
+% Modified (v2.0): Samuel LeBlanc, Hilo, Hawaii, 2017-05-28
+%                  Modifed codes to handle multiple different instruments
 %
 % -------------------------------------------------------------------------
 
 %% start of function
-function [visresp, nirresp, visnote, nirnote, vislstr, nirlstr,visaerosolcols, niraerosolcols, visresperr, nirresperr] = starskyresp(t);
-version_set('1.7');
+version_set('2.0');
 
 % control the input
 if nargin==0;
     t=now;
+    instrumentname = '4STAR'; % by default use 4STAR
+elseif nargin<=2;
+    instrumentname = '4STAR'; % by default use 4STAR
 end;
 
 % select a source file
+switch instrumentname;
+    case {'4STAR'}
 if isnumeric(t); % time of the measurement is given; return the response of the time.
     if t>=datenum([2012 7 3 0 0 0])&& t< datenum([2013 1 16 0 0 0]) ; % new VIS spectrometer since July 3, 2012       
         daystr='20120920'; % temporary calibration, over m_aero over 1.2 - 1.8.
@@ -132,6 +142,17 @@ else % special collections
         filesuffix=repmat({'refined_Langley_at_MLO_V3'},size(daystr));
     end;
 end;
+    case {'4STARB'}
+        warning('4STARB radiance response function not yet defined, using 4STAR default')
+        daystr = '20160330';
+        filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
+    case {'2STAR'}
+        warning('2STAR does not have a radiance measurement, returning nul arrays')
+        visresp=[]; nirresp=[]; visnote=''; nirnote=''; 
+        vislstr=''; nirlstr=''; visaerosolcols=[]; niraerosolcols=[]; 
+        visresperr=[]; nirresperr=[];
+        return
+end; %switch instrumentname
 
 % read the file and return response values and notes
 if ~exist('visresp')
