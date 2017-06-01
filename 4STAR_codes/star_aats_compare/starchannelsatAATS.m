@@ -6,6 +6,7 @@ function [visc,nirc,viscrange,nircrange]=starchannelsatAATS(t,instrumentname)
 version_set('v2.0')
 
 if nargin==1;
+    instrumentname = '4STAR';
     [visw,nirw]=starwavelengths(t,instrumentname); 
     [lambda,fwhm]=aatslambda(t);
 else

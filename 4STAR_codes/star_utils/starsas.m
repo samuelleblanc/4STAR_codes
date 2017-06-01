@@ -86,6 +86,7 @@ if exist(fullfile(pathname,[figurename '.fig']))==2;
 end;
 disp(['Saving ' figurename '.fig under ' pathname]);
 saveas(gcf, fullfile(pathname, [figurename '.fig']), 'fig');
+set(gcf,'paperpositionmode','auto');
 try
     saveas(gcf, fullfile(pngsavedir, [figurename '.png']), 'png');
 catch; % patch figures do not seem to be converted to PNG.  try jpeg.

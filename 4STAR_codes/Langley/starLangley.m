@@ -23,7 +23,7 @@ version_set('1.1');
 %********************
 % set parameters
 %********************
-daystr='20170528';
+%daystr='20170528';
 stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 % cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -32,31 +32,32 @@ savefigure=1;
 %********************
 % generate a new cal
 %********************
-if isequal(daystr, '20120722'); % TCAP July 2012
-    source='20120722Langleystarsun.mat';
-elseif isequal(daystr, '20141002')
-    source='20141002starsun_R2.mat';% after latest code modification - starsun generated on Oct-08-2015
-    %source='20141002starsun.mat';% this was using most accurate c0 wFORJ
-    %(before Oct 2015)
-    %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
-    % elseif isequal(daystr, '20160112')
-    %     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
-    % elseif isequal(daystr, '20160113')
-    %
-    source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
-    % elseif isequal(daystr, '20160426')
-    %     source = '20160426starsun_constO3.mat';
-else
-    source=['4STAR_' daystr 'starsun.mat'];
-    instrumentname = '4STAR';
-    %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
-    % source='20140917starsunLangley.mat';% this is the original file made
-    % in field
-end;
-file=fullfile(starpaths, source);
-if ~exist(file);
-    [file, contents0, savematfile,instrumentname]=startupbusiness('langley');
-end;
+% if isequal(daystr, '20120722'); % TCAP July 2012
+%     source='20120722Langleystarsun.mat';
+% elseif isequal(daystr, '20141002')
+%     source='20141002starsun_R2.mat';% after latest code modification - starsun generated on Oct-08-2015
+%     %source='20141002starsun.mat';% this was using most accurate c0 wFORJ
+%     %(before Oct 2015)
+%     %source='20141002starsun_wupdatedForj.mat';% this was ad-hoc c0
+%     % elseif isequal(daystr, '20160112')
+%     %     source='20160112starsun_wstraylightcorr.mat';% forj correction from 2016-01-13
+%     % elseif isequal(daystr, '20160113')
+%     %
+%     source='20160113starsunFORJcorrected1.mat';% forj correction from 2016-01-13
+%     % elseif isequal(daystr, '20160426')
+%     %     source = '20160426starsun_constO3.mat';
+% else
+%     source=['4STAR_' daystr 'starsun.mat'];
+%     instrumentname = '4STAR';
+%     %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
+%     % source='20140917starsunLangley.mat';% this is the original file made
+%     % in field
+% end;
+% file=fullfile(starpaths, source);
+%if ~exist(file);
+    [file, contents0, savematfile,instrumentname]=startupbusiness('langley','ask',[starpaths 'nul.mat']);
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr({file});
+%end;
 load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero','tau_aero_noscreening');
 AZ_deg_   = AZstep/(-50);
 AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
@@ -125,12 +126,23 @@ elseif isequal(daystr, '20160118')
 elseif isequal(daystr, '20160426')
     ok = ok(m_aero(ok)>=4);
 end
+%% Plot lanlgy with various stddevs on the figure
 [data0, od0, residual]=Langley(m_aero(ok),rateaero(ok,col),stdev_mult,1);
+
 if savefigure;
     ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
     title([instrumentname ' - ' daystr info_title])
+    starsas([instrumentname daystr '_Langleyplot_stdevs_zoom.fig, starLangley.m']);
+    xlim([0,20]);
+    if strcmp(instrumentname,'4STAR');
+        ylim([520,740]);
+    elseif strcmp(instrumentname,'2STAR');
+        ylim([950,1250]);
+    end;
     starsas([instrumentname daystr '_Langleyplot_stdevs.fig, starLangley.m']);
 end;
+
+%% Plot the one langley for each stdev on seperate figures
 for k=1:numel(stdev_mult);
     ok2=ok(isfinite(residual(:,k))==1);
     [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
@@ -143,13 +155,96 @@ for k=1:numel(stdev_mult);
     ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
-    title([instrumentname ' ' starttstr ' - ' stoptstr ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', STDx' num2str(stdev_mult(k), '%0.1f')]);
     if savefigure;
         starsas([instrumentname daystr 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley.m']);
     end;
 end;
 
-% plot Lat/Lon with Az_deg
+%% plot langley at multiple wavelengths.
+fig = figure;
+cm = hsv(length(cols));
+colormap(cm);
+hm = semilogy(m_aero(ok),rateaero(ok,cols(1))./c0new(1,cols(1)).*NaN,'.');hold on;
+for ii=1:length(cols);
+    hm = semilogy(m_aero(ok),rateaero(ok,cols(ii))./c0new(1,cols(ii)),'.','color',cm(ii,:));
+    hl = plot([0 max(m_aero(ok))],[c0new(1,cols(ii))' exp(log(c0new(1,cols(ii)))'-od(1,cols(ii))'*max(m_aero(ok)))]./c0new(1,cols(ii)),...
+        '-','color',cm(ii,:));
+    
+end;
+chi=get(gca,'children');
+set(gca,'children',flipud(chi));
+ylim([0.7,1]);
+set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
+xlim([0,20]);
+labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+title([instrumentname ' multi-wavelength ' daystr ' :'  starttstr ' - ' stoptstr]);
+ylabel('Aerosol Count Rate normalized by c0')
+xlabel('Airmass factor')
+grid();
+
+if savefigure;
+    starsas([instrumentname daystr '_Langleyplot_multiwavelength_normalized.fig, starLangley.m']);
+end;
+
+% only vis
+fig = figure;
+cm = hsv(length(cols));
+colormap(cm);
+hm = semilogy(m_aero(ok),rateaero(ok,cols(1))./c0new(1,cols(1)).*NaN,'.');hold on;
+for ii=1:10;
+    hm = semilogy(m_aero(ok),rateaero(ok,cols(ii))./c0new(1,cols(ii)),'.','color',cm(ii,:));
+    hl = plot([0 max(m_aero(ok))],[c0new(1,cols(ii))' exp(log(c0new(1,cols(ii)))'-od(1,cols(ii))'*max(m_aero(ok)))]./c0new(1,cols(ii)),...
+        '-','color',cm(ii,:));
+    
+end;
+chi=get(gca,'children');
+set(gca,'children',flipud(chi));
+ylim([0.7,1]);
+set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
+xlim([0,20]);
+labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
+for ij=11:length(cols), labels{ij} = '.'; end;
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+title([instrumentname ' VIS ' daystr ' :'  starttstr ' - ' stoptstr]);
+ylabel('Aerosol Count Rate normalized by c0')
+xlabel('Airmass factor')
+grid();
+
+if savefigure;
+    starsas([instrumentname daystr '_Langleyplot_vis_multiwavelength_normalized.fig, starLangley.m']);
+end;
+
+% only nir
+fig = figure;
+cm = hsv(length(cols));
+colormap(cm);
+hm = semilogy(m_aero(ok),rateaero(ok,cols(1))./c0new(1,cols(1)).*NaN,'.');hold on;
+for ii=11:length(cols);
+    hm = semilogy(m_aero(ok),rateaero(ok,cols(ii))./c0new(1,cols(ii)),'.','color',cm(ii,:));
+    hl = plot([0 max(m_aero(ok))],[c0new(1,cols(ii))' exp(log(c0new(1,cols(ii)))'-od(1,cols(ii))'*max(m_aero(ok)))]./c0new(1,cols(ii)),...
+        '-','color',cm(ii,:));
+    
+end;
+chi=get(gca,'children');
+set(gca,'children',flipud(chi));
+ylim([0.7,1]);
+set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
+xlim([0,20]);
+labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
+for ij=1:10, labels{ij} = '.'; end;
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+title([instrumentname ' NIR multi-wavelength ' daystr ' :'  starttstr ' - ' stoptstr]);
+ylabel('Aerosol Count Rate normalized by c0')
+xlabel('Airmass factor')
+grid();
+
+if savefigure;
+    starsas([instrumentname daystr '_Langleyplot_nir_multiwavelength_normalized.fig, starLangley.m']);
+end;
+
+%% plot Lat/Lon with Az_deg
 for k=1;
     figure;
     h2=scatter(Lon(ok), Lat(ok),6,AZ_deg(ok),'filled');
@@ -346,10 +441,11 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     %filesuffix='refined_Langley_korusaq_transit1_v2';variable omi data
     %filesuffix='refined_Langley_korusaq_transit1_v3';% 230DU for omi
     %filesuffix='refined_Langley_airborne_ORACLES_v2';
-    filesuffix = ['refined_Langley_' instrumentname '_MLO_May2017'];
+    filesuffix = ['refined_Langley_' instrumentname '_MLO_May2017_pm'];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging.';
     additionalnotes=['Data outside ' num2str(stdev_mult(k), '%0.1f') 'x the STD of 501 nm Langley residuals were screened out. For instrument:' instrumentname];
     % additionalnotes='Data outside 2x the STD of 501 nm Langley residuals were screened out before the averaging. The Langley results were lowered by 0.8% in order to represent the middle FORJ sensitivity.';
+    source=file;
 elseif isequal(k, 'addunc'); % add unc to an existing c0 file
     daystr='20120722';
     originalfilesuffix='refined_Langley_on_G1_second_flight_screened_2x_withOMIozonemiddleFORJsensitivity'

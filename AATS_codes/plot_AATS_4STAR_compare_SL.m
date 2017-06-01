@@ -2,6 +2,7 @@
 clear
 close all
 asktopause=true;
+calculate_again=true;
 
 corstr='_corr';
 corstr='';
@@ -10,11 +11,17 @@ corstr='';
 %dateprocstr='20140502';
 %dateprocstr='20140407';
 dateprocstr='20150113';
+dateprocstr='20170526';
 %dateprocstr='20150114';
 %dateprocstr='20130708';
-stardir=['C:\Users\sleblan2\Research\4STAR\roof\' dateprocstr '\'];
+instrumentname = '4STAR'
 
-time_to_norm=19.2
+title0 = 'MLO';
+
+stardir=['C:\Users\sleblan2\Research\4STAR\roof\' dateprocstr '\'];
+stardir = 'C:\Users\sleblan2\Research\MLO\2017_May\';
+
+time_to_norm=20.2
 
 UTlim=[16.1 19.7];
 templim=[10 40];
@@ -22,46 +29,177 @@ ratlim=[0.95 1.05];
 %ratlim=[0.018,0.022];
 
 dd='C:\Users\sleblan2\Research\AATS\figs\';%'~/AATS/figs/';
+dd = 'C:\Users\sleblan2\Research\MLO\2017_May\figs\';
 
-%[vis_sun, nir_sun, aats]=staraatscompare_John(dateprocstr)
-if ~exist('vis_sun');
-    [vis_sun, nir_sun, aats]=staraatscompare(dateprocstr);
-end;
-
-UTdechr=timeMatlab_to_UTdechr(vis_sun.t);
-UTdechr_AATS=timeMatlab_to_UTdechr(aats.t);
-[nul,inorm] = min(abs(UTdechr-time_to_norm))
-
-for i=1:14;
-    rr(:,i)=vis_sun.raterelativeratiotoaats(:,i)./vis_sun.raterelativeratiotoaats(inorm,i);
-end;
-
-vis_sun.raterelativeratiotoaats=rr;
-
-% 0.3535  0.3800  0.4520  0.5005  0.5204  0.6052  0.6751  0.7805  0.8645  0.9410  1.0191  1.2356  1.5585  2.1391
+fs = [stardir dateprocstr instrumentname 'toaats.mat'];
 myColorOrder=[0 1 1; 0.6 0.8 1.0; 0 0 1; 0.6 1.0 0.6; 0 1 0; 0.5 0.6 0.0; 1 0 1; 1 0 0; 0.5 0.1 0.7; 0 0 0];
 
-%set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
-%% load track from day
-disp(['loading star.mat file for ' dateprocstr]);
-fpp = [stardir dateprocstr 'star' corstr '.mat'];
-if ~exist(fpp)
-    [fns,pns] = uigetfile(starpaths,'star.mat',[dateprocstr 'star*.mat'])
-    fpp = [pns,fns];
-end
-load(fpp,'track');
+if ~exist(fs)|calculate_again;
+    %[vis_sun, nir_sun, aats]=staraatscompare_John(dateprocstr)
+    if ~exist('vis_sun');
+        [vis_sun, nir_sun, aats]=staraatscompare(dateprocstr);
+    end;
+    
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr(vis_sun.filename);
+    
+    UTdechr=timeMatlab_to_UTdechr(vis_sun.t);
+    UTdechr_AATS=timeMatlab_to_UTdechr(aats.t);
+    [nul,inorm] = min(abs(UTdechr-time_to_norm))
+    
+    for i=1:14;
+        rr(:,i)=vis_sun.raterelativeratiorangetoaats(:,i)./vis_sun.raterelativeratiorangetoaats(inorm,i);
+        rar(:,i)=vis_sun.raterelativeratiotoaats(:,i)./vis_sun.raterelativeratiotoaats(inorm,i);
+    end;
+    
+    vis_sun.raterelativeratiorangetoaats=rr;
+    vis_sun.raterelativeratiotoaats=rar;
+    
+    % 0.3535  0.3800  0.4520  0.5005  0.5204  0.6052  0.6751  0.7805  0.8645  0.9410  1.0191  1.2356  1.5585  2.1391
+    
+    %set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+    if ~strcmp(instrumentname,'2STAR');
+        %% load track from day
+        disp(['loading star.mat file for ' dateprocstr]);
+        fpp = [stardir dateprocstr 'star' corstr '.mat'];
+        if ~exist(fpp)
+            [fns,pns] = uigetfile2(starpaths,[instrumentname ' star.mat'],['*' instrumentname '*' dateprocstr 'star*.mat'])
+            fpp = [pns,fns];
+        end
+        load(fpp,'track');
+        
+        %% Save output
+        disp(['Saving file to: ' fs])
+        save(fs,'nir_sun','vis_sun','track','aats','instrumentname','program_version','-v7.3');
+    else;
+        %% Save output
+        disp(['Saving file to: ' fs])
+        save(fs,'nir_sun','vis_sun','aats','instrumentname','program_version','-v7.3');
+    end;
+else;
+    disp(['Loading comparison file name: ' fs])
+    load(fs);
+    
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr(vis_sun.filename);
+    UTdechr=timeMatlab_to_UTdechr(vis_sun.t);
+    UTdechr_AATS=timeMatlab_to_UTdechr(aats.t);
+end;
+%stophere
 
-
-%% Save output
-fs = [stardir dateprocstr 'startoaats.mat'];
-disp(['Saving file to: ' fs])
-save(fs,'nir_sun','vis_sun','track','aats','program_version','-v7.3');
-
-stophere
-
-idxwvlvisp=[0 0 1 1 1 1 1 1 1 0 1 1 1];
+if ~strcmp(instrumentname,'2STAR');
+    idxwvlvisp=[0 0 1 1 1 1 1 1 1 0 1 1 1];
+    end_num = 13;
+else;
+    idxwvlvisp=[0 0 1 1 1 1 1 1 1 1];
+    end_num = 10;
+end;
 %UTlim=[22.5 23];%20.1];
 %UTlim=[16 21.5];%20.1];
+
+figure(20);
+ax1 = subplot(1,1,1);
+set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+h=plot(UTdechr,vis_sun.raterelativeratiorangetoaats(:,idxwvlvisp==1), '.');
+hx = graph2d.constantline(time_to_norm);
+changedependvar(hx,'x');
+lstr=[]; lstrc={};
+for i=1:end_num; %:-1:1,
+    if idxwvlvisp(i)==1,
+        lstr=[lstr;sprintf('%6.1f',1000*aats.w(i))];
+        lstrc = {lstrc{:},sprintf('%6.1f',1000*aats.w(i))};
+    end
+end
+colormap(myColorOrder(1:length(lstr),:));
+lcolorbar(lstrc)
+%lh=legend(lstr,'location','bestoutside');
+%set(lh,'fontsize',16,'location','east');
+ylim([0.92 1.05]);
+%xlim(UTlim);
+set(gca,'fontsize',16);
+grid on;
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s range of wvl rates/V normalized at %2.1f h'],dateprocstr,time_to_norm);
+title(titlestr);
+save_fig(20,[dd dateprocstr '_aatsto' instrumentname '_normalizedratio_wvlrange']);
+
+figure(19);
+ax1 = subplot(1,1,1);
+set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+h=plot(UTdechr,vis_sun.raterelativeratiotoaats(:,idxwvlvisp==1), '.');
+hx = graph2d.constantline(time_to_norm);
+changedependvar(hx,'x');
+lstr=[]; lstrc={};
+for i=1:end_num; %:-1:1,
+    if idxwvlvisp(i)==1,
+        lstr=[lstr;sprintf('%6.1f',1000*aats.w(i))];
+        lstrc = {lstrc{:},sprintf('%6.1f',1000*aats.w(i))};
+    end
+end
+colormap(myColorOrder(1:length(lstr),:));
+lcolorbar(lstrc)
+%lh=legend(lstr,'location','bestoutside');
+%set(lh,'fontsize',16,'location','east');
+ylim([0.92 1.05]);
+%xlim(UTlim);
+set(gca,'fontsize',16);
+grid on;
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s single wvl rates/V normalized at %2.1f h'],dateprocstr,time_to_norm);
+title(titlestr);
+save_fig(19,[dd dateprocstr '_aatsto' instrumentname '_normalizedratio']);
+
+
+figure(21);
+ax1 = subplot(1,1,1);
+set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+h=plot(UTdechr,vis_sun.dtau_aero(:,idxwvlvisp==1), '.');
+hx = graph2d.constantline(time_to_norm);
+changedependvar(hx,'x');
+lstr=[]; lstrc={};
+for i=1:end_num;
+    if idxwvlvisp(i)==1,
+        lstr=[lstr;sprintf('%6.1f',1000*aats.w(i))];
+        lstrc = {lstrc{:},sprintf('%6.1f',1000*aats.w(i))};
+    end
+end
+colormap(myColorOrder(1:length(lstr),:));
+lcolorbar(lstrc)
+%lh=legend(lstr,'location','bestoutside');
+%set(lh,'fontsize',16,'location','east');
+%ylim([0.92 1.05]);
+%xlim(UTlim);
+set(gca,'fontsize',16);
+grid on;
+ylabel([instrumentname '-AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s tau difference'],dateprocstr);
+title(titlestr);
+save_fig(21,[dd dateprocstr '_aatsto' instrumentname '_dtau']);
+
+figure(22);
+ax1 = subplot(1,1,1);
+set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
+h=plot(UTdechr,vis_sun.trratio(:,idxwvlvisp==1), '.');
+lstr=[]; lstrc={};
+for i=1:end_num;
+    if idxwvlvisp(i)==1,
+        lstr=[lstr;sprintf('%6.1f',1000*aats.w(i))];
+        lstrc = {lstrc{:},sprintf('%6.1f',1000*aats.w(i))};
+    end
+end
+colormap(myColorOrder(1:length(lstr),:));
+lcolorbar(lstrc)
+%lh=legend(lstr,'location','bestoutside');
+%set(lh,'fontsize',16,'location','east');
+ylim([0.92 1.05]);
+%xlim(UTlim);
+set(gca,'fontsize',16);
+grid on;
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s Ratio of transmittances'],dateprocstr);
+title(titlestr);
+save_fig(22,[dd dateprocstr '_aatsto' instrumentname '_ratiotr']);
+
+
+%% figure with ratios and airmasses and temperature
 figure(11);
 ax1=subplot(3,1,1);
 set(gca, 'ColorOrder', myColorOrder, 'NextPlot', 'replacechildren');
@@ -71,7 +209,7 @@ changedependvar(hx,'x');
 %lstr=setspectrumcolor(h, aats.w);
 %lh=legend(h,lstr);
 lstr=[];
-for i=1:13,
+for i=1:end_num,
     if idxwvlvisp(i)==1,
         lstr=[lstr;sprintf('%6.1f',1000*aats.w(i))];
     end
@@ -85,8 +223,8 @@ xlim(UTlim);
 set(gca,'fontsize',16);
 grid on;
 %set(h([1 2 10:13]),'markersize',1,'visible','off');
-ylabel('4STAR/AATS','fontsize',20);
-titlestr=sprintf('Ames  %s',dateprocstr);
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s'],dateprocstr);
 title(titlestr,'fontsize',16);
 %
 % ax2=subplot(3,1,2)
@@ -100,7 +238,7 @@ ax3=subplot(3,1,2);
 h2=plot(UTdechr,vis_sun.m_aero,'r.');
 hold on;
 h2=plot(UTdechr,vis_sun.m_ray,'g.');
-set(gca,'ylim',[0 8],'ytick',[0:2:8]);
+set(gca,'ylim',[0 15],'ytick',[0:2:15]);
 set(gca,'fontsize',16);
 grid on;
 xlim(UTlim);
@@ -122,17 +260,8 @@ xlabel('UT [hr]','fontsize',20);
 linkaxes([ax1 ax3 ax4],'x');
 
 set(gcf, 'Units', 'pixels', 'Position', [0, 0, 1300, 900], 'PaperUnits', 'Inches', 'PaperSize', [10.5, 7.25])
-if asktopause
-    OK =menu('continue or exit?','Continue','Exit')
-    if OK==2
-        return
-    end
-end
-hgsave([dd dateprocstr 'aats4star_temp' corstr]);
-saveas(11,[dd dateprocstr 'aats4star_temp' corstr '.png']);
-%print([dd dateprocstr 'aats4star_temp' corstr],'-depsc2');
-%system(['convert ' dd dateprocstr 'aats4star_temp' corstr '.eps ' dd dateprocstr 'aats4star_temp' corstr '.png']);
 
+save_fig(11,[dd dateprocstr 'aats4star_temp' corstr]);
 
 %%
 %% plot the raw counts from the AATS and 4STAR
@@ -160,8 +289,8 @@ if 0 ;
     set(gca,'fontsize',16);
     grid on;
     %set(h([1 2 10:13]),'markersize',1,'visible','off');
-    ylabel('4STAR [counts/ms]','fontsize',20);
-    titlestr=sprintf('Ames  %s',dateprocstr);
+    ylabel([instrumentname ' [counts/ms]'],'fontsize',20);
+    titlestr=sprintf([title0 ' %s'],dateprocstr);
     title(titlestr,'fontsize',16);
     
     %% Now for the aats data
@@ -225,8 +354,8 @@ if 0;
     set(gca,'fontsize',16);
     grid on;
     %set(h([1 2 10:13]),'markersize',1,'visible','off');
-    ylabel('4STAR [Normalized]','fontsize',20);
-    titlestr=sprintf('Ames  %s',dateprocstr);
+    ylabel([instrumentname ' [Normalized]'],'fontsize',20);
+    titlestr=sprintf([title0 ' %s'],dateprocstr);
     title(titlestr,'fontsize',16);
     
     %% Now for the aats data
@@ -255,14 +384,7 @@ if 0;
     %title(titlestr,'fontsize',16);
     xlabel('UT [hr]','fontsize',20);
     linkaxes([axx1 axx2],'x');
-    
-    if asktopause
-        OK =menu('continue or exit?','Continue','Exit')
-        if OK==2
-            return
-        end
-    end
-    hgsave([dd dateprocstr 'aats4star_normraw' corstr]);
+    save_fig(gcf(),[dd dateprocstr 'aats4star_normraw' corstr]);
 end;
 
 
@@ -300,8 +422,8 @@ if 1;
     set(gca,'fontsize',16);
     grid on;
     %set(h([1 2 10:13]),'markersize',1,'visible','off');
-    ylabel('4STAR/AATS','fontsize',20);
-    titlestr=sprintf('Ames  %s',dateprocstr);
+    ylabel([instrumentname '/AATS'],'fontsize',20);
+    titlestr=sprintf([title0 ' %s'],dateprocstr);
     title(titlestr,'fontsize',16);
     
     
@@ -313,18 +435,11 @@ if 1;
     linkaxes([axx1 axx2],'x');
     set(lh,'fontsize',16,'location','east');
     
-    if asktopause
-        OK =menu('continue or exit?','Continue','Exit')
-        if OK==2
-            return
-        end
-    end
-    hgsave([dd dateprocstr 'aats4star_ratio_timeseries' corstr]);
-    saveas(12,[dd dateprocstr 'aats4star_ratio_timeseries' corstr '.png']);
-    %print([dd dateprocstr 'aats4star_ratio_timeseries' corstr],'-depsc2');
-    %system(['convert ' dd dateprocstr 'aats4star_ratio_timeseries' corstr '.eps ' dd dateprocstr 'aats4star_ratio_timeseries' corstr '.png']);
+    save_fig(12,[dd dateprocstr 'aats4star_ratio_timeseries' corstr]);
 end;
 
+
+stophere
 %
 %plot the scatter plots with the color of the points indicating the well depth of the pixel
 %
@@ -361,24 +476,13 @@ xlim(UTlim);
 set(gca,'fontsize',16);
 grid on;
 %set(h([1 2 10:13]),'markersize',1,'visible','off');
-ylabel('4STAR/AATS','fontsize',20);
-titlestr=sprintf('Ames  %s',dateprocstr);
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s'],dateprocstr);
 title(titlestr,'fontsize',16);
 xlabel('UTC [hr]','fontsize',20);
 clh=colorbar('vert');
 ylabel(clh,'Welldepth');
-
-if asktopause
-    OK =menu('continue or exit?','Continue','Exit')
-    if OK==2
-        return
-    end
-end
-hgsave([dd dateprocstr 'aats_4star_welldepth']);
-saveas(13,[dd dateprocstr 'aats_4star_welldepth' '.png']);
-%print([dd dateprocstr 'aats4star_welldepth'],'-depsc2');
-%system(['convert ' dd dateprocstr 'aats4star_welldepth.eps ' dd dateprocstr 'aats4star_welldepth.png']);
-
+save_fig(13,[dd dateprocstr 'aats_4star_welldepth']);
 %
 %plot the scatter plots with the color of the points indicating the well depth of the pixel
 %
@@ -419,24 +523,14 @@ xlim([0.0 0.6]);
 set(gca,'fontsize',16);
 grid on;
 %set(h([1 2 10:13]),'markersize',1,'visible','off');
-ylabel('4STAR/AATS','fontsize',20);
-titlestr=sprintf('Ames  %s',dateprocstr);
+ylabel([instrumentname '/AATS'],'fontsize',20);
+titlestr=sprintf([title0 ' %s'],dateprocstr);
 title(titlestr,'fontsize',16);
 %xlabel('UTC [hr]','fontsize',20);
 xlabel('Welldepth ratio','fontsize',20);
 %clh=colorbar('vert');
 %ylabel(clh,'Welldepth','fontsize',20);
-
-if asktopause
-    OK =menu('continue or exit?','Continue','Exit')
-    if OK==2
-        return
-    end
-end
-hgsave([dd dateprocstr 'aats_4star_welldepth_ratio' corstr]);
-saveas(14,[dd dateprocstr 'aats_4star_welldepth_ratio' corstr '.png']);
-%print([dd dateprocstr 'aats4star_welldepthratio' corstr],'-depsc2');
-%system(['convert ' dd dateprocstr 'aats4star_welldepthratio' corstr '.eps ' dd dateprocstr 'aats4star_welldepthratio' corstr '.png']);
+save_fig(14,[dd dateprocstr 'aats_4star_welldepth_ratio' corstr]);
 
 stophere
 %linkaxes([ax1 ax3],'x')
@@ -474,7 +568,7 @@ plot(UTdechr,vis_sun.sunaz,'r-','linewidth',2)
 set(gca,'fontsize',16)
 set(gca,'xlim',UTlim)
 grid on
-hleg121=legend('4STAR','Sun  ');
+hleg121=legend(instrumentname,'Sun  ');
 set(hleg121,'fontsize',16)
 ylabel('Azimuth [deg]','fontsize',20)
 title(dateprocstr,'fontsize',16)
@@ -506,7 +600,7 @@ xlim(UTlim)
 set(gca,'fontsize',16)
 grid on;
 ylabel('4STAR/AATS','fontsize',20);
-titlestr=sprintf('MLO  %s',dateprocstr);
+titlestr=sprintf([title0 ' %s'],dateprocstr);
 %plot instrument pointing and solar ephemeris
 elevdiff_4STARsun=vis_sun.El_deg-vis_sun.sunel;
 azdiff_4STARsun=vis_sun.AZ_deg-vis_sun.sunaz;
@@ -553,7 +647,7 @@ xlim(UTlim)
 set(gca,'fontsize',16)
 grid on;
 ylabel('4STAR/AATS','fontsize',16);
-titlestr=sprintf('MLO  %s',dateprocstr);
+titlestr=sprintf([title0 ' %s'],dateprocstr);
 title(titlestr,'fontsize',16)
 %plot instrument pointing and solar ephemeris
 elevdiff_4STARsun=vis_sun.El_deg-vis_sun.sunel;
