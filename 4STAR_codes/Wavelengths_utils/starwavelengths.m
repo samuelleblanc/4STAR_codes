@@ -8,7 +8,8 @@ function [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(t,inst
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set
 % Samuel, v1.1, 2017/05/27, added instrumentname, to use tracking of other
 % instruments, namely here for 2STAR
-version_set('1.1');
+% Samuel, v1.2, 2017/06/01, updated 2STAR coefficients from zeiss documents
+version_set('1.2');
 
 % development
 % Values change with renewed calibration and assessment. Update this file
@@ -28,11 +29,11 @@ end;
 
 switch instrumentname;
     case {'2STAR'}
-        if t>=datenum([2015 1 1 0 0 0]) % from the start of 2STAR
-            C0 = 303.0;
-            C1 = 3.305;
-            C2 = 4.095e-4;
-            C3 = -1.63e-6;
+        if t(1)>=datenum([2015 1 1 0 0 0]) % from the start of 2STAR
+            C0 = 301.712;
+            C1 = 3.32956;
+            C2 = 0.00037127;
+            C3 = -1.81758e-6;
             p = 0:255;
             visw=C0+C1*p+C2*p.^2+C3*p.^3;
             visw=visw/1000;
