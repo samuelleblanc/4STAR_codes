@@ -70,6 +70,7 @@ ywidth = po(4);
 dpi = 150.0;
 set(pid,'PaperSize',[xwidth ywidth]./dpi);
 set(pid,'PaperPosition',[0 0 xwidth ywidth]./dpi);
+set(gcf,'paperpositionmode','auto');
 saveas(pid,[fi '.png']);
 disp(['saving figure at:' fi])
 return
