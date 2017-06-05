@@ -10,6 +10,8 @@ function     [responsivityFOV,responsivityFOVA, responsivityFOVP]=starresponsivi
 % MS: v1.1, added Yohei's FOV updates
 % SL: v1.2, 2017-05-09, added FOV for ORACLES, and modified load for using 4STAR's name in the file
 % SL: v2.0, 2017-05-28, modified for use with multiple instruments, added the instrumentname variable (defaults to 4STAR)
+% MS: v2.0, 2017-06-05, modified line 58 to fit SARP and KORUS-AQ; based on
+%                       ORACLES FOV, which are closest in time
 
 if ~exist('instrumentname');
     instrumentname = '4STAR';
@@ -54,9 +56,16 @@ end;
         fovp_filen=1; % filenumber of 11
 end; %switch instrumentname
 % load FOV data
-if t>datenum([2016 6 15 0 0 0]);
+%if t>datenum([2016 6 15 0 0 0]);% FOV for SARP/KORUS-AQ
+if t>datenum([2016 4 15 0 0 0]);% FOV for SARP/KORUS-AQ
+    daystr = '20160923';
+    fova_filen=3; % filenumber of 15
+    fovp_filen=1; % filenumber of 11
     load(which([instrumentname '_' daystr 'starfov.mat']));
 else
+    daystr = '20160923';
+    fova_filen=3; % filenumber of 15
+    fovp_filen=1; % filenumber of 11
     load(which( [daystr 'starfov.mat']));
 end;
 version_set('2.0');
