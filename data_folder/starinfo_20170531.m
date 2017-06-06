@@ -15,8 +15,8 @@ end
 s.flight=[datenum(2017,6,01,15,33,00) datenum(2017,6,01,22,30,00)]; 
 s.langley = [datenum(2017,6,01,15,40,00) datenum(2017,6,01,22,44,00)];
 
-%s.langley1 = [datenum(2017,5,31,15,50,00) datenum(2017,5,31,20,30,00)];
-%s.langley2 = [datenum(2017,5,31,26,44,00) datenum(2017,5,31,28,44,00)];
+s.langley1 = [datenum(2017,5,31,15,50,00) datenum(2017,5,31,20,30,00)];
+s.langley2 = [datenum(2017,6,01,2,40,00) datenum(2017,6,01,4,54,00)];
 
 % Ozone and other gases 
 s.O3h=21; %  

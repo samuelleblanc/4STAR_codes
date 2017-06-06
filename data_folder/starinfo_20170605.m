@@ -12,20 +12,19 @@ else
 end
 
  
-s.flight=[datenum(2017,6,01,15,33,00) datenum(2017,6,01,22,30,00)]; 
-s.langley = [datenum(2017,6,01,15,40,00) datenum(2017,6,01,22,44,00)];
-
-s.langley1 = [datenum(2017,6,01,15,50,00) datenum(2017,6,01,22,44,00)];
-s.langley2 = [datenum(2017,6,01,26,57,00) datenum(2017,6,01,27,59,00)];
-
+s.flight=[datenum(2017,6,05,15,0,00) datenum(2017,6,05,28,40,00)]; 
+s.langley=[datenum(2017,6,05,15,0,00) datenum(2017,6,05,22,10,00)]; 
+s.langley1=[datenum(2017,6,05,15,33,00) datenum(2017,6,05,22,10,00)]; 
+s.langley2=[datenum(2017,6,05,25,40,00) datenum(2017,6,05,28,40,00)]; 
+ 
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.279; % OMI overhead     
+s.O3col=0.280; % OMI overhead     
 s.NO2col=2.0e15; %   
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=682.9; % this is for MLO 
+    s.Pst(find(s.Pst<10))=682.9; % this is for Ames 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
