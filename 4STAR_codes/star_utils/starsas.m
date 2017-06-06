@@ -1,24 +1,29 @@
-function starsas(filename, author)
+function starsas(filename, author,figsavedir)
 
 % Stamps and saves the current figure under designated 4STAR figure paths.
 % See also stamp.m and sas.m.
 % Yohei, 2009/04/20, 2012/04/20
+% Samuel, 2017/06/04, added inputs for specifying the figsavedir
 
 %!!!!!!!!!!!!!!!!!
 % THIS CODE SAVES.
 %!!!!!!!!!!!!!!!!!
 
 % get directories
-[matfolder, pngsavedir]=starpaths;
-figsavedir=fullfile(pngsavedir, 'fig');
-if ~exist(figsavedir);
-    figsavedir=pngsavedir;
+if nargin>2;
+    pngsmallsavedir = fullfile(figsavedir,'small');
+    pngsavedir = figsavedir;
+else;
+    [matfolder, pngsavedir]=starpaths;
+    figsavedir=fullfile(pngsavedir, 'fig');
+    if ~exist(figsavedir);
+        figsavedir=pngsavedir;
+    end;
+    pngsmallsavedir=fullfile(pngsavedir, 'small');
+    if ~exist(pngsmallsavedir);
+        pngsmallsavedir='';
+    end;
 end;
-pngsmallsavedir=fullfile(pngsavedir, 'small');
-if ~exist(pngsmallsavedir);
-    pngsmallsavedir='';
-end;
-
 % ask for input string for the stamp
 if nargin<1
     % get the existing stamp string if any
