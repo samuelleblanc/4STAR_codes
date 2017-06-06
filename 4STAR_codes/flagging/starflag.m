@@ -34,9 +34,10 @@ function [flags, good, flagfile] = starflag(s, Mode)
 % SL, v1.5, 2016-09-19, modified code to use the smaller starsun files for starflag use
 % SL, v1.6, 2016-10-24, modified code for using files of different format
 %                       and doing some checks for already available starflag files defined in starinfo 
+% SL, v1.7, 2017-06-03, Modified for a different flagging based on instrument
 
 %% Start
-version_set('1.6');
+version_set('1.7');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -110,25 +111,22 @@ if ~isempty(s)
     catch;
         disp('Missing some variables (viscols,nircols, or aerosolcols), trying anyway')
     end;
+    if ~isfield(s,'instrumentname');
+        s.instrumentname = '4STAR';
+    end;
+    if ~strcmp(s.instrumentname,'2STAR');
+       Str=s.Str;
+    else;
+       Str = ~isnan(s.rate(:,45));
+    end;
     try;
         rawrelstd=s.rawrelstd;
-    catch;
-        ti=9/86400;
-        cc=[408 169+1044];
-        pp=numel(s.t);
-        s.rawstd=NaN(pp, numel(cc));
-        s.rawmean=NaN(pp, numel(cc));
-        for i=1:pp;
-            rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 s.Str>0
-            if numel(rows)>0;
-                s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-            end;
-        end;
-        s.rawrelstd=s.rawstd./s.rawmean;
-        rawrelstd=s.rawrelstd;
+    catch;       
+        [rawrelstd,rawstd,rawmean] = starrawrelstd(s.t,Str,s.raw,'sun',s.instrumentname);
+        s.rawrelstd=rawrelstd;
+        s.rawstd=rawstd;
+        s.rawmean=rawmean;
     end;
-    Str=s.Str;
     raw=s.raw;dark=s.dark;
     if ~save_for_starflag;
         if isfield(s,'tau_aero_noscreening')

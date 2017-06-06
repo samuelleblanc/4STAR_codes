@@ -90,8 +90,10 @@ function	s=starwrapper(s, s2, varargin)
 %                       auto turn off of the running watervapor if the Optimization Toolbox is
 %                       not found.
 % MS, 2016-01-16, refined auto flags for gases statements (Lines 1006-1014)
+% SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
+%                       support for multiinstruments
 
-version_set('2.7');  
+version_set('2.8');  
 %********************
 %% prepare for processing
 %********************
@@ -199,6 +201,7 @@ s2.note={};
 %% get data type
 if toggle.verbose; disp('get data types'), end;
 [daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);
+s.instrumentname = instrumentname;
 if nargin>=(2+nnarg)
     [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);
     if instrumentname~=instrumentname2;
@@ -443,7 +446,7 @@ if nargin>=2+nnarg
     end;
     % discard the s2 variables for which s has duplicates
     if toggle.verbose, disp('discarding duplicate structures'), end;
-    fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
+    fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
         fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
     fnok=[]; % Yohei, 2012/11/27
     for ff=1:length(fn); % take the values from the s structure, and discard those in s2
@@ -577,36 +580,21 @@ end
 %********************
 %% screen data
 %********************
+if strmatch('sun', lower(datatype(end-2:end)));
+    if ~strcmp(instrumentname,'2STAR');
+        [s.rawrelstd,s.rawstd,s.rawmean] = starrawrelstd(s.t,s.Str,s.raw,datatype,instrumentname);
+    else;
+        valid = ~isnan(s.rate(:,45));
+        [s.rawrelstd,s.rawstd,s.rawmean] = starrawrelstd(s.t,valid,s.raw,datatype,instrumentname);
+    end;
+end;
+
 if toggle.doflagging;
     m_aero_max=15;
     if toggle.booleanflagging; % new flagging system
         boolean=toggle.booleanflagging;
         %warning('Boolean flagging is under development. Please report any bug to Yohei.');
-        if toggle.verbose; disp('in the boolean flagging system'), end;
-        % prepare for flagging
-        if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
-            if toggle.verbose; disp('In the boolean flagging area'), end;
-            % compute STD for auto cloud screening
-            ti=9/86400;
-            if strmatch('vis', lower(datatype(1:3)));
-                cc=408;
-            elseif strmatch('nir', lower(datatype(1:3)));
-                cc=169;
-            else;
-                cc=[408 169+1044];
-            end;
-            s.rawstd=NaN(pp, numel(cc));
-            s.rawmean=NaN(pp, numel(cc));
-            for i=1:pp;
-                rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-                if numel(rows)>0;
-                    s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                    s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-                end;
-            end;
-            s.rawrelstd=s.rawstd./s.rawmean;
-        end;
-        
+        if toggle.verbose; disp('in the boolean flagging system'), end;        
         % flag all columns (see below for flagging specific columns)
         nflagallcolsitems=7;
         s.flagallcolsitems=repmat({''},nflagallcolsitems,1);
@@ -666,54 +654,13 @@ if toggle.doflagging;
             % non-tracking mode - is this redundant with the Str-based screening?
             s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
             autoscrnote=[autoscrnote 'non-tracking modes, '];
-            % STD-based cloud screening
-            ti=9/86400;
-            if strmatch('vis', lower(datatype(1:3)));
-                cc=408;
-            elseif strmatch('nir', lower(datatype(1:3)));
-                cc=169;
-            else;
-                cc=[408 169+1044];
-            end;
-            s.rawstd=NaN(pp, numel(cc));
-            s.rawmean=NaN(pp, numel(cc));
-            for i=1:pp;
-                rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 s.Str>0
-                if numel(rows)>0;
-                    s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-                    s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-                end;
-            end;
-            s.rawrelstd=s.rawstd./s.rawmean;
+
             s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)=s.flag(any(s.rawrelstd>s.sd_aero_crit,2),:)+0.01;
             autoscrnote=[autoscrnote 'STD higher than ' num2str(s.sd_aero_crit) ' at columns #' num2str(cc) ', '];
         end;
         s.note=[autoscrnote(1:end-2) '. ' s.note];
     end;
 end; % toggle.doflagging
-%compute s.rawrelstd for auto cloud screening
-% if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
-%     ti=9/86400;
-%     if strmatch('vis', lower(datatype(1:3)));
-%         cc=408;
-%     elseif strmatch('nir', lower(datatype(1:3)));
-%         cc=169;
-%     else;
-%         cc=[408 169+1044];
-%     end;
-% %gasmode=1;
-%
-%     s.rawstd=NaN(pp, numel(cc));
-%     s.rawmean=NaN(pp, numel(cc));
-%     for i=1:pp;
-%         rows=find(s.t>=s.t(i)-ti/2&s.t<=s.t(i)+ti/2 & s.Str==1); % Yohei, 2012/10/22 changed from s.Str>0
-%         if numel(rows)>0;
-%             s.rawstd(i,:)=nanstd(s.raw(rows,cc),0,1); % stdvec.m seems to have a precision problem.
-%             s.rawmean(i,:)=nanmean(s.raw(rows,cc),1);
-%         end;
-%     end;
-%     s.rawrelstd=s.rawstd./s.rawmean;
-%  %end;
 
 % (remaining items from the AATS code)
 % filter #2 discard measurement cycles with bad tracking
@@ -732,6 +679,24 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     % derive optical depths by the traditional method
     [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
     [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
+    if ~isfield(toggle,'hires_rayleigh');toggle.hires_rayleigh=true;end; % Check if needed to do a hires wavelength resolution rayleigh calculation for accounting for large slit functions
+    if toggle.hires_rayleigh;
+        if strcmp(instrumentname,'2STAR');
+            ww = linspace(s.w(1),s.w(end),10000);
+            [tau_ray_hires, tau_r_err_hires]=rayleighez(ww,s.Pst,s.t,s.Lat); % Rayleigh
+            [wo,slit] = slit_function_2STAR(s.t(1));
+            for i=1:length(s.w);
+                sww = s.w(i).*1000.0+wo;
+                sss(i,:) = interp1(sww,slit,ww.*1000.0,'linear',0.0);
+                sss(i,:) = sss(i,:)./trapz(sss(i,:));
+            end;
+            s.tau_ray = tau_ray_hires*sss';
+            s.tau_r_err = tau_r_err_hires*sss';
+        else;
+            disp('Hires_rayleigh correction not implemented for instruments other than 2STAR')
+        end;
+    end;
+    
     [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
  
     % cjf: Alternative with tr
@@ -1007,6 +972,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
             end
         end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
+        if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
         [s.flags, good]=starflag(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
         if toggle.runwatervapor;
             % apply auto gas flagging
@@ -1067,6 +1033,10 @@ if ~toggle.saveadditionalvariables;
     if toggle.computeerror;
         s=rmfield(s, {'tau_aero_err1' 'tau_aero_err2' 'tau_aero_err3' 'tau_aero_err4' 'tau_aero_err5' 'tau_aero_err6' 'tau_aero_err7' 'tau_aero_err8' 'tau_aero_err9' 'tau_aero_err10' 'tau_aero_err11'});
     end;
+end;
+
+if strcmp(instrumentname,'2STAR');
+    s=rmfield(s,{'Zn','Headng','roll','pitch','Tst','Tbox','Vdettemp','skyresp','skyresperr','Tbox_C'});
 end;
 
 %********************

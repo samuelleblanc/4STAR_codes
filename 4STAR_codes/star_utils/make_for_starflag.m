@@ -2,8 +2,9 @@ function make_for_starflag(f_in)
 %% Program that loads a full starsun to create a much smaller file useful for flagging only
 % contains a very limited set of aod values at some distinct wavelengths
 % created: Samuel LeBlanc, 2016-09-19, v1.0, Santa Cruz, CA
+% modified: SL, 2017-06-03, v1.1, MLO, Hawaii, added specific calls for 2STAR
 
-version_set('v1.0')
+version_set('v1.1')
 
 % Simple program to load a starsun and save just a few values from it to a
 % smaller file used for starflag.
@@ -23,6 +24,8 @@ if ~isfield(fs, 'falgsCWV');
     gas_note = ' ** does not contain gas flags';
     gases = false; 
 end;
+
+[daystr, filen, datatype, instrumentname]=starfilenames2daystr({f_in});
 
 g.Alt = s.Alt; g.Lat=s.Lat; g.Lon=s.Lon; g.t = s.t;
 g.m_aero = s.m_aero; g.rawrelstd = s.rawrelstd; g.Md = s.Md; g.Str = s.Str;
@@ -55,7 +58,12 @@ g.aod_500nm_max=3;
 g.m_aero_max=15;
 
 %calculate quantity [1-cos(roll angle)]
+if ~strcmp(instrumentname,'2STAR');
 g.roll_proxy=1-cos(s.roll*pi/180);
+else;
+    g.roll_proxy = s.Alt.*0.0;
+end;
+
 if not_nm_1215;
     g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040)];
     g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040)];
