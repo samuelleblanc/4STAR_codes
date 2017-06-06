@@ -54,8 +54,7 @@ else
      coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
 end
 
-
-if t>=datenum([2012 7 3 0 0 0]);
+if t(1)>=datenum([2012 7 3 0 0 0]);
     cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
     fn=fieldnames(cross_sections);
     for ff=1:length(fn);
@@ -112,14 +111,22 @@ end;
 switch instrumentname; % defaults to use 4STAR, here you put special code to modify 4STAR
     case {'4STARB'}
         warning('Cross sections for 4STARB not yet calculated, using 4STAR')
+        nwl = size(cross_sections.wln);
     case {'2STAR'}
         warning('Gas phase cross sections for 2STAR not yet defined, using 4STAR and then convolving')
         fn=fieldnames(cross_sections);
         visw_4s = cross_sections.wln;
         visw_2s = starwavelengths(t,'2STAR').*1000.0;
+        %if length(visw_4s)>1044; visw_4s = visw_4s(1:1044); end;
+        ig = find(isfinite(visw_4s));
         for ff=1:length(fn);
-            cross_sections.(fn{ff})=interp1(visw_4s,cross_sections.(fn{ff}),visw_2s);
+            if strcmp(fn{ff},'wln'); continue;  end; % skip over the wavelengths
+            ccs = cross_sections.(fn{ff})(ig);
+            cross_sections.(fn{ff})=interp1(visw_4s(ig),ccs,visw_2s,'linear',0.0);
         end;
+        nwl = size(visw_2s);
+    case {'4STAR'}
+        nwl = size(cross_sections.wln);
 end; %switch instrumentname
 
 %% get NO2 optical depth
@@ -164,8 +171,8 @@ if isfield(cross_sections,'o4all'); % Yohei, 2013/01/16, for the legacy July 3, 
 else
     tau_O4=O4_vercol*cross_sections.o4;
 end;
-tau_O2=zeros(size(cross_sections.wln)); % don't subtract O2 % O2_vercol*cross_sections.o2;
-tau_CO2_CH4_N2O=zeros(size(cross_sections.wln)); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
+tau_O2=zeros(nwl); % don't subtract O2 % O2_vercol*cross_sections.o2;
+tau_CO2_CH4_N2O=zeros(nwl); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
 
 %% get O3 optical depths
 
