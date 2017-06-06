@@ -42,7 +42,28 @@ switch instrumentname;
             visfwhm = [];nirfwhm= [];
         end;
     case {'4STARB'}
-        error('4STARB wavelengths not yet implemented')
+        if t(1)>datenum([2015 1 1 1 0 0 0]);
+            C0 = 171.7;   
+            C1 = 0.81254;
+            C2 = -1.55568e-6;
+            C3 = -1.59216e-8;
+            p = 0:1043;
+            visw=C0+C1*p+C2*p.^2+C3*p.^3;
+            visw=visw/1000;
+            visnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
+            
+            C0n = 1700.28;   
+            C1n = -1.17334;
+            C2n = -0.000655055;
+            C3n = -7.06199e-7;
+            C4n = -1.14153e-9;
+            pn = 0:511;
+            nirw=C0n+C1n*pn+C2n*pn.^2+C3n*pn.^3+C4n*pn.^4;
+            nirw=nirw/1000;
+            nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
+            
+        end;
+        %error('4STARB wavelengths not yet implemented')
         
     otherwise % defaults to 4STAR(A) wavelengths
         if t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012
