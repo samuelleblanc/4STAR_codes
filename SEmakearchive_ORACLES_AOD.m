@@ -24,8 +24,8 @@
 % NEEDED FILES:
 %  - starsun.mat file compiled from raw data using allstarmat and then
 %  processed with starsun
-%  - starinfo for the flight with the flagfile defined 
-%  - flagfile 
+%  - starinfo for the flight with the flagfile defined
+%  - flagfile
 %
 % EXAMPLE:
 %  none
@@ -105,7 +105,7 @@ NormalComments = {...
 revComments = {...
     'R2: Final calibrations but no error calculations, and impact of window deposition still in data.';...
     'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
-   %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission and minimal column trace gas impacts on certain wavelengths.';...
+    %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission and minimal column trace gas impacts on certain wavelengths.';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
@@ -192,19 +192,19 @@ for i=idx_file_proc
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
     try;
-        load(starfile,'tau_aero_subtract_all'); 
+        load(starfile,'tau_aero_subtract_all');
         tau = tau_aero_subtract_all;
     catch;
         disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
-        tau = tau_aero_noscreening; 
+        tau = tau_aero_noscreening;
     end;
     if gas_subtract;
         try;
-            load(starfile,'tau_aero_subtract_all'); 
+            load(starfile,'tau_aero_subtract_all');
             tau = tau_aero_subtract_all;
         catch;
             disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
-            tau = tau_aero_noscreening; 
+            tau = tau_aero_noscreening;
         end;
     else;
         tau = tau_aero_noscreening;
@@ -233,12 +233,12 @@ for i=idx_file_proc
     [nnutc,iiutc] = unique(tutc);
     data.Latitude = interp1(nnutc,Lat(iiutc),UTC);
     data.Longitude = interp1(nnutc,Lon(iiutc),UTC);
-    data.amass_aer = interp1(nnutc,m_aero(iiutc),UTC);    
+    data.amass_aer = interp1(nnutc,m_aero(iiutc),UTC);
     
     %% Load the flag file
     if isfield(s, 'flagfilename');
         disp(['Loading flag file: ' s.flagfilename])
-        flag = load(s.flagfilename); 
+        flag = load(s.flagfilename);
     else
         [flagfilename, pathname] = uigetfile2('*.mat', ...
             ['Pick starflag file for day:' daystr]);
@@ -282,19 +282,19 @@ for i=idx_file_proc
             disp('No flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
         end
     elseif isfield(flag,'screened')
-       flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
-       flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
-                     'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
+        flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
+        flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
+            'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
         for tag = 1:length(flag_tags)
             flag.(flag_names{tag}) = flag.screened==flag_tags(tag);
-        end  
+        end
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
         qual_flag = bitor(qual_flag,flag.cirrus);
         qual_flag = bitor(qual_flag,flag.frost);
         qual_flag = bitor(qual_flag,flag.low_cloud);
         qual_flag = bitor(qual_flag,flag.unspecified_clouds);
         if length(flag.screened)==length(t);
-           flag.time.t = t; 
+            flag.time.t = t;
         end
     else
         error('No flagfile that are useable')
@@ -303,8 +303,8 @@ for i=idx_file_proc
     % tweak for different flag files
     if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
         flag.utc = t2utch(flag.flags.time.t);
-    %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
-    %    flag.utc = UTC';
+        %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
+        %    flag.utc = UTC';
     else
         try;
             flag.utc = t2utch(flag.time.t);
@@ -353,9 +353,9 @@ for i=idx_file_proc
 end;
 
 function name = getUserName ()
-    if isunix() 
-        name = getenv('USER'); 
-    else 
-        name = getenv('username'); 
-    end
+if isunix()
+    name = getenv('USER');
+else
+    name = getenv('username');
+end
 return
