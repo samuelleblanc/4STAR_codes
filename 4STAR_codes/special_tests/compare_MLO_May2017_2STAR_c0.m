@@ -115,6 +115,27 @@ figure(fig2);
 ylim([96 104]);
 save_fig(fig2,[fp_out 'MLO_May2017_2STAR_cal_c0_relative_zoom']);
 
+fig3 = figure;
+ax1 = subplot(3,1,1);
+plot(w_vis,visc0_avg,'.-k'); hold on;
+%plot(w_nir,nirc0_avg.*10.0,'.-k');hold off;
+ylabel('c0'); ylim([0,1800])
+title('2STAR C0 saved for good averages from MLO May 2017')
+ax2 = subplot(3,1,2);
+
+plot(w_vis,visc0_std./visc0_avg.*100.0,'.-k'); hold on;
+%plot(w_nir,nirc0_std./nirc0_avg.*100.0,'.-k');hold off;
+ylabel('Relative std of c0 [%]');ylim([0,20]);grid;
+ax3 = subplot(3,1,3);
+title('zoomed')
+plot(w_vis,visc0_std./visc0_avg.*100.0,'.-k'); hold on;
+%plot(w_nir,nirc0_std./nirc0_avg.*100.0,'.-k');hold off;
+ylabel('Relative std of c0 [%]');ylim([0,1.5]); grid;
+
+linkaxes([ax1,ax2,ax3],'x');
+xlabel('Wavelength [nm]'); 
+save_fig(fig3,[fp_out 'MLO_May2017_2STAR_cal_c0_avg']);
+
 %stophere
 % Now save the new averaged c0 for use
 days_cell = '';
