@@ -26,8 +26,10 @@ s.AODuncert_mergemark_file = '20160510_AOD_merge_marks.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.279; %    omi
-s.NO2col=2.0e15; % no omi 
+% s.O3col=0.279; %    omi
+% s.NO2col=2.0e15; % no omi 
+s.O3col=0.330;    % default
+s.NO2col=3e15;  % default
  
 s.sd_aero_crit=0.01;  
  

@@ -27,8 +27,10 @@ s.AODuncert_mergemark_file = '20160524_AOD_merge_marks.mat';
 
 % Ozone and other gases 
 s.O3h=21; % guess 
-s.O3col=0.300; % guess     
-s.NO2col=2.0e15; % guess  
+% s.O3col=0.300; % guess     
+% s.NO2col=2.0e15; % guess  
+s.O3col=0.304;    % OMI O3 average along the track, Qin
+s.NO2col=3.01e15;  % OMI NO2 average along the track 
  
 s.sd_aero_crit=0.01;  
  

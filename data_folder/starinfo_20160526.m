@@ -26,8 +26,10 @@ s.clean = [datenum(2016,5,26,08,33,30) datenum(2016,5,26,08,35,15)];
 
 % Ozone and other gases 
 s.O3h=21; % guess 
-s.O3col=0.300; % guess     
-s.NO2col=2.0e15; % guess  
+% s.O3col=0.300; % guess     
+% s.NO2col=2.0e15; % guess  
+s.O3col=0.294;    % OMI O3 average along the track, Qin
+s.NO2col=3.10e15;  % OMI NO2 average along the track 
  
 s.sd_aero_crit=0.01;  
  

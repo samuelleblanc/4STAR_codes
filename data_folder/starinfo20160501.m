@@ -5,8 +5,11 @@ s.sd_aero_crit=0.01;
 
 % Ozone and other gases
 s.O3h=21;
-s.O3col=0.360;    % OMI's median;first transit
-s.NO2col=3.0e16;  % OMI's median;first transit
+% s.O3col=0.360;    % OMI's median;first transit
+% s.NO2col=3.0e16;  % OMI's median;first transit
+
+s.O3col=0.330;    % OMI O3 average along the track, Qin
+s.NO2col=2.96e15;  % OMI NO2 average along the track 
 
 % other tweaks
 if isfield(s, 'Pst');

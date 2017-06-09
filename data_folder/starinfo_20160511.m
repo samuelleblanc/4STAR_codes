@@ -31,8 +31,10 @@ s.AODuncert_constant_extra = [0.1140    0.1000    0.0915    0.0884    0.0865    
 %s.flag = starflags_20160511_CWV_MS_marks_ALL_20160523_0126;% runs a function.
 % Ozone and other gases 
 s.O3h=21; % guess 
-s.O3col=0.279; % omi  
-s.NO2col=2.0e15; % no omi data 
+% s.O3col=0.279; % omi  
+% s.NO2col=2.0e15; % no omi data 
+s.O3col=0.333;    % OMI O3 average along the track, Qin
+s.NO2col=3.11e15;  % OMI NO2 average along the track 
  
 s.sd_aero_crit=0.01;  
  

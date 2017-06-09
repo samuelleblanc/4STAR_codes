@@ -4,8 +4,9 @@ flight=[datenum(2016,6,04,23,00,34) datenum(2016,6,5,7,28,36)];
 
 % Ozone and other gases
 s.O3h=21; % Yohei's guess
-s.O3col=0.300; % Yohei's guess    
-s.NO2col=2.0e15; % Yohei's guess 
+
+s.O3col=0.330;    % default
+s.NO2col=3e15;  % default
 
 % other tweaks
 if isfield(s, 'Pst');

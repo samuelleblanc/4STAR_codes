@@ -19,8 +19,10 @@ s.clean = [datenum(2016,5,7,8,02,30) datenum(2016,5,7,8,07,00)];
  
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.300; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+% s.O3col=0.300; % Yohei's guess     
+% s.NO2col=2.0e15; % Yohei's guess  
+s.O3col=0.310;    % OMI O3 average along the track, Qin
+s.NO2col=3.22e15;  % OMI NO2 average along the track 
 
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 

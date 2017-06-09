@@ -4,8 +4,9 @@ flight=[datenum(2016,5,21,22,56,17) datenum(2016,5,22,08,18,22)]; !!! to be upda
 
 % Ozone and other gases
 s.O3h=21; % Yohei's guess
-s.O3col=0.300; % Yohei's guess    
-s.NO2col=2.0e15; % Yohei's guess 
+
+s.O3col=0.308;    % OMI O3 average along the track, Qin
+s.NO2col=2.82e15;  % OMI NO2 average along the track 
 
 % other tweaks
 if isfield(s, 'Pst');

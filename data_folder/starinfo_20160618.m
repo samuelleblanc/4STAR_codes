@@ -23,8 +23,8 @@ s.flagfilenameCWV = '20160618_starflag_CWV_man_created20160713_1332by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 
-s.O3col=0.360;    % Michal's guess based on forecast 
-s.NO2col=3.0e16;  % Michal's guess; need to confirm. 
+s.O3col=0.300;    % default 
+s.NO2col=2.0e15;  % default. 
  
 % other tweaks 
 if isfield(s, 'Pst'); 

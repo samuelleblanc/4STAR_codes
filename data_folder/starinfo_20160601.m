@@ -28,8 +28,10 @@ s.AODuncert_mergemark_file = '20160601_AOD_merge_marks.mat';
 
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
-s.O3col=0.300; % Yohei's guess     
-s.NO2col=2.0e15; % Yohei's guess  
+% s.O3col=0.300; % Yohei's guess     
+% s.NO2col=2.0e15; % Yohei's guess  
+s.O3col=0.330;    % default
+s.NO2col=3e15;  % default
  
 % other tweaks 
 if isfield(s, 'Pst'); 

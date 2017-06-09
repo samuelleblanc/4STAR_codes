@@ -28,8 +28,10 @@ s.flagfilenameHCOH  = '20160501_starflag_HCOH_man_created20170109_0310by_MS.mat'
  
 % Ozone and other gases 
 s.O3h=21; 
-s.O3col=0.360;    % Michal's guess based on forecast 
-s.NO2col=3.0e16;  % Michal's guess; need to confirm. 
+% s.O3col=0.360;    % Michal's guess based on forecast 
+% s.NO2col=3.0e16;  % Michal's guess; need to confirm. 
+s.O3col=0.330;    % OMI O3 average along the track, Qin
+s.NO2col=2.96e15;  % OMI NO2 average along the track 
  
 % other tweaks 
 if isfield(s, 'Pst'); 

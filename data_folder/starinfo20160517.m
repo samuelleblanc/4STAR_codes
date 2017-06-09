@@ -1,11 +1,15 @@
-flight=[datenum(2016,6,17,17,12,33) datenum(2016,6,17,22,13,25)];
+flight=[datenum(2016,5,16,23,06,07) datenum(2016,5,17,7,22,08)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55)
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];
 
 % Ozone and other gases
 s.O3h=21; % Yohei's guess
-s.O3col=0.300; %  guess    
-s.NO2col=2.0e15; % guess 
+
+s.O3col=0.330;    % default
+s.NO2col=3e15;  % default 
+
+s.sd_aero_crit=0.01; 
+
 
 % other tweaks
 if isfield(s, 'Pst');

@@ -28,8 +28,10 @@ s.flagfilenameHCOH  = '20160512_starflag_HCOH_man_created20170109_0531by_MS.mat'
 
 % Ozone and other gases 
 s.O3h=21; % guess 
-s.O3col=0.300; % guess     
-s.NO2col=2.0e15; % guess  
+% s.O3col=0.300; % guess     
+% s.NO2col=2.0e15; % guess  
+s.O3col=0.330;    % default
+s.NO2col=3e15;  % default
  
 s.sd_aero_crit=0.01;  
  

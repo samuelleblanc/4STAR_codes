@@ -5,8 +5,9 @@ flight=[datenum(2016,5,4,22,50,3) datenum(2016,5,5,3,40,4)];
 
 % Ozone and other gases
 s.O3h=21; % Yohei's guess
-s.O3col=0.300; % Yohei's guess    
-s.NO2col=2.0e15; % Yohei's guess 
+
+s.O3col=0.311;    % OMI O3 average along the track, Qin
+s.NO2col=2.91e15;  % OMI NO2 average along the track 
 
 
 % other tweaks
