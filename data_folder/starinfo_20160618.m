@@ -23,8 +23,10 @@ s.flagfilenameCWV = '20160618_starflag_CWV_man_created20160713_1332by_MS.mat';
  
 % Ozone and other gases 
 s.O3h=21; 
-s.O3col=0.300;    % default 
-s.NO2col=2.0e15;  % default. 
+%s.O3col=0.300;    % default 
+%s.NO2col=2.0e15;  % default.
+s.O3col=0.293;    % OMI O3 average along the track, Qin 
+s.NO2col=3.16e15;  % OMI NO2 average along the track  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
