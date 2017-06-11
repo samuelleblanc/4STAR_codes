@@ -20,6 +20,7 @@ s.sd_aero_crit=0.01;
 s.flagfilename    = '20160617_starflag_man_created20160701_1219by_MS.mat';
 s.flagfilenameO3  = '20160617_starflag_O3_man_created20160701_1258by_MS.mat';
 s.flagfilenameCWV = '20160617_starflag_CWV_man_created20160701_1241by_MS.mat';
+s.flagfilenameNO2 = '20160617_starflag_NO2_man_created20170611_0639by_MS.mat'
  
 % Ozone and other gases 
 s.O3h=21; 

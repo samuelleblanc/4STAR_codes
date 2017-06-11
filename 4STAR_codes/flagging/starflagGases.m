@@ -299,7 +299,7 @@ end
 
 % define input param to flag
 if Mode == 1
-    
+        % this is automatic -reading from starsun fields
         if strcmp(gas_name_str,'CWV')
             input_param = s.cwv.cwv940m1;
             std_param   = s.cwv.cwv940m1std;
@@ -316,7 +316,7 @@ if Mode == 1
         end
     
 elseif Mode == 2
-    
+        
         if strcmp(gas_name_str,'CWV')
             input_param = gas.cwv;
             std_param   = gas.cwv_std;

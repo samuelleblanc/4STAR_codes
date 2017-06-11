@@ -45,6 +45,7 @@
 %                      away. Set new revision for R1
 % 2017-04-05, SL,v2.3, Added reading of the tau_aero_subtract_all to use
 %                      aod with gas subtracted
+% 2017-06-11, MS, v2.3, added end at line 202 to fix a loop bug
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
@@ -149,14 +150,9 @@ form.qual_flag = '%1.0f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-<<<<<<< HEAD
 
 jproc=[         0          0          0          0          0          0          0          1           0           0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
-jproc=[         0          0          0          0          0          0          0          0           0           0          1          0          0          0          0          0          0          0          0] ; %set=1 to process
-=======
-jproc=[         0          0          0          0          0          0          0          0           1           0          0          0          1          0          0          0          0          0          0] ; %set=1 to process
->>>>>>> origin/master
 
 
 %% run through each flight, load and process
@@ -203,6 +199,7 @@ for i=idx_file_proc
     catch;
         disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
         tau = tau_aero_noscreening; 
+    end% end was missing
 
     if gas_subtract;
         try;

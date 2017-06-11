@@ -41,15 +41,16 @@
 %                       flights. based on Connor's merge marks files, identified
 %                       in starinfo files
 % 2017-06-11, MS, v2.2, added altitude fix and archive version comments
+%                       updated flag structure call
 % -------------------------------------------------------------------------
 
-function SEmakearchive_KORUS_AOD
+function SEmakearchive_SARP_AOD
 version_set('v2.2')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
-    ICTdir = 'E:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
-    starinfo_path = 'E:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-    starsun_path = 'E:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+    ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\June-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+    starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'));
     ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
@@ -60,20 +61,22 @@ else
     starsun_path = 'D:\KORUS-AQ\starsun\';
 end
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='1'; % A; %0 % revision number; if a string, no uncertainty will be saved.
+rev='0'; % A; %0 % revision number; if a string, no uncertainty will be saved.
 platform = 'DC8';
+gas_subtract = true;
+avg_wvl = false;
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          1          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          1          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
     'Jens Redemann';...                           % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
-    'KORUS-AQ';...                                  % Mission name
+    'SARP';...                                   % Mission name
     '1, 1';...                                   % volume number, number of file volumes
     '1';...                                      % time interval (see documentation)
     'Start_UTC, seconds, Elapsed seconds from 0 hours UT on day: DATE';...  % Independent variable name and description
@@ -82,7 +85,7 @@ HeaderInfo = {...
 NormalComments = {...
     'PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov';...
     'PLATFORM: NASA DC8';...
-    'LOCATION: based in Osan Air Force Base in South Korea, Exact aircraft latitude, longitude, altitude are included in the data records';...
+    'LOCATION: based in Palmdale, CA, Exact aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research';...
     'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
@@ -92,18 +95,17 @@ NormalComments = {...
     'LLOD_FLAG: -8888';...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Michal Segal-Rozenhaimer, michal.segalrozenhaimer@nasa.gov';...
-    'PROJECT_INFO: KORUS-AQ deployment; April-June 2016; Osan AFB, Korea';...
+    'PROJECT_INFO: SARP following KORUS-AQ deployment; June 2016; Palmdale, CA';...
     'STIPULATIONS_ON_USE: None. Consulting with PI before use is advised.';...
     'OTHER_COMMENTS: N/A';...
     };
 
 revComments = {...
-    'R1: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties and adjustments to AOD values linked to deposition on the front window has been included. \n';...
-    'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included. \n';...
+    'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. \n';...
     'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
     };
 
-specComments_extra_uncertainty = 'Uncertainty in this file has been adjusted to reflect estimated AOD impact of deposition on window. AOD values has not been corrected in this release. Future revisions will include corrected AODs.\n'; 
+specComments_extra_uncertainty = 'Uncertainty in this file has been adjusted to reflect estimated AOD impact of deposition on window. AOD values has  been corrected in this release.\n'; 
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -203,10 +205,24 @@ for i=idx_file_proc
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
     
+    % load uncertainties
     try;
         load(starfile, 't','tau_aero_err');
     catch;
         error(['Problem loading the uncertainties in file:' starfile])
+    end;
+    
+    % load subtracted sturcture
+    if gas_subtract;
+        try;
+            load(starfile,'tau_aero_subtract_all'); 
+            tau = tau_aero_subtract_all;
+        catch;
+            disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+            tau = tau_aero_noscreening; 
+        end;
+    else;
+        tau = tau_aero_noscreening;
     end;
     
     %% Update the uncertainties with merge marks file saved in the starinfo
@@ -263,29 +279,48 @@ for i=idx_file_proc
     disp('Setting the flags')
     if isfield(flag,'manual_flags');
         qual_flag = ~flag.manual_flags.good;
-    elseif strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
-        qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
-        qual_flag = bitor(qual_flag,flag.flags.cirrus);
-        qual_flag = bitor(qual_flag,flag.flags.frost);
-        qual_flag = bitor(qual_flag,flag.flags.low_cloud);
-        qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
+    %elseif strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
     else
-        % only for automatic flagging
-        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        %qual_flag = bitor(qual_flag,flag.cirrus);
-        %qual_flag = bitor(qual_flag,flag.frost);
-        %qual_flag = bitor(qual_flag,flag.low_cloud);
-        %qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        
+        try
+         % new flagfile struct version   
+            qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
+            qual_flag = bitor(qual_flag,flag.flags.cirrus);
+            qual_flag = bitor(qual_flag,flag.flags.frost);
+            qual_flag = bitor(qual_flag,flag.flags.low_cloud);
+            qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
+        catch
+            qual_flag = bitor(flag.before_or_after_flight,flag.flags.bad_aod);
+            qual_flag = bitor(qual_flag,flag.cirrus);
+            qual_flag = bitor(qual_flag,flag.frost);
+            qual_flag = bitor(qual_flag,flag.low_cloud);
+            qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        end
+         % new flagfile struct version      
+%     else
+%         % only for automatic flagging
+%         qual_flag = bitor(flag.flags.before_or_after_flight,flag.bad_aod);
+%         %qual_flag = bitor(qual_flag,flag.cirrus);
+%         %qual_flag = bitor(qual_flag,flag.frost);
+%         %qual_flag = bitor(qual_flag,flag.low_cloud);
+%         %qual_flag = bitor(qual_flag,flag.unspecified_clouds);
     end
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     % tweak for different flag files
-    if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+%     if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+%         flag.utc = t2utch(flag.flags.time.t);
+%     %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
+%     %    flag.utc = UTC';
+%     else
+%         flag.utc = t2utch(flag.time.t);
+%     end
+    
+    try
         flag.utc = t2utch(flag.flags.time.t);
-    %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
-    %    flag.utc = UTC';
-    else
-        flag.utc = t2utch(flag.time.t);
+    catch
+         flag.utc = t2utch(flag.time.t);
     end
+    
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));
