@@ -48,8 +48,8 @@ version_set('v1.0')
 %% set variables
 ICTdir = 'D:\MichalsData\KORUS-AQ\gas_ict\';
 starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';
-starsun_path = 'D:\MichalsData\KORUS-AQ\starsun_for_starflag\';
-gasfile_path = 'D:\MichalsData\KORUS-AQ\gas_summary\Jan-15-archive\';
+starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\';
+gasfile_path = 'D:\MichalsData\KORUS-AQ\gas_summary\June-15-archive\';
 prefix='korusaq-4STAR-GASES'; 
 rev='0'; % this is final archive (A/B...is field archive); some adjustments and improvements might be added to R1/R2
 platform = 'DC8';
@@ -61,7 +61,7 @@ HeaderInfo = {...
     'Jens Redemann';...                          % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
-    'KORUS-AQ';...                                  % Mission name
+    'KORUS-AQ';...                               % Mission name
     '1, 1';...                                   % volume number, number of file volumes
     '1';...                                      % time interval (see documentation)
     'Start_UTC, seconds, Elapsed seconds from 0 hours UT on day: DATE';...  % Independent variable name and description
@@ -86,7 +86,7 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R0: Final data archival. This data is using latest calibration.\n';...
+    'R0: Final data archival. This data is using latest calibration.';...
     };
 
 
@@ -137,7 +137,7 @@ form.std_CWV   = '%2.3f';
 %% prepare list of details for each flight
 dslist={'20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          1          0           1          1 ]  ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0           0          1]  ; %set=1 to process
 
 
 %% run through each flight, load and process
