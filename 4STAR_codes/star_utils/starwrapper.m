@@ -690,8 +690,13 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
                 sss(i,:) = interp1(sww,slit,ww.*1000.0,'linear',0.0);
                 sss(i,:) = sss(i,:)./trapz(sss(i,:));
             end;
-            s.tau_ray = tau_ray_hires*sss';
+            s.tau_ray = tau_ray_hires*sss';     
+            if length(tau_r_err_hires)==1;
+                s.tau_r_err = tau_r_err_hires;
+                %tau_r_err_hires = repmat(tau_r_err_hires,size(tau_ray_hires));
+            else;
             s.tau_r_err = tau_r_err_hires*sss';
+            end;
         else;
             disp('Hires_rayleigh correction not implemented for instruments other than 2STAR')
         end;
@@ -978,7 +983,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
             % apply auto gas flagging
             [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
         end
-        if toggle.gassubtract;
+        if toggle.gassubtract & ~strcmp(instrumentname,'2STAR') & isfield(s,'gas');
             [~ , s.flagsO3,  flagfile] = starflagGases(s, 1,'O3');
             [~ , s.flagsNO2, flagfile] = starflagGases(s, 1,'NO2');
             [~ ,s.flagsHCOH, flagfile] = starflagGases(s, 1,'HCOH');
