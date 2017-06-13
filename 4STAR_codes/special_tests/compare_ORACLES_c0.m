@@ -4,11 +4,16 @@ clear all
 fp = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 fp_out = 'C:\Users\sleblan2\Research\ORACLES\plot\';
 
+i_avg = [1 6 6 9 10 13 14 16];
+i_avg = [1 6 10 16]; % for flights after sept 20, 2016
+i_avg = [1 6 7 8 9 13 14 15]; % for flights after sept. 4th up to and including sept 20.
+i_avg = [1 2 7 8]; % for flights on the early part of ORACLES before sept 4th
+
 vis_names = {'20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';...
-             '20161110_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161111_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161112_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161113_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161110_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161111_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161112_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161113_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
              '20161115_VIS_C0_refined_Langley_Nov2016part1.5incl1115_good_mean.dat';...
              '20160908_VIS_C0_refined_Langley_airborne_ORACLES_v1.dat';...
              '20160912_VIS_C0_refined_Langley_airborne_ORACLES_v1.dat';...
@@ -19,13 +24,16 @@ vis_names = {'20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';...
              '20160908_VIS_C0_refined_high_alt_low_m.dat';...
              '20160912_VIS_C0_refined_high_alt_low_m.dat';...
              '20160918_VIS_C0_refined_high_alt_low_m.dat';...
-             '20160927_VIS_C0_refined_high_alt_low_m.dat'};
+             '20160927_VIS_C0_refined_high_alt_low_m.dat';...
+             '20160927_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';...
+    '20160927_VIS_C0_refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160927_ORACLES.dat';...
+    '20160918_VIS_C0_refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160918_ORACLES.dat'};
         
 nir_names = {'20160825_NIR_C0_refined_Langley_ORACLES_transit2.dat';...
-             '20161110_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161111_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161112_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
-             '20161113_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161110_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161111_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161112_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
+            % '20161113_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
              '20161115_NIR_C0_refined_Langley_Nov2016part1.5incl1115_good_mean.dat';...
              '20160908_NIR_C0_refined_Langley_airborne_ORACLES_v1.dat';...
              '20160912_NIR_C0_refined_Langley_airborne_ORACLES_v1.dat';...
@@ -36,11 +44,16 @@ nir_names = {'20160825_NIR_C0_refined_Langley_ORACLES_transit2.dat';...
              '20160908_NIR_C0_refined_high_alt_low_m.dat';...
              '20160912_NIR_C0_refined_high_alt_low_m.dat';...
              '20160918_NIR_C0_refined_high_alt_low_m.dat';...
-             '20160927_NIR_C0_refined_high_alt_low_m.dat'};
+             '20160927_NIR_C0_refined_high_alt_low_m.dat';...
+             '20160927_NIR_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';...
+    '20160927_NIR_C0_refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160927_ORACLES.dat';...
+    '20160918_NIR_C0_refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160918_ORACLES.dat'};
          
-supp = {'inflight';'MLO';'MLO';'MLO';'MLO';'MLO avg';'inflight';...
+supp = {'inflight';...%'MLO';'MLO';'MLO';'MLO';
+    'MLO avg';'inflight';...
         'inflight';'inflight';'inflight';'high alt';'high alt';...
-        'high alt';'high alt';'high alt';'high alt'};
+        'high alt';'high alt';'high alt';'high alt';'Averages for all';...
+        'ORACLES late';'ORACLES mid'};
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
 
@@ -56,8 +69,8 @@ hold on;
 
 cm = jet(n);
 for i=1:n;
-    visfilename = [fp vis_names{i}]
-    nirfilename = [fp nir_names{i}]
+    visfilename = [fp vis_names{i}];
+    nirfilename = [fp nir_names{i}];
     
     a=importdata(which(visfilename));
     visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
@@ -75,14 +88,24 @@ for i=1:n;
     leg{i} = [supp{i} '-' vis_names{i}(1:8)];
    
     figure(fig);
-    l = plot(w_vis,visc0(i,:),'color',cm(i,:));
+    if any(i_avg==i);
+        l = plot(w_vis,visc0(i,:),'color',cm(i,:),'linewidth',4);
+         plot(w_nir,nirc0(i,:).*10,'color',cm(i,:),'linewidth',4);
+    else;
+        l = plot(w_vis,visc0(i,:),'color',cm(i,:));
+         plot(w_nir,nirc0(i,:).*10,'color',cm(i,:));
+    end;
     p(i) = l;
-    plot(w_nir,nirc0(i,:).*10,'color',cm(i,:));
     
     figure(fig2);
-    l2 = plot(w_vis,visc0(i,:)./visc0(1,:).*100.0,'color',cm(i,:));
+    if any(i_avg==i);
+        l2 = plot(w_vis,visc0(i,:)./visc0(1,:).*100.0,'color',cm(i,:),'linewidth',4);
+        plot(w_nir,nirc0(i,:)./nirc0(1,:).*100.0,'color',cm(i,:),'linewidth',4);
+    else;
+        l2 = plot(w_vis,visc0(i,:)./visc0(1,:).*100.0,'color',cm(i,:));
+        plot(w_nir,nirc0(i,:)./nirc0(1,:).*100.0,'color',cm(i,:));
+    end;
     p2(i) = l2;
-    plot(w_nir,nirc0(i,:)./nirc0(1,:).*100.0,'color',cm(i,:));
     
 end;
 figure(fig);
@@ -108,31 +131,57 @@ ylabel('c0');
 ylim([0,650]);
 
 % Now average the c0s for creating the right c0
-i_avg = [1 6 6 9 10 13 14 16];
 visc0_avg = mean(visc0(i_avg,:));
 visc0_std = std(visc0(i_avg,:));
 nirc0_avg = mean(nirc0(i_avg,:));
 nirc0_std = std(nirc0(i_avg,:));
+
+gdaystr = vis_names{i_avg(end)}(1:8);
 
 figure(fig2);
 l2 = plot(w_vis,visc0_avg./visc0(1,:).*100.0,'color','black');
 plot(w_nir,nirc0_avg./nirc0(1,:).*100.0,'color','black');
 grid;
 p2(i+1) = l2;
-leg{i+1} = 'Averages';
-legend(p2,leg);
+leg{i+1} = ['Averages with ' gdaystr];
+legend(p2,leg,'location','northeastoutside');
 
 figure(fig);
 l = plot(w_vis,visc0_avg,'color','black');
 plot(w_nir,nirc0_avg.*10.0,'color','black');
 grid;
 p(i+1) = l;
-leg{i+1} = 'Averages';
-legend(p,leg);
+leg{i+1} = ['Averages with ' gdaystr];
+legend(p,leg,'location','northeastoutside');
 
 % Save the figures
-save_fig(fig,[fp_out 'ORACLES_cal_c0.fig']);
-save_fig(fig2,[fp_out 'ORACLES_cal_c0_relative.fig']);
+save_fig(fig,[fp_out 'ORACLES_cal_c0_' gdaystr]);
+save_fig(fig2,[fp_out 'ORACLES_cal_c0_relative_' gdaystr]);
+
+figure(fig2);
+ylim([96 104]);
+save_fig(fig2,[fp_out 'ORACLES2016_cal_c0_relative_zoom']);
+
+fig3 = figure;
+ax1 = subplot(3,1,1);
+plot(w_vis,visc0_avg,'.-k'); hold on;
+plot(w_nir,nirc0_avg.*10.0,'.-k');hold off;
+ylabel('c0 (NIR c0 x10)'); ylim([0,800])
+title('4STAR C0 saved for good averages from ORACLES 2016')
+ax2 = subplot(3,1,2);
+
+plot(w_vis,visc0_std./visc0_avg.*100.0,'.-k'); hold on;
+plot(w_nir,nirc0_std./nirc0_avg.*100.0,'.-k');hold off;
+ylabel('Relative std of c0 [%]');ylim([0,20]);
+ax3 = subplot(3,1,3);
+title('zoomed')
+plot(w_vis,visc0_std./visc0_avg.*100.0,'.-k'); hold on;
+plot(w_nir,nirc0_std./nirc0_avg.*100.0,'.-k');hold off;
+ylabel('Relative std of c0 [%]');ylim([0,1]); grid;
+
+linkaxes([ax1,ax2,ax3],'x');
+xlabel('Wavelength [nm]'); 
+save_fig(fig3,[fp_out 'Oracles2016_cal_c0_avg_' gdaystr]);
 
 % Now save the new averaged c0 for use
 days_cell = '';
@@ -140,7 +189,7 @@ for i=1:length(i_avg);
     c = char(leg{i_avg(i)});
     days_cell = [days_cell ', ' c(1:4) '-' c(5:6) '-' c(7:8)];
 end;
-filesuffix='refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
+filesuffix=['refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_' gdaystr '_ORACLES'];
 additionalnotes={'Langley at MLO and airborne Data outside 2.0x the STD of 501 nm Langley residuals were screened out. ';...
                  'Including high Altitude rate spectra, matched to splined stratospheric AOD measured at MLO.';...
                  ['Averages of c0 from multiple days including: ' days_cell '. See the list of files below']};
@@ -156,7 +205,6 @@ nirsource = '(SEE Original files for sources)';
 starsavec0(visfilename, vissource, [additionalnotes; vissource_alt], w_vis, visc0_avg, visc0_std);
 starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc0_avg, nirc0_std);
 
-stophere
 
 
 
