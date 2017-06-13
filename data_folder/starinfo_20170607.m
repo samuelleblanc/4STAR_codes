@@ -12,11 +12,10 @@ else
 end
 
  
-s.flight=[datenum(2017,6,6,15,35,00) datenum(2017,6,6,28,10,00)]; 
-s.langley1=[datenum(2017,6,6,15,35,00) datenum(2017,6,6,22,10,00)]; 
-s.langley2=[datenum(2017,6,6,25,10,00) datenum(2017,6,6,28,10,00)]; 
+s.flight=[datenum(2017,6,7,15,55,00) datenum(2017,6,7,31,02,00)]; 
+s.langley1 = [datenum(2017,6,7,15,55,00) datenum(2017,6,7,22,10,00)]; 
+s.langley2 = [datenum(2017,6,7,25,50,00) datenum(2017,6,7,31,02,00)]; 
  
-
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
