@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR(fname_4starsun,ppt_fname);
+function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
@@ -8,6 +8,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,ppt_fname);
 %
 % INPUT:
 %  fname_4starsun: (optional) the full path of the 4STAR starsun.mat file
+%  fname_4star: (optional) the full path of the 4STAR star.mat file
 %  ppt_fname: (optional) the full powerpoint file path to ammend the figures.
 %
 % OUTPUT:
@@ -43,7 +44,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,ppt_fname);
 %
 % Example:
 %     % create a starsun.mat file unless it already exists.
-%     daystr='20151104'; 
+%     daystr='20151104';
 %     allstarmat; % create a star.mat; after this, put the 'flight' [take-off landing] times in starinfo....m, run figure;spvis(daystr,'t','Alt','.');
 %     toggle.saveadditionalvariables=0;toggle.savefigure=0;toggle.computeerror=0;toggle.inspectresults=0;toggle.applynonlinearcorr=1;toggle.applytempcorr=0;toggle.dostarflag=0;toggle.doflagging=0;toggle.flagging=0;
 %     starsun(fullfile(starpaths, [daystr 'star.mat']),fullfile(starpaths, [daystr 'starsun.mat']), toggle); % create a starsun.mat
@@ -53,7 +54,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,ppt_fname);
 %
 % See NAAMESquickplots.m for plots for multiple days, ad hoc analyses, etc. See
 % also NAAMES starbasicplots.m and SEstarbasicplots.m.
-% 
+%
 % Yohei, 2015/11/09, being modified from NAAMESstarbasicplots.m. Continuously evolving throughout the campaign.
 % MS   , 2016/01/09, modified to accomodate MLO campaign data.
 % MS   , 2016/04/06, modified to accomodate KORUS-AQ campaign data.
@@ -74,313 +75,432 @@ version_set('1.0');
 if nargin<1; % no file path set
     [f1,p1] = uigetfile2('4STAR*starsun.mat','Choose 4STAR starsun file');
     fname_4starsun = [p1 f1];
+    [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
+    fname_4star = [pt ft];
+elseif nargin<2;
+    [p1, f, ext0]=fileparts(fname_4starsun);
+    [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
+    fname_4star = [pt ft];
 else;
     [p1, f, ext0]=fileparts(fname_4starsun);
 end;
-n = nargin
 
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
 savefigure = true;
 
-if nargin <2;
+if nargin <3;
     ppt_fname = fullfile(p1,[daystr '_' instrumentname '_Quicklooks.ppt']);
 end;
 
-%% load the files
+%% Set up the load path of the files
 disp(['Loading 4STAR file: ' fname_4starsun])
 s = load(fname_4starsun);
+disp(['Loading 4STAR file: ' fname_4star])
+st = load(fname_4star);
 
 %********************
-% set parameters
+%% set parameters and default titles
 %********************
-if nargin<3;
-    savefigure=true;
-end;
-if ismember(lower(platform), {'f' 'flight' 'flt' 'dc8'});
-    platform='flight';
-elseif ismember(lower(platform), {'g' 'ground' 'grd'});
-    platform='ground';
-else
+if length(unique(s.Lat))==1;
     platform = 'ground';
-    %error('platform must be either flight or ground.');
+else;
+    platform = 'flight';
 end;
+
+tit = [instrumentname ' - ' daystr];
 
 %********************
 % prepare for plotting
 %********************
-% load frequently used variables
-[a,f,p] = getfile(['*' daystr '*star.mat']);
-[as,fs,ps] = getfile(['*' daystr '*starsun.mat']);
-fp = [p f];
-fps = [ps fs];
-load(fp, 'track');
-track.T=[track.T1 track.T2 track.T3 track.T4];
-track.P=[track.P1 track.P2 track.P3 track.P4];
+
+%% get the track info
+track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
+track.P=[st.track.P1 st.track.P2 st.track.P3 st.track.P4];
 bl=60/86400;
-if numel(track.t)<=1;
+if numel(st.track.t)<=1;
     track.Tsm=track.T;
     track.Psm=track.P;
 else;
     for i=1:4;
-        track.Tsm(:,i)=boxxfilt(track.t, track.T(:,i), bl);
-        track.Psm(:,i)=boxxfilt(track.t, track.P(:,i), bl);
+        track.Tsm(:,i)=boxxfilt(st.track.t, track.T(:,i), bl);
+        track.Psm(:,i)=boxxfilt(st.track.t, track.P(:,i), bl);
     end;
 end;
 clear i;
-load(fps, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
-    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas'); % sun data and nav data associated with them
-[visc,nirc,viscrange,nircrange]=starchannelsatAATS(t);
+
+
+%load(fps, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
+%    'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas'); % sun data and nav data associated with them
+[visc,nirc,viscrange,nircrange]=starchannelsatAATS(s.t);
 c=[visc(1:10) nirc(11:13)+1044];
 colslist={'' c 1:13
-    'VISonly' visc(3:9) 3:9 
+    'VISonly' visc(3:9) 3:9
     'NIRonly' nirc(11:13)+1044 11:13};
-% upload gases if 'gas'/'cwv' does not exist in starsun
-if exist('gas','var')
-    cwv2plot  =cwv.cwv940m1;
-    o32plot   =gas.o3.o3DU;
-    no22plot  =gas.no2.no2_molec_cm2;
-elseif exist([daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
+
+%% prepare the gas 'gas'/'cwv' does not exist in starsun
+if exist('gas','s')
+    cwv2plot  =s.cwv.cwv940m1;
+    o32plot   =s.gas.o3.o3DU;
+    no22plot  =s.gas.no2.no2_molec_cm2;
+elseif exist([instrumentname daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
     gas   = load(strcat(gasfile_path,daystr{:},'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
     no22plot =gas.no2_molec_cm2;
-else disp('No gas data found. Skipping...') %otherwise just skip it if we haven't run gas retrievals
-end
+else;
+    disp('No gas data found. Skipping...') %otherwise just skip it if we haven't run gas retrievals
+end;
 
 %% filter the gas fields to plot
-
-
 % read starinfo files
 
-    disp(['on day:' daystr])
-    %cd starinfo_path
-    %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
-    infofile_ = ['starinfo_' daystr '.m'];
-    infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    s.dummy = '';
-    try
-        s = infofnt(s);
-    catch
-        eval([infofile_(1:end-2),'(s)']);
-    end
+disp(['on day:' daystr])
+infofile_ = ['starinfo_' daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s)']);
+end
+
+%% Load the flag filea and see if gas flags exist
+if isfield(s, 'flagfilename');
+    disp(['Loading flag file: ' s.flagfilename])
+    flagO3 = load(s.flagfilename);
+    % read flags
+    flag  = flag.manual_flags.screen;
+else;
+    flag = zeros(length(s.t),1);
+end;
+
+if isfield(s, 'flagfilenameO3');
+    disp(['Loading flag file: ' s.flagfilenameO3])
+    flagO3 = load(s.flagfilenameO3);
+    % read flags
+    flagO3  = flagO3.manual_flags.screen;
+else
+    % don't flag
+    flagO3   = zeros(length(s.t),1);
+end
+
+if isfield(s,'flagfilenameCWV');
+    disp(['Loading flag file: ' s.flagfilenameCWV])
+    flagCWV = load(s.flagfilenameCWV);
+    flagCWV = flagCWV.manual_flags.screen;
+else;
+    flagCWV  = zeros(length(s.t),1);
+end;
+
+flagNO2  = ones(length(s.t),1);% flag all-bad calibration
 
 
-    % Load the flag file and see if gas flags exist
-    if isfield(s, 'flagfilename');
-        disp(['Loading flag file: ' s.flagfilenameO3])
-        flagO3 = load(s.flagfilenameO3); 
-        disp(['Loading flag file: ' s.flagfilenameCWV])
-        flagCWV = load(s.flagfilenameCWV); 
-        % read flags
-        flagO3  = flagO3.manual_flags.screen;
-        flagCWV = flagCWV.manual_flags.screen;
-        flagNO2 = ones(length(t),1);% flag all- bad calibration
-    else
-        % don't flag
-        flagO3   = zeros(length(t),1);
-        flagCWV  = zeros(length(t),1);
-        flagNO2  = ones(length(t),1);% flag all-bad calibration
-    end   
-
-
-% read auxiliary data from starinfo and select rows
-evalstarinfo(daystr, 'ground');
+%% read auxiliary data from starinfo and select rows
 if isequal(platform, 'flight');
-    if ~exist('flight');
-        error(['Specify flight time period in starinfo' daystr '.m.']);
+    if ~isfield(s,'flight');
+        error(['Specify flight time period in starinfo_' daystr '.m.']);
     end;
-    tlim=flight;
+    tlim=s.flight;
 elseif isequal(platform, 'ground');
-    if exist('flight');
-        tlim=NaN(size(flight,1)+1,2);
+    if isfield(s,'flight');
+        tlim=NaN(size(s.flight,1)+1,2);
         tlim(1,1)=t(1);
         tlim(end,2)=t(end);
-        tlim(1:end-1,2)=flight(:,1);
-        tlim(2:end,1)=flight(:,2);
+        tlim(1:end-1,2)=s.flight(:,1);
+        tlim(2:end,1)=s.flight(:,2);
     else
         tlim=t([1 end])';
     end;
-    evalstarinfo(daystr, 'groundcomparison');
-    if ~exist('groundcomparison');
-        groundcomparison=tlim;
+    if ~isfield(s,'groundcomparison');
+        s.groundcomparison=tlim;
     end;
 end;
 
-% prepare common lines
-mods={'tlim', tlim, ...
-    'title', [daystr ' ' platform], ...
-    'savefigure', savefigure};
-if isequal(platform, 'flight');
-    vars.xtlim={'xlim', [min(flight(:)) max(flight(:))]+60/86400*[-1 1]};
-    vars.Alt={'t', Alt, '-k'};
-    vars.Alt1e4={'t', Alt/1e4, '-k'};
-    vars.Alt1e5={'t', Alt/1e5, '-k'};
-elseif isequal(platform, 'ground');
-    vars.xtlim={'xlim', t([1 end])'+60/86400*[-1 1]};
-    vars.Alt={};
-    vars.Alt1e4={};
-    vars.Alt1e5={};
-end;
-
-% prepare to save a PowerPoint file
+%% prepare to save a PowerPoint file
 pptcontents={}; % pairs of a figure file name and the number of figures per slide
 pptcontents0={};
-[~, figurefolder]=starpaths;
+
+
+%% Plot the housekeeping data
+%plot airmasses
+figure(1);
+plot(s.t,s.m_aero,'.b');
+hold on;
+plot(s.t,s.m_ray,'.r');
+grid on;
+legend({'m\_aero';'m\_ray'}');
+dynamicDateTicks;
+xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+ylabel('Airmass');
+title([instrumentname ' - ' daystr ' - airmasses']);
+fname = fullfile(p1,[instrumentname daystr '_airmass']);
+fig_names = {[fname '.png']};
+save_fig(1,fname,0);
+pptcontents0=[pptcontents0; {fig_names{1} 4}];
+
+% plot temperatures and pressures
+figure(2);
+ax = plotyy(s.t,s.Tprecon_C,s.t,s.RHprecon_percent);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+grid on;
+plot(ax(1),s.t,s.Tbox_C,'.r');
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+ylabel(ax(2),'RH [%]');
+ylabel(ax(1),'Temperature [^\circC]');
+legend(starfieldname2label('Tprecon'),starfieldname2label('Tbox'),starfieldname2label('RHprecon'));
+title([instrumentname ' - ' daystr ' - Temperature and Pressure (precon)']);
+fname = fullfile(p1,[instrumentname daystr '_TnP']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(2,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+% plot the can temperatures and pressures (smoothed)
+% T&P from track
+for ii={'T' 'P'};
+    ysm=s.track.([ii{:} 'sm']);
+    figtp = figure;
+    plot(s.track.t, ysm, '.');
+    dynamicDateTicks;
+    lh=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']));
+    grid on;
+    ylabel([ii{:} ', smoothed over ' num2str(bl*86400) ' s']);
+    if strcmp(tt{:},'T'); title([tit ' - Temperature (head)']), else title([tit ' - Pressures (head)']), end;
+    fname = fullfile(p1,[instrumentname daystr '_track_' ii{:}]);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(figtp,fname,0);
+    pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+end;
+clear ii;
+
+%% plot tracking details
+% plot the solar angles
+figure(5);
+plot(s.t,s.sza,'o');
+hold on;
+plot(s.t,s.sunaz,'+r');
+plot(s.t,s.sunel,'xg');
+dynamicDateTicks;
+grid on;
+xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+ylabel('Degrees [^\circ]')
+legend('SZA','Sun Az','Sun El');
+title([instrumentname ' - ' daystr ' - Solar Angles']);
+fname = fullfile(p1,[instrumentname daystr '_solarangles']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(5,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+% plot the quad signals
+figure(4);
+ax1 = subplot(211);
+plot(s.t,s.QdVtot,'.b');
+ylabel('Total Quad voltages [V]');
+title([instrumentname ' - ' daystr ' - Quad voltages']);
+dynamicDateTicks;grid on;
+ax2 = subplot(212);
+linkaxes([ax1,ax2],'x')
+plot(s.t,s.QdVtb,'+r');hold on;
+plot(s.t,s.QdVlr,'xg');
+dynamicDateTicks;grid on;
+hold off;
+xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+ylabel('Quad voltages [V]'); ylim([-1,1])
+legend('Quad top bottom','Quad Left right');
+fname = fullfile(p1,[instrumentname daystr '_Quad']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(4,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+% plot the orientation (Az El)
+figure(3);
+[ax,h1,h2] = plotyy(s.t,s.El_deg,s.t,s.AZ_deg);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+grid on;
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+ylabel(ax(2),'Azimuth degrees [^\circ]')
+ylabel(ax(1),'Elevation degrees [^\circ]');
+title([instrumentname ' - ' daystr ' - Elevation and Azimuth angles']);
+fname = fullfile(p1,[instrumentname daystr '_El_Az']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(3,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+% plot ambient Tst and Pst
+figts = figure;
+ax = plotyy(s.t,s.Tst,s.t,s.Pst);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+grid on;
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+ylabel(ax(2),'Pst [hPa]');
+ylabel(ax(1),'Tst [^\circC]');
+title([instrumentname ' - ' daystr ' - Temperature and Pressure St']);
+fname = fullfile(p1,[instrumentname daystr '_Tst_Pst']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figts,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
 
 %********************
 % map flight path and airmasses
 %********************
 if isequal(platform, 'flight');
     % flight track map
-    figure;
-    [h,filename]=ssvis(daystr, 'Lon', 'Lat', 24, 't', mods{:});
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-    % altitude 
-    figure;
-    [h,filename]=spvis(daystr, 't', 'Alt', '.', vars.xtlim{:}, ...
-        'tlim', tlim, ...
-    'title', [daystr ' ' platform]);
-    for i=1:numel(h);
-        set(h(i), 'ydata', get(h(i),'ydata')/1e3);
+    figm = figure;
+    ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'marker','.');
+    leg = {'vis_sun'};
+    fld = fields(st);
+    fld_marks = '.+>^<vopx';
+    for ii = 1:length(fld);
+        if isequal(lower(fld{ii}(1:3)),'vis');
+            %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
+            sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,4,st.(fld{ii}).t,'marker',fld_marks(ii));
+            leg = [leg; {fld{ii}}];
+        end;
     end;
-    yl=ylim;
-    ylim([0 max(yl)]/1000);
-    lh=legend;
-    lstr=get(lh,'string');
-    hold on;
-    h2=spsun(daystr, 't', 'm_ray', '.b', 't', 'm_aero', '.c', vars.xtlim{:}, 'tlim', tlim);
-    lstr=[lstr {'m_ray'} {'m_aero'}];
-    ylabel('Altitude (km) or Airmass');
-    lh=legend([h; h2], lstr);
-    set(lh,'interpreter','none','fontsize',12,'location','best');
-    if savefigure;
-        starsas([filename '.fig, ' mfilename '.m']);
-    end;
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-    % longitude and altitude
-    figure;
-    [h,filename]=ssvis(daystr, 'Lon', 'Alt', 24, 't', mods{:});
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-    % latitude and altitude
-    figure;
-    [h,filename]=ssvis(daystr, 'Lat', 'Alt', 24, 't', mods{:});
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-elseif isequal(platform, 'ground');
-     % latitude and altitude
-    figure;
-    [h,filename]=spsun(daystr, 't', 'm_ray', 'b.','t', 'm_aero', 'c.', vars.xtlim{:}, mods{:});
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-end;
-
-%********************
-% inspect environmental and instrument conditions
-%********************
-% T&P from track
-for ii={'T' 'P'};
-    ysm=track.([ii{:} 'sm']);
-    figure;
-    plot(track.t, ysm, '.');
-    set(gca,'xlim', vars.xtlim{2});
-    lh=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']));
-    set(lh,'fontsize',12,'location','best');
-    ggla;
-    grid on;
-    dateticky('x','keeplimits');
-    ylabel([ii{:} ', smoothed over ' num2str(bl*86400) ' s']);
-    title([daystr ' ' platform]);
-    filename=['star' daystr platform 'track' ii{:} 'smtseries'];
-    if savefigure;
-        starsas([filename '.fig, ' mfilename '.m'])
-    end;
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-end;
-clear ii;
-
-% T&RH
-figure;
-[h,filename]=spsun(daystr, 't', 'RHprecon_percent', '.', ...
-    't', 'Tprecon_C', '.', ...
-    't', 'Tbox_C', '.', ...
-    'ylim', [0 40], ...
-    vars.xtlim{:}, mods{:});
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
+    xlabel('Longitude [^\circ]')
+    ylabel('Latitude [^\circ]');
+    title([tit ' - flight track map']);    
+    ch=colorbarlabeled('UTC');
+    datetick(ch, 'y','keeplimits');
+    legend(leg);
+    fname = fullfile(p1,[instrumentname daystr '_map']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(figm,fname,0);
+    pptcontents0=[pptcontents0; {[fname '.png'] 1}];
     
-% Pst
-figure;
-[h,filename]=spvis(daystr, 't', 'Pst', '.', vars.xtlim{:}, mods{:});
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-
-% Tst
-figure;
-[h,filename]=spvis(daystr, 't', 'Tst', '.', vars.xtlim{:}, mods{:});
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-
-% Tint
-figure;
-[h,filename]=spvisnir(daystr, 't', 'Tint', '.', vars.xtlim{:}, mods{:});
-% pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-
-% motors
-figure;
-[h,filename]=spsun(daystr, 't', 'AZ_deg', '.', ...
-    't', 'El_deg', '.', ...
-    vars.xtlim{:}, mods{:});
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
-pptcontents0=[pptcontents0; {' ' 4}];
-pptcontents0=[pptcontents0; {' ' 4}];
-
-% quad
-figure;
-ax(1)=subplot(5,1,1:4);
-[h,filename]=spsun(daystr, 't', QdVlr./QdVtot, '>', ...
-    't', QdVtb./QdVtot, 'v', ...
-    'tlim', tlim, 'title', [daystr ' ' platform], ...
-    vars.xtlim{:});    
-set(h, 'linewidth',1);
-grid on;
-dateticky('x','keeplimits');
-ylabel('Quad Signal Ratio');
-ylim([-0.6 0.6]);
-lh=legend('(Left-Right) / Total', '(Top-Bottom) / Total');
-set(lh, 'location', 'best', 'fontsize',12);
-ax(2)=subplot(5,1,5);
-h2=spvis(daystr, 't', 'Str', 'rs', 't', 'Md', '.k', 't', 'Zn', 'o', ...
-    'linewidth',1);
-% set(h2(1), 'markersize',6);
-% set(h2(2), 'markersize',12);
-% set(h2(3), 'markersize',3, 'color',[.5 .5 .5]);
-lh2=legend;
-set(lh2,'fontsize',8);
-dateticky('x','keeplimits');
-axis tight;
-linkaxes(ax,'x');
-filename=['star' daystr platform 'QuadSignalRatiotseries'];
-if savefigure;
-    starsas([filename '.fig, ' mfilename '.m'])
+    
+    
+    % altitude
+    %...
+    % longitude and altitude
+    % ...
+    % latitude and altitude
+    % ...
 end;
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 
 %********************
-% plot spectra, of 4STAR only
+%% Start plotting the raw signals
 %********************
-% raw count
-figure;
-[h,filename]=spsun(daystr, 't', 'raw', '.', vars.Alt{:}, mods{:}, ...
-    'cols', c, ...
-    'filename', ['star' daystr platform 'rawcounttseries']);
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 
-% dark count
-figure;
-[h,filename]=spsun(daystr, 't', 'dark', '.', 't', Alt/100, mods{:}, ...
-    'cols', c, ...
-    'filename', ['star' daystr platform 'darkcounttseries']);
-pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+% plot raw signal at one wavelength with parks and saturations, with Tint
+figp = figure;
+iw = 400;
+[ax,h1,h2] = plotyy(s.t,s.raw(:,iw),s.t,s.visTint);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+grid on;
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+hold on;
+plot(s.t(s.Md==0),s.raw(s.Md==0,iw),'dc','markersize',4);
+plot(s.t(s.Str==0),s.raw(s.Str==0,iw),'xm','markersize',4);
+plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'or');
+plot(s.t(s.sat_time==1),s.raw(s.sat_time==1,iw),'sy','markersize',4);
+hold off;
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+ylabel(ax(2),'VIS Integration time [ms]')
+ylabel(ax(1),['Raw at ' num2str(s.w(iw).*1000.0,'%4.1f') ' nm [counts]']);
+title([instrumentname ' - ' daystr ' - Vis Raw counts, parks, saturation, Tint' ]);
+if any(s.sat_time==1);
+    legend('Raw','parked','Shuttered','removed','saturated','Tint');
+else;
+    a = legend('Raw','parked','Shuttered','removed','Tint');
+    lpos = get(a,'Position');
+    text(lpos(2),lpos(1),'No saturation','Units','normalized');
+end;
+fname = fullfile(p1,[instrumentname daystr '_vis_sats_parks_Tint']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figp,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+figp = figure;
+iw = 1100;
+[ax,h1,h2] = plotyy(s.t,s.raw(:,iw),s.t,s.nirTint);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+grid on;
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+hold on;
+plot(s.t(s.Md==0),s.raw(s.Md==0,iw),'dc','markersize',4);
+plot(s.t(s.Str==0),s.raw(s.Str==0,iw),'xm','markersize',4);
+plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'osr');
+plot(s.t(s.sat_time==1),s.raw(s.sat_time==1,iw),'sy','markersize',4);
+hold off;
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+ylabel(ax(2),'NIR Integration time [ms]')
+ylabel(ax(1),['Raw at ' num2str(s.w(iw).*1000.0,'%4.1f') ' nm [counts]']);
+title([instrumentname ' - ' daystr ' - NIR Raw counts, parks, saturation, Tint' ]);
+if any(s.sat_time==1);
+    legend('Raw','parked','Shuttered','removed','saturated','Tint');
+else;
+    a = legend('Raw','parked','Shuttered','removed','Tint');
+    lpos = get(a,'Position');
+    text(lpos(2),lpos(1),'No saturation','Units','normalized');
+end;
+fname = fullfile(p1,[instrumentname daystr '_nir_sats_parks_Tint']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figp,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+pptcontents0=[pptcontents0; {' ' 4}];
+pptcontents0=[pptcontents0; {' ' 4}];
+
+
+%********************
+%% plot the data
+%********************
+% plot the raw vis
+frv = figure;
+cm=hsv(nw);
+set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
+plot(s.t,s.raw(:,iwvlv),'.');
+dynamicDateTicks;
+xlabel('UTC time');
+ylabel('Raw [counts]');
+xlim([s.t(1)-0.01 s.t(end)+0.01]);
+title([tit ' - VIS Raw counts' ]);
+grid on;
+labels = strread(num2str(wvlv,'%5.0f'),'%s');
+colormap(cm);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile(p1,[instrumentname daystr '_visraw']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(frv,fname,0);
+pptcontents0=[pptcontents0; {[fname '.png'] 4}];
+
+% plot the raw nir
+figure(7);
+cm=hsv(nw);
+set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
+plot(s.t,s.raw(:,iwvl),'.');
+dynamicDateTicks;
+xlabel('UTC time');
+ylabel('Raw [counts]');
+xlim([s.t(1)-0.01 s.t(end)+0.01]);
+title([instrumentname ' - ' daystr ' - Raw counts' ]);
+grid on;
+labels = strread(num2str(wvl,'%5.0f'),'%s');
+colormap(cm);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile(p1,[instrumentname daystr '_raw']);
+fig_names{7} = [fname '.png'];
+save_fig(7,fname,0);
+pptcontents0=[pptcontents0; {fig_names{7} 4}];
+
+% plot the raw carpet vis
+figure(8);
+colormap(parula);
+imagesc(s.t,s.w.*1000.0,s.raw');
+dynamicDateTicks;
+xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+ylabel('Wavelength [nm]');
+title([instrumentname ' - ' daystr ' - Raw counts' ]);
+cb = colorbarlabeled('Raw counts');
+fname = fullfile(p1,[instrumentname daystr '_rawcarpet']);
+fig_names{8} = [fname '.png'];
+save_fig(8,fname,0);
+pptcontents0=[pptcontents0; {fig_names{8} 4}];
 
 % tau aero noscreening
 if exist('tau_aero_noscreening');
@@ -413,44 +533,44 @@ end;
 % water vapor
 
 if exist('cwv2plot');
-        
-        % apply flags
-        cwv2plot(flagCWV==1) = NaN;
-        
-        figure;
-        [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, mods{:}, ...
-            'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
-            'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    
+    % apply flags
+    cwv2plot(flagCWV==1) = NaN;
+    
+    figure;
+    [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, mods{:}, ...
+        'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
+        'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
+    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 end;
 
 
 % O3
 
 if exist('o32plot');
-        
-         % apply flags
-        o32plot(flagO3==1) = NaN;
-        
-        figure;
-        [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, mods{:}, ...
-            'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
-            'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    
+    % apply flags
+    o32plot(flagO3==1) = NaN;
+    
+    figure;
+    [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, mods{:}, ...
+        'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
+        'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
+    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 end;
 
 % NO2
 
-if exist('no22plot'); 
+if exist('no22plot');
     
-       % apply flags
-       o32plot(flagO3==1) = NaN;
-       
-       figure;
-       [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, ...
-           'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
-           'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
-       pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    % apply flags
+    o32plot(flagO3==1) = NaN;
+    
+    figure;
+    [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, ...
+        'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
+        'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
+    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 end;
 
 
@@ -469,7 +589,7 @@ if exist('tau_aero_scaled');
     end;
 end;
 
-% zenith radiance time series 
+% zenith radiance time series
 starzenfile=fullfile(starpaths, [daystr 'starzen.mat']);
 if exist(starzenfile);
     load(starzenfile, 'Alt');
@@ -578,17 +698,17 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
     end;
     
     % transmittance ratio, 4STAR/AATS, against wavelengths
-    if ~exist('groundcomparison');        
+    if ~exist('groundcomparison');
         rows=incl(both.t, groundcomparison);
         % extrapolate to non-AATS wavelengths
         aatsgoodviscols=[2:7 9];
         aatsgoodnircols=[11 13]; % "You should ignore AATS 1.2 um." says Phil, Aug. 13, 2013.
         %         visc0corrfactor=interp1(aats.w(aatsgoodviscols), nanmean(both.trratio(rows,aatsgoodviscols),1), w, 'cubic');
-%         [p,S] = polyfit(log(aats.w(aatsgoodviscols)),nanmean(both.trratio(rows,aatsgoodviscols),1),2);
+        %         [p,S] = polyfit(log(aats.w(aatsgoodviscols)),nanmean(both.trratio(rows,aatsgoodviscols),1),2);
         [p,S] = polyfit(log(aats.w(aatsgoodviscols)),nanmedian(both.trratio(rows,aatsgoodviscols),1),2);
         visc0corrfactor=polyval(p,log(w));
         %         nirc0corrfactor=interp1(aats.w(aatsgoodnircols), nanmean(both.trratio(rows,aatsgoodnircols),1), w, 'cubic');
-%         [p,S] = polyfit(log(aats.w(aatsgoodnircols)),nanmean(both.trratio(rows,aatsgoodnircols),1),2);
+        %         [p,S] = polyfit(log(aats.w(aatsgoodnircols)),nanmean(both.trratio(rows,aatsgoodnircols),1),2);
         [p,S] = polyfit(log(aats.w(aatsgoodnircols)),nanmedian(both.trratio(rows,aatsgoodnircols),1),2);
         nirc0corrfactor=polyval(p,log(w));
         c0corrfactor=[visc0corrfactor(1:1044) nirc0corrfactor(1044+(1:512))];
@@ -599,7 +719,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         %         sh=semilogx(aats.w(1:13), both.trratio(rows,:), 'c.', ...
         %             w, c0corrfactor, '.m', ...
         %             w([1 end]), [1 1], '-k');
-%         set(sh(1:end-2),'markersize',24);
+        %         set(sh(1:end-2),'markersize',24);
         xxs=repmat(aats.w(1:13),size(rows));
         yys=both.trratio(rows,:);
         ccs=24*ones(size(both.trratio(rows,:)));
@@ -607,7 +727,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         sh=scatter(xxs(:), yys(:), ccs(:), sss(:));
         ch=colorbarlabeled('UTC');
         datetick(ch,'y','keeplimits');
-            hold on;
+        hold on;
         plot(w, c0corrfactor, '.m', ...
             w([1 end]), [1 1], '-k');
         gglwa;
@@ -641,109 +761,109 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
     end;
     
-% % %     % spectra, average
-% % %     figure;
-% % %     ok=both.rowscomparison;
-% % %     aats.ok=interp1(aats.t,1:numel(aats.t),both.t(ok),'nearest');
-% % %     aats.ok=unique(aats.ok(isfinite(aats.ok)));
-% % %     h=starplotspectrum(w, nanmean(both.tau_aero(ok,:)), aerosolcols, viscols, nircols);
-% % %     hold on;
-% % %     ah=plot(aats.w, nanmean(aats.tau_aero(:,aats.ok)'), '.', 'markersize',12,'color', [0 0.5 0]);
-% % %     % starttstr=datestr(tlim(1),13);
-% % %     % stoptstr=datestr(tlim(2),13);
-% % %     ylabel('Optical Depth');
-% % %     % title([refdaystr ' on the ground ' starttstr ' - ' stoptstr]);
-% % %     title([daystr ' MLO']);
-% % %     % lh=legend([h(2) h2(2) ah], 'TCAP winter cal', 'high alt subtracted', 'AATS-14');
-% % %     % set(lh,'fontsize',12,'location','best');
-% % %     if savefigure;
-% % %         %     starsas(['star' daystr datestr(tlim(1),'HHMMSS') datestr(tlim(2),'HHMMSS') 'ground_tau_aero.fig, SEquickplots.m'])
-% % %         starsas(['star' daystr 'ground_tau_aero.fig, SEquickplots.m'])
-% % %     end;
-% % %     
-% % %     % spectra, individual
-% % %     figure;
-% % %     ok=both.rowscomparison;
-% % %     aats.ok=interp1(aats.t,1:numel(aats.t),both.t(ok),'nearest');
-% % %     aats.ok=unique(aats.ok(isfinite(aats.ok)));
-% % %     h=starplotspectrum(w, both.tau_aero(ok,:), aerosolcols, viscols, nircols);
-% % %     hold on;
-% % %     ah=plot(aats.w, aats.tau_aero(:,aats.ok)', '.', 'markersize',12,'color', [0 0.5 0]);
-% % %     % starttstr=datestr(tlim(1),13);
-% % %     % stoptstr=datestr(tlim(2),13);
-% % %     ylabel('Optical Depth');
-% % %     % title([refdaystr ' on the ground ' starttstr ' - ' stoptstr]);
-% % %     title([daystr ' MLO']);
-% % %     lh=legend([h(2) h2(2) ah], 'TCAP winter cal', 'high alt subtracted', 'AATS-14');
-% % %     set(lh,'fontsize',12,'location','best');
-% % %     if savefigure;
-% % %         starsas(['star' daystr datestr(tlim(1),'HHMMSS') datestr(tlim(2),'HHMMSS') 'ground_tau_aero.fig, SEquickplots.m'])
-% % %     end;
+    % % %     % spectra, average
+    % % %     figure;
+    % % %     ok=both.rowscomparison;
+    % % %     aats.ok=interp1(aats.t,1:numel(aats.t),both.t(ok),'nearest');
+    % % %     aats.ok=unique(aats.ok(isfinite(aats.ok)));
+    % % %     h=starplotspectrum(w, nanmean(both.tau_aero(ok,:)), aerosolcols, viscols, nircols);
+    % % %     hold on;
+    % % %     ah=plot(aats.w, nanmean(aats.tau_aero(:,aats.ok)'), '.', 'markersize',12,'color', [0 0.5 0]);
+    % % %     % starttstr=datestr(tlim(1),13);
+    % % %     % stoptstr=datestr(tlim(2),13);
+    % % %     ylabel('Optical Depth');
+    % % %     % title([refdaystr ' on the ground ' starttstr ' - ' stoptstr]);
+    % % %     title([daystr ' MLO']);
+    % % %     % lh=legend([h(2) h2(2) ah], 'TCAP winter cal', 'high alt subtracted', 'AATS-14');
+    % % %     % set(lh,'fontsize',12,'location','best');
+    % % %     if savefigure;
+    % % %         %     starsas(['star' daystr datestr(tlim(1),'HHMMSS') datestr(tlim(2),'HHMMSS') 'ground_tau_aero.fig, SEquickplots.m'])
+    % % %         starsas(['star' daystr 'ground_tau_aero.fig, SEquickplots.m'])
+    % % %     end;
+    % % %
+    % % %     % spectra, individual
+    % % %     figure;
+    % % %     ok=both.rowscomparison;
+    % % %     aats.ok=interp1(aats.t,1:numel(aats.t),both.t(ok),'nearest');
+    % % %     aats.ok=unique(aats.ok(isfinite(aats.ok)));
+    % % %     h=starplotspectrum(w, both.tau_aero(ok,:), aerosolcols, viscols, nircols);
+    % % %     hold on;
+    % % %     ah=plot(aats.w, aats.tau_aero(:,aats.ok)', '.', 'markersize',12,'color', [0 0.5 0]);
+    % % %     % starttstr=datestr(tlim(1),13);
+    % % %     % stoptstr=datestr(tlim(2),13);
+    % % %     ylabel('Optical Depth');
+    % % %     % title([refdaystr ' on the ground ' starttstr ' - ' stoptstr]);
+    % % %     title([daystr ' MLO']);
+    % % %     lh=legend([h(2) h2(2) ah], 'TCAP winter cal', 'high alt subtracted', 'AATS-14');
+    % % %     set(lh,'fontsize',12,'location','best');
+    % % %     if savefigure;
+    % % %         starsas(['star' daystr datestr(tlim(1),'HHMMSS') datestr(tlim(2),'HHMMSS') 'ground_tau_aero.fig, SEquickplots.m'])
+    % % %     end;
     
-%     % 4STAR/AATS ratio (not normalized) v. airmass
-%     figure;
-%     cols=find(isfinite(both.c(2,:))==1);
-%     ph=plot(both.m_aero, both.rateratiotoaats(:,cols), '.');
-%     xlabel('Aerosol Airmass Factor');
-%     ylabel('4STAR/AATS');
-%     ggla;
-%     grid on;
-%     lstr=setspectrumcolor(ph, both.w(both.c(2,cols)));
-%     title(daystr);
-%     lh=legend(ph,lstr);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'rateratiotoAATSvm_aero'  '.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
-%     set(ph([1 2 10:end]), 'visible','off','markersize',1);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'rateratiotoAATSvm_aero' 'VISonly.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
-%     ylim([0 2]);
-%     set(ph([1 2 10:end]), 'visible','on','markersize',6);
-%     set(ph([1:10]), 'visible','off','markersize',1);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'rateratiotoAATSvm_aero' 'NIRonly.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
-%     
-%     % 4STAR/AATS ratio normalized v. airmass
-%     figure;
-%     cols=find(isfinite(both.c(2,:))==1);
-%     ph=plot(both.m_aero, both.raterelativeratiotoaats(:,cols), '.');
-%     hold on;
-%     plot(xlim, [1 1], '-k');
-%     xlabel('Aerosol Airmass Factor');
-%     ylabel(['4STAR/AATS, ' datestr(both.t(both.noonrow),13) '=1']);
-%     ylim([0.96 1.04]);
-%     ggla;
-%     grid on;
-%     lstr=setspectrumcolor(ph, both.w(both.c(2,cols)));
-%     title(daystr);
-%     lh=legend(ph,lstr);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero'  '.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
-%     ylim([0.94 1.02])
-%     set(ph([1 2 10:end]), 'visible','off','markersize',1);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero' 'VISonly.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
-%     set(ph([1 2 10:end]), 'visible','on','markersize',6);
-%     set(ph([1:10]), 'visible','off','markersize',1);
-%     set(lh,'fontsize',12,'location','best');
-%     if savefigure;
-%         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero' 'NIRonly.fig, SEquickplots.m'])
-%         pause(3);
-%     end;
+    %     % 4STAR/AATS ratio (not normalized) v. airmass
+    %     figure;
+    %     cols=find(isfinite(both.c(2,:))==1);
+    %     ph=plot(both.m_aero, both.rateratiotoaats(:,cols), '.');
+    %     xlabel('Aerosol Airmass Factor');
+    %     ylabel('4STAR/AATS');
+    %     ggla;
+    %     grid on;
+    %     lstr=setspectrumcolor(ph, both.w(both.c(2,cols)));
+    %     title(daystr);
+    %     lh=legend(ph,lstr);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'rateratiotoAATSvm_aero'  '.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
+    %     set(ph([1 2 10:end]), 'visible','off','markersize',1);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'rateratiotoAATSvm_aero' 'VISonly.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
+    %     ylim([0 2]);
+    %     set(ph([1 2 10:end]), 'visible','on','markersize',6);
+    %     set(ph([1:10]), 'visible','off','markersize',1);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'rateratiotoAATSvm_aero' 'NIRonly.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
+    %
+    %     % 4STAR/AATS ratio normalized v. airmass
+    %     figure;
+    %     cols=find(isfinite(both.c(2,:))==1);
+    %     ph=plot(both.m_aero, both.raterelativeratiotoaats(:,cols), '.');
+    %     hold on;
+    %     plot(xlim, [1 1], '-k');
+    %     xlabel('Aerosol Airmass Factor');
+    %     ylabel(['4STAR/AATS, ' datestr(both.t(both.noonrow),13) '=1']);
+    %     ylim([0.96 1.04]);
+    %     ggla;
+    %     grid on;
+    %     lstr=setspectrumcolor(ph, both.w(both.c(2,cols)));
+    %     title(daystr);
+    %     lh=legend(ph,lstr);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero'  '.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
+    %     ylim([0.94 1.02])
+    %     set(ph([1 2 10:end]), 'visible','off','markersize',1);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero' 'VISonly.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
+    %     set(ph([1 2 10:end]), 'visible','on','markersize',6);
+    %     set(ph([1:10]), 'visible','off','markersize',1);
+    %     set(lh,'fontsize',12,'location','best');
+    %     if savefigure;
+    %         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero' 'NIRonly.fig, SEquickplots.m'])
+    %         pause(3);
+    %     end;
 end;
 
 %********************
@@ -754,13 +874,13 @@ end;
 % % % existingfigures=get(0,'children');
 % % % for dtli=1:numel(datatypelist);
 % % %     datatype=datatypelist{dtli};
-% % %     if any(ismember(v, datatype)); % check if any FOV was taken 
+% % %     if any(ismember(v, datatype)); % check if any FOV was taken
 % % %         load(fullfile(starpaths, [daystr 'star.mat']), datatype); % load the variable of the specific datatype
 % % %         eval(['v2=' datatype ';']);
 % % %         for i=1:numel(v2); % go through each set of FOV test
 % % %             if ~isempty(v2(i).t) && ~isempty(incl(nanmean(v2(i).t(1)),tlim)); % see if there is actually a data point
 % % %                 ins = FOV_scan(v2(i)); % run Connor's code
-% % %                 existingfigures2=get(0,'children'); 
+% % %                 existingfigures2=get(0,'children');
 % % %                 newfigures=setxor(existingfigures,existingfigures2); % identify new figures
 % % %                 for nn=1:numel(newfigures);
 % % %                     figure(newfigures(nn));
