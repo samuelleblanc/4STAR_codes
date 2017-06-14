@@ -3,13 +3,15 @@ function make_for_starflag(f_in)
 % contains a very limited set of aod values at some distinct wavelengths
 % created: Samuel LeBlanc, 2016-09-19, v1.0, Santa Cruz, CA
 % modified: SL, 2017-06-03, v1.1, MLO, Hawaii, added specific calls for 2STAR
+% modified: SL, 2017-06-13, v1.2, NASA Ames, added another wavelength at
+%           620 nm, and saving of notes nad wavelength indices
 
-version_set('v1.1')
+version_set('v1.2')
 
 % Simple program to load a starsun and save just a few values from it to a
 % smaller file used for starflag.
 s = load(f_in,'w','Alt','Lat','Lon','tau_aero_noscreening','m_aero','t','roll',...
-              'rawrelstd','Md','Str','raw','dark','c0','darkstd','QdVlr','QdVtot','ng','program_version','sd_aero_crit');
+              'rawrelstd','Md','Str','raw','dark','c0','darkstd','QdVlr','QdVtot','ng','program_version','sd_aero_crit','note');
 try;          
     fs = load(f_in,'flagsCWV','flagsO3','flagsNO2','flagsHCOH');
     gas_note = ' ** created with gas flags';
@@ -31,6 +33,7 @@ g.Alt = s.Alt; g.Lat=s.Lat; g.Lon=s.Lon; g.t = s.t;
 g.m_aero = s.m_aero; g.rawrelstd = s.rawrelstd; g.Md = s.Md; g.Str = s.Str;
 g.QdVlr = s.QdVlr; g.QdVtot = s.QdVtot; g.ng = s.ng; g.c0=s.c0;
 g.program_version = s.program_version; g.sd_aero_crit=s.sd_aero_crit;
+g.note = s.note;
 
 nm_380 = interp1(s.w,[1:length(s.w)],.38, 'nearest');
 nm_500 = interp1(s.w,[1:length(s.w)],.5, 'nearest');
@@ -40,6 +43,7 @@ nm_452 = interp1(s.w,[1:length(s.w)],.452, 'nearest');
 nm_865 = interp1(s.w,[1:length(s.w)],.865, 'nearest');
 nm_1040 = interp1(s.w,[1:length(s.w)],1.04, 'nearest');
 nm_1215 = interp1(s.w,[1:length(s.w)],1.215, 'nearest');
+g.i_wvsl = [nm_380;nm_452;nm_500;nm_620;nm_865;nm_1040;nm_1215];
 colsang=[nm_452 nm_865];
 g.ang_noscreening=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
 g.aod_380nm = s.tau_aero_noscreening(:,nm_380);
