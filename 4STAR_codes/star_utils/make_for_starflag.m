@@ -35,6 +35,7 @@ g.program_version = s.program_version; g.sd_aero_crit=s.sd_aero_crit;
 nm_380 = interp1(s.w,[1:length(s.w)],.38, 'nearest');
 nm_500 = interp1(s.w,[1:length(s.w)],.5, 'nearest');
 nm_870 = interp1(s.w,[1:length(s.w)],.87, 'nearest');
+nm_620 = interp1(s.w,[1:length(s.w)],.62, 'nearest');
 nm_452 = interp1(s.w,[1:length(s.w)],.452, 'nearest');
 nm_865 = interp1(s.w,[1:length(s.w)],.865, 'nearest');
 nm_1040 = interp1(s.w,[1:length(s.w)],1.04, 'nearest');
@@ -44,6 +45,7 @@ g.ang_noscreening=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
 g.aod_380nm = s.tau_aero_noscreening(:,nm_380);
 g.aod_452nm = s.tau_aero_noscreening(:,nm_452);
 g.aod_500nm = s.tau_aero_noscreening(:,nm_500);
+g.aod_620nm = s.tau_aero_noscreening(:,nm_620);
 g.aod_865nm = s.tau_aero_noscreening(:,nm_865);
 g.aod_1040nm = s.tau_aero_noscreening(:,nm_1040);
 try;
@@ -65,17 +67,17 @@ else;
 end;
 
 if not_nm_1215;
-    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040)];
-    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040)];
+    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_620),s.raw(:,nm_865),s.raw(:,nm_1040)];
+    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_620),s.dark(:,nm_865),s.dark(:,nm_1040)];
     g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
-        s.darkstd(:,nm_865),s.darkstd(:,nm_1040)];
-    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;
+        s.darkstd(:,nm_620),s.darkstd(:,nm_865),s.darkstd(:,nm_1040)];
+    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_620 = 4;g.nm_865 = 5;g.nm_1040 = 6;
 else;
-    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_865),s.raw(:,nm_1040),s.raw(:,nm_1215)];
-    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_865),s.dark(:,nm_1040),s.dark(:,nm_1215)];
+    g.raw = [s.raw(:,nm_380),s.raw(:,nm_452),s.raw(:,nm_500),s.raw(:,nm_620),s.raw(:,nm_865),s.raw(:,nm_1040),s.raw(:,nm_1215)];
+    g.dark = [s.dark(:,nm_380),s.dark(:,nm_452),s.dark(:,nm_500),s.dark(:,nm_620),s.dark(:,nm_865),s.dark(:,nm_1040),s.dark(:,nm_1215)];
     g.darkstd = [s.darkstd(:,nm_380),s.darkstd(:,nm_452),s.darkstd(:,nm_500),...
-        s.darkstd(:,nm_865),s.darkstd(:,nm_1040),s.darkstd(:,nm_1215)];
-    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_865 = 4;g.nm_1040 = 5;g.nm_1215 = 6;
+        s.darkstd(:,nm_620),s.darkstd(:,nm_865),s.darkstd(:,nm_1040),s.darkstd(:,nm_1215)];
+    g.nm_380 = 1;g.nm_452 = 2;g.nm_500 = 3;g.nm_620=4;g.nm_865 = 5;g.nm_1040 = 6;g.nm_1215 = 7;
 end;
 g.save_for_starflag = true;
 
