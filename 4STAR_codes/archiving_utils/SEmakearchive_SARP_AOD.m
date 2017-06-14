@@ -42,10 +42,11 @@
 %                       in starinfo files
 % 2017-06-11, MS, v2.2, added altitude fix and archive version comments
 %                       updated flag structure call
+% 2017-06-14, SL, v2.3, fixed bug in populating aod fields.
 % -------------------------------------------------------------------------
 
 function SEmakearchive_SARP_AOD
-version_set('v2.2')
+version_set('v2.3')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
@@ -69,7 +70,7 @@ avg_wvl = false;
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          1          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          1          1] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -353,7 +354,7 @@ for i=idx_file_proc
     [tutc_unique,itutc_unique] = unique(tutc);
     [idat,datdt] = knnsearch(tutc_unique,UTC');
     iidat = datdt<1.0/3600.0; % Distance no greater than 1.0 seconds.
-    for nn=iradstart:length(names)
+    for nn=iradstart:length(save_iwvls)+iradstart-1;
         ii = nn-iradstart+1;
         data.(names{nn}) = UTC*0.0+NaN;
         if avg_wvl;
