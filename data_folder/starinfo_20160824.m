@@ -15,7 +15,7 @@ end
 % flight=[datenum(2016,6,18,17,00,00) datenum(2016,6,18,22,34,43)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-%s.langley=[datenum(2016,8,23,10,52,00) datenum(2016,8,23,11,47,00)];
+s.langley=[datenum(2016,8,24,12,10,00) datenum(2016,8,24,13,20,00)];
 s.flight=[datenum(2016,8,24,11,51,25) datenum(2016,8,24,17,41,47)];
 s.dirty = [datenum(2016,8,25,09,30,00) datenum(2016,8,25,09,41,00)];
 s.clean = [datenum(2016,8,25,09,54,00) datenum(2016,8,25,09,54,45)];

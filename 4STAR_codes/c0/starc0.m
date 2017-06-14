@@ -60,18 +60,27 @@ switch instrumentname;
                     daystr = '20160927';
                     filesuffix = 'refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160927_ORACLES';
                     %filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
+                elseif t>=datenum([2016 9 11 0 0 0])&t<=datenum([2016 9 15 10 0 0]);
+                    filesuffix = 'refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist';
+                    daystr = '20160912';
+                    
                 elseif t>=datenum([2016 9 5 10 0 0]);
                     
                     daystr = '20160918';
                     filesuffix = 'refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160918_ORACLES';
                     
-                elseif t>=datenum([2016 8 26 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
+                elseif t>=datenum([2016 8 26 0 0 0])&t<=datenum([2016 8 29 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
                     %daystr='20161113';
                     %filesuffix='refined_Langley_MLO_Nov2016part1good_gnd';
-                    daystr = '20160904';
-                    filesuffix = 'refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160904_ORACLES';
+                    %daystr = '20160904';
+                    %filesuffix = 'refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160904_ORACLES';
                     %filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
-                elseif t>=datenum([2016 8 26 0 0 0]);
+                    daystr = '20160825';
+                    filesuffix = 'refined_Langley_ORACLES_transit2';
+                elseif t>=datenum([2016 8 24 0 0 0])&t<=datenum([2016 8 26 0 0 0]);
+                    daystr = '20160824';
+                    filesuffix = 'refined_Langley_averaged_inflight_Langley_ORACLES_transits';
+                elseif t>=datenum([2016 8 23 0 0 0]);
                     %if t>=datenum([2016 8 24 0 0 0]); % From November 2016 MLO, first half before spectrometer dropouts
                     %daystr='20161115';
                     daystr = '20160927';
@@ -79,10 +88,10 @@ switch instrumentname;
                     %filesuffix='refined_Langley_Nov2016part1.5incl1115_good_mean';
                     filesuffix = 'refined_Langley_airborne_ORACLES_averages_v1';
                     filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
-                elseif t>=datenum([2016 8 23 0 0 0]);
+                elseif t>=datenum([2016 8 22 0 0 0]);
                     daystr='20160825';
                     filesuffix='refined_Langley_ORACLES_transit2';
-                elseif t>=datenum([2016 8 23 0 0 0]);
+                elseif t>=datenum([2016 8 22 0 0 0]);
                     daystr='20160823';
                     filesuffix='refined_Langley_ORACLES_WFF_gnd';
                 elseif t>=datenum([2016 6 30 0 0 0]); %MLO June 2016
