@@ -65,7 +65,7 @@ prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % '
 rev='0'; % A; %0 % revision number; if a string, no uncertainty will be saved.
 platform = 'DC8';
 gas_subtract = true;
-avg_wvl = false;
+avg_wvl = true;
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
