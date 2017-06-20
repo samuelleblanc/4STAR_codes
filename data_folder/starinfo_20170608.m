@@ -11,27 +11,18 @@ else
     s.toggle = update_toggle;
 end
 
-s.flagfilename = '20160831_starflag_man_created20160904_1609by_SL.mat';
-s.flagfilenameCWV  = '20160831_starflag_CWV_man_created20161017_1339by_MS.mat';
-s.flagfilenameO3   = '20160831_starflag_O3_man_created20161017_1340by_MS.mat';
-s.flagfilenameNO2  = '20160831_starflag_NO2_man_created20161017_1349by_MS.mat';
-s.flagfilenameHCOH = '20160831_starflag_HCOH_man_created20161017_1351by_MS.mat';
  
-s.flight=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)]; 
-% spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
-% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-s.langley=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)];
-
-s.high_alt_c0 = [datenum(2016,8,31,8,24,35) datenum(2016,8,31,8,27,35)];
+s.flight=[datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,00,00)]; 
+s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
  
 % Ozone and other gases 
-s.O3h=21; % Yohei's guess 
-s.O3col=0.350; % Michal's guess     
-s.NO2col=2.0e15; % Michal's guess  
+s.O3h=21; %  
+s.O3col=0.278; % OMI overhead     
+s.NO2col=2.0e15; %   
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=680.25;  
+    s.Pst(find(s.Pst<10))=682; % this is for Ames 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
