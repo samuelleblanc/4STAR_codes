@@ -43,15 +43,16 @@
 % 2017-06-11, MS, v2.2, added altitude fix and archive version comments
 % 2017-06-19, SL, v2.3, new version with window desposition impact
 %                       subtracted to AOD
+% 2017-06-20, MS, v2.4, updated for final KORUS archive
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
-version_set('v2.3')
+version_set('v2.4')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
-    ICTdir = 'E:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
-    starinfo_path = 'E:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-    starsun_path = 'E:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+    ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\June-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+    starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'));
     ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R1\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
@@ -69,7 +70,7 @@ avg_wvl = true;
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          1          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          1          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -101,9 +102,9 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R1: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties and adjustments to AOD values linked to deposition on the front window has been included. \n';...
-    'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included. \n';...
-    'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.\n';...
+    'R1: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties and adjustments to AOD values linked to deposition on the front window has been included.';...
+    'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included.';...
+    'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
 specComments_extra_uncertainty = 'Uncertainty in this file has been adjusted to reflect estimated AOD impact of deposition on window. AOD values has not been corrected in this release. Future revisions will include corrected AODs.\n'; 
@@ -274,7 +275,7 @@ for i=idx_file_proc
         flag = load([pathname flagfilename]);
     end
     
-    %% Combine the flag values
+ %% Combine the flag values
     disp('Setting the flags')
     if isfield(flag,'manual_flags');
         qual_flag = ~flag.manual_flags.good;
@@ -284,13 +285,48 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.frost);
         qual_flag = bitor(qual_flag,flag.flags.low_cloud);
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
-    else
+    elseif isfield(flag,'flags');
+        qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
+        qual_flag = bitor(qual_flag,flag.flags.cirrus);
+        qual_flag = bitor(qual_flag,flag.flags.frost);
+        qual_flag = bitor(qual_flag,flag.flags.low_cloud);
+        qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
+    elseif isfield(flag,'before_or_after_flight');
         % only for automatic flagging
+        if length(flag.before_or_after_flight) <1;
+            flag.before_or_after_flight = t<s.flight(1) | t>s.flight(2);
+            try
+                flag.time.t = flag.t;
+            catch
+                flag.time.t = t;
+            end;
+        end
         qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
-        %qual_flag = bitor(qual_flag,flag.cirrus);
-        %qual_flag = bitor(qual_flag,flag.frost);
-        %qual_flag = bitor(qual_flag,flag.low_cloud);
-        %qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        try
+            qual_flag = bitor(qual_flag,flag.cirrus);
+            qual_flag = bitor(qual_flag,flag.frost);
+            qual_flag = bitor(qual_flag,flag.low_cloud);
+            qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        catch
+            disp('No flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
+        end
+    elseif isfield(flag,'screened')
+       flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
+       flag_names = {'unknown','before_or_after_flight','tracking_errors','unspecified_clouds','cirrus',...
+                     'inst_trouble' ,'inst_tests' ,'frost','low_cloud','hor_legs','vert_legs','bad_aod','smoke','dust','unspecified_aerosol'};
+        for tag = 1:length(flag_tags)
+            flag.(flag_names{tag}) = flag.screened==flag_tags(tag);
+        end  
+        qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
+        qual_flag = bitor(qual_flag,flag.cirrus);
+        qual_flag = bitor(qual_flag,flag.frost);
+        qual_flag = bitor(qual_flag,flag.low_cloud);
+        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        if length(flag.screened)==length(t);
+           flag.time.t = t; 
+        end
+    else
+        error('No flagfile that are useable')
     end
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     % tweak for different flag files
@@ -299,7 +335,11 @@ for i=idx_file_proc
     %elseif strcmp(daystr,'20160530') || strcmp(daystr,'20160602') || strcmp(daystr,'20160608') || strcmp(daystr,'20160609')
     %    flag.utc = UTC';
     else
-        flag.utc = t2utch(flag.time.t);
+        try;
+            flag.utc = t2utch(flag.time.t);
+        catch;
+            flag.utc = t2utch(flag.flags.time.t);
+        end;
     end
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
@@ -374,10 +414,10 @@ for i=idx_file_proc
                     if correct_aod;
                        it = find(diff(d.dCo(:,5))<-0.0001);
                        dAODs = d.dAODs.*0.0;
-                       for itt=it;
-                           [nul,itm] = min(abs(d.time-(d.time(itt)-600.0/86400)));
-                           [nul,itp] = min(abs(d.time-(d.time(itt)+600.0/86400)));
-                           dAODs(itm:itp,:) = repmat(d.dAODs(itt+1,:)-d.dAODs(itt,:),itp-itm+1,1);
+                       for itt=1:length(it);
+                           [nul,itm] = min(abs(d.time-(d.time(it(itt))-600.0/86400)));
+                           [nul,itp] = min(abs(d.time-(d.time(it(itt))+600.0/86400)));
+                           dAODs(itm:itp,:) = repmat(d.dAODs(it(itt)+1,:)-d.dAODs(it(itt),:),itp-itm+1,1);
                        end;
                        try;
                             data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,dAODs(itutc_unique,ii),UTC,'nearest');

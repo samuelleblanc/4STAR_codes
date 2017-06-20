@@ -108,12 +108,12 @@ switch instrumentname;
                     %daystr='20160109';
                     %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113_wFORJcorr'; % MLO-Jan-2016 mean
                     %filesuffix='refined_Langley_at_MLO_screened_2.0std_averagethru20160113'; % MLO-Jan-2016 mean
-                    %daystr='20160426';
+                    daystr='20160426';
                     %korus-aq transit section 1
-                    %filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
+                    filesuffix='refined_Langley_korusaq_transit1_v1'; % korus-aq transit 1
                     
-                    daystr='20160707';
-                    filesuffix='Langley_MLO_June2016_mean';
+                    %daystr='20160707';
+                    %filesuffix='Langley_MLO_June2016_mean';
                     
                 elseif now>=datenum([2016 1 19 0 0 0]);
                     %daystr='20160109';
