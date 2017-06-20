@@ -30,12 +30,13 @@ close all
 clear all
 
 version_set('1.0');
-fp = 'C:\Users\sleblan2\Research\ORACLES\data\v4\';
+fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
 
 %% set day info
 daystr = '20160912';
 daystr = '20160927';
 daystr = '20160918';
+daystr = '20160831';
 
 wl = [340.,   380.,   440.,   500.,   675.,   870.,  1020.,  1640.];
 aod = [0.01341534,  0.01563484,  0.01673158,  0.01320213,  0.00794751,...

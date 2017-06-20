@@ -21,6 +21,7 @@ function Quickapply_newc0
 %  - starsun_for_starflag.mat file compiled from raw data using allstarmat and then
 %  processed with starsun
 %  - new c0 file
+%  - optionally the full starsun.mat file for loading spectral data
 %
 % EXAMPLE:
 %  none
@@ -37,20 +38,24 @@ version_set('1.0');
 fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
 
 days = ['824';'825';'827';'830';'831';'902';'904';'906';'908';'910';...
-        '912';'914';'918';'920';'924';'925';'927';'929';'930'];
-    
-days = ['827';'830';'831'];
+    '912';'914';'918';'920';'924';'925';'927';'929';'930'];
 
-    %c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
+days = ['831';'902';'904';'906';'908';'910'];
+
+%c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
 %c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist.dat';
-c0f = '20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';
+%c0f = '20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';
 %c0f = '20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd.dat';
 %c0f = '20160824_VIS_C0_refined_Langley_averaged_inflight_Langley_ORACLES_transits.dat';
+c0f = '20160831_VIS_C0_refined_Langley_averaged_inflight_Langley_high_alt_ORACLES.dat';
+c0f = '20160831_VIS_C0_refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES.dat';
+c0f = '20160824_VIS_C0_refined_Langley_averaged_inflight_Langley_high_alts_highRH_ORACLES.dat';
 newc0_visfile = [starpaths c0f];
 
+load_sp = true;
 
-for i=1:length(days);
-    file = ['4STAR_20160' days(i,:) 'starsun_for_starflag.mat'];
+for jd=1:length(days);
+    file = ['4STAR_20160' days(jd,:) 'starsun_for_starflag.mat'];
     
     load([fp file]);
     
@@ -137,7 +142,7 @@ for i=1:length(days);
     hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{1} ' nm']);
     plot(t(i),t(i).*0,'-k');datetick;
     set(gca,'Position',[0.07 1-(1/7-0.01) .92 1/7-0.03]);
-    set(gca,'XTickLabel','');    
+    set(gca,'XTickLabel','');
     
     ax2 = subplot(7,1,2);
     plot(ax2,t(i),aod_452nm(i),'.','color',cm(2,:).*0.5);
@@ -195,13 +200,60 @@ for i=1:length(days);
     plot(ax5,t(i),calc_new_aod(aod_865nm(i),m_aero(i),oc0(5),nc0(5)),'.','color',cm(5,:));
     plot(ax6,t(i),calc_new_aod(aod_1040nm(i),m_aero(i),oc0(6),nc0(6)),'.','color',cm(6,:));
     v = plot(ax7,t(i),calc_new_aod(aod_1215nm(i),m_aero(i),oc0(7),nc0(7)),'.','color',cm(7,:));
-  
+    
     try;
-       legend([u,v],'Original','Modified c0');
+        legend([u,v],'Original','Modified c0');
     catch;
-       disp(['No points for day:' days(i,:)])
+        disp(['No points for day:' days(i,:)])
     end;
     %set(gcf,'pos',[10 10 600 1500])
+    
+    if load_sp;
+        try;
+            files = ['4STAR_20160' days(jd,:) 'starsun.mat'];            
+            s = load([fp files],'t','tau_aero_noscreening','c0','w','Alt','m_aero');
+        catch;
+            disp(['No spectra able to plot: ' days(jd,:)])
+            continue;
+        end;
+        
+        figs = figure;
+        sp_num = 6;
+        ii = [1:length(s.t)];
+        ii = ii(s.Alt>5000.0);
+        if ~any(ii);
+            ntot = length(s.t);
+            ii = [1:ntot];
+        else;
+            ntot = length(s.t(ii));
+        end;
+        inum = floor(linspace(20,ntot,sp_num));
+        cm=hsv(sp_num);
+        set(gca, 'ColorOrder', cm*0.5, 'NextPlot', 'replacechildren');
+        plot(s.w.*1000.0,s.tau_aero_noscreening(ii(inum),:),'-');
+        hold on;
+        %set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+        for j=1:sp_num;
+            plot(s.w.*1000.0,calc_new_aod(s.tau_aero_noscreening(ii(inum(j)),:),s.m_aero(ii(inum(j))),s.c0,newc0),'-','color',cm(j,:));
+        end;
+        xlim([300,1700]); ylim([0.001,0.2]);
+        set(gca,'xscale','log','yscale','log');
+        set(gca,'XTick',[300 400 500 600 700 800 900 1000, 1100 1400 1600]);
+        hold on;labels = {datestr(s.t(ii(inum(1))),'HH:MM:SS')};
+        for i=2:sp_num;
+            %   plot(s.w.*1000.0,s.tau_aero_noscreening(ii(inum(i)),:),'-');
+            labels = [labels;{datestr(s.t(ii(inum(i))),'HH:MM:SS')}];
+        end;
+        xlabel('Wavelength [nm]');
+        ylabel('AOD');
+        title([days(jd,:) ' - High alt AOD spectra' ],'fontweight','bold');
+        grid on;
+        colormap(cm);
+        lcolorbar(labels','TitleString','UTC time','fontweight','bold');
+        hold off;
+        
+    end;
+    
 end; % loop over days
 return
 

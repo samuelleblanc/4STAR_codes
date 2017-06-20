@@ -136,6 +136,32 @@ linkaxes([ax1,ax2,ax3],'x');
 xlabel('Wavelength [nm]'); 
 save_fig(fig3,[fp_out 'MLO_May2017_2STAR_cal_c0_avg']);
 
+%% Now redo a plot for just the good c0 subset, divided by the average
+figz = figure;
+plot([1],[1]); hold on;
+for i=1:n;
+    if any(i_avg==i);
+    visfilename = [fp vis_names{i}]
+    
+    a=importdata(which(visfilename));
+    visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+    visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
+    c0v{i} = visc0; c0rv{i} = visc0err;
+    
+    w_vis = a.data(:,strcmp(lower(a.colheaders),'wavelength'));
+    
+    leg{i} = [supp{i} '-' vis_names{i}(1:8)];
+    l2 = plot(w_vis,visc0(i,:)./visc0_avg.*100.0,'color',cm(i,:),'linewidth',3);
+    
+    p2(i) = l2;
+    end;
+end;
+ylabel('Relative to avg of c0 [%]');ylim([97,103]); grid on;
+xlabel('Wavelength [nm]')
+save_fig(figz,[fp_out 'MLO_May2017_2STAR_cal_c0_avg_good']);
+
+
+%% Print out the new c0 average file
 %stophere
 % Now save the new averaged c0 for use
 days_cell = '';
