@@ -112,7 +112,7 @@ tit = [instrumentname ' - ' daystr];
 %********************
 % prepare for plotting
 %********************
-
+t = s.t;
 %% get the track info
 track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
 track.P=[st.track.P1 st.track.P2 st.track.P3 st.track.P4];
@@ -136,9 +136,11 @@ c=[visc(1:10) nirc(11:13)+1044];
 colslist={'' c 1:13
     'VISonly' visc(3:9) 3:9
     'NIRonly' nirc(11:13)+1044 11:13};
+iwvl = c; iwvlv = visc(1:10); iwvln = nirc(11:13);
+wvl = s.w(iwvl); wvlv = s.w(iwvlv); wvln = s.w(iwvln); 
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
-if exist('gas','s')
+if isfield(s,'gas')
     cwv2plot  =s.cwv.cwv940m1;
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
@@ -239,12 +241,13 @@ pptcontents0=[pptcontents0; {fig_names{1} 4}];
 
 % plot temperatures and pressures
 figure(2);
-ax = plotyy(s.t,s.Tprecon_C,s.t,s.RHprecon_percent);
+[ax,h1,h2] = plotyy(s.t,nfsmooth(s.Tprecon_C,60),s.t,nfsmooth(s.RHprecon_percent,60));
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
-grid on;
+grid on; hold on;
 plot(ax(1),s.t,s.Tbox_C,'.r');
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]); xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 ylabel(ax(2),'RH [%]');
 ylabel(ax(1),'Temperature [^\circC]');
 legend(starfieldname2label('Tprecon'),starfieldname2label('Tbox'),starfieldname2label('RHprecon'));
@@ -257,14 +260,15 @@ pptcontents0=[pptcontents0; {[fname '.png'] 4}];
 % plot the can temperatures and pressures (smoothed)
 % T&P from track
 for ii={'T' 'P'};
-    ysm=s.track.([ii{:} 'sm']);
+    ysm=track.([ii{:} 'sm']);
     figtp = figure;
-    plot(s.track.t, ysm, '.');
+    plot(st.track.t, ysm, '.');
     dynamicDateTicks;
-    lh=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']));
+    lh=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']),'Location','Best');
     grid on;
     ylabel([ii{:} ', smoothed over ' num2str(bl*86400) ' s']);
-    if strcmp(tt{:},'T'); title([tit ' - Temperature (head)']), else title([tit ' - Pressures (head)']), end;
+    if strcmp(ii{:},'T'); title([tit ' - Temperature (head)']), else title([tit ' - Pressures (head)']), end;
+    
     fname = fullfile(p1,[instrumentname daystr '_track_' ii{:}]);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figtp,fname,0);
@@ -423,7 +427,7 @@ set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.')
 hold on;
 plot(s.t(s.Md==0),s.raw(s.Md==0,iw),'dc','markersize',4);
 plot(s.t(s.Str==0),s.raw(s.Str==0,iw),'xm','markersize',4);
-plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'osr');
+plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'or');
 plot(s.t(s.sat_time==1),s.raw(s.sat_time==1,iw),'sy','markersize',4);
 hold off;
 xlabel('UTC time');
@@ -452,6 +456,7 @@ pptcontents0=[pptcontents0; {' ' 4}];
 %********************
 % plot the raw vis
 frv = figure;
+nw = length(iwvlv);
 cm=hsv(nw);
 set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
 plot(s.t,s.raw(:,iwvlv),'.');
@@ -470,22 +475,22 @@ save_fig(frv,fname,0);
 pptcontents0=[pptcontents0; {[fname '.png'] 4}];
 
 % plot the raw nir
-figure(7);
+figure(7); nw = length(iwvln)
 cm=hsv(nw);
 set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
-plot(s.t,s.raw(:,iwvl),'.');
+plot(s.t,s.raw(:,iwvln),'.');
 dynamicDateTicks;
 xlabel('UTC time');
 ylabel('Raw [counts]');
 xlim([s.t(1)-0.01 s.t(end)+0.01]);
 title([instrumentname ' - ' daystr ' - Raw counts' ]);
 grid on;
-labels = strread(num2str(wvl,'%5.0f'),'%s');
+labels = strread(num2str(wvln,'%5.0f'),'%s');
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_raw']);
 fig_names{7} = [fname '.png'];
-save_fig(7,fname,0);
+save_fig(7,fname,0); 
 pptcontents0=[pptcontents0; {fig_names{7} 4}];
 
 % plot the raw carpet vis
