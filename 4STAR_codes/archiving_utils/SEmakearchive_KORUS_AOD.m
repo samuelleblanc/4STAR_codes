@@ -41,17 +41,19 @@
 %                       flights. based on Connor's merge marks files, identified
 %                       in starinfo files
 % 2017-06-11, MS, v2.2, added altitude fix and archive version comments
+% 2017-06-19, SL, v2.3, new version with window desposition impact
+%                       subtracted to AOD
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
-version_set('v2.2')
+version_set('v2.3')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     ICTdir = 'E:\MichalsData\KORUS-AQ\aod_ict\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'E:\MichalsData\KORUS-AQ\starinfo\Jan-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
     starsun_path = 'E:\MichalsData\KORUS-AQ\starsun\Jan-15-archive-starsun\aod_only\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'));
-    ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R1\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
     starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 else
@@ -62,11 +64,12 @@ end
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='1'; % A; %0 % revision number; if a string, no uncertainty will be saved.
 platform = 'DC8';
+avg_wvl = true;
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          1          0] ; %set=1 to process
+jproc=[         0          0          0          1          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -113,23 +116,25 @@ info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
 info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
 info.amass_aer = 'unitless, aerosol optical airmass';
 
-info.AOD0380 = 'unitless, Aerosol optical depth at 380.0 nm';
-info.AOD0452 = 'unitless, Aerosol optical depth at 451.7 nm';
-info.AOD0501 = 'unitless, Aerosol optical depth at 500.7 nm';
-info.AOD0520 = 'unitless, Aerosol optical depth at 520.0 nm';
-info.AOD0532 = 'unitless, Aerosol optical depth at 532.0 nm';
-info.AOD0550 = 'unitless, Aerosol optical depth at 550.3 nm';
-info.AOD0606 = 'unitless, Aerosol optical depth at 605.5 nm';
-info.AOD0620 = 'unitless, Aerosol optical depth at 619.7 nm';
-info.AOD0675 = 'unitless, Aerosol optical depth at 675.2 nm';
-info.AOD0781 = 'unitless, Aerosol optical depth at 780.6 nm';
-info.AOD0865 = 'unitless, Aerosol optical depth at 864.6 nm';
-info.AOD1020 = 'unitless, Aerosol optical depth at 1019.9 nm';
-info.AOD1040 = 'unitless, Aerosol optical depth at 1039.6 nm';
-info.AOD1064 = 'unitless, Aerosol optical depth at 1064.2 nm';
-info.AOD1236 = 'unitless, Aerosol optical depth at 1235.8 nm';
-info.AOD1559 = 'unitless, Aerosol optical depth at 1558.7 nm';
-info.AOD1627 = 'unitless, Aerosol optical depth at 1626.6 nm';
+if avg_wvl; avg_wvl_note = 'averaged over neighboring wavelengths centered at '; else avg_wvl_note = ''; end;
+
+info.AOD0380 = ['unitless, Aerosol optical depth at ' avg_wvl_note '380.0 nm'];
+info.AOD0452 = ['unitless, Aerosol optical depth at ' avg_wvl_note '451.7 nm'];
+info.AOD0501 = ['unitless, Aerosol optical depth at ' avg_wvl_note '500.7 nm'];
+info.AOD0520 = ['unitless, Aerosol optical depth at ' avg_wvl_note '520.0 nm'];
+info.AOD0532 = ['unitless, Aerosol optical depth at ' avg_wvl_note '532.0 nm'];
+info.AOD0550 = ['unitless, Aerosol optical depth at ' avg_wvl_note '550.3 nm'];
+info.AOD0606 = ['unitless, Aerosol optical depth at ' avg_wvl_note '605.5 nm'];
+info.AOD0620 = ['unitless, Aerosol optical depth at ' avg_wvl_note '619.7 nm'];
+info.AOD0675 = ['unitless, Aerosol optical depth at ' avg_wvl_note '675.2 nm'];
+info.AOD0781 = ['unitless, Aerosol optical depth at ' avg_wvl_note '780.6 nm'];
+info.AOD0865 = ['unitless, Aerosol optical depth at ' avg_wvl_note '864.6 nm'];
+info.AOD1020 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1019.9 nm'];
+info.AOD1040 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1039.6 nm'];
+info.AOD1064 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1064.2 nm'];
+info.AOD1236 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1235.8 nm'];
+info.AOD1559 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1558.7 nm'];
+info.AOD1627 = ['unitless, Aerosol optical depth at ' avg_wvl_note '1626.6 nm'];
 
 info.UNCAOD0380 = 'unitless, Uncertainty in aerosol optical depth at 380.0 nm';
 info.UNCAOD0452 = 'unitless, Uncertainty in aerosol optical depth at 451.7 nm';
@@ -209,13 +214,23 @@ for i=idx_file_proc
         error(['Problem loading the uncertainties in file:' starfile])
     end;
     
+    try;
+        load(starfile,'tau_aero_subtract_all');
+        tau = tau_aero_subtract_all;
+    catch;
+        disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+        tau = tau_aero_noscreening;
+    end;
+    
+    
     %% Update the uncertainties with merge marks file saved in the starinfo
     add_uncert = false;
+    correct_aod = false;
     if isfield(s,'AODuncert_mergemark_file');
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true;
+        add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
@@ -329,6 +344,16 @@ for i=idx_file_proc
         else;
             data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
         end;
+        if correct_aod;
+            d.dAODs(isnan(d.dAODs)) = 0.0;
+            try;
+                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+            catch;
+                [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+            end;
+        end;
     end;
     
     % do the same but for uncertainty
@@ -346,12 +371,29 @@ for i=idx_file_proc
              
                 data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
                 if add_uncert;  % if the add uncertainty exists then run that also.
-                    try;
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
-                    catch;
-                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                    if correct_aod;
+                       it = find(diff(d.dCo(:,5))<-0.0001);
+                       dAODs = d.dAODs.*0.0;
+                       for itt=it;
+                           [nul,itm] = min(abs(d.time-(d.time(itt)-600.0/86400)));
+                           [nul,itp] = min(abs(d.time-(d.time(itt)+600.0/86400)));
+                           dAODs(itm:itp,:) = repmat(d.dAODs(itt+1,:)-d.dAODs(itt,:),itp-itm+1,1);
+                       end;
+                       try;
+                            data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,dAODs(itutc_unique,ii),UTC,'nearest');
+                        catch;
+                            [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                            data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                            disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                        end;
+                    else;
+                        try;
+                            data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+                        catch;
+                            [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                            data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                            disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                        end;
                     end;
                 end;
         
