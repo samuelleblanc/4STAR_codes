@@ -43,7 +43,8 @@
 % 2017-06-11, MS, v2.2, added altitude fix and archive version comments
 % 2017-06-19, SL, v2.3, new version with window desposition impact
 %                       subtracted to AOD
-% 2017-06-20, MS, v2.4, updated for final KORUS archive
+% 2017-06-20, MS, v2.4, updated for final KORUS archive, fixed bug in unc
+%                       implementation
 % -------------------------------------------------------------------------
 
 function SEmakearchive_KORUS_AOD
@@ -70,7 +71,7 @@ avg_wvl = true;
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          1          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          1          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -231,7 +232,7 @@ for i=idx_file_proc
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true; correct_aod = true;
+        add_uncert = true; correct_aod = false;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);

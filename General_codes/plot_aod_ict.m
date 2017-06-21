@@ -1,7 +1,7 @@
 % plot aod_ict
 %--------------
 
-ict = ictread('D:\MichalsData\KORUS-AQ\aod_ict\korusaq-4STAR-AOD_DC8_20160609_R1.ict');
+ict = ictread('D:\MichalsData\KORUS-AQ\aod_ict\korusaq-4STAR-AOD_DC8_20160601_R1.ict');
 
 % AOD 500 nm - all
 % AOD 500 nm - good (qual_flag==0)
