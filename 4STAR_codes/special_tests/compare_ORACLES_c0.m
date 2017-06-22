@@ -16,12 +16,14 @@ i_avg = [3 5 9 10 11]; % for testing of inflights and high altitude only for fli
 %filesuffix=['refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_' gdaystr '_ORACLES'];
 i_avg = [1 17 18]; % for 'refined_Langley_averaged_inflight_Langley_high_alt_ORACLES' on 20160831
 i_avg = [1 7 8 18]; % for 'refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES'
-i_avg = [9 20 21]; % for 'refined_Langley_averaged_inflight_Langley_high_alts_highRH_ORACLES'
+i_avg = [9 20 21]; % for 20160904 'refined_Langley_averaged_inflight_high_alts_highRH_ORACLES' 
+i_avg = [3 9 10 20 21]; % for 20160908 'refined_Langley_averaged_inflight_high_alts_with_Langley_highRH_ORACLES'
 filesuffix = ['refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransit'];
 filesuffix = ['refined_Langley_averaged_inflight_Langley_ORACLES_transits'];
 filesuffix = ['refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES'];
 filesuffix = ['refined_Langley_averaged_inflight_high_alts_highRH_ORACLES'];
-label_daystr = '20160904';
+filesuffix = ['refined_Langley_averaged_inflight_high_alts_with_Langley_highRH_ORACLES'];
+label_daystr = '20160908';
 
 vis_names = {'20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';...
             % '20161110_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
