@@ -178,7 +178,7 @@ for i=idx_file_proc
     %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
     infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    s.dummy = '';
+    s='';s.dummy = '';
     try
         s = infofnt(s);
     catch
