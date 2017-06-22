@@ -37,10 +37,14 @@ daystr = '20160912';
 daystr = '20160927';
 daystr = '20160918';
 daystr = '20160831';
+daystr = '20160908'
 
 wl = [340.,   380.,   440.,   500.,   675.,   870.,  1020.,  1640.];
 aod = [0.01341534,  0.01563484,  0.01673158,  0.01320213,  0.00794751,...
-       0.00896252,  0.00709206,  0.00568186];
+       0.00896252,  0.00709206,  0.00568186]; % MLO high alt values in september
+   
+wl =  [1640.   ,1020.   ,870.    ,675.    ,500.    ,440.    ,380.    ,340.    ,300.];
+aod = [0.004104,0.011504,0.009940,0.010834,0.016625,0.020482,0.036209,0.038874,0.040].*0.85; %Bonanza value at lowest AOD in August 5th, 2016 (altitude at 1382 m near Namibia)
 
 if isequal(daystr, '20160918');
     aod(1:6)= aod(1:6)+0.03; % to account for some window deposition
@@ -101,7 +105,7 @@ visc0_std = c0_std(1:1044);
 nirc0_std = c0_std(1045:end);
 
 %% Prepare for saving c0 file
-filesuffix='refined_high_alt_low_m';
+filesuffix='refined_high_alt_low_m_fromBonanza';
 additionalnotes={'Using the MLO from September 2016 high altitude AOD for stratospheric AOD component, calculating the c0 from the AOD at low airmass. '};
 w_vis = w(1:1044);
 w_nir = w(1045:end);

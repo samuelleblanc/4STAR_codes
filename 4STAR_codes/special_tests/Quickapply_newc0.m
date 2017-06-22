@@ -40,7 +40,7 @@ fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
 days = ['824';'825';'827';'830';'831';'902';'904';'906';'908';'910';...
     '912';'914';'918';'920';'924';'925';'927';'929';'930'];
 
-days = ['831';'902';'904';'906';'908';'910'];
+days = ['902';'904';'906';'908'];
 
 %c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
 %c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist.dat';
@@ -49,7 +49,7 @@ days = ['831';'902';'904';'906';'908';'910'];
 %c0f = '20160824_VIS_C0_refined_Langley_averaged_inflight_Langley_ORACLES_transits.dat';
 c0f = '20160831_VIS_C0_refined_Langley_averaged_inflight_Langley_high_alt_ORACLES.dat';
 c0f = '20160831_VIS_C0_refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES.dat';
-c0f = '20160824_VIS_C0_refined_Langley_averaged_inflight_Langley_high_alts_highRH_ORACLES.dat';
+c0f = '20160904_VIS_C0_refined_Langley_averaged_inflight_high_alts_highRH_ORACLES.dat';
 newc0_visfile = [starpaths c0f];
 
 load_sp = true;
