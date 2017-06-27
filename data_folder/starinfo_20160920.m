@@ -13,7 +13,8 @@ end
 
 s.flight =[datenum(2016,9,20,6,58,17) datenum(2016,9,20,14,59,08)];  
 %s.ground =[datenum('02:37:27') datenum('06:07:07')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]);
-    
+s.langley=[datenum(2016,9,20,7,26,20) datenum(2016,9,20,8,14,00)];    
+s.high_alt_c0 = [datenum(2016,9,20,8,10,0) datenum(2016,9,20,8,14,00)];
  
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 

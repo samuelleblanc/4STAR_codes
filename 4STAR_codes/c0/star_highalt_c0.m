@@ -26,18 +26,22 @@
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Santa Cruz, CA, 2017-05-22
 % -------------------------------------------------------------------------
-close all
+%close all
 clear all
 
 version_set('1.0');
-fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
-
+if ~isunix;
+    fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
+else;
+    fp = '/nobackup/sleblan2/ORACLES/data/v6/';
+end;
 %% set day info
 daystr = '20160912';
 daystr = '20160927';
 daystr = '20160918';
 daystr = '20160831';
-daystr = '20160908'
+daystr = '20160918'
+
 
 wl = [340.,   380.,   440.,   500.,   675.,   870.,  1020.,  1640.];
 aod = [0.01341534,  0.01563484,  0.01673158,  0.01320213,  0.00794751,...
@@ -91,6 +95,8 @@ ok=incl(t,high_alt_c0);
 
 %% interpolate the aods
 aods = interp1(wl,aod,w.*1000.0,'pchip');
+aodp = exp(polyval(polyfit(log(wl),log(aod),2),log(w.*1000.0)));
+%aods = aodp;
 
 %% get the average rateaero 'c'
 rate = nanmean(rateaero(ok,:));
@@ -105,7 +111,7 @@ visc0_std = c0_std(1:1044);
 nirc0_std = c0_std(1045:end);
 
 %% Prepare for saving c0 file
-filesuffix='refined_high_alt_low_m_fromBonanza';
+filesuffix='refined_high_alt_low_m_fromBonanza'; %_loglogquad';
 additionalnotes={'Using the MLO from September 2016 high altitude AOD for stratospheric AOD component, calculating the c0 from the AOD at low airmass. '};
 w_vis = w(1:1044);
 w_nir = w(1045:end);

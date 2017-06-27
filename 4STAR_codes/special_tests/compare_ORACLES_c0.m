@@ -1,9 +1,13 @@
 % Checking some c0, and calculating the averages
-close all
+%close all
 clear all
-fp = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+if ~isunix;
 fp_out = 'C:\Users\sleblan2\Research\ORACLES\plot\';
-
+else;
+fp_out = '/nobackup/sleblan2/ORACLES/plot/';
+end;
+asktosave = 2; %set if ask to save the figures
 %i_avg = [1 6 6 9 10 13 14 16];
 %i_avg = [1 6 10 16]; % for flights after sept 20, 2016
 %i_avg = [1 6 7 8 9 13 14 15]; % for flights after sept. 4th up to and including sept 20.
@@ -18,12 +22,17 @@ i_avg = [1 17 18]; % for 'refined_Langley_averaged_inflight_Langley_high_alt_ORA
 i_avg = [1 7 8 18]; % for 'refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES'
 i_avg = [9 20 21]; % for 20160904 'refined_Langley_averaged_inflight_high_alts_highRH_ORACLES' 
 i_avg = [3 9 10 20 21]; % for 20160908 'refined_Langley_averaged_inflight_high_alts_with_Langley_highRH_ORACLES'
+i_avg = [24 25 26]; % for 20160920 refined_averaged_inflight_Langley_high_alts_ORACLES
+i_avg = [2 6 12 17 23]; % for 20160924 refined_averaged_inflight_Langley_high_alts_transitback_ORACLES
 filesuffix = ['refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransit'];
 filesuffix = ['refined_Langley_averaged_inflight_Langley_ORACLES_transits'];
 filesuffix = ['refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES'];
 filesuffix = ['refined_Langley_averaged_inflight_high_alts_highRH_ORACLES'];
 filesuffix = ['refined_Langley_averaged_inflight_high_alts_with_Langley_highRH_ORACLES'];
-label_daystr = '20160908';
+filesuffix = ['refined_averaged_inflight_Langley_high_alts_loglog_lowRH_ORACLES'];
+filesuffix = ['refined_averaged_inflight_Langley_high_alts_ORACLES'];
+filesuffix = ['refined_averaged_inflight_Langley_high_alts_transitback_ORACLES'];
+label_daystr = '20160924';
 
 vis_names = {'20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';...
             % '20161110_VIS_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
@@ -49,7 +58,12 @@ vis_names = {'20160825_VIS_C0_refined_Langley_ORACLES_transit2.dat';...
             '20160831_VIS_C0_refined_high_alt_low_m.dat';...
             '20160902_VIS_C0_refined_high_alt_low_m_fromBonanza.dat';...
             '20160904_VIS_C0_refined_high_alt_low_m_fromBonanza.dat';...
-            '20160908_VIS_C0_refined_high_alt_low_m_fromBonanza.dat'};
+            '20160908_VIS_C0_refined_high_alt_low_m_fromBonanza.dat';...
+            '20160918_VIS_C0_refined_high_alt_low_m_fromBonanza_loglogquad.dat';...
+            '20160927_VIS_C0_refined_high_alt_low_m_fromBonanza_loglogquad.dat';...
+            '20160920_VIS_C0_refined_langley_4STAR.dat';...
+            '20160920_VIS_C0_refined_high_alt_low_m_fromBonanza.dat';...
+            '20160918_VIS_C0_refined_high_alt_low_m_fromBonanza.dat'};
         
 nir_names = {'20160825_NIR_C0_refined_Langley_ORACLES_transit2.dat';...
             % '20161110_NIR_C0_refined_Langley_MLO_Nov2016_12to2airmass.dat';...
@@ -75,14 +89,20 @@ nir_names = {'20160825_NIR_C0_refined_Langley_ORACLES_transit2.dat';...
             '20160831_NIR_C0_refined_high_alt_low_m.dat';...
             '20160902_NIR_C0_refined_high_alt_low_m_fromBonanza.dat';...
             '20160904_NIR_C0_refined_high_alt_low_m_fromBonanza.dat';...
-            '20160908_NIR_C0_refined_high_alt_low_m_fromBonanza.dat'};
+            '20160908_NIR_C0_refined_high_alt_low_m_fromBonanza.dat';...
+            '20160918_NIR_C0_refined_high_alt_low_m_fromBonanza_loglogquad.dat';...
+            '20160927_NIR_C0_refined_high_alt_low_m_fromBonanza_loglogquad.dat';...
+            '20160920_NIR_C0_refined_langley_4STAR.dat';...
+            '20160920_NIR_C0_refined_high_alt_low_m_fromBonanza.dat';...
+            '20160918_NIR_C0_refined_high_alt_low_m_fromBonanza.dat'};
          
 supp = {'inflight';...%'MLO';'MLO';'MLO';'MLO';
     'MLO avg';'inflight';...
         'inflight';'inflight';'inflight';'high alt';'high alt';...
         'high alt';'high alt';'high alt';'high alt';'Averages for all';...
         'ORACLES late';'ORACLES mid';'ORACLES early';'inflight';'high alt';...
-        'high alt BON';'high alt BON';'high alt BON'};
+        'high alt BON';'high alt BON';'high alt BON';'high alt loglog BON';'high alt loglog BON';...
+        'inflight';'high alt BON';'high alt BON'};
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
 
@@ -100,8 +120,13 @@ cm = jet(n);
 for i=1:n;
     visfilename = [fp vis_names{i}];
     nirfilename = [fp nir_names{i}];
-    
-    a=importdata(which(visfilename));
+
+    try; 
+        a=importdata(which(visfilename));
+    catch;
+        disp(['*** Error unable to load file:' visfilename ' found at :' which(visfilename)])
+        continue;
+    end;
     visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
     visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
     c0v{i} = visc0; c0rv{i} = visc0err;
@@ -184,12 +209,12 @@ leg{i+1} = ['Averages with ' gdaystr];
 legend(p,leg,'location','northeastoutside');
 
 % Save the figures
-save_fig(fig,[fp_out 'ORACLES_cal_c0_' gdaystr]);
-save_fig(fig2,[fp_out 'ORACLES_cal_c0_relative_' gdaystr]);
+save_fig(fig,[fp_out 'ORACLES_cal_c0_' gdaystr],asktosave);
+save_fig(fig2,[fp_out 'ORACLES_cal_c0_relative_' gdaystr],asktosave);
 
 figure(fig2);
 ylim([96 104]);
-save_fig(fig2,[fp_out 'ORACLES2016_cal_c0_relative_zoom']);
+save_fig(fig2,[fp_out 'ORACLES2016_cal_c0_relative_zoom'],asktosave);
 
 fig3 = figure;
 ax1 = subplot(3,1,1);
@@ -210,7 +235,7 @@ ylabel('Relative std of c0 [%]');ylim([0,1]); grid;
 
 linkaxes([ax1,ax2,ax3],'x');
 xlabel('Wavelength [nm]'); 
-save_fig(fig3,[fp_out 'Oracles2016_cal_c0_avg_' gdaystr]);
+save_fig(fig3,[fp_out 'Oracles2016_cal_c0_avg_' gdaystr],asktosave);
 
 % Now save the new averaged c0 for use
 days_cell = '';
@@ -234,6 +259,7 @@ nirsource = '(SEE Original files for sources)';
 starsavec0(visfilename, vissource, [additionalnotes; vissource_alt], w_vis, visc0_avg, visc0_std);
 starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc0_avg, nirc0_std);
 
+disp(['Printing c0 file to :' visfilename])
 
 
 

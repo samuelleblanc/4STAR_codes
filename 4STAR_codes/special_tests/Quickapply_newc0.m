@@ -35,13 +35,16 @@ function Quickapply_newc0
 version_set('1.0');
 
 %% define paths and load starsun_for_starflag
+if isunix;
+fp = '/nobackup/sleblan2/ORACLES/data/v6/';
+else;
 fp = 'C:\Users\sleblan2\Research\ORACLES\data\v6\';
-
+end;
 days = ['824';'825';'827';'830';'831';'902';'904';'906';'908';'910';...
     '912';'914';'918';'920';'924';'925';'927';'929';'930'];
 
 days = ['912';'914';'918';'920'];
-days = ['910';'912';'914']
+days = ['924';'925';'927';'929';'930'];%'924';'925']
 
 %c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
 c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist.dat';
@@ -52,6 +55,12 @@ c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_n
 %c0f = '20160831_VIS_C0_refined_Langley_averaged_inflight_Langley_early_high_alts_ORACLES.dat';
 %c0f = '20160904_VIS_C0_refined_Langley_averaged_inflight_high_alts_highRH_ORACLES.dat';
 %c0f = '20160908_VIS_C0_refined_Langley_averaged_inflight_high_alts_with_Langley_highRH_ORACLES.dat';
+c0f = '20160920_VIS_C0_refined_averaged_inflight_Langley_high_alts_lowRH_ORACLES.dat';
+c0f = '20160920_VIS_C0_refined_averaged_inflight_Langley_high_alts_loglog_lowRH_ORACLES.dat';
+c0f = '20160920_VIS_C0_refined_averaged_inflight_Langley_high_alts_lowRH_ORACLES.dat';
+c0f = '20160920_VIS_C0_refined_averaged_inflight_Langley_high_alts_ORACLES.dat';
+c0f = '20160924_VIS_C0_refined_averaged_inflight_Langley_high_alts_transitback_ORACLES.dat'; 
+
 newc0_visfile = [starpaths c0f];
 
 load_sp = true;
@@ -132,7 +141,7 @@ for jd=1:length(days);
     
     
     %% plot out the original aods and their modified versions
-    figaas = figure('pos',[30 10 800 1100]);
+    figaas = figure('pos',[30 10 800 1000]);
     i = find(Alt>5000.0);
     cm = hsv(n);
     colormap(cm);
@@ -209,7 +218,67 @@ for jd=1:length(days);
         disp(['No points for day:' days(i,:)])
     end;
     %set(gcf,'pos',[10 10 600 1500])
+
+    %% Now redo the multi plot panel but for vs. airmass
+    figm = figure('pos',[500 10 800 1000]);
+
+    setappdata(gcf, 'SubplotDefaultAxesLocation', [0, 0, 1, 1]);
+    ax1 = subplot(7,1,1);
+    plot(ax1,m_aero(i),aod_380nm(i),'.','color',cm(1,:).*0.5);
+    title(['High Alt [>5000m] AODs: ' file],'Interpreter','none');
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{1} ' nm']);
+    set(gca,'Position',[0.07 1-(1/7-0.01) .92 1/7-0.03]);
+    set(gca,'XTickLabel','');
+
+    ax2 = subplot(7,1,2);
+    plot(ax2,m_aero(i),aod_452nm(i),'.','color',cm(2,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{2} ' nm']);
+    title(['Previous: ' note{6}],'Interpreter','none')
+    set(gca,'Position',[0.07 1-(2/7-0.01) .92 1/7-0.03]);
+    set(gca,'XTickLabel','');
+
+    ax3 = subplot(7,1,3);
+    plot(ax3,m_aero(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{3} ' nm']);
+    set(gca,'Position',[0.07 1-(3/7-0.01) .92 1/7-0.03]);
+    title(['New: ' c0f],'Interpreter','none')
+
+    ax4 = subplot(7,1,4);
+    plot(ax4,m_aero(i),aod_620nm(i),'.','color',cm(3,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{4} ' nm']);
+    set(gca,'Position',[0.07 1-(4/7-0.01) .92 1/7-0.02])
+
+    ax5 = subplot(7,1,5);
+    plot(ax5,m_aero(i),aod_865nm(i),'.','color',cm(4,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{5} ' nm']);
+    set(gca,'Position',[0.07 1-(5/7-0.01) .92 1/7-0.02])
+
+    ax6 = subplot(7,1,6);
+    plot(ax6,m_aero(i),aod_1040nm(i),'.','color',cm(5,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{6} ' nm']);
+    set(gca,'Position',[0.07 1-(6/7-0.01) .92 1/7-0.02])
     
+    ax7 = subplot(7,1,7);
+    u = plot(ax7,m_aero(i),aod_1215nm(i),'.','color',cm(6,:).*0.5);
+    hold on;grid on; ylim([-0.02,0.03]);ylabel(['AOD ' leg{7} ' nm']);
+    set(gca,'Position',[0.07 1-(7/7-0.01) .92 1/7-0.02])
+
+    linkaxes([ax1,ax2,ax3,ax4,ax5,ax6,ax7],'x');
+
+    plot(ax1,m_aero(i),calc_new_aod(aod_380nm(i),m_aero(i),oc0(1),nc0(1)),'.','color',cm(1,:));
+    plot(ax2,m_aero(i),calc_new_aod(aod_452nm(i),m_aero(i),oc0(2),nc0(2)),'.','color',cm(2,:));
+    plot(ax3,m_aero(i),calc_new_aod(aod_500nm(i),m_aero(i),oc0(3),nc0(3)),'.','color',cm(3,:));
+    plot(ax4,m_aero(i),calc_new_aod(aod_620nm(i),m_aero(i),oc0(4),nc0(4)),'.','color',cm(4,:));
+    plot(ax5,m_aero(i),calc_new_aod(aod_865nm(i),m_aero(i),oc0(5),nc0(5)),'.','color',cm(5,:));
+    plot(ax6,m_aero(i),calc_new_aod(aod_1040nm(i),m_aero(i),oc0(6),nc0(6)),'.','color',cm(6,:));
+    v = plot(ax7,m_aero(i),calc_new_aod(aod_1215nm(i),m_aero(i),oc0(7),nc0(7)),'.','color',cm(7,:));
+
+    try;
+        legend([u,v],'Original','Modified c0');
+    catch;
+        disp(['No points for day:' days(i,:)])
+    end;   
+ 
     if load_sp;
         try;
             files = ['4STAR_20160' days(jd,:) 'starsun.mat'];            
@@ -251,7 +320,11 @@ for jd=1:length(days);
         title([days(jd,:) ' - High alt AOD spectra' ],'fontweight','bold');
         grid on;
         colormap(cm);
-        lcolorbar(labels','TitleString','UTC time','fontweight','bold');
+        try;
+            lcolorbar(labels','TitleString','UTC time','fontweight','bold');
+        catch;
+            legend(labels);
+        end;
         hold off;
         
     end;

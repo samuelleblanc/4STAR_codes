@@ -41,7 +41,7 @@ version_set('1.0');
 %********************
 %% set parameters and santize inputs
 %********************
-stdev_mult=2:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
+stdev_mult=1.8:0.3:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 
 if nargin<1;
@@ -175,7 +175,12 @@ ylim([0.7,1]);
 set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
 xlim([0,20]);
 labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
+try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+catch;
+legend(labels);
+end;
+
 title([instrumentname ' multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')
@@ -204,7 +209,12 @@ set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
 xlim([0,20]);
 labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
 for ij=11:length(cols), labels{ij} = '.'; end;
+try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+catch;
+legend(labels);
+end;
+
 title([instrumentname ' VIS ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')
@@ -233,7 +243,11 @@ set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
 xlim([0,20]);
 labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
 for ij=1:10, labels{ij} = '.'; end;
+try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+catch;
+legend(labels)
+end;
 title([instrumentname ' NIR multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')

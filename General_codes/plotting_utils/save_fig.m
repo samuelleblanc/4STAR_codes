@@ -36,13 +36,23 @@
 %                  - changed the stophere to eval('dbstop');
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, December 5th, 2014
 %                  - changed options to be more descriptive.
-%
+% Modified (v1.3): by Samuel LeBlanc, Santa Cruz, June 26th, 2017
+%                  - added keywords to be selected via the asktopause variable
 % -------------------------------------------------------------------------
 
 %% Function routine
 function save_fig(pid,fi,asktopause)
-version_set('1.2');
-if nargin<3, asktopause=true; end; % set default asktopause behavior
+version_set('1.3');
+if nargin<3;
+    asktopause=true; 
+elseif asktopause>1;
+    return
+elseif asktopause>2;
+    s=dbstack;
+    eval(['dbstop in ' s(2).name ' at ' num2str(s(2).line+1)])
+    return
+end;
+
 if asktopause 
   OK =menu('Plot saving?','Save figure and continue','Continue without saving','Exit and debug');
   if OK==3
