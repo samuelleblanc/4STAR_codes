@@ -9,8 +9,8 @@
 
 function create_all_forj
 
-%vis = getfullname('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
-vis = getfullname('*_NIR_FORJ*.dat','ARISE','Select Forj Az dat file.');
+vis = getfullname('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
+nir = getfullname('*_NIR_FORJ*.dat','ARISE','Select Forj Az dat file.');
 
 
 [pname_, fname, ext] = fileparts(vis);
