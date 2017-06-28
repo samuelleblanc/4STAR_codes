@@ -1,6 +1,6 @@
 %% Details of the program:
 % NAME:
-%   SEmakearchive_KORUS_AOD
+%   SEmakearchive_KORUS_AOD_4NAS
 %
 % PURPOSE:
 %  To generate AOD archive files for use wih KORUS-AQ
@@ -45,23 +45,24 @@
 %                       subtracted to AOD
 % 2017-06-20, MS, v2.4, updated for final KORUS archive, fixed bug in unc
 %                       implementation
+% 2017-06-23, MS, v2.5, tweaked code to run on supercomputer
 % -------------------------------------------------------------------------
 
-function SEmakearchive_KORUS_AOD
-version_set('v2.4')
+function SEmakearchive_KORUS_AOD_4NAS
+version_set('v2.5')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
-    ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\with_0707c0_corrected\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
-    starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\June-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-    starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\0707c0\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+    ICTdir = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/aod_ict/';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    starinfo_path = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/starinfo/';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
+    starsun_path = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/starsun/';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'));
     ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R1\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
     starsun_path = 'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 else
-    ICTdir = 'D:\KORUS-AQ\aod_ict\';
-    starinfo_path = 'D:\KORUS-AQ\starinfo\';
-    starsun_path = 'D:\KORUS-AQ\starsun\';
+    ICTdir = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/aod_ict/';
+    starinfo_path = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/starinfo/';
+    starsun_path = '/nobackupp8/msegalro/4STAR/KORUS_June_archive/starsun/';
 end
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='1'; % A; %0 % revision number; if a string, no uncertainty will be saved.
@@ -71,7 +72,7 @@ avg_wvl = true;
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          1          0          0          0          0          0          0          0] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -232,7 +233,7 @@ for i=idx_file_proc
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true; correct_aod = true;
+        add_uncert = true; correct_aod = false;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
