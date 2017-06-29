@@ -23,7 +23,10 @@ s.flagfilenameCWV  = '20160920_starflag_CWV_man_created20161017_2130by_MS.mat';
 s.flagfilenameO3   = '20160920_starflag_O3_man_created20161017_2130by_MS.mat';
 s.flagfilenameNO2  = '20160920_starflag_NO2_man_created20161017_2134by_MS.mat';
 s.flagfilenameHCOH = '20160920_starflag_HCOH_man_created20161017_2138by_MS.mat';
- 
+
+%dirty correction
+s.AODuncert_mergemark_file = '20160920_AOD_merge_marks.mat';
+
 % Ozone and other gases 
 s.O3h=21; 
 s.O3col=0.360;    % Michal's guess based on forecast 

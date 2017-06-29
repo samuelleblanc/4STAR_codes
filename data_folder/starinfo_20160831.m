@@ -24,6 +24,9 @@ s.langley=[datenum(2016,8,31,7,55,00) datenum(2016,8,31,15,46,23)];
 
 s.high_alt_c0 = [datenum(2016,8,31,8,24,35) datenum(2016,8,31,8,27,35)];
  
+%dirty correction
+s.AODuncert_mergemark_file = '20160831_AOD_merge_marks.mat';
+
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
 s.O3col=0.350; % Michal's guess     

@@ -23,6 +23,9 @@ s.high_alt_c0 = [datenum(2016,9,2,9,52,0) datenum(2016,9,2,9,56,0)];
 s.dirty = [datenum(2016,9,02,15,31,40) datenum(2016,9,02,15,32,10)];
 s.clean = [datenum(2016,9,02,15,33,15) datenum(2016,9,02,15,34,20)];
  
+%dirty correction
+s.AODuncert_mergemark_file = '20160902_AOD_merge_marks.mat';
+
 % Ozone and other gases 
 s.O3h=21; % Yohei's guess 
 s.O3col=0.268; % Yohei's guess     

@@ -31,6 +31,8 @@ s.flagfilenameO3   = '20160924_starflag_O3_man_created20161017_2141by_MS.mat';
 s.flagfilenameNO2  = '20160924_starflag_NO2_man_created20161017_2145by_MS.mat';
 s.flagfilenameHCOH = '20160924_starflag_HCOH_man_created20161017_2147by_MS.mat';
 
+%dirty correction
+s.AODuncert_mergemark_file = '20160924_AOD_merge_marks.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
