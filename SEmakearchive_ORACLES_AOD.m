@@ -45,10 +45,13 @@
 %                      away. Set new revision for R1
 % 2017-04-05, SL,v2.3, Added reading of the tau_aero_subtract_all to use
 %                      aod with gas subtracted
+% 2017-06-28, SL,v3.0, Added uncertainty, window deposition
+%                      correction, and notes on final archive.
+%                      Added new wavelengths and uncertainty comments
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
-version_set('v2.3')
+version_set('v2.4')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
@@ -62,15 +65,15 @@ if getUserName=='sleblan2';
         starinfo_path = '/u/sleblan2/4STAR/4STAR_codes/data_folder\';
         starsun_path = '/nobackup/sleblan2/ORACLES/data/v6/';
     else;
-        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\v5\';
+        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict\v7\';
         starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v5\';
+        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v7\';
     end;
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='2'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
-gas_subtract = true;
+gas_subtract = false;
 avg_wvl = true;
 
 %% Prepare General header for each file
@@ -91,23 +94,25 @@ NormalComments = {...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research';...
     'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
-    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent, for in-field archiving can be up to 0.03';...
+    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent, see specific reported uncertainty in the data fields.';...
     'ULOD_FLAG: -7777';...
     'ULOD_VALUE: N/A';...
     'LLOD_FLAG: -8888';...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Samuel LeBlanc, samuel.leblanc@nasa.gov';...
     'PROJECT_INFO: ORACLES 2016 deployment; August-December 2016; Walvis Bay, Namibia';...
-    'STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI.';...
+    'STIPULATIONS_ON_USE: None. Consulting with PI before use is strongly advised.';...
     'OTHER_COMMENTS: N/A';...
     };
 
 revComments = {...
-    'R2: Final calibrations but no error calculations, and impact of window deposition still in data.';...
+    'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
     'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
     %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission and minimal column trace gas impacts on certain wavelengths.';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
+
+specComments_extra_uncertainty = 'AOD in this file has been adjusted to reflect impact of deposition on window.\n'; 
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -117,25 +122,22 @@ info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
 info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
 info.amass_aer = 'unitless, aerosol optical airmass';
 
-info.AOD0380 = 'unitless, Aerosol optical depth at 380.0 nm';
-info.AOD0452 = 'unitless, Aerosol optical depth at 451.7 nm';
-info.AOD0501 = 'unitless, Aerosol optical depth at 500.7 nm';
-info.AOD0520 = 'unitless, Aerosol optical depth at 520.0 nm';
-info.AOD0532 = 'unitless, Aerosol optical depth at 532.0 nm';
-info.AOD0550 = 'unitless, Aerosol optical depth at 550.3 nm';
-info.AOD0606 = 'unitless, Aerosol optical depth at 605.5 nm';
-info.AOD0620 = 'unitless, Aerosol optical depth at 619.7 nm';
-info.AOD0675 = 'unitless, Aerosol optical depth at 675.2 nm';
-info.AOD0781 = 'unitless, Aerosol optical depth at 780.6 nm';
-info.AOD0865 = 'unitless, Aerosol optical depth at 864.6 nm';
-info.AOD1020 = 'unitless, Aerosol optical depth at 1019.9 nm';
-info.AOD1040 = 'unitless, Aerosol optical depth at 1039.6 nm';
-info.AOD1064 = 'unitless, Aerosol optical depth at 1064.2 nm';
-info.AOD1236 = 'unitless, Aerosol optical depth at 1235.8 nm';
-info.AOD1559 = 'unitless, Aerosol optical depth at 1558.7 nm';
-info.AOD1627 = 'unitless, Aerosol optical depth at 1626.6 nm';
+% wls = [355, 380,452, 470,501,520,530,532,550,606,620,660,675, 700,781,865,1020,1040,1064,1236,1250,1559,1627,1650];
 
-save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6];
+if avg_wvl; avg_wvl_note = 'averaged over nearest neighboring wavelengths centered at '; else avg_wvl_note = 'at '; end;
+save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,699.7,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9,1558.7,1626.6,1650.1];
+% save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6]; old
+
+for i=1:length(save_wvls);
+    namestr = sprintf('AOD%04.0f',save_wvls(i));
+    info.(namestr) = sprintf(['unitless, Aerosol optical depth ' avg_wvl_note '%4.1f nm'],save_wvls(i)); 
+end;
+
+for i=1:length(save_wvls);
+    uncnamestr = sprintf('UNCAOD%04.0f',save_wvls(i));
+    info.(uncnamestr) = sprintf('unitless, Uncertainty in aerosol optical depth at %4.1f nm',save_wvls(i));
+end;
+
 iradstart = 6; % the start of the field names related to wavelengths
 
 %set the format of each field
@@ -151,7 +153,7 @@ form.qual_flag = '%1.0f';
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          1          1          1          1          1          1          1           1           1          1          1          1          1          1          1          1          1          1] ; %set=1 to process
-
+%jproc=[         0          0          0          0          0          0          0          0           1           0          0          0          0          0          0          0          0          0          0] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -163,7 +165,7 @@ for i=idx_file_proc
     %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
     infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    s.dummy = '';
+    s = ''; s.dummy = '';
     try
         s = infofnt(s);
     catch
@@ -210,6 +212,27 @@ for i=idx_file_proc
         tau = tau_aero_noscreening;
     end;
     
+    try;
+        load(starfile, 't','tau_aero_err');
+    catch;
+        error(['Problem loading the uncertainties in file:' starfile])
+    end;
+    
+    %% Update the uncertainties with merge marks file saved in the starinfo
+    add_uncert = false;
+    correct_aod = false;
+    if isfield(s,'AODuncert_mergemark_file');
+        disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
+        d = load(s.AODuncert_mergemark_file);
+        specComments{end+1} = specComments_extra_uncertainty;
+        add_uncert = true; correct_aod = false;
+    elseif isfield(s,'AODuncert_constant_extra');
+        disp(['Applying constant AOD factor to existing AOD'])
+        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
+        specComments{end+1} = specComments_extra_uncertainty;
+        add_uncert = true;
+    end
+    
     %% extract special comments about response functions from note
     if ~isempty(strfind(note, 'C0'));
         temp_cells = strfind(note,'C0');
@@ -227,7 +250,7 @@ for i=idx_file_proc
     
     %% fill up some of the data and interpolate for proper filling
     tutc = t2utch(t);
-    ialt = find(Alt>0); % filter out bad data
+    ialt = find(Alt>0&Alt<10000.0); % filter out bad data
     [nutc,iutc] = unique(tutc(ialt));
     data.GPS_Alt = interp1(nutc,Alt(ialt(iutc)),UTC);
     [nnutc,iiutc] = unique(tutc);
@@ -323,7 +346,7 @@ for i=idx_file_proc
     [tutc_unique,itutc_unique] = unique(tutc);
     [idat,datdt] = knnsearch(tutc_unique,UTC');
     iidat = datdt<1.0/3600.0; % Distance no greater than 1.0 seconds.
-    for nn=iradstart:length(names)
+    for nn=iradstart:length(names)-length(save_iwvls)
         ii = nn-iradstart+1;
         data.(names{nn}) = UTC*0.0+NaN;
         if avg_wvl;
@@ -334,10 +357,69 @@ for i=idx_file_proc
         else;
             data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
         end;
-    end;
+        if correct_aod;
+            d.dAODs(isnan(d.dAODs)) = 0.0;
+            try;
+                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+            catch;
+                [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+            end;
+        end;
+    end;    
     
+        % do the same but for uncertainty
+        for nn=iradstart+length(save_wvls):length(names);
+            ii = nn-iradstart-length(save_wvls)+1;
+            [tutc_unique,itutc_unique] = unique(tutc);
+            %          if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+            %          % tweak to accomodate those dates (flags<data)  - no interp
+            %                 data.(names{nn}) = tau_aero_err(itutc_unique,save_iwvls(ii));
+            %                 if add_uncert;  % if the add uncertainty exists then run that also.
+            %                     data.(names{nn}) = data.(names{nn}) + d.dAODs(itutc_unique,ii);
+            %                 end;
+            %          else
+            data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+            if add_uncert;  % if the add uncertainty exists then run that also.
+                if correct_aod;
+                    it = find(diff(d.dCo(:,5))<-0.0001);
+                    dAODs = d.dAODs.*0.0;
+                    for itt=1:length(it); % add uncertainty equivalent to the daod change for a period of +/- 10 minutes around the effect
+                        [nul,itm] = min(abs(d.time-(d.time(it(itt))-600.0/86400)));
+                        [nul,itp] = min(abs(d.time-(d.time(it(itt))+600.0/86400)));
+                        dAODs(itm:itp,:) = repmat(d.dAODs(it(itt)+1,:)-d.dAODs(it(itt),:),itp-itm+1,1);
+                    end;
+                    try;
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,dAODs(itutc_unique,ii),UTC,'nearest');
+                    catch;
+                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                    end;
+                    try;  % add uncertainty equivalent to 10% of the correction
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii).*0.1,UTC,'nearest');
+                    catch;
+                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*0.2,UTC,'nearest');
+                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                    end;
+                else;
+                    try;
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+                    catch;
+                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                    end;
+                end;
+            end;
+            
+            %end
+        end;
+        
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
-    inans = find(isnan(data.AOD0501));
+    inans = find(isnan(data.(names{iradstart+2})));
     %data.UTC(inans) = NaN;
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;
