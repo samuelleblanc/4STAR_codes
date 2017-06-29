@@ -77,6 +77,9 @@
 %                 based on ICARTTwriter_example.m written by 20130606 GMW; gwolfe@umbc.edu
 % Modified (v1.1): Samuel LeBlanc, Osan AB, Korea, May 15th, 2016
 %                  - added the missing_data_val keyword
+% Modified (v1.2): Samuel LeBlanc, Santa Cruz, 2017-06-28
+%                  - modified the missing_data_val file writing to match
+%                  the format of the missing data
 %
 % -------------------------------------------------------------------------
 
@@ -216,7 +219,12 @@ numspec  = length(specComments);                %number of special comments
 numnorm  = length(NormalComments) + numrev;     %number of normal comments
 numlines = numhead + numvar + numspec + numnorm + 9 ;%number of lines in header, with extra lines indicating number of lines
 
-missStr = repmat([num2str(missing_data_val) ', '],1,numvar);         %missing data flag
+fStrmiss = ''; %format for independent variable
+for i=1:numvar; fStrmiss = [fStrmiss ', ' form.(names{i})]; end;
+fStrmiss = [fStrmiss(2:end) ' \n'];
+missStr = sprintf(fStrmiss,repmat(missing_data_val,1,numvar)); %missing data flag
+%fprintf(fid,fStr,Start_UTC(i),data(i,:))
+%missStr = repmat([num2str(missing_data_val) ', '],1,numvar);         %missing data flag
 missStr = [missStr(1:end-2) '\n'];
 
 scaleStr = repmat('1, ',1,numvar);            %scaling factor
