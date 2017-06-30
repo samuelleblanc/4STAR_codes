@@ -101,7 +101,7 @@ NormalComments = {...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Samuel LeBlanc, samuel.leblanc@nasa.gov';...
     'PROJECT_INFO: ORACLES 2016 deployment; August-December 2016; Walvis Bay, Namibia';...
-    'STIPULATIONS_ON_USE: None. Consulting with PI before use is strongly advised.';...
+    'STIPULATIONS_ON_USE: This is the initial public release of the ORACLES-2016 data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
     'OTHER_COMMENTS: N/A';...
     };
 
@@ -112,7 +112,7 @@ revComments = {...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
-specComments_extra_uncertainty = 'AOD in this file has been adjusted to reflect impact of deposition on window.\n'; 
+specComments_extra_uncertainty = 'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -124,13 +124,19 @@ info.amass_aer = 'unitless, aerosol optical airmass';
 
 % wls = [355, 380,452, 470,501,520,530,532,550,606,620,660,675, 700,781,865,1020,1040,1064,1236,1250,1559,1627,1650];
 
-if avg_wvl; avg_wvl_note = 'averaged over nearest neighboring wavelengths centered at '; else avg_wvl_note = 'at '; end;
 save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,699.7,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9,1558.7,1626.6,1650.1];
 % save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6]; old
 
+[v,n] = starwavelengths; wvl = [v,n].*1000.0;
+
 for i=1:length(save_wvls);
     namestr = sprintf('AOD%04.0f',save_wvls(i));
-    info.(namestr) = sprintf(['unitless, Aerosol optical depth ' avg_wvl_note '%4.1f nm'],save_wvls(i)); 
+    if avg_wvl;
+        [nul,iw] = min(abs(wvl-save_wvls(i)));
+        info.(namestr) = sprintf(['unitless, Aerosol optical depth averaged over 3 wavelength pixels from %4.1f nm to %4.1f nm centered at %4.1f nm'],wvl(iw-1),wvl(iw+1),save_wvls(i));
+    else;
+        info.(namestr) = sprintf(['unitless, Aerosol optical depth at %4.1f nm'],save_wvls(i));
+    end;
 end;
 
 for i=1:length(save_wvls);
@@ -153,7 +159,7 @@ form.qual_flag = '%1.0f';
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          1          1          1          1          1          1          1           1           1          1          1          1          1          1          1          1          1          1] ; %set=1 to process
-%jproc=[         0          0          0          0          0          0          0          0           1           0          0          0          0          0          0          0          0          0          0] ;
+jproc=[         1          0          0          0          1          1          1          1           1           1          1          0          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -225,12 +231,12 @@ for i=idx_file_proc
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true; correct_aod = false;
+        add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true;
+        add_uncert = true; correct_aod = false;
     end
     
     %% extract special comments about response functions from note
@@ -359,65 +365,67 @@ for i=idx_file_proc
         end;
         if correct_aod;
             d.dAODs(isnan(d.dAODs)) = 0.0;
+            if ~strcmp(datestr(d.time(1),'YYYYmmDD'),daystr); error('Time array in delta AOD merge mark file not the same as starsun file'), end;
+            [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
             try;
-                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
+                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
             catch;
                 [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
                 data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
                 disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
             end;
         end;
-    end;    
+    end;
     
-        % do the same but for uncertainty
-        for nn=iradstart+length(save_wvls):length(names);
-            ii = nn-iradstart-length(save_wvls)+1;
-            [tutc_unique,itutc_unique] = unique(tutc);
-            %          if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
-            %          % tweak to accomodate those dates (flags<data)  - no interp
-            %                 data.(names{nn}) = tau_aero_err(itutc_unique,save_iwvls(ii));
-            %                 if add_uncert;  % if the add uncertainty exists then run that also.
-            %                     data.(names{nn}) = data.(names{nn}) + d.dAODs(itutc_unique,ii);
-            %                 end;
-            %          else
-            data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
-            if add_uncert;  % if the add uncertainty exists then run that also.
-                if correct_aod;
-                    it = find(diff(d.dCo(:,5))<-0.0001);
-                    dAODs = d.dAODs.*0.0;
-                    for itt=1:length(it); % add uncertainty equivalent to the daod change for a period of +/- 10 minutes around the effect
-                        [nul,itm] = min(abs(d.time-(d.time(it(itt))-600.0/86400)));
-                        [nul,itp] = min(abs(d.time-(d.time(it(itt))+600.0/86400)));
-                        dAODs(itm:itp,:) = repmat(d.dAODs(it(itt)+1,:)-d.dAODs(it(itt),:),itp-itm+1,1);
-                    end;
-                    try;
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,dAODs(itutc_unique,ii),UTC,'nearest');
-                    catch;
-                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                    end;
-                    try;  % add uncertainty equivalent to 10% of the correction
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii).*0.1,UTC,'nearest');
-                    catch;
-                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*0.2,UTC,'nearest');
-                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                    end;
-                else;
-                    try;
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique,d.dAODs(itutc_unique,ii),UTC,'nearest');
-                    catch;
-                        [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                        data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                        disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                    end;
+    % do the same but for uncertainty
+    for nn=iradstart+length(save_wvls):length(names);
+        ii = nn-iradstart-length(save_wvls)+1;
+        [tutc_unique,itutc_unique] = unique(tutc);
+        %          if strcmp(daystr,'20160529') || strcmp(daystr,'20160601') || strcmp(daystr,'20160604')
+        %          % tweak to accomodate those dates (flags<data)  - no interp
+        %                 data.(names{nn}) = tau_aero_err(itutc_unique,save_iwvls(ii));
+        %                 if add_uncert;  % if the add uncertainty exists then run that also.
+        %                     data.(names{nn}) = data.(names{nn}) + d.dAODs(itutc_unique,ii);
+        %                 end;
+        %          else
+        data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+        if add_uncert;  % if the add uncertainty exists then run that also.
+            if correct_aod;
+                it = find(diff(d.dCo(:,5))<-0.0001);
+                dAODs = d.dAODs.*0.0;
+                for itt=1:length(it); % add uncertainty equivalent to the daod change for a period of +/- 10 minutes around the effect
+                    [nul,itm] = min(abs(d.time-(d.time(it(itt))-600.0/86400)));
+                    [nul,itp] = min(abs(d.time-(d.time(it(itt))+600.0/86400)));
+                    dAODs(itm:itp,:) = repmat(d.dAODs(it(itt)+1,:)-d.dAODs(it(itt),:),itp-itm+1,1);
+                end;
+                try;
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                catch;
+                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                end;
+                try;  % add uncertainty equivalent to 20% of the correction
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*0.2,UTC,'nearest');
+                catch;
+                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*0.2,UTC,'nearest');
+                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
+                end;
+            else;
+                try;
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                catch;
+                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
+                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
+                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
                 end;
             end;
-            
-            %end
         end;
         
+        %end
+    end;
+    
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.(names{iradstart+2})));
     %data.UTC(inans) = NaN;
