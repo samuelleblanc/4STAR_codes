@@ -39,17 +39,35 @@
 % MS, 2016-05-14, fixing bugs in gas flags
 % MS, 2016-05-26, setting NO2 to -99999 until new calibration is applied
 % MS, 2016-10-18, adjusted for ORACLES
+% SL, v2.0, 2017-06-30, Changed version to R1, with different stipulations on use and using the most
+%                        recent starsun runs, to match R2 AOD archival.
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_GAS
-version_set('v1.0')
+version_set('v2.0')
 %% set variables
 ICTdir = 'E:\ORACLES\gas_ict\';
 starinfo_path = 'E:\ORACLES\starinfo\';
 starsun_path = 'E:\ORACLES\starsun\';
 gasfile_path = 'E:\ORACLES\gas_summary\';
+if getUserName=='sleblan2';
+    ICTdir = 'C:\Users\sleblan2\Research\ORACLES\gas_ict\';
+    starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+    starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\';
+    if isunix;
+        ICTdir = '/u/sleblan2/ORACLES/aod_ict/v6/';
+        starinfo_path = '/u/sleblan2/4STAR/4STAR_codes/data_folder\';
+        starsun_path = '/nobackup/sleblan2/ORACLES/data/v6/';
+    else;
+        ICTdir = 'C:\Users\sleblan2\Research\ORACLES\gas_ict\v7\';
+        starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
+        starsun_path = 'C:\Users\sleblan2\Research\ORACLES\data\v7\';
+        gasfile_path = 'C:\Users\sleblan2\Research\ORACLES\data\gas_summary\';
+    end;
+end;
+
 prefix='4STAR-GAS'; 
-rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
 
 
@@ -79,12 +97,13 @@ NormalComments = {...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Michal Segal-Rozenhaimer, michal.segalrozenhaimer@nasa.gov';...
     'PROJECT_INFO: ORACLES deployment; August-September 2016; Walvis Bay, Namibia';...
-    'STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI; this is preliminary data';...
+    'STIPULATIONS_ON_USE: This is the initial public release of the ORACLES-2016 data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
     'OTHER_COMMENTS: N/A';...
     };
 
 revComments = {...
-    'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the instrument window. Calibration is not final.\n';...
+    'R1: Archival for first initial public release. Updated AOD calibrations with little impact on gas retrievals The data is still subject to uncertainties associated with cloud screening, diffuse light, and specific wavelength impact on deposition on the instrument window.';...
+    'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the instrument window. Calibration is not final.';...
     };
 
 
@@ -135,7 +154,7 @@ form.std_CWV   = '%2.3f';
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906' '20160908' '20160910' '20160912' '20160914' '20160918' '20160920' '20160924' '20160925' '20160927' '20160929' '20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          1]  ; %set=1 to process
+jproc=[         1          1          1          1          1          1          1          1          1          1          1           1         1          1          1          1          1          1          1]  ; %set=1 to process
 
 
 %% run through each flight, load and process
@@ -149,7 +168,7 @@ for i=idx_file_proc
     %infofile_ = fullfile(starinfo_path, ['starinfo_' daystr '.m']);
     infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    s.dummy = '';
+    s = ''; s.dummy = '';
     try
         s = infofnt(s);
     catch
@@ -201,7 +220,7 @@ for i=idx_file_proc
     
     %% fill up some of the data and interpolate for proper filling
     tutc = t2utch(t);
-    ialt = find(Alt>0); % filter out bad data
+    ialt = find(Alt>0&Alt<10000.0); % filter out bad data
     [nutc,iutc] = unique(tutc(ialt));
     data.GPS_Alt = interp1(nutc,Alt(ialt(iutc)),UTC);
     [nnutc,iiutc] = unique(tutc);
@@ -362,6 +381,16 @@ for i=idx_file_proc
         %data.resid_NO2(iddg)= Start_UTCs(iddg)*0+(-99999);% until new calibration is applied; no2err_molec_cm2(iig(iddg))/(Loschmidt/1000);
 %     end
     
+    %% Last bit of sanity check
+    disp('Running through some sanity checks of the data whichs sets the respective QA flags to 1(bad) when CWV>3.6, VCD_O3>460, VCD_NO2>2.0, VCD_HCOH>8.0&<-1.0')
+    icwv_bad = find(data.CWV>3.6);
+    data.QA_CWV(icwv_bad) = 1;
+    io3_bad = find(data.VCD_O3>460.0);
+    data.QA_O3(io3_bad) = 1;
+    ino2_bad = find(data.VCD_NO2>2.0);
+    data.QA_NO2(ino2_bad) = 1;
+    ihcoh_bad = find(data.VCD_HCOH>8.0|data.VCD_HCOH<-1.0);
+    data.QA_HCOH(ihcoh_bad) = 1;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.VCD_O3));
