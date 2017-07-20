@@ -51,9 +51,9 @@ function SEmakearchive_KORUS_AOD
 version_set('v2.4')
 %% set variables
 if ~isempty(strfind(lower(userpath),'msegalro')); %
-    ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\with_0426c0_corrected\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
+    ICTdir = 'D:\MichalsData\KORUS-AQ\aod_ict\with_0707c0_corrected\';%'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R0\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'D:\MichalsData\KORUS-AQ\starinfo\June-15-archive\';%'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
-    starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\0426c0\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
+    starsun_path = 'D:\MichalsData\KORUS-AQ\starsun\June-15-archive\0707c0\';%'C:\Users\sleblan2\Research\KORUS-AQ\data\';%'D:\KORUS-AQ\starsun\';
 elseif ~isempty(strfind(lower(userpath),'sleblan2'));
     ICTdir = 'C:\Users\sleblan2\Research\KORUS-AQ\aod_ict\R1\';%'D:\KORUS-AQ\aod_ict\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';%'D:\KORUS-AQ\starinfo\';
@@ -64,14 +64,14 @@ else
     starsun_path = 'D:\KORUS-AQ\starsun\';
 end
 prefix='korusaq-4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='2'; % A; %0 % revision number; if a string, no uncertainty will be saved.
+rev='1'; % A; %0 % revision number; if a string, no uncertainty will be saved.
 platform = 'DC8';
 avg_wvl = true;
 
 %% prepare list of details for each flight
 dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to process
+jproc=[         0          0          0          0          0          0          0          0          0          0          0           0         0          0          0          0          1          0          0          0          0          0          0          0] ; %set=1 to process
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -103,7 +103,6 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R2: Final data. Same as R1. Bug was fixed on the special comments line.';...
     'R1: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties and adjustments to AOD values linked to deposition on the front window has been included.';...
     'R0: Final data with updated calibrations. The uncertainty in the data is now included in this archived version. Increased uncertainties linked to deposition on the front window has been included.';...
     'RA: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
@@ -232,7 +231,7 @@ for i=idx_file_proc
     if isfield(s,'AODuncert_mergemark_file');
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
-        %specComments{end+1} = specComments_extra_uncertainty;
+        specComments{end+1} = specComments_extra_uncertainty;
         add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
