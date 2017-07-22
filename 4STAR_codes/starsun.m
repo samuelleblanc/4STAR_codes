@@ -59,7 +59,7 @@ load(sourcefile,contents0{:},'program_version');
 % combine the two structures.
 if ~strcmp(instrumentname,'2STAR');
     s=starwrapper(vis_sun, nir_sun,toggle);
-else;
+else
     toggle.applynonlinearcorr=false;
     toggle.applyforjcorr=false;
     s=starwrapper(vis_sun, toggle);
