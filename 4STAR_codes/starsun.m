@@ -82,9 +82,9 @@ end;
 if exist('program_version','var');
    s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
-make_small(s, savematfile);
-make_for_starflag(s, savematfile);
+tic; make_small(s, savematfile);toc
+tic; make_for_starflag(s, savematfile);toc
 disp(['Saving: ',savematfile])
-save(savematfile, '-struct', 's', '-mat');
+tic; save(savematfile, '-struct', 's', '-mat');toc
 
 contents=[contents; fieldnames(s)];
