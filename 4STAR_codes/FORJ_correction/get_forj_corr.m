@@ -1,7 +1,7 @@
 function [forj_corr, detail] = get_forj_corr(time)
 % forj_corr = get_forj_corr(time)
 % Returns the 
-forj_all = load([starpaths,'forj_all.mat']);
+forj_all = load([getnamedpath('Github_data_folder'),'forj_all.mat']);
 lower = max([1, find(forj_all.time<time,1,'last')]);
 upper = min([length(forj_all.time), find(forj_all.time>time,1,'first')]);
 forj_corr.Az_deg = forj_all.Az_deg(1,:);

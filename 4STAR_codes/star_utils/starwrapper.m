@@ -217,7 +217,7 @@ s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=Inf; % variable for screening direct sun datanote
 infofile_ = ['starinfo_' daystr '.m'];
-infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
+infofile = fullfile(getnamedpath('starinfo'), ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
