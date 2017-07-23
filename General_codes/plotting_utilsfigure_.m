@@ -72,4 +72,11 @@ if exist('pos','var') && ~isempty(pos)
     end    
 end
 
+% next line is never executed but is added so that bundlefnt will include
+% closereq which along with loadfigpos and savefigpos is required for
+% figure_ to work
+if false
+   closereq;
+end
+
 return

@@ -1,10 +1,10 @@
 function pos = loadfigpos(H)
 % Loads a figure position file for H
-
-pname = strrep(strrep(userpath,';',filesep),':',filesep);
-pathdir = [pname, 'filepaths'];
+usrpath = [strrep(userpath,pathsep,''),filesep];
+% usrpath= strrep(strrep(userpath,';',filesep),':',filesep);
+pathdir = [usrpath, 'fig_position'];
 if ~exist(pathdir,'dir')
-    mkdir(pname, 'filepaths');
+    mkdir(usrpath, 'fig_position');
 end
 pathdir = [pathdir,filesep];
 
@@ -23,7 +23,5 @@ if exist(figfile,'file')
 else
     pos = [];
 end
-
-
 
 return

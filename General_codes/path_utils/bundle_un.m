@@ -18,6 +18,7 @@ end
 if ~exist(outpath,'dir')
    mkdir(outpath);
 end
+outpath = [outpath, filesep];
 if ~exist('over','var')
    over = 2;
 end
@@ -54,7 +55,11 @@ for f = length(files):-1:1
             movefile(files{f},there);
          elseif over==2
             if (there_f.datenum > there_file.datenum)
-               movefile(files{f},there);
+               try 
+                  movefile(files{f},there);
+               catch
+                  movefile(files{f},outpath)
+               end
             else
                delete(files{f});
             end
