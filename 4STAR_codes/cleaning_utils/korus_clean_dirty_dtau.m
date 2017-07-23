@@ -271,9 +271,9 @@ mrg_out.m_aero(nan_mass) = interp1(mrg_out.time(~nan_mass), mrg_out.m_aero(~nan_
 mrg_out.wl_nm = wls;
 % Make figures of dCo and dAODs
  if ~cancel
-[p_out, fname] = fileparts(in_star_file);p_out = [p_out, filesep];
-save([p_out,fname(1:8),'_AOD_marks.mat'],'-struct','mark');
-save([p_out,fname(1:8),'_AOD_merge_marks.mat'],'-struct','mrg_out');
+[p_out, fname] = fileparts(in_star_file);p_out = [p_out, filesep];fname = strrep(fname, 'starsun','');
+save([p_out,fname,'_AOD_marks.mat'],'-struct','mark');
+save([p_out,fname,'_AOD_merge_marks.mat'],'-struct','mrg_out');
 fig_out = strrep(p_out,'mat','fig');
 if ~exist(fig_out,'dir')
     mkdir(fig_out);
