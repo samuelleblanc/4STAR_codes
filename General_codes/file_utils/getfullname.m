@@ -8,18 +8,16 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 % 2009-01-08, CJF: Uploading to 4STAR matlab_files repository
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
-DRV = [];
 usrpath = userpath;
-if ~isempty(usrpath)&&strcmp(usrpath(2),':')
-   DRV = usrpath(1:2); usrpath = usrpath(3:end);
-end
-pname = strrep(strrep(usrpath,';',filesep),':',filesep);
-pathdir = [DRV,pname,filesep, 'filepaths',filesep];
+if isempty(usrpath)
+    [~, usrpath]=system('hostname'); % somehow Yohei's laptop returns blank userpath; call for system hostname
+end;
+usrpath = [strrep(usrpath,pathsep,''),filesep];
+
+pathdir = [usrpath,'filepaths',filesep];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
 end
-pathdir = [pathdir,filesep];
-pathdir = strrep(pathdir,[filesep filesep],filesep);
 
 if ~exist('dialog','var')||isempty(dialog)
     if exist('pathfile','var')&&~isempty(pathfile)
@@ -88,8 +86,8 @@ if ~isequal(pname,0)
     if ~iscell(fname)
         fullname = fullfile(pname,filesep, fname);
     else
-        for l = length(fname):-1:1
-            fullname(l) = {fullfile(pname, fname{l})};
+        for L = length(fname):-1:1
+            fullname(L) = {fullfile(pname, fname{L})};
         end
     end
     if exist('newpathfile','var')

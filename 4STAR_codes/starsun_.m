@@ -34,7 +34,7 @@ if (~isempty(varargin));
 else
     vars = varargin;
 end
-[sourcefile, contents0, savematfile]=startupbusiness('sun', vars{:});
+[sourcefile, contents0, savematfile,instrumentname]=startupbusiness('sun', vars{:});
 contents=[];
 if isempty(contents0);
     savematfile=[];
@@ -46,7 +46,9 @@ end;
 %********************
 % grab structures
 if numel(contents0)==1;
-    error('This part of starsun.m to be developed. For now both vis and nir structures must be present.');
+    if ~strcmp(instrumentname,'2STAR');
+       error('This part of starsun.m to be developed. For now both vis and nir structures must be present.');
+    end;
 elseif ~isequal(sort(contents0), sort([{'vis_sun'};{'nir_sun'}]))
     error('vis_sun and nir_sun must be the sole contents for starsun.m.');
 end;
@@ -56,20 +58,39 @@ load(sourcefile,contents0{:},'program_version');
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
 t_wrap = tic
-s=starwrapper_(vis_sun, nir_sun, toggle,savematfile); toggle = s.toggle;
+if ~strcmp(instrumentname,'2STAR');
+    s=starwrapper_(vis_sun, nir_sun,toggle);
+else
+    toggle.applynonlinearcorr=false;
+    toggle.applyforjcorr=false;
+    s=starwrapper_(vis_sun, toggle);
+end;
+toggle = s.toggle;
 if toggle.verbose
     disp({['Time for starwrapper:'],toc(t_wrap)})
 end
 %********************
 % save
 %********************
+%% Change the types of variables to make smaller variables
+if ~isfield(s.toggle, 'reduce_variable_size'); 
+    if s.toggle.verbose; disp('reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
+    s.toggle.reduce_variable_size = true;
+end;
+
+if s.toggle.reduce_variable_size;
+  if s.toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+  s = make_starsun_single(s);
+end;
+
+%% save
+%********************
 if exist('program_version','var');
    s.program_version = catstruct(program_version,evalin('base','program_version'));
 end;
 disp(['Saving: ',savematfile])
-% save(savematfile, '-struct', 's', '-mat');
+save(savematfile, '-struct', 's', '-mat');
 make_small(savematfile);
+make_for_starflag(savematfile);
 contents=[contents; fieldnames(s)];
-
-
 return

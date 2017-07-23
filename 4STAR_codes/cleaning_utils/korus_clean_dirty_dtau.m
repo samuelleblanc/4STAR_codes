@@ -23,7 +23,7 @@ tt = [serial2hs(mrg.time');serial2hs(mrg.time')];
 wls = [380,452, 501,520,532,550,606,620,675, 781,865,1020,1040,1064,1236,1559,1627];
 for wii = length(wls):-1:1
     star.(sprintf('i_%3.0f',wls(wii))) = interp1(star.w, [1:length(star.w)], wls(wii)./1000, 'nearest');
-    AODs(:,wii) = mrg.(sprintf('AOD_dash_%3.0fnm_4STAR',wls(wii)));
+    AODs(:,wii) = mrg.(sprintf('AOD_%3.0fnm_4STAR',wls(wii)));
 end
 bad = AODs<0; AODs(bad) = NaN;
 nAODs = length(wls);
@@ -32,17 +32,17 @@ nwiis = length(wii);
 % star.i_501 = interp1(star.w, [1:length(star.w)],.501,'nearest');
 % star.i_781 = interp1(star.w, [1:length(star.w)],.781,'nearest');
 % AODs = [...
-%     mrg.AOD_dash_501nm_4STAR,...
-%     mrg.AOD_dash_781nm_4STAR];
+%     mrg.AOD_501nm_4STAR,...
+%     mrg.AOD_781nm_4STAR];
 % nAODs = size(AODs,2); % make this match the number of merged AODs to use
 [ainc, cina] = nearest(star.t, mrg.time);  mrg.m_aero = NaN(size(mrg.time)); mrg.m_aero(cina) = star.m_aero(ainc);
-% ainc(mrg.AOD_dash_675nm_4STAR(cina)<=0 | mrg.AOD_dash_QualFlag_4STAR(cina)~=0) = [];
-% cina(mrg.AOD_dash_675nm_4STAR(cina)<=0 | mrg.AOD_dash_QualFlag_4STAR(cina)~=0) =[];
-ainc(isnan(sum(AODs(cina,wii),2)) | mrg.AOD_dash_QualFlag_4STAR(cina)~=0) = [];
-cina(isnan(sum(AODs(cina,wii),2)) | mrg.AOD_dash_QualFlag_4STAR(cina)~=0) = [];
+% ainc(mrg.AOD_675nm_4STAR(cina)<=0 | mrg.AOD_QualFlag_4STAR(cina)~=0) = [];
+% cina(mrg.AOD_675nm_4STAR(cina)<=0 | mrg.AOD_QualFlag_4STAR(cina)~=0) =[];
+ainc(isnan(sum(AODs(cina,wii),2)) | mrg.AOD_QualFlag_4STAR(cina)~=0) = [];
+cina(isnan(sum(AODs(cina,wii),2)) | mrg.AOD_QualFlag_4STAR(cina)~=0) = [];
 cina_ = NaN(size(mrg.time)); cina_(cina) = 0;
 ainc_ = NaN(size(star.t)); ainc_(ainc) = 0;
-mrg.SCAT550nm_dash_dry_total_LARGE(mrg.SCAT550nm_dash_dry_total_LARGE<-100) = NaN;
+mrg.SCAT550nm_dry_total_LARGE(mrg.SCAT550nm_dry_total_LARGE<-100) = NaN;
 cld = zeros(size(mrg.CloudFlag_CPSPD_LARGE)); cld(mrg.CloudFlag_CPSPD_LARGE~=1)=NaN;
 
 
@@ -51,7 +51,7 @@ cld = zeros(size(mrg.CloudFlag_CPSPD_LARGE)); cld(mrg.CloudFlag_CPSPD_LARGE~=1)=
 done = false; cancel = false;
 blip.time_b4 = mrg.time(cina(1));
 blip.wl = wls;
-%     mark.AOD_b4 = [mrg.AOD_dash_501nm_4STAR(cina(1)),mrg.AOD_dash_781nm_4STAR(cina(1))];
+%     mark.AOD_b4 = [mrg.AOD_501nm_4STAR(cina(1)),mrg.AOD_781nm_4STAR(cina(1))];
 blip.AOD_b4 = AODs(cina(1),:);
 blip.time_f2= mrg.time(cina(1));
 blip.AOD_f2= blip.AOD_b4;
@@ -132,7 +132,7 @@ while ~done
     if exist('vs','var')
         axis(ax(3),vs(3,:));
     end
-    figure_(6); plot(serial2hs(star.t), cosd(star.AZstep./(-50)), 'b-',serial2hs(star.t), area_norm, 'gx');
+    figure_(6); plot(serial2hs(star.t), cosd(single(star.AZstep)./(-50)), 'b-',serial2hs(star.t), area_norm, 'gx');
     yl= ylim; yls = [yl(1)+cld'; yl(2)+cld']; mms = [yl(1)+mm';yl(2)+mm'];
     hold('on'); plot(tt(:), yls(:), 'or-',tt(:), mms(:), 'ok-'); hold('off'); ylim(yl);
     % dynamicDateTicks;
