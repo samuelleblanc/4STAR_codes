@@ -10,10 +10,10 @@ fwhm=[];
 V0=[];
 xsect=[];
 if t>=datenum([2016 10 30]); % filter swap (see AATS-14_Filter_ Use_20160305.xls); changes in the format of this function
-    xsect_dir=fullfile(starpaths, 'raw', 'AATS');
-    if ~exist(xsect_dir);
-        xsect_dir = fullfile(starpaths, 'source', 'AATS');
-    end;
+    xsect_dir=getnamedpath('AATS_xsect');
+%     if ~exist(xsect_dir);
+%         xsect_dir = fullfile(starpaths, 'source', 'AATS');
+%     end;
     CrossSec_name='Ames14#1_2012_05182012.asc' %'Ames14#1_2008_05142008.asc'; %'Ames14#1_20160307.asc';%'Ames14#1_2008_05142008.asc'(ARCATS-summer),'Ames14#1_2011_09222011.asc'(MLO-Sept2011),'Ames14#1_2012_05182012.asc' (MLO-May2012)
     fid=fopen(fullfile(xsect_dir, CrossSec_name));
     fgetl(fid);
