@@ -1,4 +1,4 @@
-function s = make_starsun_single(s_in)
+function s = make_starsun_single(s)
 
 %% Details of the program:
 % NAME:
@@ -12,7 +12,7 @@ function s = make_starsun_single(s_in)
 %   s = make_starsun_single(s_in);
 %
 % INPUT:
-%   s_in: (optional) starsun structure with all the variables typically saved in
+%   s: (optional) starsun structure with all the variables typically saved in
 %         starsun.mat or full file path of a starsun.mat file. If ommitted, will
 %         ask to choose starsun.mat file
 %
@@ -32,46 +32,49 @@ function s = make_starsun_single(s_in)
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, Moffett Field, CA, 2016-10-25
+%Connor, v2.0, 2017/07/23, converted all to single unless exempted 
+% since integers restrict arithmetic 
+%size
 % 
 % -------------------------------------------------------------------------
 
 %% Start of function
-version_set('v1.0')
+version_set('v2.0')
 
 %% Sanitize input and load file if needed
-if exist('s_in','var')
-    if ~isstruct(s_in)
+if exist('s','var')
+    if ~isstruct(s)
         % not a structure
-        starsun_file = fullfile(s_in)
-        s_in = load(starsun_file);
+        starsun_file = fullfile(s)
+        s = load(starsun_file);
     end
 else
      % not defined variable, ask to load starsun
      starsun_file = getfullname('*starsun_*.mat','starsun','Select starsun file for analysis');
-     s_in = load(starsun_file);
+     s = load(starsun_file);
 end
 
 %% Now prepare a list of fields that should be integers should not be changed to singles
-to_uint16 = {'Str','Md','Zn','aerosolcols','viscols',...
-          'nircols','visTint','nirTint','visAVG','nirAVG','visfilen','nirfilen'};
-to_int16 = {'AZstep','Elstep'};
+% to_uint16 = {'Str','Md','Zn','aerosolcols','viscols',...
+%           'nircols','visTint','nirTint','visAVG','nirAVG','visfilen','nirfilen'};
+% to_int16 = {'AZstep','Elstep'};
 keep_double = {'t','Lat','Lon','vist','nirt'};
-flds = fields(s_in);
+flds = fields(s);
 
 %% Run through the fields and substitute for single precision (or int)
 for i=1:length(flds);
-    if isa(s_in.(flds{i}),'double')
-       if strmatch(flds{i},to_uint16)
-           s.(flds{i}) = uint16(s_in.(flds{i}));
-       elseif strmatch(flds{i},to_int16)
-           s.(flds{i}) = int16(s_in.(flds{i}));
-       elseif strmatch(flds{i},keep_double)
-           s.(flds{i}) = s_in.(flds{i});
-       else
-           s.(flds{i}) = single(s_in.(flds{i}));
-       end
-    else
-        s.(flds{i}) = s_in.(flds{i});
+    if isa(s.(flds{i}),'double') && ~any(strcmp(flds{i},keep_double))
+%        if strmatch(flds{i},to_uint16)
+%            s.(flds{i}) = uint16(s_in.(flds{i}));
+%        elseif strmatch(flds{i},to_int16)
+%            s.(flds{i}) = int16(s_in.(flds{i}));
+%        elseif strmatch(flds{i},keep_double)
+%            s.(flds{i}) = s_in.(flds{i});
+%        else
+           s.(flds{i}) = single(s.(flds{i}));
+%        end
+%     else
+%         s.(flds{i}) = s_in.(flds{i});
     end;
 end;
 
