@@ -971,14 +971,14 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
             dnul = strsplit(pnul,'_');
             if dnul{1}==daystr;
                 if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
-                if toggle.starflag_mode==1;
-                    toggle.starflag_mode = 3;
-                end;
+%                 if toggle.starflag_mode==1;
+%                     toggle.starflag_mode = 3;
+%                 end;
             end
         end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
-        [s.flags, good]=starflag(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual, flagging=3, load existing
+        [s.flags, good]=starflag_(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual
         if toggle.runwatervapor;
             % apply auto gas flagging
             [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
