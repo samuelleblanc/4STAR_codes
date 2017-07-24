@@ -17,7 +17,7 @@
 %********************
 %daystr='20160426';% airborne KORUS-AQ
 %daystr='20130712';
-daystr='20160825';
+daystr='20170531';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -51,12 +51,12 @@ ok=incl(t,langley);
 % load H2O a and b parameters
 % watvapcoef   = load(strcat(starpaths,'cross_sections_uv_vis_swir_all.mat'));                                % 3.4km MidLatSummer-old FWHM
 % watvapcoef   = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));        % Alt=0km MidLatSummer 
-% watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));        % 3.4km Tropical MLO
+watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));          % 3.4km Tropical MLO
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');   % 6.85km MidLatWinter for 20130214
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');      % 6.0km MidLatWinter for 20130212
 % watvapcoef = load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);              % 6.0km MidLatWinter for 20130212
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat'); % 6.0km-3coef. MidLatwinter
-  watvapcoef = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));               % Mid-Lat summer use for ORACLES 2nd transit  
+% watvapcoef = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));               % Mid-Lat summer use for ORACLES 2nd transit  
 
  
  % interpolate H2O parameters to whole wln grid
@@ -87,6 +87,9 @@ if strcmp(daystr,'20141002')
 elseif strcmp(daystr,'20151106')
     % adjust values for NAAMES ground 20151104
      am = [min(m_H2O(ok)) 7.2]; 
+elseif strcmp(daystr,'20170531')
+    % adjust values for NAAMES ground 20151104
+     am = [2 7];      
 else
     am = [min(m_H2O(ok)) max(m_H2O(ok))];
     % adjust values for MLO 2013

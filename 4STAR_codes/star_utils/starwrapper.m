@@ -92,6 +92,7 @@ function	s=starwrapper(s, s2, varargin)
 % MS, 2016-01-16, refined auto flags for gases statements (Lines 1006-1014)
 % SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
 %                       support for multiinstruments
+% MS: 2017-07-22, omitted toggle gassubtract for O4 calculation/rateslant
 
 version_set('2.8');  
 %********************
@@ -743,7 +744,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     s.tau_aero=s.tau_aero_noscreening;
     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    if toggle.gassubtract
+    %if toggle.gassubtract
         tau_O4nir          = s.tau_O4; 
         if ~strcmp(instrumentname,'2STAR');
             tau_O4nir(:,1:1044)=0;
@@ -754,7 +755,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-    end;
+    %end;
     
     % compare rate structures:
     
