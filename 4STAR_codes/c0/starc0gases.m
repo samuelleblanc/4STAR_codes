@@ -173,8 +173,8 @@ end;
         
         % ORACLES 2017
         
-        elseif t> datenum([2017 5 30 0 0 0]); % use MLO June-2017-ORACLES    
-        if now>=datenum([2017 5 30 0 0 0]);
+        elseif t> datenum([2017 2 1 0 0 0]); % use MLO June-2017-ORACLES    
+        if now>=datenum([2017 2 1 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
                     % use MLO c0
