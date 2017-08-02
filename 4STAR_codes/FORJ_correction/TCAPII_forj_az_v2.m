@@ -28,7 +28,7 @@ bar = bar<1 | bar>359; % Logical that identifies the wrap point (in order to set
 pix_630 = interp1(forj_vis.nm, [1:length(forj_vis.nm)],630,'nearest');
 %%
 
-dark = forj_vis.t.shutter==0 & forj_vis.spectra(:,pix_630)<210;
+dark = forj_vis.t.shutter==0 & forj_vis.spectra(:,pix_630)<310;
 darks_vis = mean(forj_vis.spectra(dark,:));
 % darks_nir = mean(forj_nir.spectra(dark,:))
 % figure; plot(forj_vis.nm, forj_vis.spectra(~dark,:)-ones([sum(~dark),1])*darks,'-'); zoom('on')

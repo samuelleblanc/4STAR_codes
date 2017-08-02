@@ -3,8 +3,10 @@ function track = rd_tracking_F4_v2(infile);
 %% Function to read the tracking files, original from CJF
 % SL, v2.1, 2016-08-23, added version_set to control this document, added
 %                       handling of the instrument name in the filenames
+% SL, v2.2, 2017-07-20, added error tracking for reading of lines, matlab
+%                       2016a gives error when using buffersize
 
-version_set('2.1')
+version_set('2.2')
 
 %%
 if ~exist('infile','var')||~exist(infile,'file')
@@ -37,9 +39,17 @@ first_row = fgetl(fid);
 fseek(fid, start,-1);
 PM = ~isempty(strfind(first_row,'PM'))||~isempty(strfind(first_row,'AM'));
 if PM
+    try; 
     [C] = textscan(fid, '%d %s %s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]', 'bufsize',20000);
+    catch
+        [C] = textscan(fid, '%d %s %s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]');% , 'bufsize',20000);
+    end;
 else
+    try; 
     [C] = textscan(fid, '%d %s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]', 'bufsize',20000);
+    catch;
+    [C] = textscan(fid, '%d %s %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]'); %, 'bufsize',20000);
+    end;
 end
 fclose(fid);
 

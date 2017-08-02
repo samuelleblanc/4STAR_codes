@@ -9,8 +9,8 @@
 
 function create_all_forj
 
-vis = getfullname('*_VIS_FORJ*.dat','ARISE','Select Forj Az dat file.');
-nir = getfullname('*_NIR_FORJ*.dat','ARISE','Select Forj Az dat file.');
+vis = getfullname('*_VIS_FORJ*.dat','ORACLES','Select Forj Az dat file.');
+nir = getfullname('*_NIR_FORJ*.dat','ORACLES','Select Forj Az dat file.');
 
 
 [pname_, fname, ext] = fileparts(vis);
@@ -34,8 +34,8 @@ plot_dir = [plot_dir,filesep];
 if exist([starpaths,'forj_all.mat'],'file')
     forj_out = load([starpaths,'forj_all.mat']);
 end
-%files = dir([pname_, filesep,'*_VIS_FORJ*.dat']);
-files = dir([pname_, filesep,'*_NIR_FORJ*.dat']);
+files = dir([pname_, filesep,'*_VIS_FORJ*.dat']);
+%files = dir([pname_, filesep,'*_NIR_FORJ*.dat']);
 
 in = 0;
 for f = 1:length(files)

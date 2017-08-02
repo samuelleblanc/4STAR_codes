@@ -1,7 +1,7 @@
 %% plot aod_ict
 %---------------
 
-ict = ictread('D:\MichalsData\KORUS-AQ\aod_ict\korusaq-4STAR-AOD_DC8_20160601_R1.ict');
+ict = ictread('E:\MichalsData\KORUS-AQ\aod_ict\korusaq-4STAR-AOD_DC8_20160601_R1.ict');
 
 % AOD 500 nm - all
 % AOD 500 nm - good (qual_flag==0)
@@ -44,14 +44,14 @@ xlabel('time [UTC]');ylabel('AOD');title(ict.note);
 %dslist={'20160426' '20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 dslist={'20160501' '20160503' '20160504' '20160506' '20160510' '20160511' '20160512' '20160516' '20160517' '20160519' '20160521' '20160524' '20160526' '20160529' '20160530' '20160601' '20160602' '20160604' '20160608' '20160609' '20160614' '20160617' '20160618'} ; %put one day string
 %dslist={'20160601','20160604','20160609','20160614','20160617','20160618'} ; %put one day string
-dslist={'20160510'};
-path0707 = 'D:\MichalsData\KORUS-AQ\aod_ict\with_0707c0_corrected\';% no deposition correction
-path0426 = 'D:\MichalsData\KORUS-AQ\aod_ict\with_0426c0_corrected\';% no deposition correction
+dslist={'20160510','20160519','20160602','20160604','20160609'};
+path0707 = 'E:\MichalsData\KORUS-AQ\aod_ict\with_0707c0_corrected\';% no deposition correction
+path0426 = 'E:\MichalsData\KORUS-AQ\aod_ict\with_0426c0_corrected\';% no deposition correction
 
 for i=1:length(dslist)
 
     ict0707 = ictread([path0707,'korusaq-4STAR-AOD_DC8_',dslist{:,i},'_R1.ict']);
-    ict0426 = ictread([path0426,'korusaq-4STAR-AOD_DC8_',dslist{:,i},'_R1.ict']);
+    ict0426 = ictread([path0426,'korusaq-4STAR-AOD_DC8_',dslist{:,i},'_R2.ict']);
     
     % compare AOD with altitude - no window deposition correction
     
@@ -86,7 +86,7 @@ for i=1:length(dslist)
     %x_width=7.25 ;y_width=9.125;
     %set(gcf, 'PaperPosition', [0 0 x_width y_width]); 
     set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 9.125], 'PaperUnits', 'Inches', 'PaperSize', [10, 9.125])
-    fi = strcat('D:\MichalsData\KORUS-AQ\aod_ict\aod_ict_figs_June-15-archive\',dslist{:,i},'AOD_per_Alt_compare_c0_corrected');
+    fi = strcat('E:\MichalsData\KORUS-AQ\aod_ict\aod_ict_figs_June-15-archive\',dslist{:,i},'AOD_per_Alt_compare_c0_corrected');
     save_fig(11,fi,false);
     
     close(11);
@@ -118,7 +118,7 @@ for i=1:length(dslist)
     linkaxes(ax,'x');
     
     set(gcf, 'Units', 'Inches', 'Position', [0, 0, 10, 9.125], 'PaperUnits', 'Inches', 'PaperSize', [10, 9.125])
-    fi = strcat('D:\MichalsData\KORUS-AQ\aod_ict\aod_ict_figs_June-15-archive\',dslist{:,i},'AOD_500nm_timeseries_corrected');
+    fi = strcat('E:\MichalsData\KORUS-AQ\aod_ict\aod_ict_figs_June-15-archive\',dslist{:,i},'AOD_500nm_timeseries_corrected');
     save_fig(111,fi,false);
     close(111);
 

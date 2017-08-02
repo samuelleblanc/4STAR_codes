@@ -179,7 +179,7 @@ end;
 %define operator for manual screening mode (mode=2)
 if (Mode==2)
     op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
-        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
+        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone','Yana Karol');
     op_name_str = '?';
     switch op_name
         case 1
@@ -198,6 +198,8 @@ if (Mode==2)
             op_name_str = 'JR';
         case 8
             op_name_str = 'KP';
+        case 9
+            op_name_str = 'YK';
     end
 end
 
@@ -321,7 +323,7 @@ if (Mode==1)
     flags_str.cirrus = '';
     flags_str.low_cloud = '';
     flags_str.hor_legs = '';
-    %     flags_str.vert_legs = '';
+    flags_str.vert_legs = '';
     flags_str.unspecified_aerosol = '';
     flags_str.frost = '';
     reset_flags=true;
@@ -350,7 +352,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            %             flags_str.vert_legs = '';
+            flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -372,7 +374,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            %             flags_str.vert_legs = '';
+            flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -391,7 +393,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            %             flags_str.vert_legs = '';
+            flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             
@@ -462,7 +464,7 @@ if (Mode==2)
             flags_str.cirrus = '';
             flags_str.low_cloud = '';
             flags_str.hor_legs = '';
-            %             flags_str.vert_legs = '';
+            flags_str.vert_legs = '';
             flags_str.unspecified_aerosol = '';
             flags_str.frost = '';
             reset_flags=true;
@@ -479,7 +481,7 @@ if (reset_flags)
     if ~isempty(flags_str.cirrus) flags.cirrus=eval(flags_str.cirrus);else flags.cirrus = []; end
     if ~isempty(flags_str.low_cloud) flags.low_cloud=eval(flags_str.low_cloud);else flags.low_cloud = []; end
     if ~isempty(flags_str.hor_legs) flags.hor_legs=eval(flags_str.hor_legs);else flags.hor_legs = []; end
-    %     if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
+    if ~isempty(flags_str.vert_legs) flags.vert_legs=eval(flags_str.vert_legs);else flags.vert_legs = []; end
     if ~isempty(flags_str.unspecified_aerosol) flags.unspecified_aerosol=eval(flags_str.unspecified_aerosol);else flags.unspecified_aerosol = []; end
     if ~isempty(flags_str.frost) flags.frost=eval(flags_str.frost);else flags.frost = []; end
     auto_settings = flags_str;

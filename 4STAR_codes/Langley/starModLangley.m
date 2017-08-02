@@ -17,7 +17,7 @@
 %********************
 %daystr='20160426';% airborne KORUS-AQ
 %daystr='20130712';
-daystr='20160825';
+daystr='20170604';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -40,23 +40,42 @@ load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_a
 
 tau_aero = tau_aero_noscreening;
 
-starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
-s=importdata(starinfofile);
+infofile_ = ['starinfo_' daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+s='';s.dummy = '';
+try
+   s = infofnt(s);
+catch
+   eval([infofile_(1:end-2),'(s)']);
+end
+
+% this is old starinfo version
+%starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
+%s=importdata(starinfofile);
 %s1=s(strmatch('langley',s));
-s1=s(strncmp('langley',s,1));
-eval(s1{:});
+%s1=s(strncmp('langley',s,1));
+%eval(s1{:});
+%
 % chose Langley period values
-ok=incl(t,langley);
+% langley1 is for 20170531
+if strcmp(daystr,'20170531')
+    ok=incl(t,s.langley1);
+% langley1 is for 20170604
+elseif strcmp(daystr,'20170604')
+    ok=incl(t,s.langley2);
+else
+    ok=incl(t,s.langley);
+end
 % load water vapor coef
 % load H2O a and b parameters
 % watvapcoef   = load(strcat(starpaths,'cross_sections_uv_vis_swir_all.mat'));                                % 3.4km MidLatSummer-old FWHM
 % watvapcoef   = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));        % Alt=0km MidLatSummer 
-% watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));        % 3.4km Tropical MLO
+watvapcoef  = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat'));          % 3.4km Tropical MLO
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat');   % 6.85km MidLatWinter for 20130214
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat');      % 6.0km MidLatWinter for 20130212
 % watvapcoef = load([starpaths 'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat']);              % 6.0km MidLatWinter for 20130212
 % watvapcoef = load('C:\MatlabCodes\data\H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6000m_c.mat'); % 6.0km-3coef. MidLatwinter
-  watvapcoef = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));               % Mid-Lat summer use for ORACLES 2nd transit  
+% watvapcoef = load(strcat(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));               % Mid-Lat summer use for ORACLES 2nd transit  
 
  
  % interpolate H2O parameters to whole wln grid
@@ -87,6 +106,9 @@ if strcmp(daystr,'20141002')
 elseif strcmp(daystr,'20151106')
     % adjust values for NAAMES ground 20151104
      am = [min(m_H2O(ok)) 7.2]; 
+elseif strcmp(daystr,'20170531')|| strcmp(daystr,'20170604')
+    
+     am = [2 12];      
 else
     am = [min(m_H2O(ok)) max(m_H2O(ok))];
     % adjust values for MLO 2013
@@ -217,6 +239,13 @@ elseif strcmp(daystr,'20160825')  % ORACLES transit 2
     c0mod = c0vis;
     c0mod(iwln) = c0_mod;
     filesuffix='modified_Langley_ORACLES_transit2'; 
+    visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
+elseif strcmp(daystr,'20170531')||strcmp(daystr,'20170604')  % MLO May 2017 for ORACLES 2
+    c0=importdata(fullfile(starpaths,  '20170527_VIS_C0_refined_Langley_MLO_May2017.dat'));
+    c0vis = c0.data(:,3);
+    c0mod = c0vis;
+    c0mod(iwln) = c0_mod;
+    filesuffix='modified_Langley_MLO_May2017'; 
     visfilename=fullfile(starpaths, [daystr '_VIS_C0_' filesuffix '.dat']);
 else % MLO modified Langleys
     %c0file = strcat(daystr,'_VIS_C0_refined_Langley_MLO_screened_2x.dat');

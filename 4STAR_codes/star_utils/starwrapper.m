@@ -92,6 +92,7 @@ function	s=starwrapper(s, s2, varargin)
 % MS, 2016-01-16, refined auto flags for gases statements (Lines 1006-1014)
 % SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
 %                       support for multiinstruments
+% MS: 2017-07-22, omitted toggle gassubtract for O4 calculation/rateslant
 
 version_set('2.8');  
 %********************
@@ -269,14 +270,15 @@ elseif exist(infofile)==2;
 else; % copy an existing old starinfo file and run it
     while dayspast<maxdayspast;
         dayspast=dayspast+1;
-        infofile_previous=fullfile(starpaths, ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
+        infofile_previous=fullfile(starpaths, ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
         if exist(infofile_previous);
-            copyfile(infofile_previous, infofile);
-            open(infofile);
-            run(infofile);
+            copyfile(infofile_previous, infofile_);
+            open(infofile_);
+            eval([infofile_(1:end-2),'(s)']);
+            %run(infofile_);
             %             eval(['edit ' infofile ';']);
             %             eval(['run ' infofile ';']);
-            warning([infofile ' has been created from ' ['starinfo' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
+            warning([infofile_ ' has been created from ' ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
             break;
         end;
     end;
