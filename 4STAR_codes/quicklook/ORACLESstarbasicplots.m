@@ -62,9 +62,12 @@ slsun(daystr, 't', 'w', 'Alt', 'aerosolcols', 'viscols', 'nircols', ...
     'tau_aero', 'tau_aero_noscreening', 'raw', 'm_aero', 'QdVlr', 'QdVtb', 'QdVtot','cwv','gas','flagsCWV','flagsO3','flagsNO2','flagsHCOH'); % sun data and nav data associated with them
 [visc,nirc,viscrange,nircrange]=starchannelsatAATS(t);
 c=[visc(1:10) nirc(11:13)+1044];
+visc2=[visc(1) visc(3:10)];
 colslist={'' c 1:13
-    'VISonly' visc(3:9) 3:9
+    'VISonly' visc2 1:9
     'NIRonly' nirc(11:13)+1044 11:13};
+% 'VISonly' visc(3:10) 3:10
+% 'VISonly' visc(3:9) 3:9
 
 % read auxiliary data from starinfo and select rows
 evalstarinfo(daystr, 'flight');
@@ -330,14 +333,14 @@ pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 %********************
 % raw count
 figure;
-[h,filename]=spsun(daystr, 't', 'raw', '.', vars.Alt{:}, mods{:}, ...
+[h,filename]=spsun(daystr, 't', 'raw', '.', vars.Alt{:}, mods{:}, vars.xtlim{:},...
     'cols', c, ...
     'filename', ['star' daystr platform 'rawcounttseries']);
 pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 
 % dark count
 figure;
-[h,filename]=spsun(daystr, 't', 'dark', '.', 't', Alt/100, mods{:}, ...
+[h,filename]=spsun(daystr, 't', 'dark', '.', 't', Alt/100, mods{:}, vars.xtlim{:},...
     'cols', c, ...
     'filename', ['star' daystr platform 'darkcounttseries']);
 pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
@@ -366,7 +369,7 @@ for k=1:size(colslist,1); % for multiple sets of wavelengths
         text(mean(t([1 end])), mean(yl), 'No data', 'fontsize', 60, 'horizontalalignment', 'center', 'verticalalignment','middle');
         hold on;
     end;
-    [h,filename]=spsun(daystr, 't', tau_aero, '.', vars.Alt1e4{:}, mods{:}, ...
+    [h,filename]=spsun(daystr, 't', tau_aero, '.', vars.Alt1e4{:}, mods{:},vars.xtlim{:}, ...
         'cols', colslist{k,2}, 'ylabel', 'tau_aero', ...
         'ylim', yl, ...
         'filename', ['star' daystr platform 'tau_aerotseries' colslist{k,1}]);
@@ -439,7 +442,7 @@ if exist('no22plot');
     
        
        figure;
-       [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, 'ylim', [-0.5 2],...
+       [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, vars.xtlim{:},'ylim', [-0.5 2],...
            'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
            'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
@@ -469,7 +472,7 @@ if exist('hcoh2plot');
     
        
        figure;
-       [h,filename]=spsun(daystr, 't', hcoh2plot, '.', vars.Alt1e4{:}, mods{:}, 'ylim', [-1 10],...
+       [h,filename]=spsun(daystr, 't', hcoh2plot, '.', vars.Alt1e4{:}, mods{:}, vars.xtlim{:},'ylim', [-1 10],...
            'cols', colslist{k,2}, 'ylabel', 'HCOH [DU]', ...
            'filename', ['star' daystr platform 'hcohtseries' colslist{k,1}]);
        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
@@ -501,7 +504,7 @@ end;
 if exist('tau_aero_scaled');
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
-        [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, ...
+        [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, vars.xtlim{:},...
             'cols', colslist{k,2}, 'ylabel', 'tau_aero_scaled', ...
             'filename', ['star' daystr platform 'tau_aero_scaledtseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
