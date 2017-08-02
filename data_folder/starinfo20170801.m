@@ -8,6 +8,8 @@ s.O3h=21; % Yohei's guess
 s.O3col=0.268; % Yohei's guess    
 s.NO2col=2.0e15; % Yohei's guess 
 
+s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+
 % other tweaks
 if isfield(s, 'Pst');
     s.Pst(find(s.Pst<10))=680.25; 
