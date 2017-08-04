@@ -41,7 +41,7 @@ flagfile = [daystr,'_starflag_auto_created_',now_str,'.mat'];
 flags.flagfile = flagfile; % make it so that we save the flagfile name.
 %Define ouput file names
 % Use "which" to locate directory containing starinfo and put flag files in same location
-outputfile=[starpaths,filesep,flagfile];
+outputfile=[getnamedpath('Github_4STAR_data_folder'),flagfile];
 op_name_str = 'auto';
 disp(['Automatic flags written to: ' flagfile])
 

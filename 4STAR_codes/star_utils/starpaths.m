@@ -51,9 +51,11 @@ askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
    matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files',reset) ;
    figurefolder=getnamedpath('4STAR_images','4STAR image files',reset);
+   getnamedpath('starsun', '4STAR starsun files',reset);
 else
    matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files') ;
    figurefolder=getnamedpath('4STAR_images','4STAR image files');
+   getnamedpath('starsun', '4STAR starsun files');
 end
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
