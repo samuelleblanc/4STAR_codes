@@ -33,34 +33,57 @@ if ~exist('Mode','var') || Mode~=1
     Mode = 2;
 end
 
-[flags, inp] = define_starflags_20160605(s);
+upath = strrep(strrep(userpath,';',filesep),[filesep filesep],filesep);
+tmp_file = [upath, '~starflags.mat'];
+if exist(tmp_file,'file')
+      tmpio = matfile(tmp_file); 
+end
+fresh_start = true;
+if Mode==2 && exist(tmp_file,'file')&&any(strcmp(properties(tmpio),'flagfile'))
+   flagfile = tmpio.flagfile;
+   fresh_start = logical(menu({['There is an unsaved temporary starflags file intended as:'];[' "',flagfile,'"'];['Load this temp starflags file and continue, or start fresh?']}, 'Load it','Start fresh')-1);
+   if fresh_start 
+      delete(tmp_file);
+      clear tmpio
+   else
+      flags = load(tmp_file);
+      flags_matio = matfile(tmp_file,'writable',true);
+   end
+end
 
 t = s.t;
-daystr = datestr(t(1),'yyyymmdd'); now_str = datestr(now,'yyyymmdd_HHMM');
-flagfile = [daystr,'_starflag_auto_created_',now_str,'.mat'];
-flags.flagfile = flagfile; % make it so that we save the flagfile name.
-%Define ouput file names
-% Use "which" to locate directory containing starinfo and put flag files in same location
-outputfile=[getnamedpath('Github_4STAR_data_folder'),flagfile];
-op_name_str = 'auto';
-disp(['Automatic flags written to: ' flagfile])
+daystr = datestr(t(1),'yyyymmdd'); 
+now_str = datestr(now,'yyyymmdd_HHMM');
 
-[~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
-if ~exist(outputfile,'file')
-    disp(['Creating ',outmat]);
-    save(outputfile,'-struct','flags','-v7.3');
-else
-    disp(['Appending to ',outmat]);
-    save(outputfile,'-append','-struct','flags');
+if Mode==1 || fresh_start % Then output flag file with auto-generated flags
+   [flags, inp] = define_starflags_20160605(s);
+   flagfile = [daystr,'_starflag_auto_created_',now_str,'.mat'];
+   flags.flagfile = flagfile; % make it so that we save the flagfile name.
+   %Define ouput file names
+   % Use "which" to locate directory containing starinfo and put flag files in same location
+   outputfile=[getnamedpath('starinfo','Select where starinfo files and flag files are to be saved.'),flagfile];
+   op_name_str = 'auto';
+   disp(['Automatic flags written to: ' flagfile])
+   
+   if ~exist(outputfile,'file')
+      disp(['Creating ',flagfile]);
+      save(outputfile,'-struct','flags','-v7.3');
+   else
+      disp(['Appending to ',flagfile]);
+      save(outputfile,'-append','-struct','flags');
+   end
+   save(tmp_file,'-struct','flags','-v7.3');
+   flags_matio = matfile(tmp_file,'writable',true);
+   
+   [flag_all, flag_names_all, flag_tag_all] = cnvt_flags2ng(t, flags);
+   if ~isempty(flag_all)
+      [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
+   end
 end
 
-[flag_all, flag_names_all, flag_tag_all] = cnvt_flags2ng(t, flags);
-if ~isempty(flag_all)
-    [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
-end
 
 if Mode~=1
-    op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
+      op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
         'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
     op_name_str = '?';
     switch op_name
@@ -82,12 +105,26 @@ if Mode~=1
             op_name_str = 'KP';
     end
 
+    flagfile = [daystr,'_starflag_man_created_',now_str, 'by_',op_name_str,'.mat'];
+    outputfile=[getnamedpath('starinfo'),flagfile]; 
+    disp(['Starflag manual flags output to:' flagfile])
+    
+%     save(tmp_file, '-struct','flags','-v7.3');
+%     flags_matio = matfile(tmp_file,'Writable',true);
+    flags_matio.flagfile = flagfile; flags.flagfile = flagfile;
+    time.t = t;
+    flags_matio.time = time; flags.time.t = t;
+    
+    mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
+    disp(['Corresponding "marks" m-file to: ',mark_fname]);    
 
     % Define flags which do not flag data as "bad".
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
 
-    
+    if ~exist('inp','var')
+       [~, inp] = define_starflags_20160605(s);
+    end
     %We define several fields to plot in the auxiliary panels
     panel_1.aod_380nm = inp.aod_380nm;
     panel_1.aod_452nm = inp.aod_452nm;
@@ -133,17 +170,7 @@ if Mode~=1
     end
     screen_bad_list = F_t(~test_good);
             
-    flagfile = [daystr,'_starflag_man_created',now_str, 'by_',op_name_str,'.mat'];
-    outputfile=[starpaths,flagfile];
-    disp(['Starflag mode 2 to output to:' flagfile])
-    
-    flags_matio = matfile(outputfile,'Writable',true);
-    flags_matio.flagfile = flagfile;
-    
-    mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
-    disp(['Corresponding "marks" m-file to: ',mark_fname]);
-        
-    [flags, screen, good, figs] = visi_screen_v14(t,inp.aod_500nm,'time_choice',1,'flags',flags,'flags_matio',flags_matio,'no_mask',flags.flag_struct.flag_noted,'figs',figs,...
+    [flags, screen, good, figs] = visi_screen_v15(t,inp.aod_500nm,'time_choice',1,'flags',flags,'flags_matio',flags_matio,'no_mask',flags.flag_struct.flag_noted,'figs',figs,...
         'panel_1', panel_1, 'panel_2',panel_2,'panel_3',panel_3,'panel_4',panel_4,'ylims',ylims, 'figs',figs,'field_name','aod 500nm');
     %     ,...
     %         'special_fn_name','Change sd_aero_crit','special_fn_flag_name','unspecified_clouds','special_fn_flag_str',flags_str.unspecified_clouds,'special_fn_flag_var','sd_aero_crit');
@@ -177,7 +204,6 @@ if Mode~=1
         disp(['Appending to ',outmat]);
         save(outputfile,'-append','-struct','flags');
     end
-    
     % Output an m-file representing all these flags in "ng" format
     [flag_all, flag_names_all, flag_tag_all] = cnvt_flags2ng(t, flags);
     if ~isempty(flag_all)
@@ -279,20 +305,12 @@ end
 %Write output file:
 %Mode 1: YYYYMMDD_auto_starflag_createdYYYYMMDD_HHMM.mat
 %Mode 2: YYYYMMDD_man_starflag_createdYYYYMMDD_HHMM_by_Op.mat
-flags.flagfile = flagfile; % make it so that we save the flagfile name.
-[~,outmat,ext] = fileparts(outputfile); outmat = [outmat,ext];
-if ~exist(outputfile,'file')
-    disp(['Creating ',outmat]);
-    save(outputfile,'-struct','flags');
-else
-    disp(['Appending to ',outmat]);
-    save(outputfile,'-append','-struct','flags');
-end
 
 if ~exist('good','var')
     good = [];
 end
 
+delete(tmp_file);
 return
 
 

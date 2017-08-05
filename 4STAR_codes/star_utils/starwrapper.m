@@ -93,8 +93,11 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
 %                       support for multiinstruments
 % MS: 2017-07-22, omitted toggle gassubtract for O4 calculation/rateslant
+% CF: 2017-08-04,       Modified logic related to starpaths and getnamedpath
+%                       Meshed starwrapper with logic for new starflag
+%                       Added Alt_from_P to replace Alt==0 with pressure Altitude 
 
-version_set('2.8');  
+version_set('2.9');  
 %********************
 %% prepare for processing
 %********************
@@ -487,6 +490,13 @@ s.Az_gnd = mod(s.Az_gnd,360);
 % sun tracking (Str==1, balanced quads, high enough Qd_tot) to determine an
 % offset between where we thought we were pointing and the ephemeris.  And
 % correct our Az_true and El_true to agree with the ephemeris 
+%********************
+%% If Alt is 0 from telemetry, attempt to replace by pressure altitude
+if s.airborne
+[~, test_Alt] = Alt_from_P(s.Pst);
+bad_Alt = (s.Alt==0)&(s.Pst>0);
+s.Alt(bad_Alt) = test_Alt(bad_Alt); 
+end
 
 %********************
 %% adjust the count rate

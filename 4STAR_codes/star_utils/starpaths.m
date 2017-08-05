@@ -49,13 +49,17 @@ vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files',reset) ;
-   figurefolder=getnamedpath('4STAR_images','4STAR image files',reset);
-   getnamedpath('starsun', '4STAR starsun files',reset);
+   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files.',reset) ;
+   figurefolder=getnamedpath('4STAR_images','4STAR image files.',reset);
+   getnamedpath('allstarmat','Select the location for "allstarmat" files...',reset);
+   getnamedpath('starsun', 'Select the location for starsun mat-file...',reset);
+   getnamedpath('starinfo', 'Select the location for starinfo m-files...',reset);   
 else
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files') ;
-   figurefolder=getnamedpath('4STAR_images','4STAR image files');
-   getnamedpath('starsun', '4STAR starsun files');
+   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files.') ;
+   figurefolder=getnamedpath('4STAR_images','4STAR image files.');
+   getnamedpath('allstarmat','Select the location for "allstarmat" files...');
+   getnamedpath('starsun', 'Select the location for starsun mat-file...');
+   getnamedpath('starinfo', 'Select the location for starinfo m-files...');
 end
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
@@ -64,13 +68,13 @@ elseif ~isempty(strfind(lower(userpath),'meloe'));
     author='Meloe';
 elseif ~isempty(strfind(lower(userpath),'qin'));
     author='Qin';
-elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor')) 
+elseif ~isempty(strfind(lower(userpath),'d3k014')) || ~isempty(strfind(lower(userpath),'connor')) 
     author='Connor';
 elseif ~isempty(strfind(lower(userpath),'jredeman'));
     author='Jens';
 elseif ~isempty(strfind(lower(userpath),'livings'));
     author='John';
-elseif ~isempty(strfind(lower(userpath),'ys')) | ~isempty(strfind(lower(userpath),'yohei'))
+elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath1),'yohei')); % Yohei's laptop
     author='Yohei';
