@@ -647,14 +647,16 @@ while ~done
     axis(v_);
     flags_matio.screen = screen(:,FI);
     flags_matio.screened = screened;
-    
+    for f = 1:length(flag_names)
+       flags_matio.(flag_names{f}) = logical(bitget(screen(:,FI),f));
+    end
 end
 %%
 for f = 1:length(flag_names)
-    flags.(char(flag_names(f))) = logical(bitget(screen(:,FI),f));
+    flags.(flag_names{f}) = logical(bitget(screen(:,FI),f));;
 end
 % flags.time.t = time';
-flags_matio.flags = flags;
+
 
 %%
 good = screened==0;
