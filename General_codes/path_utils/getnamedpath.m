@@ -6,16 +6,22 @@ function [fullpath] = getnamedpath(pathfile,dialog,reset)
 % 'dialog' is a string that will be provided to the user to prompt for the
 % selection of an appropriate path if the supplied pathfile isn't found or
 % doesn't map to an existing directory.
-% 'reset' is a boolean indicating whether to reset the pathfile contents
+% 'reset' indicates whether to reset the pathfile contents.  It can be
+% provided as a string 'reset' or 'true' or 't', or as a numeric that will be cast
+% into a logical as reset = logical(reset), so 1 = true, ~1 = false.
 %
 % 2017-03-21, CJF: Modified for robustness. Potential replacement for starpaths
+% 2017-08-05, CJF: Handle alternate forms for argument "reset"
 
-version_set('1.0'); 
+version_set('1.1'); 
 % Handle whether "reset" is provided or not
 if ~exist('reset','var')
    reset = false;
 else
    % Handle incorrect class for "reset"
+   if ischar(reset)
+      reset = strcmpi(reset,'reset')||strcmpi(reset(1),'t');
+   end
    try
       reset = logical(reset);
    catch
