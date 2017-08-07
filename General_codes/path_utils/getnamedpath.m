@@ -94,14 +94,7 @@ end
 % within a directory and strip the filepath, so we let the user choose.
 pickdir = 0;
 if reset
-   while pickdir<1||pickdir>2
-      pickdir = menu('Select a directory, or a file within a directory?','Dir','File');
-   end
-   if pickdir==1
-      pname = uigetdir(pname,dialog);
-   else
-      [~, pname] = uigetfile([pname, filesep,'*.*'],dialog);
-   end
+   pname = uigetdir(pname,dialog);
    if ~ischar(pname)
       pname = [];
    end

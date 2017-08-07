@@ -49,17 +49,15 @@ vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files.',reset) ;
+   getnamedpath('rawstardat','Select the location for raw *.dat files...',reset);
+   matfolder = getnamedpath('allstarmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]'],'reset');
+   getnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]',reset);
    figurefolder=getnamedpath('4STAR_images','4STAR image files.',reset);
-   getnamedpath('allstarmat','Select the location for "allstarmat" files...',reset);
-   getnamedpath('starsun', 'Select the location for starsun mat-file...',reset);
-   getnamedpath('starinfo', 'Select the location for starinfo m-files...',reset);   
 else
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files.') ;
-   figurefolder=getnamedpath('4STAR_images','4STAR image files.');
-   getnamedpath('allstarmat','Select the location for "allstarmat" files...');
+   getnamedpath('rawstardat','Select the location for raw *STAR files...');
+   matfolder = getnamedpath('allstarmat','Select the location for "allstarmat" files...');
    getnamedpath('starsun', 'Select the location for starsun mat-file...');
-   getnamedpath('starinfo', 'Select the location for starinfo m-files...');
+   figurefolder=getnamedpath('4STAR_images','4STAR image files.'); 
 end
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
