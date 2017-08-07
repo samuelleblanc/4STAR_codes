@@ -76,7 +76,7 @@ elseif ~isempty(strfind(lower(userpath),'livings'));
     author='John';
 elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
     author='Yohei';
-elseif ~isempty(strfind(lower(userpath1),'yohei')); % Yohei's laptop
+elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath),'samuel'))
     author='Samuel';
