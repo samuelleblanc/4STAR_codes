@@ -8,18 +8,20 @@ else;
 fp_out = '/nobackup/sleblan2/ORACLES/plot/';
 end;
 asktosave = 2; %set if ask to save the figures
-i_avg = [1,2];
-filesuffix = ['refined_averaged_MLO_WFF'];
+i_avg = [1,2,3];
+filesuffix = ['refined_averaged_MLO_inflight'];
 label_daystr = '20170801';
 
 vis_names = {'20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
-            '20160918_VIS_C0_refined_high_alt_low_m_fromBonanza.dat'};
+            '20170801_VIS_C0_refined_langley_4STAR_WFF_ground.dat';...
+            '20170807_VIS_C0_refined_langley_4STARpm.dat'};
         
 nir_names = {'20170605_NIR_C0_refined_Langley_MLO_May2017_averages.dat';...
-            '20160918_NIR_C0_refined_high_alt_low_m_fromBonanza.dat'};
+            '20170801_NIR_C0_refined_langley_4STAR_WFF_ground.dat';...
+            '20170807_NIR_C0_refined_langley_4STARpm.dat'};
          
 supp = {'MLO avg';...%'MLO';'MLO';'MLO';'MLO';
-        'WFF'};
+        'WFF';'inflight'};
     
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
