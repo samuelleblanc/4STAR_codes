@@ -493,7 +493,7 @@ s.Az_gnd = mod(s.Az_gnd,360);
 %********************
 %% If Alt is 0 from telemetry, attempt to replace by pressure altitude
 if s.airborne
-[~, test_Alt] = Alt_from_P(s.Pst);
+[~, test_Alt] = Alt_from_P(s.Pst); s.Alt_pressure = test_Alt;
 bad_Alt = (s.Alt==0)&(s.Pst>0);
 s.Alt(bad_Alt) = test_Alt(bad_Alt); 
 end
