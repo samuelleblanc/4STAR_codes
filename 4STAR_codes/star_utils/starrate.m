@@ -38,7 +38,11 @@ function [rate, dark, darkstd, note]=starrate(s, bounds,instrumentname)
 %                         right integration times of signal.
 % SL: v2.0, 2017/05/28: - added instrumentname field for running other
 %                         intruments, with special codes for 2STAR
-version_set('2.0');
+% CJF: v2.1, 2017,08/10:- added test for rawcorr else use raw to permit
+%                         processing of non-sun mode files.  Also replaced
+%                         tests based on s.w with tests on q to eliminate
+%                         need for w.
+version_set('2.1');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -46,8 +50,12 @@ version_set('2.0');
 % !!! Consider details of sky scan sequence and implications on dark subt.
 
 % control input variables
- [p,q]=size(s.rawcorr);
-%[p,q]=size(s.raw);
+if isfield(s,'rawcorr')
+   [p,q]=size(s.rawcorr);
+elseif isfield(s,'raw')
+   [p,q]=size(s.raw);
+end
+%
 if size(s.t,1)~=p | size(s.Str,1)~=p | size(s.Tint,1)~=p;
     error('Input variables must all have the same number of rows.');
 end;
@@ -82,12 +90,14 @@ for uu=1:length(tintu); % for each integration time
         darkstd(rowsu,:)=repmat(nanstd(dark(rowsu,:),1),size(rowsu));
         note='over entire duration.';
         % check if the darks are too large
-        if length(s.w)==512; % it is the nir spectrometer
+        if q==512; % it is the nir spectrometer
+%         if length(s.w)==512; % it is the nir spectrometer
            if any(dark(rowsu,200) > 2000); 
                dark(rowsu(dark(rowsu,200)>2000),:)=NaN;
                note=[note ' Dark too high, therefore ignored.'];
            end;
-        elseif length(s.w)==256; % it is for the vis on 2STAR
+        elseif q==256; % it is for the vis on 2STAR
+%         elseif length(s.w)==256; % it is for the vis on 2STAR
             if any(dark(rowsu,50) > -70);
                 dark(rowsu(dark(rowsu,50)>-70),:)=NaN;
                 note=[note ' Dark for 2STAR too high, therefore ignored.'];
@@ -119,12 +129,14 @@ for uu=1:length(tintu); % for each integration time
             end;
             note='over nearest (before and after) dark measurement blocks.';
             % check if the darks are too large
-            if length(s.w)==512; % it is the nir spectrometer
+            if q==512; % it is the nir spectrometer
+%             if length(s.w)==512; % it is the nir spectrometer
               if any(dark(rowsu,200) > 2000); 
                   dark(rowsu(dark(rowsu,200)>2000),:)=NaN; 
                   note=[note ' Dark too high, therefore ignored.'];
               end;
-            elseif length(s.w)==256; % it is for the vis on 2STAR
+            elseif q==256; % it is for the vis on 2STAR
+%             elseif length(s.w)==256; % it is for the vis on 2STAR
               if any(dark(rowsu,50) > -70);
                   dark(rowsu(dark(rowsu,50)>-70),:)=NaN; 
                   note=[note ' Dark for 2STAR too high, therefore ignored.'];
@@ -154,12 +166,14 @@ for uu=1:length(tintu); % for each integration time
             dark(rowsu,:)=dark0sum./snsum;            
             note=['Darks averaged ' note];
             % check if the darks are too large
-            if length(s.w)==512; % it is the nir spectrometer
+            if q==512; % it is the nir spectrometer
+%             if length(s.w)==512; % it is the nir spectrometer
               if any(dark(rowsu,200) > 2000); 
                   dark(rowsu(dark(rowsu,200)>2000),:)=NaN; 
                   note=[note ' Dark too high, therefore ignored.'];
               end;
-            elseif length(s.w)==256; % it is for the vis on 2STAR
+            elseif q==256; % it is for the vis on 2STAR
+%             elseif length(s.w)==256; % it is for the vis on 2STAR
               if any(dark(rowsu,50) > -70);
                   dark(rowsu(dark(rowsu,50)>-70),:)=NaN; 
                   note=[note ' Dark for 2STAR too high, therefore ignored.'];
@@ -186,7 +200,8 @@ if any(any(isnan(dark)));
     if any(any(isfinite(dark))); % checking to see if there are any darks to use
         warning('.. Using darks interpolated/extrapolated from other integration times');
         inotemptydark=any(isfinite(dark'));
-        for iw=1:length(s.w); % loop through each wavelength
+        for iw=1:q; % loop through each wavelength
+        %for iw=1:length(s.w); % loop through each wavelength
           % calculate dark rate for non empty darks
           darkrate(:,iw)=dark(inotemptydark,iw)./s.Tint(inotemptydark);
           if any(~darkrate(:,iw)); continue, end; % make sure that the darkrate is not just zeros
@@ -210,11 +225,13 @@ if any(any(isnan(dark)));
 end;
 
 %% check darks for any problems
-if length(s.w)==512; % it is the nir spectrometer
+if q==512 % it is the nir spectrometer
+% if length(s.w)==512; % it is the nir spectrometer
     if any(dark(:,200) > 2000);
         warning('NIR darks too large, please double check');
     end;
-elseif length(s.w)==256; % it is for the vis on 2STAR
+elseif q==256; % it is for the vis on 2STAR
+% elseif length(s.w)==256; % it is for the vis on 2STAR
     if any(dark(:,50) > -70);
          warning('2STAR VIS darks too large, please double check');
     end;
@@ -230,7 +247,11 @@ adj=1;
 
 % subtract dark and divide by integration time
 % rate=(s.rawFORJcorr-dark)./repmat(s.Tint,1,q).*adj;
-rate=(s.rawcorr-dark)./repmat(s.Tint,1,q).*adj;
+if isfield(s,'rawcorr')
+   rate=(s.rawcorr-dark)./repmat(s.Tint,1,q).*adj;
+else
+   rate=(s.raw-dark)./repmat(s.Tint,1,q).*adj;
+end
 if strcmp(instrumentname,'2STAR'); %special processing for 2STAR without shutter and added a time lag
     irun = find(s.Md==1); d = find(diff(irun)~=1)+1;
     ii = []; for i=1:length(d); ii = [ii,irun(d(i))-1:irun(d(i))+10]; end;
