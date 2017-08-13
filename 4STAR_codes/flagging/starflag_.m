@@ -63,8 +63,7 @@ if Mode==1 || fresh_start % Then output flag file with auto-generated flags
    % Use "which" to locate directory containing starinfo and put flag files in same location
    outputfile=[getnamedpath('starinfo','Select where starinfo files and flag files are to be saved.'),flagfile];
    op_name_str = 'auto';
-   disp(['Automatic flags written to: ' flagfile])
-   
+   disp(['Automatic flags written to: ' flagfile])   
    if ~exist(outputfile,'file')
       disp(['Creating ',flagfile]);
       save(outputfile,'-struct','flags','-v7.3');
@@ -80,11 +79,9 @@ if Mode==1 || fresh_start % Then output flag file with auto-generated flags
       [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
    end
 end
-
-
 if Mode~=1
       op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
-        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
+        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone','Yana Karol');
     op_name_str = '?';
     switch op_name
         case 1
@@ -100,11 +97,14 @@ if Mode~=1
         case 6
             op_name_str = 'SL';
         case 7
-            op_name_str = 'JR';
+            op_name_str = 'JR'; 
         case 8
             op_name_str = 'KP';
+        case 8
+            op_name_str = 'YK';            
     end
 
+    
     flagfile = [daystr,'_starflag_man_created_',now_str, 'by_',op_name_str,'.mat'];
     outputfile=[getnamedpath('starinfo'),flagfile]; 
     disp(['Starflag manual flags output to:' flagfile])
@@ -121,19 +121,22 @@ if Mode~=1
     % Define flags which do not flag data as "bad".
     %Once flags are specified above, the "bad" flags are deduced.
     %"bad" flags gray out symbols in plots and show >0 in variable "screen"
-
     if ~exist('inp','var')
        [~, inp] = define_starflags_20160605(s);
     end
     %We define several fields to plot in the auxiliary panels
-    panel_1.aod_380nm = inp.aod_380nm;
+
     panel_1.aod_452nm = inp.aod_452nm;
+    panel_1.aod_500nm = inp.aod_500nm;
     panel_1.aod_865nm = inp.aod_865nm;
     
     panel_2.ang = inp.ang_noscreening;
-    panel_2.Quad = sqrt(s.QdVlr.^2 + s.QdVtb.^2)./s.QdVtot;
+    
+    panel_3.Quad = sqrt(s.QdVlr.^2 + s.QdVtb.^2)./s.QdVtot;
     panel_3.rawrelstd = inp.rawrelstd(:,1);
-    panel_4.Alt = s.Alt;
+    
+    panel_4.Alt = s.Alt./1000;
+    panel_4.Lat = s.Lat;
     
     ylims.panel_1 = [-.1, 2];
     ylims.panel_2 = [-1,4];
