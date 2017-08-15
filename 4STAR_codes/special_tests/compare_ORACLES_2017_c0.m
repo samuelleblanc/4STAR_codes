@@ -10,7 +10,7 @@ end;
 asktosave = 2; %set if ask to save the figures
 i_avg = [1,2,3];
 filesuffix = ['refined_averaged_MLO_inflight'];
-label_daystr = '20170801';
+label_daystr = '20170807';
 
 vis_names = {'20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20170801_VIS_C0_refined_langley_4STAR_WFF_ground.dat';...

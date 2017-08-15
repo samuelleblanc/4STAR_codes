@@ -14,7 +14,7 @@ function [mark, mrg_out] = oracles_clean_dirty_dtau
 
 version_set('v1.0')
 
-in_star_file = getfullname('*20160*starsun*.mat','starsun');
+in_star_file = getfullname('*201?0*starsun*.mat','starsun');
 % star_ = matfile(in_star_file);
 [~, fname, ext] = fileparts(in_star_file);
 star = load(in_star_file, 't','El_deg','AZstep','rateaero','m_aero','c0', 'aeronetcols', 'w');
