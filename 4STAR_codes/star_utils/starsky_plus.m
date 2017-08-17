@@ -12,10 +12,14 @@ if ~exist('s','var')
         s = s.s_out;
     end
 end
+if isfield(s,'s_out')
+   s = s.s_out;
+end
 if isfield(s,'filename')
     [p,skytag,x] = fileparts(strrep(s.filename{1},'\',filesep));
     skytag = strrep(skytag,'_VIS_','_');skytag = strrep(skytag,'_NIR_','_');
 end
+
 if ~exist('sfile','var')
     sfile = s.filename{1};
 end

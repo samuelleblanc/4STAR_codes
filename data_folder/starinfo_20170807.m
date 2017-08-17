@@ -50,3 +50,7 @@ for i=1:length(varNames)
 end;
 
 return
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master

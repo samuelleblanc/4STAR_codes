@@ -1,4 +1,4 @@
-function	s=starwrapper(s, s2, varargin)
+function	s=starwrapper(s, s2, toggle, varargin)
 
 %% STARWRAPPER, called in the middle of a 4STAR processing code (e.g.,
 % starsun.m, starsky.m), adds variables and makes adjustments common among
@@ -93,14 +93,21 @@ function	s=starwrapper(s, s2, varargin)
 % SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
 %                       support for multiinstruments
 % MS: 2017-07-22, omitted toggle gassubtract for O4 calculation/rateslant
+% CF: 2017-08-04,       Modified logic related to starpaths and getnamedpath
+%                       Meshed starwrapper with logic for new starflag
+%                       Added Alt_from_P to replace Alt==0 with pressure Altitude 
 
-version_set('2.8');  
+version_set('2.9');  
 %********************
 %% prepare for processing
 %********************
 
 %% set default toggle switches
-toggle = update_toggle();
+if exist('toggle','var')&&~isempty(toggle)&&isstruct(toggle)
+toggle = update_toggle(toggle);
+else
+    toggle = update_toggle;
+end
 
 if isfield(s, 'toggle')
     s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
@@ -201,10 +208,10 @@ s2.note={};
 
 %% get data type
 if toggle.verbose; disp('get data types'), end;
-[daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);
+[daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
 s.instrumentname = instrumentname;
 if nargin>=(2+nnarg)
-    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);
+    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);s2.datatype = datatype2;
     if instrumentname~=instrumentname2;
         error('Instrument name on files from both structures do not match')
     end;
@@ -216,7 +223,7 @@ end;
 if toggle.verbose; disp('get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
-s.sd_aero_crit=Inf; % variable for screening direct sun datanote
+s.sd_aero_crit=0.01; % variable for screening direct sun datanote
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(getnamedpath('starinfo'), ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
@@ -340,7 +347,7 @@ if toggle.verbose; disp('...calculating saturated points'); end;
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
-if nargin>=2+nnarg
+if exist('s2','var')
     if strmatch('vis', lower(datatype2));
         s2.w=visw;
         s2.c0=visc0;
@@ -406,109 +413,13 @@ end;
 % combine two structures
 if toggle.verbose; disp('out of starrate, combining two structures'), end;
 drawnow;
+if exist('s','var')&&exist('s2','var');
+    s = combine_star_s_s2(s,s2,toggle);
+end
 pp=numel(s.t);
 qq=size(s.raw,2);
-if nargin>=2+nnarg
-    % check whether the two structures share almost identical time arrays
-    if pp~=length(s2.t);
-        bad_t=find(diff(s.t)<=0);
-        bad_t2=find(diff(s2.t)<=0);
-        if length(bad_t2) > 0
-            disp('bad_t2 larger than 0');
-        end
-        [ainb, bina] = nearest(s.t, s2.t);
-        st_len = length(s.t);
-        st2_len = length(s2.t);
-        fld = fieldnames(s);
-        for fd = 1:length(fld)
-            [rr,col] = size(s.(fld{fd}));
-            if rr == st_len && col==1
-                s.(fld{fd}) = s.(fld{fd})(ainb);
-                s2.(fld{fd}) = s2.(fld{fd})(bina);
-            elseif rr==st_len && col == length(s.w)
-                s.(fld{fd}) = s.(fld{fd})(ainb,:);
-                s2.(fld{fd}) = s2.(fld{fd})(bina,:);
-            end
-        end
-        
-        %         error(['Different size of time arrays. starwrapper.m needs to be updated.']);
-    end;
-    pp=numel(s.t);
-    qq=size(s.raw,2);
-    ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
-    if ngap==0;
-    elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
-        warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
-    else; % many differences. stop.
-        error([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
-    end;
-    % check whether the two structures come from separate spectrometers
-    if isequal(lower(datatype(1:3)), lower(datatype2(1:3)))
-        error('Two structures must be for separate spectrometers.');
-    end;
-    % discard the s2 variables for which s has duplicates
-    if toggle.verbose, disp('discarding duplicate structures'), end;
-    fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
-        fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
-    fnok=[]; % Yohei, 2012/11/27
-    for ff=1:length(fn); % take the values from the s structure, and discard those in s2
-        if isfield(s, fn{ff});
-            fnok=[fnok; ff];
-            if size(s.(fn{ff}),1)~=pp || size(s2.(fn{ff}),1)~=pp
-                error(['Check ' fn{ff} '.']);
-            end;
-        end;
-    end;
-    drawnow;
-    s2=rmfield(s2, fn(fnok));
-    clear fnok; % Yohei, 2012/11/27
-    % combine some of the remaining s2 variables into corresponding s variables
-    fnc={'raw' 'rawcorr' 'w' 'c0' 'c0err' 'fwhm' 'rate' 'dark' 'darkstd' 'sat_ij' 'skyresp', 'skyresperr'};
-    qq2=size(s2.raw,2);
-    s.([lower(datatype(1:3)) 'cols'])=1:qq;
-    s.([lower(datatype2(1:3)) 'cols'])=(1:qq2)+qq;
-    for ff=length(fnc):-1:1;
-        if size(s.(fnc{ff}),2)~=qq || size(s2.(fnc{ff}),2)~=qq2
-            error(['Check ' fnc{ff} '.']);
-        else
-            s.(fnc{ff})=[s.(fnc{ff}) s2.(fnc{ff})];
-        end;
-    end;
-    s.aerosolcols=[s.aerosolcols(:)' s2.aerosolcols(:)'];
-    %     s.aeronetcols = [s.aeronetcols(:)' s2.aeronetcols(:)'];
-    note_x = {[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']};
-    note_x(end+1,1) = {[upper(datatype2(1:3)) ' notes: ']};
-    for L = 1:length(s.note)
-        note_x(end+1,1) = {s.note{L}};
-    end
-    note_x(end+1,1) = {[upper(datatype(1:3)) ' notes: ']};
-    for L = 1:length(s2.note)
-        note_x(end+1,1) = {s2.note{L}};
-    end
-    s.note = note_x;
-    %     s.note={[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']; [upper(datatype(1:3)) ' notes: ']; s.note{:} ;...
-    %         [upper(datatype2(1:3)) ' notes: ']; s2.note{:}};
-    s.filename=[s.filename; s2.filename];
-    s2=rmfield(s2, [fnc(:); 'aerosolcols';'aeronetcols'; 'note'; 'filename']);
-    % store the remaining s2 variables separately in s
-    fn=fieldnames(s2);
-    for ff=1:length(fn);
-        s.([lower(datatype(1:3)) fn{ff}])=s.(fn{ff});
-        s.([lower(datatype2(1:3)) fn{ff}])=s2.(fn{ff});
-    end;
-    s=rmfield(s, setdiff(fn,'t'));
-    qq=qq+qq2;
-    clear qq2 s2;
-end
-[daystr, filen, datatype, instrumentname]=starfilenames2daystr(s.filename, 1);
+daystr = s.daystr; filen = s.filen; datatype = s.datatype; instrumentname = s.instrumentname;
 
-%% get solar zenith angle, airmass, temperatures, etc.
-v=datevec(s.t);
-[s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
-s.sza=90-s.sunel;
-s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
-clear v;
-[s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
 if isfield(s, 'RHprecon'); % Yohei, 2012/10/19
     s.RHprecon_percent=s.RHprecon*20;
 end;
@@ -538,6 +449,54 @@ if isfield(s, 'nirVdettemp'); % Yohei, 2013/07/23, from Livingston's plot_4STAR_
     s.nirVdettemp_C=NaN(size(s.t));
     s.nirVdettemp_C(ig3)=1./denom_nir(ig3) - 273.16;
 end;
+
+%********************
+%% get solar zenith angle, airmass, temperatures, etc.
+v=datevec(s.t);
+[s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
+s.sza=90-s.sunel;
+s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
+clear v;
+[s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
+
+%********************
+%% Account for offsets between sun and sky optics to define Az_sky and El_sky
+% These will be used to determine ground-referenced values by apply Euler
+% angle rotations and/or offsets to yield Az_gnd and El_gnd;
+s.sun_sky_El_offset = 3.5; %This represents the known mechanical offset between the sun and sky FOV in elevation.
+s.sun_sky_Az_offset = 0;
+s.Az_deg = s.AZstep/(-50); 
+s.Az_sky = s.Az_deg; 
+s.El_sky = s.El_deg; s.El_sky(s.Str==2) = s.El_sky(s.Str==2) - s.sun_sky_El_offset;
+
+% Now we'll determind if we're on the ground or in the air, and if we trust
+% the nav data.  If we are in the air and trust the nav then we'll apply
+% Euler angle rotations.
+
+% First, determine if we're in the air.  Eliminate duplicated coords.
+dist_moved = sqrt(real(geodist(s.Lat(1), s.Lon(1),s.Lat, s.Lon)).^2 + (s.Alt(1)-s.Alt).^2);
+course_changed = false(size(s.t));
+course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
+if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
+   s.airborne = true;
+   warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
+else
+   s.airborne = false;
+   s.Az_gnd = s.Az_sky;  s.El_gnd = s.El_sky;
+end
+s.Az_gnd = mod(s.Az_gnd,360);
+% Then, in starsky_scan whether airborne or not, good nav or bad nav, we'll use good 
+% sun tracking (Str==1, balanced quads, high enough Qd_tot) to determine an
+% offset between where we thought we were pointing and the ephemeris.  And
+% correct our Az_true and El_true to agree with the ephemeris 
+%********************
+%% If Alt is 0 from telemetry, attempt to replace by pressure altitude
+if s.airborne
+[~, test_Alt] = Alt_from_P(s.Pst); s.Alt_pressure = test_Alt;
+bad_Alt = (s.Alt==0)&(s.Pst>0);
+s.Alt(bad_Alt) = test_Alt(bad_Alt); 
+end
 
 %********************
 %% adjust the count rate
@@ -602,7 +561,7 @@ if toggle.doflagging;
         s.flagallcolsitems=repmat({''},nflagallcolsitems,1);
         s.flagallcols=false(pp,1,nflagallcolsitems); % flags applied to all columns
         s.flagallcols(s.Str~=1,:,1)=true; s.flagallcolsitems(1)={'darks or sky scans'};
-        if strmatch('sun', lower(datatype(end-2:end)));
+        if strcmpi('sun', datatype(end-2:end)); % screening only for SUN data
             s.flagallcols(s.Md~=1,:,2)=true; s.flagallcolsitems(2)={'non-tracking modes'}; % is this flag redundant with the Str-based screening?
             s.flagallcols(any(s.rawrelstd>s.sd_aero_crit,2),:,3)=true; s.flagallcolsitems(3)={'high standard deviation'};
         end;
@@ -652,7 +611,7 @@ if toggle.doflagging;
         autoscrnote=[autoscrnote '<=1 signal-to-noise ratio or non-positive c0, ']; % YS 2012/10/09
         s.flag(s.m_aero>m_aero_max,:)=s.flag(s.m_aero>m_aero_max,:)+0.02; % Yohei 2012/10/19 large airmass. John says "I certainly don't trust values of m_aero > 15 (for that matter, I probably don't trust the values for m_aero ~>14? 13?)."
         autoscrnote=[autoscrnote 'aerosol airmass higher than ' num2str(m_aero_max) ', ']; % YS 2012/10/09
-        if strmatch('sun', lower(datatype(end-2:end))); % screening only for SUN data
+        if strcmpi('sun', datatype(end-2:end)) % screening only for SUN data
             % non-tracking mode - is this redundant with the Str-based screening?
             s.flag(s.Md~=1,:)=s.flag(s.Md~=1,:)+0.2;
             autoscrnote=[autoscrnote 'non-tracking modes, '];
@@ -674,7 +633,7 @@ end; % toggle.doflagging
 % mode of gas retrieval proc
 % gasmode=menu('Select gas retrieval mode:','1: CWV only','2: PCA, hyperspectral');
 
-if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype),'forj'));
+% if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype),'forj'));
     % || ~isempty(strfind(lower(datatype),'sky')); % not for FOV, ZEN, PARK data
     
     %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
@@ -742,9 +701,13 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
     s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
     s.tau_aero=s.tau_aero_noscreening;
-    
+    % aerosol optical depth before flags are applied
+    sun_ = s.Str==1;
+    s.rateaero(~sun_,:) = NaN;
+    s.tau_aero_noscreening(~sun_,:) = NaN; 
+    s.tau_aero=s.tau_aero_noscreening;     
     % total optical depth (Rayleigh subtracted) needed for gas processing
-    if toggle.gassubtract
+%     if toggle.gassubtract
         tau_O4nir          = s.tau_O4; 
         if ~strcmp(instrumentname,'2STAR');
             tau_O4nir(:,1:1044)=0;
@@ -755,7 +718,11 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
         s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
         s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-    end;
+        s.rateslant(~sun_,:) = NaN;
+        s.ratetot(~sun_,:) = NaN; 
+        s.tau_tot_slant(~sun_,:) = NaN; 
+        s.tau_tot_vertical(~sun_,:) = NaN; 
+%     end;
     
     % compare rate structures:
     
@@ -860,7 +827,7 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         toggle.runwatervapor = false;
         warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
     end;
-        
+if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'));        
     if toggle.runwatervapor;
         if toggle.verbose; disp('water vapor retrieval start'), end;
         [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
@@ -971,12 +938,12 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
         if isfield(s,'flagfilename')
             [fnul,pnul] = fileparts(s.flagfilename);
             dnul = strsplit(pnul,'_');
-            if dnul{1}==daystr;
-                if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
-%                 if toggle.starflag_mode==1;
-%                     toggle.starflag_mode = 3;
-%                 end;
-            end
+%             if dnul{1}==daystr;
+%                 if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
+% %                 if toggle.starflag_mode==1;
+% %                     toggle.starflag_mode = 3;
+% %                 end;
+%             end
         end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
@@ -1021,12 +988,12 @@ if ~isempty(strfind(lower(datatype),'sun'));%|| ~isempty(strfind(lower(datatype)
     
 end; % End of sun-specific processing
 
-if ~isempty(strfind(lower(datatype),'sky')); % if clause added by Yohei, 2012/10/22
+if ~isempty(strfind(lower(datatype),'sky'))||~isempty(strfind(lower(datatype),'zen'))||...
+      ~isempty(strfind(lower(datatype),'cld')); % if clause added by Yohei, 2012/10/22
     s.skyrad = s.rate./repmat(s.skyresp,pp,1);
-    s.skyrad(s.Str==0|s.Md==1,:) = NaN; % sky radiance not defined when shutter is closed or when actively tracking the sun
+    s.skyrad(s.Str==1|s.Str==0|s.Md==1,:) = NaN; % sky radiance not defined when shutter is closed or when actively tracking the sun
+    s.skyrad(s.sat_ij) = NaN;
 end;
-
-
 
 %********************
 %% remove some of the results for a lighter file
@@ -1253,4 +1220,102 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
 end % done with plotting sun results
 
 s.toggle = toggle;
+return
+function s = combine_star_s_s2(s,s2,toggle);
+pp=numel(s.t);
+qq=size(s.raw,2);
+    % check whether the two structures share almost identical time arrays
+    if pp~=length(s2.t);
+        bad_t=find(diff(s.t)<=0);
+        bad_t2=find(diff(s2.t)<=0);
+        if length(bad_t2) > 0
+            disp('bad_t2 larger than 0');
+        end
+        [ainb, bina] = nearest(s.t, s2.t);
+        st_len = length(s.t);
+        st2_len = length(s2.t);
+        fld = fieldnames(s);
+        for fd = 1:length(fld)
+            [rr,col] = size(s.(fld{fd}));
+            if rr == st_len && col==1
+                s.(fld{fd}) = s.(fld{fd})(ainb);
+                s2.(fld{fd}) = s2.(fld{fd})(bina);
+            elseif rr==st_len && col == length(s.w)
+                s.(fld{fd}) = s.(fld{fd})(ainb,:);
+                s2.(fld{fd}) = s2.(fld{fd})(bina,:);
+            end
+        end
+        
+        %         error(['Different size of time arrays. starwrapper.m needs to be updated.']);
+    end;
+    pp=numel(s.t);
+    qq=size(s.raw,2);
+    ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
+    if ngap==0;
+    elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
+        warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
+    else; % many differences. stop.
+        error([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);
+    end;
+    % check whether the two structures come from separate spectrometers
+    if isequal(lower(s.datatype(1:3)), lower(s2.datatype(1:3)))
+        error('Two structures must be for separate spectrometers.');
+    end;
+    % discard the s2 variables for which s has duplicates
+    if toggle.verbose, disp('discarding duplicate structures'), end;
+    fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
+        fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
+    fnok=[]; % Yohei, 2012/11/27
+    for ff=1:length(fn); % take the values from the s structure, and discard those in s2
+        if isfield(s, fn{ff});
+            fnok=[fnok; ff];
+            if size(s.(fn{ff}),1)~=pp || size(s2.(fn{ff}),1)~=pp
+                error(['Check ' fn{ff} '.']);
+            end;
+        end;
+    end;
+    drawnow;
+    s2=rmfield(s2, fn(fnok));
+    clear fnok; % Yohei, 2012/11/27
+    % combine some of the remaining s2 variables into corresponding s variables
+    fnc={'raw' 'rawcorr' 'w' 'c0' 'c0err' 'fwhm' 'rate' 'dark' 'darkstd' 'sat_ij' 'skyresp', 'skyresperr'};
+    qq2=size(s2.raw,2);
+    s.([lower(s.datatype(1:3)) 'cols'])=1:qq;
+    s.([lower(s2.datatype(1:3)) 'cols'])=(1:qq2)+qq;
+    for ff=length(fnc):-1:1;
+        if size(s.(fnc{ff}),2)~=qq || size(s2.(fnc{ff}),2)~=qq2
+            error(['Check ' fnc{ff} '.']);
+        else
+            s.(fnc{ff})=[s.(fnc{ff}) s2.(fnc{ff})];
+        end;
+    end;
+    s.aerosolcols=[s.aerosolcols(:)' s2.aerosolcols(:)'];
+    %     s.aeronetcols = [s.aeronetcols(:)' s2.aeronetcols(:)'];
+    note_x = {[upper(s.datatype(1:3)) ' and ' upper(s2.datatype(1:3)) ' data were combined with starwrapper.m. ']};
+    note_x(end+1,1) = {[upper(s2.datatype(1:3)) ' notes: ']};
+    for L = 1:length(s.note)
+        note_x(end+1,1) = {s.note{L}};
+    end
+    note_x(end+1,1) = {[upper(s.datatype(1:3)) ' notes: ']};
+    for L = 1:length(s2.note)
+        note_x(end+1,1) = {s2.note{L}};
+    end
+    s.note = note_x;
+    %     s.note={[upper(datatype(1:3)) ' and ' upper(datatype2(1:3)) ' data were combined with starwrapper.m. ']; [upper(datatype(1:3)) ' notes: ']; s.note{:} ;...
+    %         [upper(datatype2(1:3)) ' notes: ']; s2.note{:}};
+    s.filename=[s.filename; s2.filename];
+    s2=rmfield(s2, [fnc(:); 'aerosolcols';'aeronetcols'; 'note'; 'filename']);
+    % store the remaining s2 variables separately in s
+    fn=fieldnames(s2);
+    for ff=1:length(fn);
+        s.([lower(s.datatype(1:3)) fn{ff}])=s.(fn{ff});
+        s.([lower(s2.datatype(1:3)) fn{ff}])=s2.(fn{ff});
+    end;
+    s=rmfield(s, setdiff(fn,'t'));
+    qq=qq+qq2;
+    clear qq2 s2;
+    [daystr, filen, s.datatype]=starfilenames2daystr(s.filename, 1);
+    [s.daystr, s.filen, s.datatype, s.instrumentname]=starfilenames2daystr(s.filename, 1);
+% end
+
 return

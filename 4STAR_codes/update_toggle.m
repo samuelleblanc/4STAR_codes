@@ -16,7 +16,7 @@ toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
 toggle_out.gassubtract = false;
 toggle_out.booleanflagging = true;
-toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.starflag_mode = 2 % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
 toggle_out.doflagging = true; % for running any Yohei style flagging
 toggle_out.dostarflag = true; 
@@ -28,7 +28,7 @@ toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
 
 if exist('toggle_in', 'var')
-   toggle_out = catstruct(toggle_out, toggle_in);
+   toggle_out = catstruct(toggle_in,toggle_out);
 end
 
 return

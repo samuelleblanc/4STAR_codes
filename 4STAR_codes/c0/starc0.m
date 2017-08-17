@@ -49,7 +49,13 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
-                if t>=datenum([2017 8 1 0 0 0]); % From transit #1 Morning at WFF
+                if t>=datenum([2017 8 8 0 0 0]); % using averages of MLO and transit #3
+                    daystr = '20170807';
+                    filesuffix = 'refined_averaged_MLO_inflight';
+                elseif t>=datenum([2017 8 7 0 0 0]); %from Transit #3 to Ascension
+                    daystr = '20170807';
+                    filesuffix = 'refined_langley_4STARpm';
+                elseif t>=datenum([2017 8 1 0 0 0]); % From transit #1 Morning at WFF
                     daystr = '20170801';
                     filesuffix = 'refined_langley_4STAR_WFF_ground';
                 elseif t>=datenum([2017 2 1 0 0 0]); % From November 2016 MLO, first half before spectrometer dropout7

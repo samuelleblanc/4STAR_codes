@@ -49,11 +49,15 @@ vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files',reset) ;
-   figurefolder=getnamedpath('4STAR_images','4STAR image files',reset);
+   getnamedpath('rawstardat','Select the location for raw *.dat files...',reset);
+   matfolder = getnamedpath('allstarmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]'],'reset');
+   getnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]',reset);
+   figurefolder=getnamedpath('4STAR_images','4STAR image files.',reset);
 else
-   matfolder=getnamedpath('4STAR_data_mats','4STAR mat data files') ;
-   figurefolder=getnamedpath('4STAR_images','4STAR image files');
+   getnamedpath('rawstardat','Select the location for raw *STAR files...');
+   matfolder = getnamedpath('allstarmat','Select the location for "allstarmat" files...');
+   getnamedpath('starsun', 'Select the location for starsun mat-file...');
+   figurefolder=getnamedpath('4STAR_images','4STAR image files.'); 
 end
 if ~isempty(strfind(lower(userpath),'msegalro')); %
     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
@@ -62,15 +66,15 @@ elseif ~isempty(strfind(lower(userpath),'meloe'));
     author='Meloe';
 elseif ~isempty(strfind(lower(userpath),'qin'));
     author='Qin';
-elseif ~isempty(strfind(lower(userpath),'d3k014')) | ~isempty(strfind(lower(userpath),'connor')) 
+elseif ~isempty(strfind(lower(userpath),'d3k014')) || ~isempty(strfind(lower(userpath),'connor')) 
     author='Connor';
 elseif ~isempty(strfind(lower(userpath),'jredeman'));
     author='Jens';
 elseif ~isempty(strfind(lower(userpath),'livings'));
     author='John';
-elseif ~isempty(strfind(lower(userpath),'ys')) | ~isempty(strfind(lower(userpath),'yohei'))
+elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
     author='Yohei';
-elseif ~isempty(strfind(lower(userpath1),'yohei')); % Yohei's laptop
+elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath),'samuel'))
     author='Samuel';
