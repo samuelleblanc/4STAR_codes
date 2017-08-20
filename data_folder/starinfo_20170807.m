@@ -14,7 +14,7 @@ end
  
 s.flight=[datenum(2017,8,7,10,11,11) datenum(2017,8,7,19,56,07)]; 
 %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
- s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
@@ -50,7 +50,3 @@ for i=1:length(varNames)
 end;
 
 return
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master

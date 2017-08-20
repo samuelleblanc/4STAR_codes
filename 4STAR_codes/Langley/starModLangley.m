@@ -12,12 +12,13 @@
 % MS, 2016-01-09, tweaked to accomodate Jan-2016 MLO processing
 % MS, 2016-08-23, tweaked to accomodate June 2016 MLO
 % MS, 2016-09-05, tweaked for ORACLES modc0
+% MS, 2017-08-19, tweaked starpaths after Connor's adjustments
 %********************
 % set parameters
 %********************
 %daystr='20160426';% airborne KORUS-AQ
 %daystr='20130712';
-daystr='20170604';
+daystr='20170807';
 stdev_mult=2;%:0.5:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 cols=[225   258   347   408   432   539   627   761   869   969]; % for plots
@@ -36,6 +37,8 @@ else
     %source=[daystr 'starsunLangley.mat'];
 end;
 file=fullfile(starpaths, source);
+%file=which(source);% after Connors chnages this is my starpaths: C:\Users\msegalro.NDC\Campaigns\ORACLES\2017Campaign\starmat\
+
 load(file, 't', 'w', 'rateaero', 'm_aero', 'm_H2O','m_ray','m_NO2','m_O3','tau_aero','tau_O3','tau_NO2','tau_O4','tau_ray','rate','tau_aero_noscreening');
 
 tau_aero = tau_aero_noscreening;
