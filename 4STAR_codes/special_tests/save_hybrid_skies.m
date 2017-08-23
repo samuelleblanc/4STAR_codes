@@ -96,7 +96,7 @@ xl = xlim;xl_ = serial2hs(xs4.vis_sun.t)>=xl(1) & serial2hs(xs4.vis_sun.t)<= xl(
 
 % Might need to be careful here about CW and CCW
 
-SA_round = round(SA(xs4.vis_sun.Str==2&serial2hs(xs4.vis_sun.t)>xl(1)&serial2hs(xs4.vis_sun.t)<xl(2)));
+SA_round = 4.*round(.25.*SA(xs4.vis_sun.Str==2&serial2hs(xs4.vis_sun.t)>xl(1)&serial2hs(xs4.vis_sun.t)<xl(2)));
 SA_hybrid = unique(SA_round);
 
 for s = length(SA_hybrid):-1:1

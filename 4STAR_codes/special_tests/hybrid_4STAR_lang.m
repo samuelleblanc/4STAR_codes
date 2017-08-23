@@ -1,6 +1,13 @@
 function hybrid_4STAR_lang
 % Good hybrid Langleys 6/04 PM 6/05 AM
 
+% To first order, I can probably reduce biases from multiple scattering by
+% at least reducing the diffuse light by a factor related to the slant-path 
+% transmittance. Start with just a Rayleigh OD to see what impact that has
+% in terms of driving the SW Hybrid Co values closer to MLO Co.
+% Then potentially iterate, using the initial Hybrid Co values to infer
+% slant-path transmittance.  This does not account for phase function
+
 sky_file = getfullname_('*hybridsky*.mat','hybridsky','Select a hybrid sky file.');
 [sky] = load(sky_file); [~, filen, ext] = fileparts(sky_file); sky.fname = [filen,ext];
 starn.sky = strtok(filen,'_');
@@ -89,12 +96,16 @@ end
 
 figure_(205); plot(s4.am(xl_), Str1(xl_)+ log10(s4.vis_sun.rate(xl_,400)),'x-')
 
-am_ = s4.am<15&s4.am>1.5;
+%s4.vis_sun.tr
+
+am_ = s4.am<1.5&s4.am>1;
 figure; plot(s4.vis_sun.sky_CW(xl_&am_,400)./s4.vis_sun.rate(xl_&am_,400), ...
-   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'bx-',...
+   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'bx',...
    s4.vis_sun.sky_CCW(xl_&am_,400)./s4.vis_sun.rate(xl_&am_,400), ...
-   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'ro-'); xl = xlim;
-legend('CW','CCW');
+   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'ro',...
+   (s4.vis_sun.sky_CW(xl_&am_,400).*s4.vis_sun.tr(xl_&am_,400))./s4.vis_sun.rate(xl_&am_,400), ...
+   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'k*'); xl = xlim;
+legend('CW','CCW','ray');
 xlim([max([0,xl(1)]), min([10,xl(2)])]);
 
 % Could identify a subset of wavelengths instead of pixel 400 here
@@ -102,7 +113,7 @@ xlim([max([0,xl(1)]), min([10,xl(2)])]);
 %AATS wavelength to nSTAR pixel
 a2s_wii = interp1(s4.vis_sun.wl(~isNaN(s4.vis_sun.wl)), find(~isNaN(s4.vis_sun.wl)),aats.w,'nearest'); 
 good = true(size(s4.vis_sun.t(xl_&am_)));
-X = s4.vis_sun.sky_CW(xl_&am_,a2s_wii(4))./s4.vis_sun.rate(xl_&am_,a2s_wii(4));
+X = (s4.vis_sun.sky_CW(xl_&am_,a2s_wii(4)).*s4.vis_sun.tr(xl_&am_,a2s_wii(4)))./s4.vis_sun.rate(xl_&am_,a2s_wii(4));
 Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,a2s_wii(4))./s4.vis_sun.tr(xl_&am_,a2s_wii(4)));
 
 bad = isNaN(X) | isNaN(Y) | X < 0.01 | X > 50; 
@@ -111,20 +122,20 @@ P_CW_ln = polyfit(X(good),Y(good),1);
 Io_CW_asst_ref_ = exp(P_CW_ln(2));
 [Io_CW_asst_ref, tau,P_CW,good(good)] = rlang(X(good), exp(Y(good)),2.25,10);
 
-X = s4.vis_sun.sky_CCW(xl_&am_,a2s_wii(4))./s4.vis_sun.rate(xl_&am_,a2s_wii(4));
+X = (s4.vis_sun.sky_CCW(xl_&am_,a2s_wii(4)).*s4.vis_sun.tr(xl_&am_,a2s_wii(4)))./s4.vis_sun.rate(xl_&am_,a2s_wii(4));
 Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,a2s_wii(4))./s4.vis_sun.tr(xl_&am_,a2s_wii(4)));
 bad = isNaN(X) | isNaN(Y) | X < 0.01 | X > 50; 
 good = good&~bad;
 [Io_CCW_asst_ref, tau,P_CCW,good(good)] = rlang(X(good), exp(Y(good)),2.75,10);
 
 
-X = s4.vis_sun.sky_CW(xl_&am_,a2s_wii(8))./s4.vis_sun.rate(xl_&am_,a2s_wii(8));
+X = (s4.vis_sun.sky_CW(xl_&am_,a2s_wii(8)).*s4.vis_sun.tr(xl_&am_,a2s_wii(8)))./s4.vis_sun.rate(xl_&am_,a2s_wii(8));
 Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,a2s_wii(8))./s4.vis_sun.tr(xl_&am_,a2s_wii(8)));
 bad = isNaN(X) | isNaN(Y) | X < 0.01 | X > 50; 
 good = good&~bad;
 [Io_CW_asst_ref, tau,P_CW,good(good)] = rlang(X(good), exp(Y(good)),2.25,10);
 
-X = s4.vis_sun.sky_CCW(xl_&am_,a2s_wii(8))./s4.vis_sun.rate(xl_&am_,a2s_wii(8));
+X = (s4.vis_sun.sky_CCW(xl_&am_,a2s_wii(8)).*s4.vis_sun.tr(xl_&am_,a2s_wii(8)))./s4.vis_sun.rate(xl_&am_,a2s_wii(8));
 Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,a2s_wii(8))./s4.vis_sun.tr(xl_&am_,a2s_wii(8)));
 bad = isNaN(X) | isNaN(Y) | X < 0.01 | X > 50; 
 good = good&~bad;
@@ -137,16 +148,16 @@ Io_CW = NaN(size(s4.vis_sun.wl));
 Io_CCW = Io_CW;
 Io_ref = Io_CW;
 for ii = length(s4.vis_sun.wl):-1:1
-   X = s4.vis_sun.sky_CW(xl_&am_,ii)./s4.vis_sun.rate(xl_&am_,ii);
+   X = (s4.vis_sun.sky_CW(xl_&am_,ii).*s4.vis_sun.tr(xl_&am_,ii))./s4.vis_sun.rate(xl_&am_,ii);
    Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,ii)./s4.vis_sun.tr(xl_&am_,ii));
    P_CW = polyfit(X(good),Y(good),1); 
    Io_CW(ii) = real(exp(P_CW(2)));
-   X = s4.vis_sun.sky_CCW(xl_&am_,ii)./s4.vis_sun.rate(xl_&am_,ii);
+   X = (s4.vis_sun.sky_CCW(xl_&am_,ii).*s4.vis_sun.tr(xl_&am_,ii))./s4.vis_sun.rate(xl_&am_,ii);
    P_CCW = polyfit(X(good),Y(good),1); 
    Io_CCW(ii) = real(exp(P_CCW(2)));  
-   X = s4.m_aero(xl_&am_);
-   P_ref = polyfit(X(good),Y(good),1); 
-   Io_ref(ii) = real(exp(P_ref(2)));  
+%    X = s4.m_aero(xl_&am_);
+%    P_ref = polyfit(X(good),Y(good),1); 
+%    Io_ref(ii) = real(exp(P_ref(2)));  
    end
 s4.vis_sun.Io_CW = Io_CW;
 s4.vis_sun.Io_CCW = Io_CCW;
@@ -156,37 +167,35 @@ Io_CCW = NaN(size(s4.nir_sun.wl));
 Io_CW = Io_CCW;
 Io_ref= Io_CCW;
 for ii = length(s4.nir_sun.wl):-1:1
-   X = s4.nir_sun.sky_CW(xl_&am_,ii)./s4.nir_sun.rate(xl_&am_,ii);
+   X = (s4.nir_sun.sky_CW(xl_&am_,ii).*s4.nir_sun.tr(xl_&am_,ii))./s4.nir_sun.rate(xl_&am_,ii);
    Y = Str1(xl_&am_)+ log(s4.nir_sun.rate(xl_&am_,ii)./s4.nir_sun.tr(xl_&am_,ii));
    P_CW = polyfit(X(good),Y(good),1); 
    Io_CW(ii) = real(exp(P_CW(2)));
-   X = s4.nir_sun.sky_CCW(xl_&am_,ii)./s4.nir_sun.rate(xl_&am_,ii);
+   X = (s4.nir_sun.sky_CCW(xl_&am_,ii).*s4.nir_sun.tr(xl_&am_,ii))./s4.nir_sun.rate(xl_&am_,ii);
    P_CCW = polyfit(X(good),Y(good),1); 
    Io_CCW(ii) = real(exp(P_CCW(2))); 
-   X = s4.m_aero(xl_&am_);
-   P_ref = polyfit(X(good),real(Y(good)),1); 
-   Io_ref(ii) = real(exp(P_ref(2)));     
+%    X = s4.m_aero(xl_&am_);
+%    P_ref = polyfit(X(good),real(Y(good)),1); 
+%    Io_ref(ii) = real(exp(P_ref(2)));     
 end
 s4.nir_sun.Io_CW = Io_CW;
 s4.nir_sun.Io_CCW = Io_CCW;
-s4.nir_sun.Io_ref = Io_ref;
+% s4.nir_sun.Io_ref = Io_ref;
 
 disp('Modify these plots to include AATS filter wavelengths')
 
-figure; plot(1000.*s4.vis_sun.wl, s4.vis_sun.Io_ref, '-',...
-   1000.*s4.vis_sun.wl, s4.vis_sun.Io_CW, '-',...
+figure; plot(1000.*s4.vis_sun.wl, s4.vis_sun.Io_CW, '-',...
    1000.*s4.vis_sun.wl, s4.vis_sun.Io_CCW, '-');
 xlabel('wavelength [nm]');
 ylabel('cts / ms')
 title({['Langleys for ',datestr(s4.vis_sun.t(1),'yyyy-mm-dd'),' , ',PM_str, ' leg'];...
    ['Sky (',starn.sky,sprintf(' %1.0d deg)',sky.CCW.SA_hybrid(S)) ' / Sun(',starn.sun,')']});
-legend('Refined','sky CW','sky CCW'); xlim([325,995]); 
+legend('sky CW','sky CCW'); xlim([325,995]); 
 saveas(gcf,strrep(infile,'star.mat','_skylang_vis.fig'));
 
-figure; plot(1000.*s4.nir_sun.wl, s4.nir_sun.Io_ref, '-',...
-   1000.*s4.nir_sun.wl, s4.nir_sun.Io_CW, '-'...
+figure; plot(1000.*s4.nir_sun.wl, s4.nir_sun.Io_CW, '-'...
    ,1000.*s4.nir_sun.wl, s4.nir_sun.Io_CCW, '-')
-legend('Refined',[starn.sky,' sky CW'],[starn.sky 'sky CCW']); 
+legend([starn.sky,' sky CW'],[starn.sky 'sky CCW']); 
 xlabel('wavelength [nm]');
 ylabel('cts / ms')
 title({['Langleys for ',datestr(s4.vis_sun.t(1),'yyyy-mm-dd'),' , ',PM_str, ' leg'];...
