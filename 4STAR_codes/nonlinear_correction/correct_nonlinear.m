@@ -48,7 +48,7 @@ version_set('1.1');
 %% Determine either vis or nir spectrometer
 if length(spin_raw(1,:)) == 512 
     isvis=false;
-elseif length (spin_raw(1,:)) == 1044
+elseif length (spin_raw(1,:)) >= 1044
     isvis=true;
 else
     disp('Problem determining the spectrometer in use - check size of raw array')

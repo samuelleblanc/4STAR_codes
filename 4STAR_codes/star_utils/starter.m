@@ -59,20 +59,30 @@ else % all other types
     header=header(validheader); % end of reading irregular lines Yohei, 2013/02/22.
     clear validheader
     row_labels = tmp;
+    fseek(fid,0,-1);
+    file = [file, '_'];fid_ = fopen(file,'w');
+    while ~feof(fid)
+       blah = fgetl(fid); blah = strrep(blah,'-',' -');
+        fprintf(fid_,'%s \n',blah);
+    end
     fclose(fid);
-    
+    fclose(fid_);    
     % read data
+%     vals = textscan(file,'headerlines',i, 'commentstyle','matlab');
     vals=textread(file, '', 'headerlines',i, 'commentstyle','matlab');
     if ~isempty(vals);
         s.t=datenum([vals(:,1:5) vals(:,6)+vals(:,7)/1000]); % the first 7 columns have the time
         c=8; % read the 8th column
         label=char(strread(row_labels, [repmat('%*s',1,c-1) '%s%*[^\n]']));
         while ~strcmp(lower(label), 'pix0'); % keep reading the new column until hitting the label "Pix0".
-            eval(['s.' label '=vals(:,c);']);
+            s.(label) = vals(:,c); %eval(['s.' label '=vals(:,c);']);
             c=c+1;
             label=char(strread(row_labels, [repmat('%*s',1,c-1) '%s%*[^\n]']));
         end;
-        if size(vals,2)>c
+        while all(vals(:,end)==0)
+           vals(:,end) = [];
+        end
+        if size(vals,2)>(c+1)
             s.raw=vals(:,c:end); % read all the rest, presumably the raw counts
         else; % no spectrometer data, for example 20120722_001_VIS_SUN.dat.
             s.raw=[];
@@ -80,4 +90,8 @@ else % all other types
     end;
     s.header=header;
     s.row_labels={row_labels};
+   if exist(file,'file')&&exist(file(1:end-1),'file')
+      delete(file);
+      disp(['Deleted copy of ',file(1:end-1)])
+   end
 end;
