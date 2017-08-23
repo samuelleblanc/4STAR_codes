@@ -79,10 +79,6 @@ if exist('vis_skya','var')
             disp('Ready for sky scan stuff')
             try
                 s_out = starsky_scan(s); % vis_pix restrictions in here
-                %                 [~,fname,~] = fileparts(ss.filename{1});
-                %                s_out = ss;
-                %                save([mat_dir,filesep,out],'-struct','s_out');
-                %               save(strrep(savematfile,'__starsky.mat',['_',filen,'_starsky.mat']), '-struct','s_out')
                 save([matdir, out],'s_out');
                 fig_out = [imgdir,strrep(out,'.mat','.fig')];
                 if exist(fig_out,'file')

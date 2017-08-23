@@ -25,53 +25,35 @@ version_set('1.0');
 % regulate input and read source
 %********************
 infiles = getfullname('*star.mat','starmats','Select one or more star.mat files');
-
+if ischar(infiles)
+   infiles = {infiles};
+end
 contentx = {'nir_skya';'nir_skyp';'vis_skya';'vis_skya'}
 for in = 1:length(infiles)
-    %     sourcefile = infiles{in}
-    
-    % load(sourcefile,contentx{:});
     [sourcefile, contents0, savematfile]=startupbusiness('sky', infiles{in});
     disp(sourcefile)
-    
     contents=[];
     if isempty(contents0);
         savematfile=[];
         disp('no sky files')
         disp('no sky files')
-        
-        %     return;
     else
         clear nir_skya nir_skyp vis_skya vis_skyp
         load(sourcefile,contents0{:});
-        %
-        % %********************
-        % % do the common tasks
-        % %********************
-        % % grab structures
         if numel(contents0)==1;
             error('This part of starsky.m to be developed. For now both vis and nir structures must be present.');
         elseif ~(any(~isempty(strfind(contents0,'nir_sky')))&any(~isempty(strfind(contents0,'nir_sky'))))
             ~isequal(sort(contents0), sort([{'vis_sky'};{'nir_sky'}]))
             error('vis_sun and nir_sun must be the sole contents for starsky.m.');
         end;
-        
-        
-        
-        % add variables and make adjustments common among all data types. Also
-        % combine the two structures.
         [mat_dir, fname, ext] = fileparts(savematfile);
         [matdir,imgdir] = starpaths;
         sky_str = {'skya';'skyp'}';
-        % clear contents0
         if exist('vis_skya','var')
-            %     all(~isempty(strfind(contents0{1},'skya')))
-            %     contents0(1) = [];contents0(1) = [];
             for si = length(vis_skya):-1:1
                 if ~isempty(vis_skya(si).t)
                     s=starwrapper(vis_skya(si), nir_skya(si));
-                    disp('Ready for sky scan stuff')
-                    
+                    disp('Ready for sky scan stuff')                    
                     try
                         [~,fname,~] = fileparts(s.filename{1});
                         out = [strrep(fname,'_VIS_','_'),'.mat'];
@@ -90,18 +72,14 @@ for in = 1:length(infiles)
             clear ss;
         end
         if exist('vis_skyp','var')
-            %     all(~isempty(strfind(contents0{1},'skya')))
-            %     contents0(1) = [];contents0(1) = [];
             for si = length(vis_skyp):-1:1
                 if ~isempty(vis_skyp(si).t)
                     s=starwrapper(vis_skyp(si), nir_skyp(si));
                     disp('Ready for sky scan stuff')
-                    
                     try
                         [~,fname,~] = fileparts(s.filename{1});
                         out = [strrep(fname,'_VIS_','_'),'.mat'];
                         ss = starsky_scan(s); % vis_pix restrictions in here
-                        %                 [~,fname,~] = fileparts(ss.filename{1});
                         s_out = ss;
                         save([mat_dir,filesep,out],'-struct','s_out');
                         saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
@@ -114,39 +92,6 @@ for in = 1:length(infiles)
             end
             clear ss;
         end
-        % if all(~isempty(strfind(contents0{1},'skyp')))
-        %     s=starwrapper(vis_skyp, nir_skyp);
-        %     for si = 1:length(s)
-        %         try
-        %         ss(si) = starsky_scan(s(si)); % vis_pix restrictions in here
-        %         [~,fname,~] = fileparts(ss(si).filename{1});
-        %         out = [strrep(fname,'_VIS_','_'),'.mat'];
-        %         s_out = ss(si);
-        %         save([mat_dir,filesep,out],'-struct','s_out');
-        %         saveas(gcf,[imgdir,strrep(out,'.mat','.fig')]);
-        %         saveas(gcf,[imgdir,strrep(out,'.mat','.png')]);
-        %         catch
-        %             save([mat_dir,filesep,out,'.bad'],'-struct','s_out');
-        %         end
-        %         close('all')
-        %     end
-        % end
-        % Put sky scan stuff here...
-        
-        % [mat_dir, fname, ext] = fileparts(savematfile);
-        % star_light_fname = [mat_dir,filesep,datestr(star.t(1),'yyyymmdd'),'starsun_LIGHT.mat'];
-        % if ~exist(savematfile,'file')
-        %     save(savematfile, '-struct', 'ss', '-mat');
-        % else
-        %     save(savematfile, '-struct', 'ss', '-mat', '-append');
-        % end
-        % contents=[contents; fieldnames(ss)];
-        
-        % star_anet_aip_process(s);
-        
     end
 end
-
 return
-
-
