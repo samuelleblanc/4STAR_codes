@@ -160,7 +160,7 @@ form.qual_flag = '%1.0f';
 dslist={'20170801' '20170807' '20170809' '20170812' '20170815' '20170817' '20170818' '20170819'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          1          1          1          1          1          1          1] ; %set=1 to process
-jproc=[         0          0          0          0          1          1          1          1] ;
+jproc=[         0          0          0          0          0          0          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
