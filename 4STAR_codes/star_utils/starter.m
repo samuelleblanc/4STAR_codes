@@ -10,7 +10,10 @@ function s=starter(file)
 % 
 % Yohei, 2011/10/24, 2013/02/22, 2013/06/14
 % Samuel, v1.0, 2014/10/13, added version control of this m-script via version_set 
-version_set('1.0');
+% Connor, v1.1, 2017/08/23, added code to insert spaces with negative signs 
+%         and to catch zero-length or malformed spectra
+
+version_set('1.1');
 
 % control the input
 if nargin<1;
