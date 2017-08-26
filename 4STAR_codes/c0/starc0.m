@@ -49,7 +49,10 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
-                if t>=datenum([2017 8 8 0 0 0]); % using averages of MLO and transit #3
+                if t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
+                    daystr = '20170815';
+                    filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
+                elseif t>=datenum([2017 8 8 0 0 0]); % using averages of MLO and transit #3
                     daystr = '20170807';
                     filesuffix = 'refined_averaged_MLO_inflight';
                 elseif t>=datenum([2017 8 7 0 0 0]); %from Transit #3 to Ascension

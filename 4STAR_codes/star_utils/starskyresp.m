@@ -131,9 +131,12 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
         % cal
         daystr = '20150915';
         filesuffix = 'from_20150915_012_VIS_park_with_20140606091700HISS';
-    elseif t >= datenum([2016 03 30 0 0 0]);
+    elseif t >= datenum([2016 03 30 0 0 0]) && t< datenum([2017 06 19 0 0 0]);
         daystr = '20160330';
         filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
+    elseif t >= datenum([2017 06 20 0 0 0]);
+        daystr = '20170620';
+        filesuffix = 'from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO

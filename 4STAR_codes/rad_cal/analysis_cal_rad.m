@@ -180,6 +180,13 @@ elseif date =='20160330';
     lampstr = 'Lamps_12';
     fnum = '018';
     st = '024';
+elseif date =='20170620';
+    ll = 9; % select the lamps-12
+    iint_vis = 3; % 12 ms int time
+    iint_nir = 3; % 150 ms int time
+    lampstr = 'Lamps_9';
+    fnum = '009'; % file number to use : for printing the right file
+    st = '013'; %last file analysed
 else
     ll=1; %select the lamps-9
     iint_vis=3;

@@ -57,6 +57,7 @@ version_set('1.2');
 date='20140716';
 %date='20141024'
 date = '20160330'
+date = '20170620';
 docorrection=false; %false;
 
 %% Legacy codes
@@ -157,6 +158,7 @@ lamps = [12,9,6,3,2,1];
 vis_mean = []; vis_std = []; nir_mean = []; nir_std = [];
 M_vis = []; S_vis = 0; M_nir = []; S_nir = 0;
 k = 0;
+instname = '4STAR_';
 
 %% Loop through each lamps
 for ll = lamps
@@ -275,15 +277,34 @@ for ll = lamps
         end
         pp='ZEN';
         date='20160330';
-        
+    elseif date=='20170620';
+        switch ll
+            case 12
+                fnum = '008';
+            case 9
+                fnum = '009';
+            case 6
+                fnum = '010';
+            case 3
+                fnum = '011';
+            case 2
+                fnum = '012';
+            case 1
+                fnum = '013';
+            case 0
+                fnum = '014';
+        end
+        pp='ZEN';
+        date='20170620';
+    
     else;
         disp('problem! date not recongnised')
     end
     
     %% load the files
     disp(strcat('Getting lamp #',num2str(ll)))
-    nir = rd_spc_TCAP_v2([pname,filesep,lamp_str,filesep,date,'_',fnum,'_NIR_',pp,'.dat']);
-    vis = rd_spc_TCAP_v2([pname,filesep,lamp_str,filesep,date,'_',fnum,'_VIS_',pp,'.dat']);
+    nir = rd_spc_TCAP_v2([pname,filesep,lamp_str, instname, filesep,date,'_',fnum,'_NIR_',pp,'.dat']);
+    vis = rd_spc_TCAP_v2([pname,filesep,lamp_str, instname,filesep,date,'_',fnum,'_VIS_',pp,'.dat']);
     shut = nir.t.shutter==0;
     shut(2:end)= shut(1:end-1)&shut(2:end); shut(1:end-1) = shut(1:end-1)&shut(2:end);
     sun = nir.t.shutter==1;
@@ -336,7 +357,7 @@ for ll = lamps
     end
     
     %% build rate counts an response functions from raw counts
-    for vs = length(vis_tints):-1:1
+    for vs = length(vis_tints)-1:-1:1
         cal.(lamp_str).vis.t_ms(vs) = vis_tints(vs);
         cal.(lamp_str).vis.dark(vs,:) = mean(vis.spectra(shut&vis.t.t_ms==vis_tints(vs),:));
         cal.(lamp_str).vis.light(vs,:)= mean(vis.spectra(sky &vis.t.t_ms==vis_tints(vs),:));
@@ -345,7 +366,7 @@ for ll = lamps
         cal.(lamp_str).vis.rad = interp1(hiss.nm,hiss.(['lamps_',num2str(ll)]), vis.nm,'linear');
         cal.(lamp_str).vis.resp(vs,:) = cal.(lamp_str).vis.rate(vs,:)./cal.(lamp_str).vis.rad;
     end
-    for ns = length(nir_tints):-1:1
+    for ns = length(nir_tints)-1:-1:1
         cal.(lamp_str).nir.t_ms(ns) = nir_tints(ns);
         cal.(lamp_str).nir.dark(ns,:) = mean(nir.spectra(shut&nir.t.t_ms==nir_tints(ns),:));
         cal.(lamp_str).nir.light(ns,:)= mean(nir.spectra(sky &nir.t.t_ms==nir_tints(ns),:));

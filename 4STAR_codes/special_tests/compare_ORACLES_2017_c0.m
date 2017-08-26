@@ -8,20 +8,25 @@ else;
 fp_out = '/nobackup/sleblan2/ORACLES/plot/';
 end;
 asktosave = 2; %set if ask to save the figures
-i_avg = [1,2,3];
-filesuffix = ['refined_averaged_MLO_inflight'];
-label_daystr = '20170807';
+i_avg = [1,2,3,4,5];
+filesuffix = ['refined_averaged_MLO_inflight_polyfit_v2'];
+label_daystr = '20170815';
 
 vis_names = {'20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20170801_VIS_C0_refined_langley_4STAR_WFF_ground.dat';...
-            '20170807_VIS_C0_refined_langley_4STARpm.dat'};
+            '20170807_VIS_C0_refined_langley_4STARpm.dat';...
+            '20170809_VIS_C0_refined_high_alt_low_m_frompolyfit.dat';...
+            '20170815_VIS_C0_refined_high_alt_low_m_frompolyfit.dat'};
         
 nir_names = {'20170605_NIR_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20170801_NIR_C0_refined_langley_4STAR_WFF_ground.dat';...
-            '20170807_NIR_C0_refined_langley_4STARpm.dat'};
+            '20170807_NIR_C0_refined_langley_4STARpm.dat';...
+            '20170809_NIR_C0_refined_high_alt_low_m_frompolyfit.dat';...
+            '20170815_NIR_C0_refined_high_alt_low_m_frompolyfit.dat'};
          
 supp = {'MLO avg';...%'MLO';'MLO';'MLO';'MLO';
-        'WFF';'inflight'};
+        'WFF';'inflight';'high alt polyfit';...
+        'high alt polyfit'};
     
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
