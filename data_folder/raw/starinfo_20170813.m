@@ -12,10 +12,10 @@ else
 end
 
  
-s.flight=[datenum(2017,8,21,11,13,03) datenum(2017,8,21,19,21,38)]; 
+s.flight=[datenum(2017,8,13,07,56,54) datenum(2017,8,13,16,53,48)]; 
 %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
 s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-s.flagfilename = '20170821_starflag_man_created_20170826_1508by_SL.mat';  
+s.flagfilename = '20170813_starflag_man_created_20170826_1416by_SL.mat'; 
  
 % Ozone and other gases 
 s.O3h=21; %  

@@ -101,7 +101,7 @@ NormalComments = {...
     'LLOD_FLAG: -8888';...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Samuel LeBlanc, samuel.leblanc@nasa.gov';...
-    'PROJECT_INFO: ORACLES 2017 deployment; August-September 2017; Based out of Sao Tomé';...
+    'PROJECT_INFO: ORACLES 2017 deployment; August-September 2017; Based out of Sao Tome';...
     'STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI.';...
     'OTHER_COMMENTS: N/A';...
     };
@@ -157,10 +157,10 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170807' '20170809' '20170812' '20170815' '20170817' '20170818' '20170819'} ; %put one day string
+dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          1          0          0          1          1          1] ; %set=1 to process
-%jproc=[         0          0          0          0          0          0          1          1] ;
+jproc=[         0          0          0          0          0          0          0          1          1          0          0          0] ; %set=1 to proces s
+%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -188,10 +188,14 @@ for i=idx_file_proc
     
     %% get the special comments
     switch daystr
-        case '20140919'
+        case '20170819'
             specComments = {...
-                'Platinum day for over, under, and within cloud at sea ice edge.\n',...
+                'NIR spectrometer partial failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
                 };
+         case '20170821'
+            specComments = {...
+                'NIR spectrometer failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
+                };    
         otherwise
             specComments = {};
     end
@@ -224,6 +228,14 @@ for i=idx_file_proc
     catch;
         error(['Problem loading the uncertainties in file:' starfile])
     end;
+    
+    %% Special case processing for removing NIR aod values
+     switch daystr
+        case '20170819'
+            tau(:,1044:end) = NaN;
+        case '20170821'
+            tau(:,1044:end) = NaN;
+    end
     
     %% Update the uncertainties with merge marks file saved in the starinfo
     add_uncert = false;
