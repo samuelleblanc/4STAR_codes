@@ -59,7 +59,7 @@ end;
 if nargin<3;
     fig_path = figp;
 end;
-filesuffix = ['refined_langley_' instrumentname ];
+filesuffix = ['refined_langley_' instrumentname];
 if nargin>3;
     filesuffix = [filesuffix c0_filesuffix];
 end;
@@ -103,6 +103,11 @@ else;
     langley = s.langley;
     xtra = '';
 end;
+
+if isfield(s,'xtra_langleyfilesuffix');
+    xtra = [xtra s.xtra_langleyfilesuffix];
+end;
+
 filesuffix = [filesuffix xtra];
 ok=incl(t,langley);
 

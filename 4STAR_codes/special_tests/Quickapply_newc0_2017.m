@@ -64,6 +64,7 @@ c0f = '20160920_VIS_C0_refined_averaged_inflight_Langley_high_alts_ORACLES.dat';
 c0f = '20160924_VIS_C0_refined_averaged_inflight_Langley_high_alts_transitback_ORACLES.dat'; 
 c0f = '20170809_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
+c0f = '20170815_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit.dat';
 
 newc0_visfile = [starpaths c0f];
 
