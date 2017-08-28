@@ -287,14 +287,19 @@ nm_865 = interp1(w,[1:length(w)],.865, 'nearest');
 colsang=[nm_452 nm_865];
 if Mode==1
     % reading from s strcture
-    ang_noscreening=sca2angstrom(s.tau_aero_noscreening(:,colsang), w(colsang));
+    % ang_noscreening=sca2angstrom(s.tau_aero_noscreening(:,colsang), w(colsang));
     aod_500nm = s.tau_aero_noscreening(:,nm_500);
     aod_865nm = s.tau_aero_noscreening(:,nm_865);
 else
+    try
     % reading from reduced starsun_for_starflag structure
-    ang_noscreening=s.ang_noscreening;%sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
-    aod_500nm = s.aod_500nm;%tau_aero_noscreening(:,nm_500);
-    aod_865nm = s.aod_865nm;%tau_aero_noscreening(:,nm_865);
+    % ang_noscreening=s.ang_noscreening;%sca2angstrom(tau_aero_noscreening(:,colsang), w(colsang));
+            aod_500nm = s.aod_500nm;%tau_aero_noscreening(:,nm_500);
+            aod_865nm = s.aod_865nm;%tau_aero_noscreening(:,nm_865);
+    catch
+            aod_500nm = s.tau_aero_noscreening(:,nm_500);
+            aod_865nm = s.tau_aero_noscreening(:,nm_865);
+    end
 end
 
 % define input param to flag
