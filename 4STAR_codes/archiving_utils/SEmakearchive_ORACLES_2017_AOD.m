@@ -157,10 +157,10 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826'} ; %put one day string
+dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          1          1          0          0          0] ; %set=1 to proces s
-%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1] ;
+jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          1          0] ; %set=1 to proces s
+%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -300,10 +300,10 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
     elseif isfield(flag,'flags');
         qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
-        qual_flag = bitor(qual_flag,flag.flags.cirrus);
-        qual_flag = bitor(qual_flag,flag.flags.frost);
-        qual_flag = bitor(qual_flag,flag.flags.low_cloud);
-        qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
+        if isfield(flag.flags,'cirrus'); qual_flag = bitor(qual_flag,flag.flags.cirrus); end;
+        if isfield(flag.flags,'frost'); qual_flag = bitor(qual_flag,flag.flags.frost); end;
+        if isfield(flag.flags,'low_cloud'); qual_flag = bitor(qual_flag,flag.flags.low_cloud); end;
+        if isfield(flag.flags,'unspecified_clouds'); qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds); end;
     elseif isfield(flag,'before_or_after_flight');
         % only for automatic flagging
         if length(flag.before_or_after_flight) <1;
