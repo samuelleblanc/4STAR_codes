@@ -18,7 +18,15 @@ s.flight=[datenum(2017,8,1,11,43,28) datenum(2017,8,1,17,46,38)];
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+s.NO2col=2.0e15; %  
+
+% flags
+%s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+%s.flagfilenameCWV  = '20170826_starflag_CWV_man_created20170828_0901by_MS.mat';
+%s.flagfilenameO3   = '20170826_starflag_O3_man_created20170828_0925by_MS.mat';
+%s.flagfilenameNO2  = '20170826_starflag_NO2_man_created20170828_0829by_MS.mat';
+%s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
+ 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
