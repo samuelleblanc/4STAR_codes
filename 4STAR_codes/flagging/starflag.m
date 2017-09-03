@@ -35,9 +35,10 @@ function [flags, good, flagfile] = starflag(s, Mode)
 % SL, v1.6, 2016-10-24, modified code for using files of different format
 %                       and doing some checks for already available starflag files defined in starinfo 
 % SL, v1.7, 2017-06-03, Modified for a different flagging based on instrument
+% MS, v1.8, 2017-09-03, commented line 577
 
 %% Start
-version_set('1.7');
+version_set('1.8');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -574,7 +575,7 @@ if (Mode==2)
     end
     other_flagged = false(size(good));
     for fld = 1:length(no_mask)
-        other_flagged = other_flagged | flags.(no_mask{fld});
+        %other_flagged = other_flagged | flags.(no_mask{fld});
         other_flags.(no_mask{fld}) = flags.(no_mask{fld});
     end
     % Output an m-file marking all other events not marked as bad_aerosol events
