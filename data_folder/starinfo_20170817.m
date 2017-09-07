@@ -18,11 +18,19 @@ s.flight=[datenum(2017,8,17,7,58,26) datenum(2017,8,17,16,51,35)];
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+s.NO2col=2.0e15; %  
+
+
+% flags
+%s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
+s.flagfilenameCWV  = '20170817_starflag_CWV_man_created20170907_1401by_MS.mat';
+s.flagfilenameO3   = '20170817_starflag_O3_man_created20170907_1412by_MS.mat';
+s.flagfilenameNO2  = '20170817_starflag_NO2_man_created20170907_1428by_MS.mat.mat';
+s.flagfilenameHCOH = '20170817_starflag_auto_created_for_HCOH_20170905_1653.mat'; 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=682; % this is for Ames 
+    s.Pst(find(s.Pst<10))=1013; % this is for Ames 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
