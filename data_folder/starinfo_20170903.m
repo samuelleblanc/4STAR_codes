@@ -19,6 +19,14 @@ s.flight=[datenum(2017,9,3,09,53,14) datenum(2017,9,3,19,14,21)];
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
 s.NO2col=2.0e15; %   
+
+% flags
+%s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+s.flagfilenameCWV  = '20170902_starflag_CWV_man_created20170907_1010by_MS.mat';
+s.flagfilenameO3   = '20170902_starflag_O3_man_created20170907_1017by_MS.mat';
+s.flagfilenameNO2  = '20170902_starflag_NO2_man_created20170907_1022by_MS.mat';
+s.flagfilenameHCOH = '20170902_starflag_auto_created_for_HCOH_20170906_1114.mat';
+
  
 % other tweaks 
 if isfield(s, 'Pst'); 
