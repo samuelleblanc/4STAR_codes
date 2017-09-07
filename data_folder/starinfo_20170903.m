@@ -30,7 +30,7 @@ s.flagfilenameHCOH = '20170903_starflag_auto_created_for_HCOH_20170906_1258.mat'
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=682; % this is for Ames 
+    s.Pst(find(s.Pst<10))=1013; % this is for Ames 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 

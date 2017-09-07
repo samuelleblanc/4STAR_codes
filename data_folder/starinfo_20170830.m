@@ -22,15 +22,15 @@ s.NO2col=2.0e15; %
 
 % flags
 %s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
-%s.flagfilenameCWV  = '20170826_starflag_CWV_man_created20170828_0901by_MS.mat';
-%s.flagfilenameO3   = '20170826_starflag_O3_man_created20170828_0925by_MS.mat';
-%s.flagfilenameNO2  = '20170826_starflag_NO2_man_created20170828_0829by_MS.mat';
-%s.flagfilenameHCOH = '20170826_starflag_auto_created_for_HCOH_20170828_0220.mat';
+s.flagfilenameCWV  = '20170830_starflag_CWV_man_created20170907_1143by_MS.mat';
+s.flagfilenameO3   = '20170830_starflag_O3_man_created20170907_1152by_MS.mat';
+s.flagfilenameNO2  = '20170830_starflag_NO2_man_created20170907_1157by_MS.mat';
+s.flagfilenameHCOH = '20170830_starflag_auto_created_for_HCOH_20170905_2301.mat';
  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=682; % this is for Ames 
+    s.Pst(find(s.Pst<10))=1013; % this is for Ames 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
