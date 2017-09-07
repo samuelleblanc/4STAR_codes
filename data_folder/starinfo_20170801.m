@@ -25,7 +25,7 @@ s.NO2col=2.0e15; %
 s.flagfilenameCWV  = '20170801_starflag_CWV_man_created20170906_1556by_MS.mat';
 s.flagfilenameO3   = '20170801_starflag_O3_man_created20170906_1601by_MS.mat';
 s.flagfilenameNO2  = '20170801_starflag_NO2_man_created20170906_1612by_MS.mat';
-s.flagfilenameHCOH = '20170801_starflag_auto_created_for_HCOH_20170831_0228';
+s.flagfilenameHCOH = '20170801_starflag_auto_created_for_HCOH_20170831_0228.mat';
  
  
 % other tweaks 
