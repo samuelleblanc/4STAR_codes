@@ -157,10 +157,10 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830'} ; %put one day string
+dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          1          0] ; %set=1 to proces s
-%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1          1          1] ;
+jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
+%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -192,10 +192,14 @@ for i=idx_file_proc
             specComments = {...
                 'NIR spectrometer partial failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
                 };
-         case '20170821'
+        case '20170821'
             specComments = {...
                 'NIR spectrometer failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
                 };    
+        case '20170831'
+            specComments = {...
+                'Window deposition for this flight may cause an overestimate in AOD of larger than 0.2 at 500 nm.\n',...
+                };
         otherwise
             specComments = {};
     end
