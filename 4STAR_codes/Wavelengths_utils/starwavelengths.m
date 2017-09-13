@@ -62,6 +62,14 @@ switch instrumentname;
             nirw=nirw/1000;
             nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
             
+            fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
+                load(which(fwhmfile));
+                visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
+                visnote=[visnote ' FWHM from ' fwhmfile '.'];
+                nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
+                nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
+                warning('Update the FWHM for 4STARB using the 4STAR values');
+            
         end;
         %error('4STARB wavelengths not yet implemented')
         

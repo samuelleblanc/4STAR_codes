@@ -44,6 +44,7 @@
 function rad_cal=analysis_cal_rad
 startup_plotting
 version_set('1.3');
+instrumentname = '4STARB';
 
 %get response function calibration file
 [file pname fi]=uigetfile('*.mat','Find calibration files .mat');
@@ -117,7 +118,7 @@ legend('Response','Standard deviation');
 caxis([vis.nm(220) vis.nm(1044)]);
 h=colorbar('Ylim', [vis.nm(220) vis.nm(1044)]);
 ylabel(h,'Wavelength [nm]');
-ff=[pname '\' date '_resp_per_lamp_vis'];
+ff=[pname '\' instrumentname '_' date '_resp_per_lamp_vis'];
 save_fig(1,ff,true);
 
 
@@ -138,10 +139,11 @@ ylabel('Response [Cts/ms (Wm^-2 sr^-1 um^-1)^-1]');
 xlabel('Radiance [Wm^-2 sr^-1 um^-1]');
 legend('Response','Standard deviation');
 %colormap(cl);
-caxis([nir.nm(1) nir.nm(505)]);
-h=colorbar('Ylim', [nir.nm(1) nir.nm(505)]);
+nm_low = min([nir.nm(1) nir.nm(505)]);nm_high = max([nir.nm(1) nir.nm(505)]); 
+caxis([nm_low nm_high]);
+h=colorbar('Ylim', [nm_low nm_high]);
 ylabel(h,'Wavelength [nm]');
-ff=[pname '\' date '_resp_per_lamp_nir'];
+ff=[pname '\' instrumentname '_' date '_resp_per_lamp_nir'];
 save_fig(2,ff,true);
 
 %% building the response files
@@ -187,6 +189,14 @@ elseif date =='20170620';
     lampstr = 'Lamps_9';
     fnum = '009'; % file number to use : for printing the right file
     st = '013'; %last file analysed
+    if strcmp(instrumentname,'4STARB');
+        ll = 12; % select the lamps-12
+        iint_vis = 2; % 12 ms int time
+        iint_nir = 2; % 150 ms int time
+        lampstr = 'Lamps_12';
+        fnum = '013'; % file number to use : for printing the right file
+        st = '006'; %last file analysed
+    end;
 else
     ll=1; %select the lamps-9
     iint_vis=3;

@@ -328,8 +328,13 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
+        if t>=datenum([2017 08 01 0 0 0]);
+            daystr = '20170905';
+            filesuffix = 'ompared_with_AATS_at_Ames_divbyTint';
+        else
         error('4STARB starc0 not yet implemented')
-end; % case
+        end;
+    end; % case
 % read the file and return c0 values and notes
 if ~exist('visc0')
     if ~exist('filesuffix');

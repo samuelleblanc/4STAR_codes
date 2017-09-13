@@ -146,9 +146,9 @@ else % special collections
     end;
 end;
     case {'4STARB'}
-        warning('4STARB radiance response function not yet defined, using 4STAR default')
-        daystr = '20160330';
-        filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
+        warning('4STARB radiance response using old HISS values, and old fiber configuration')
+        daystr = '20170621';
+        filesuffix = 'from_4STARB_20170621_005_VIS_ZEN_with_20160121125700HISS';
     case {'2STAR'}
         warning('2STAR does not have a radiance measurement, returning nul arrays')
         visresp=[]; nirresp=[]; visnote=''; nirnote=''; 
