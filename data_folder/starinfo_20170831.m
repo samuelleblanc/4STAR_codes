@@ -28,7 +28,7 @@ s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
 s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
 
 % window deposition
-s.AODuncert_constant_extra = 0.2;
+%s.AODuncert_constant_extra = 0.2;
  
  
 % other tweaks 

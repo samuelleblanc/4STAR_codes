@@ -57,6 +57,11 @@ version_set('v4.0')
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
+%ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';%'E:\ORACLES\gas_ict\';
+%starinfo_path = 'F:\ORACLES\ORACLES_2017\starinfo\';%'E:\ORACLES\starinfo\';
+%starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';%'E:\ORACLES\starsun\';
+%gasfile_path = 'F:\ORACLES\ORACLES_2017\gas_summary\';%'E:\ORACLES\gas_summary\';
+
 if getUserName=='sleblan2';
     ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict_2017\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
