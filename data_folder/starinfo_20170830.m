@@ -14,19 +14,21 @@ end
  
 s.flight=[datenum(2017,8,30,08,00,32) datenum(2017,8,30,16,33,31)]; 
 %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
- s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     
 s.NO2col=2.0e15; %  
 
 % flags
-%s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
+s.flagfilename     = '20170830_starflag_man_created20170915_1446by_KP.mat'; 
 s.flagfilenameCWV  = '20170830_starflag_CWV_man_created20170907_1143by_MS.mat';
 s.flagfilenameO3   = '20170830_starflag_O3_man_created20170907_1152by_MS.mat';
 s.flagfilenameNO2  = '20170830_starflag_NO2_man_created20170907_1157by_MS.mat';
 s.flagfilenameHCOH = '20170830_starflag_auto_created_for_HCOH_20170905_2301.mat';
  
+% window deposition
+s.AODuncert_constant_extra = 0.1;
  
 % other tweaks 
 if isfield(s, 'Pst'); 
