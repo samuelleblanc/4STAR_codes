@@ -80,11 +80,14 @@
 % Modified (v1.2): Samuel LeBlanc, Santa Cruz, 2017-06-28
 %                  - modified the missing_data_val file writing to match
 %                  the format of the missing data
+% Modified (v1.3): Samuel LeBlanc, St-John's Newfoundland, Canada, 2017-09-16
+%                  - fixed bug in line length when giving empty
+%                  special_comments cell.
 %
 % -------------------------------------------------------------------------
 
 function ICARTTwriter(dataID, locID, HeaderInfo, specComments, NormalComments, revComments, startDay,Start_UTC,data,info,form,rev,ICTdir,missing_data_val)
-version_set('v1.1')
+version_set('v1.3')
 %----------------------------------------------------------
 %  BEGIN INPUT OF MEASUREMENT-SPECIFIC INFO
 %----------------------------------------------------------
@@ -268,6 +271,9 @@ end
 %%%%% SPECIAL COMMENTS %%%%%
 fprintf(fid,[int2str(numspec) '\n']); % Number of special comment lines
 for i=1:numspec
+    if ~strcmp(specComments{i}(end-1:end),'\n')
+        specComments{i} = [specComments{i} '\n'];
+    end
     fprintf(fid,specComments{i});
 end
 

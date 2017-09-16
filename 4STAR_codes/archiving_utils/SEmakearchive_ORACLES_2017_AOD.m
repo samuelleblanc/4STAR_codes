@@ -118,7 +118,7 @@ revComments = {...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
-specComments_extra_uncertainty = '';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
+specComments_extra_uncertainty = 'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -162,10 +162,10 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831'} ; %put one day string
+dslist={'20170801' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
-%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1          1          1          1] ;
+jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          1] ; %set=1 to proces s
+%jproc=[         0          0          0          0          1          0          0          1          1          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -256,9 +256,10 @@ for i=idx_file_proc
         add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
-        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
+        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),length(save_wvls)]);
         specComments{end+1} = specComments_extra_uncertainty;
         add_uncert = true; correct_aod = false;
+        d.time = t;
     end
     
     %% extract special comments about response functions from note
