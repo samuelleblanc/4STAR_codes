@@ -58,7 +58,7 @@ switch instrumentname;
                     filesuffix = 'refined_averaged_MLO_inflight';
                 elseif t>=datenum([2017 8 7 0 0 0]); %from Transit #3 to Ascension
                     daystr = '20170807';
-                    filesuffix = 'refined_langley_4STARpm';
+                    filesuffix = 'refined_langley_4STAR_subset_pm';
                 elseif t>=datenum([2017 8 1 0 0 0]); % From transit #1 Morning at WFF
                     daystr = '20170801';
                     filesuffix = 'refined_langley_4STAR_WFF_ground';
