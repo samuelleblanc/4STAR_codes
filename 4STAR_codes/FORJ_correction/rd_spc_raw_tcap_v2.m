@@ -70,22 +70,22 @@ for lab = (length(labels)-pixels):-1:1
 end
 
 if is_4starb
-[visw, nirw]=starwavelengths(spc.time,'4STARB');
-disp('using 4STARB wvl vals')
-if spc.is_vis
-   spc.nm = visw.*1000.0;   
-else
-   spc.nm = nirw.*1000.0;%fliplr(lambda_swir([1:pixels]));
-   %spc.spectra = fliplr(spc.spectra);
-end
+    [visw, nirw]=starwavelengths(spc.time,'4STARB');
+    disp('using 4STARB wvl vals')
+    if spc.is_vis
+        spc.nm = visw.*1000.0;
+    else
+        spc.nm = nirw.*1000.0;%fliplr(lambda_swir([1:pixels]));
+        %spc.spectra = fliplr(spc.spectra);
+    end
     
 else
-if spc.is_vis
- spc.nm = Lambda_MCS_sn081100_tec5([1:pixels]);   
-else
-   spc.nm = fliplr(lambda_swir([1:pixels]));
-   spc.spectra = fliplr(spc.spectra);
-end
+    if spc.is_vis
+        spc.nm = Lambda_MCS_sn081100_tec5([1:pixels]);
+    else
+        spc.nm = fliplr(lambda_swir([1:pixels]));
+        spc.spectra = fliplr(spc.spectra);
+    end
 end
 [~, run_id] = strtok(fname, '_');
 [run_id] = sscanf(strtok(run_id, '_'),'%d');
