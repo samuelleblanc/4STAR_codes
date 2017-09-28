@@ -44,7 +44,7 @@ switch instrumentname;
         end;
     case {'4STARB'}
         if t(1)>datenum([2015 1 1 1 0 0 0]);
-            C0 = 171.7;   
+            C0 = 171.7;
             C1 = 0.81254;
             C2 = -1.55568e-6;
             C3 = -1.59216e-8;
@@ -56,16 +56,16 @@ switch instrumentname;
             Cn = [1700.28, -1.17334, -0.000655055, 7.06199E-07,-1.14153E-09];
             pn = [0:511];
             nirw = polyval(flip(Cn),pn);
-            nirw=nirw/1000;
+            nirw=flip(nirw)/1000;
             nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
             
             fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
-                load(which(fwhmfile));
-                visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
-                visnote=[visnote ' FWHM from ' fwhmfile '.'];
-                nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
-                nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
-                warning('Update the FWHM for 4STARB using the 4STAR values');
+            load(which(fwhmfile));
+            visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
+            visnote=[visnote ' FWHM from ' fwhmfile '.'];
+            nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
+            nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
+            warning('Update the FWHM for 4STARB using the 4STAR values');
             
         end;
         %error('4STARB wavelengths not yet implemented')
