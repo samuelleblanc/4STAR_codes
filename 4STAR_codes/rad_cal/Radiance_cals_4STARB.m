@@ -179,7 +179,7 @@ for ll = lamps
                 fnum = '015';
         end
         pp='park';
-    elseif date=='20170620';
+    elseif date=='20170620' | date=='20170621';
         switch ll
             case 12
                 date='20170620';
