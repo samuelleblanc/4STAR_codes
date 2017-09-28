@@ -1,4 +1,4 @@
-% Radiance calibration [Resp in cts/ms / W/(m^2.sr.um)] for 4STAR VIS spectrometer (1044 channels) derived from 4STARB_20170621_005_VIS_ZEN.dat on 2017-09-12 21:42:16. 
+% Radiance calibration [Resp in cts/ms / W/(m^2.sr.um)] for 4STAR VIS spectrometer (1044 channels) derived from 4STARB_20170621_005_VIS_ZEN.dat on 2017-09-18 17:27:09. 
 % Calibration used only data with Lamps_1 and 8 ms (vis), 100 ms (nir). 
 % Also requires calibrated radiance from 20160121125700HISS.txt. 
 Pix  Wavelength     resp       rate        rad 
