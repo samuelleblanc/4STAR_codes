@@ -46,7 +46,7 @@ days = ['809';'825';'827';'830';'831';'902';'904';'906';'908';'910';...
 
 days = ['912';'914';'918';'920'];
 days = ['924';'925';'927';'929';'930'];%'924';'925']
-days = ['809']
+days = ['813']
 
 %c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
 c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist.dat';
@@ -65,6 +65,7 @@ c0f = '20160924_VIS_C0_refined_averaged_inflight_Langley_high_alts_transitback_O
 c0f = '20170809_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit.dat';
+c0f = '20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';
 
 newc0_visfile = [starpaths c0f];
 
