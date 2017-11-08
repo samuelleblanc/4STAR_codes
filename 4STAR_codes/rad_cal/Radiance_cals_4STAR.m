@@ -58,6 +58,7 @@ date='20140716';
 %date='20141024'
 date = '20160330'
 date = '20170620';
+date = '20171102'
 docorrection=false; %false;
 
 %% Legacy codes
@@ -70,7 +71,7 @@ docorrection=false; %false;
 % compute dark for integration time setting.
 %%
 %%pname = 'D:\case_studies\radiation_cals\2013_11_20.SASZe1_4STAR.NASA_Ames.Flynn\';
-pname=uigetdir('C:\','Find folder for calibration files');
+pname=uigetdir(getnamedpath('rad_cal_dir'),'Find folder for calibration files');
 hiss = get_hiss;
 %% Maybe _003_ all just messing around, bracketing performance for different
 % settigs, etc.
@@ -154,7 +155,13 @@ hiss = get_hiss;
 % legend('4','6','8','50','75','100')
 
 %%
-lamps = [12,9,6,3,2,1];
+if date=='20171102';
+    lamps = [12,9,6];
+    sublamps = true;
+else;
+    lamps = [12,9,6,3,2,1];
+    sublamps = false;
+end;
 vis_mean = []; vis_std = []; nir_mean = []; nir_std = [];
 M_vis = []; S_vis = 0; M_nir = []; S_nir = 0;
 k = 0;
@@ -296,6 +303,18 @@ for ll = lamps
         end
         pp='ZEN';
         date='20170620';
+    elseif date=='20171102';
+        switch ll
+            case 12
+                fnum = '004';
+            case 9
+                fnum = '005';
+            case 6
+                fnum = '006';
+            case 0
+                fnum = '007';
+        end
+        pp='ZEN';
     
     else;
         disp('problem! date not recongnised')
@@ -303,8 +322,8 @@ for ll = lamps
     
     %% load the files
     disp(strcat('Getting lamp #',num2str(ll)))
-    nir = rd_spc_TCAP_v2([pname,filesep,lamp_str, instname, filesep,date,'_',fnum,'_NIR_',pp,'.dat']);
-    vis = rd_spc_TCAP_v2([pname,filesep,lamp_str, instname,filesep,date,'_',fnum,'_VIS_',pp,'.dat']);
+    nir = rd_spc_TCAP_v2([pname,filesep,lamp_str,filesep, instname,date,'_',fnum,'_NIR_',pp,'.dat']);
+    vis = rd_spc_TCAP_v2([pname,filesep,lamp_str,filesep, instname,date,'_',fnum,'_VIS_',pp,'.dat']);
     shut = nir.t.shutter==0;
     shut(2:end)= shut(1:end-1)&shut(2:end); shut(1:end-1) = shut(1:end-1)&shut(2:end);
     sun = nir.t.shutter==1;
@@ -455,6 +474,14 @@ figure(10);
 subplot(2,1,1);
 %lines = plot(vis.nm, [mean(cal.Lamps_12.vis.resp);mean(cal.Lamps_9.vis.resp);mean(cal.Lamps_6.vis.resp);...
 %    mean(cal.Lamps_3.vis.resp);mean(cal.Lamps_2.vis.resp);mean(cal.Lamps_1.vis.resp)],'-');
+if sublamps;
+    lines= plot(vis.nm, cal.Lamps_12.vis.mean_resp, ...
+    vis.nm, cal.Lamps_9.vis.mean_resp, ...
+    vis.nm, cal.Lamps_6.vis.mean_resp,'-');
+%colorbar;
+recolor(lines,[12,9,6]);
+    
+else;
 lines= plot(vis.nm, cal.Lamps_12.vis.mean_resp, ...
     vis.nm, cal.Lamps_9.vis.mean_resp, ...
     vis.nm, cal.Lamps_6.vis.mean_resp, ...
@@ -463,6 +490,7 @@ lines= plot(vis.nm, cal.Lamps_12.vis.mean_resp, ...
     vis.nm, cal.Lamps_1.vis.mean_resp,'-');
 %colorbar;
 recolor(lines,[12,9,6,3,2,1]);
+end;
 title([lamp_str, ': ',vis.fname],'interp','none');
 ylabel('resp');
 xlabel('wavelength [nm]')
@@ -474,6 +502,14 @@ hold('off');
 subplot(2,1,2);
 %lines = plot(nir.nm, [mean(cal.Lamps_12.nir.resp);mean(cal.Lamps_9.nir.resp);mean(cal.Lamps_6.nir.resp);...
 %    mean(cal.Lamps_3.nir.resp);mean(cal.Lamps_2.nir.resp);mean(cal.Lamps_1.nir.resp)],'-');
+if sublamps;
+    lines= plot(nir.nm, cal.Lamps_12.nir.mean_resp, ...
+    nir.nm, cal.Lamps_9.nir.mean_resp, ...
+    nir.nm, cal.Lamps_6.nir.mean_resp,'-');
+%colorbar;
+recolor(lines,[12,9,6]);
+    
+else;
 lines= plot(nir.nm, cal.Lamps_12.nir.mean_resp, ...
     nir.nm, cal.Lamps_9.nir.mean_resp, ...
     nir.nm, cal.Lamps_6.nir.mean_resp, ...
@@ -482,6 +518,7 @@ lines= plot(nir.nm, cal.Lamps_12.nir.mean_resp, ...
     nir.nm, cal.Lamps_1.nir.mean_resp,'-');
 %colorbar;
 recolor(lines,[12,9,6,3,2,1]);
+end;
 legend(num2str(lamps',' %d lamps'), 'location','northwest');
 hold('on');
 plot(nir.nm, nir_mean, '.');

@@ -134,9 +134,12 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
     elseif t >= datenum([2016 03 30 0 0 0]) && t< datenum([2017 06 19 0 0 0]);
         daystr = '20160330';
         filesuffix = 'from_20160330_018_VIS_ZEN_with_20160121125700HISS';
-    elseif t >= datenum([2017 06 20 0 0 0]);
+    elseif t >= datenum([2017 06 20 0 0 0]) && t< datenum([2017 08 27 0 0 0]);
         daystr = '20170620';
         filesuffix = 'from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS';
+    elseif t >= datenum([2017 08 27 0 0 0]) ;
+        daystr = '20171102';
+        filesuffix = 'from_4STAR_20171102_005_VIS_ZEN_with_20160121125700HISS';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
@@ -146,9 +149,15 @@ else % special collections
     end;
 end;
     case {'4STARB'}
-        warning('4STARB radiance response using old HISS values, and old fiber configuration')
-        daystr = '20170621';
-        filesuffix = 'from_4STARB_20170621_005_VIS_ZEN_with_20160121125700HISS';
+        
+        %warning('4STARB radiance response using old HISS values, and old fiber configuration')
+        if t< datenum([2017 07 15 0 0 0]);
+            daystr = '20170621';
+            filesuffix = 'from_4STARB_20170621_005_VIS_ZEN_with_20160121125700HISS';
+        elseif t>= datenum([2017 07 15 0 0 0]);
+            daystr = '20171102';
+            filsuffix = 'from_4STARB_20171102_004_NIR_ZEN_with_20160121125700HISS';
+        end;
     case {'2STAR'}
         warning('2STAR does not have a radiance measurement, returning nul arrays')
         visresp=[]; nirresp=[]; visnote=''; nirnote=''; 

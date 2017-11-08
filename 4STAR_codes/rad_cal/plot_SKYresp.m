@@ -33,39 +33,37 @@
 % Written (v1.0): Samuel LeBlanc, NASA Ames, date unknown, 2014
 % Modified (v1.1): by Samuel LeBlanc, NASA Ames, 2014-11-12
 %                 - changed startup to startup_plotting
+% Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2017-11-07
+%                 - added handling of lamp subsets
 % -------------------------------------------------------------------------
 
 %% Start of function
 function resp=plot_SKYresp(cal,vis,nir,date,pname)
 startup_plotting;
-version_set('1.1');
+version_set('1.2');
 disp('Plotting the various SKY response functions');
 
 figure(3);
-for ll=1:length(fieldnames(cal));
-  switch ll
-        case 6
+cal_names = fieldnames(cal)
+
+for ll=1:length(cal_names);
+  switch cal_names{ll}
+        case 'Lamps_12'
             fnum = '009';
-            lampstr='Lamps_12';
-        case 5
+        case 'Lamps_9'
             fnum = '010';
-            lampstr='Lamps_9';
-        case 4
+        case 'Lamps_6'
             fnum = '011';
-            lampstr='Lamps_6';
-        case 3
+        case 'Lamps_3'
             fnum = '012';
-            lampstr='Lamps_3';
-        case 2
+        case 'Lamps_2'
             fnum = '013';
-            lampstr='Lamps_2';
-        case 1
+        case 'Lamps_1'
             fnum = '014';
-            lampstr='Lamps_1';
-        case 0
+        case 'Lamps_0'
             fnum = '015';
-            lampstr='Lamps_0';
   end
+  lampstr = cal_names{ll};
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:),'DisplayName',['VIS ' lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -88,23 +86,8 @@ save_fig(3,ff,true);
 %%%% plot every response functions
 figure(4);
 subplot(2,1,1);
-for ll=1:length(fieldnames(cal));
-  switch ll
-        case 6
-            lampstr='Lamps_12';
-        case 5
-            lampstr='Lamps_9';
-        case 4
-            lampstr='Lamps_6';
-        case 3
-            lampstr='Lamps_3';
-        case 2
-            lampstr='Lamps_2';
-        case 1
-            lampstr='Lamps_1';
-        case 0
-            lampstr='Lamps_0';
-  end
+for ll=1:length(cal_names);
+  lampstr = cal_names{ll};
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:),'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -119,23 +102,8 @@ end;
 hold off; %legend(gca,'show');
 
 subplot(2,1,2);
-for ll=1:length(fieldnames(cal));
-  switch ll
-        case 6
-            lampstr='Lamps_12';
-        case 5
-            lampstr='Lamps_9';
-        case 4
-            lampstr='Lamps_6';
-        case 3
-            lampstr='Lamps_3';
-        case 2
-            lampstr='Lamps_2';
-        case 1
-            lampstr='Lamps_1';
-        case 0
-            lampstr='Lamps_0';
-  end
+for ll=1:length(cal_names);
+  lampstr = cal_names{ll};
   for iint=1:length(cal.(lampstr).nir.t_ms);
     plot(nir.nm,cal.(lampstr).nir.resp(iint,:),'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).nir.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -157,23 +125,8 @@ figure(5);
 resp.vis=cal.Lamps_9.vis.resp(3,:);
 resp.nir=cal.Lamps_9.nir.resp(3,:);
 subplot(2,1,1);
-for ll=1:length(fieldnames(cal));
-  switch ll
-        case 6
-            lampstr='Lamps_12';
-        case 5
-            lampstr='Lamps_9';
-        case 4
-            lampstr='Lamps_6';
-        case 3
-            lampstr='Lamps_3';
-        case 2
-            lampstr='Lamps_2';
-        case 1
-            lampstr='Lamps_1';
-        case 0
-            lampstr='Lamps_0';
-  end
+for ll=1:length(cal_names);
+  lampstr = cal_names{ll};
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:)./resp.vis*100,'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -188,23 +141,8 @@ end;
 hold off; %legend(gca,'show');
 
 subplot(2,1,2);
-for ll=1:length(fieldnames(cal));
-  switch ll
-        case 6
-            lampstr='Lamps_12';
-        case 5
-            lampstr='Lamps_9';
-        case 4
-            lampstr='Lamps_6';
-        case 3
-            lampstr='Lamps_3';
-        case 2
-            lampstr='Lamps_2';
-        case 1
-            lampstr='Lamps_1';
-        case 0
-            lampstr='Lamps_0';
-  end
+for ll=1:length(cal_names);
+  lampstr = cal_names{ll};
   for iint=1:length(cal.(lampstr).nir.t_ms);
     plot(nir.nm,cal.(lampstr).nir.resp(iint,:)./resp.nir*100,'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).nir.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
