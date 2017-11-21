@@ -49,6 +49,8 @@
 %                      correction, and notes on final archive.
 %                      Added new wavelengths and uncertainty comments
 % 2017-08-11, SL,v4.0, Ported over from ORACLES 2016
+% 2017-11-21, MS,    , tweaked line 196 to overcome archiving issues for
+%                      rooftests
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_2017_AOD
@@ -166,7 +168,7 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171025'} ; %put one day string
+dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171101'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
 %jproc=[         0          1          0          0          0          1          0          0          1          1          1          1          1          1          1          1          1          1          1] ;
@@ -192,7 +194,7 @@ for i=idx_file_proc
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
     
     %% build the Start_UTC time array, spaced at one second each
-    Start_UTCs = [UTCflight(1)*3600:UTCflight(2)*3600];
+    Start_UTCs = [UTCflight(1)*3600:(UTCflight(2)+24)*3600];% tweaked to allow day change
     UTC = Start_UTCs/3600.;
     num = length(Start_UTCs);
     
