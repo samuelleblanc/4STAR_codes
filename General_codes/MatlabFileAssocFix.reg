@@ -1,0 +1,851 @@
+Windows Registry Editor Version 5.00
+
+;FIXES MATLAB FILE ASSOCIATIONS
+
+;REMOVES M FILE ASSOCIATIONS
+
+[-HKEY_CLASSES_ROOT\.m]
+
+[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m]
+
+;ADD SHELL OPEN
+
+[HKEY_CLASSES_ROOT\Applications\MATLAB.exe\shell\open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\MATLAB.exe\" \"%1\""
+
+;ADD FIG FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.fig]
+@="MATLAB.fig.9.3.0"
+
+[HKEY_CLASSES_ROOT\.fig\OpenWithProgids]
+"MATLAB.fig.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.fig\Versions\MATLAB.fig.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0]
+@="MATLAB Figure"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-62"
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\fig.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\Shell\Open\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.fig.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.fig\OpenWithProgids]
+"MATLAB.fig.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.fig\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD M FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.m]
+@="MATLAB.m.9.3.0"
+"Content Type"="text/plain"
+"PerceivedType"="Text"
+
+[HKEY_CLASSES_ROOT\.m\OpenWithProgids]
+"MATLAB.m.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.m\PersistentHandler]
+@="{5e941d80-bf96-11cd-b579-08002b30bfeb}"
+
+[HKEY_CLASSES_ROOT\.m\Versions\MATLAB.m.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0]
+@="MATLAB Code"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-58"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\m.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Open\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Run]
+@="Run"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Run\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Run\ddeexec]
+@="run('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Run\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.m.9.3.0\Shell\Run\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m\OpenWithProgids]
+"m_auto_file"=hex(0):
+"MATLAB.m.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.m\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MAT FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mat]
+@="MATLAB.mat.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mat\OpenWithProgids]
+"MATLAB.mat.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mat\Versions\MATLAB.mat.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0]
+@="MATLAB Data"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-59"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mat.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Load]
+@="Load"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Load\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Load\ddeexec]
+@="load('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Load\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Load\ddeexec\topic]
+@="system"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Open\ddeexec]
+@="uiimport('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mat.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mat\OpenWithProgids]
+"MATLAB.mat.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mat\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MDL FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mdl]
+@="MATLAB.mdl.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mdl\OpenWithProgids]
+"MATLAB.mdl.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mdl\Versions\MATLAB.mdl.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0]
+@="Simulink Model"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-61"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mdl.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\Shell\Load]
+@="Load"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\Shell\Load\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\Shell\Load\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\Shell\Load\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdl.9.3.0\Shell\Load\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mdl\OpenWithProgids]
+"MATLAB.mdl.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mdl\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MDLP FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mdlp]
+@="MATLAB.mdlp.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mdlp\OpenWithProgids]
+"MATLAB.mdlp.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mdlp\Versions\MATLAB.mdlp.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mdlp.9.3.0]
+@="Simulink Protected Model"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-72"
+
+[HKEY_CLASSES_ROOT\MATLAB.mdlp.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mdlp.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mdlp\OpenWithProgids]
+"MATLAB.mdlp.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mdlp\OpenWithList]
+
+;ADD MEXW32 FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mexw32]
+@="MATLAB.mexw32.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mexw32\OpenWithProgids]
+"MATLAB.mexw32.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mexw32\Versions\MATLAB.mexw32.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mexw32.9.3.0]
+@="MATLAB MEX"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-63"
+
+[HKEY_CLASSES_ROOT\MATLAB.mexw32.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\m.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mexw32\OpenWithProgids]
+"MATLAB.mexw32.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mexw32\OpenWithList]
+
+;ADD MEXW64 FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mexw64]
+@="MATLAB.mexw64.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mexw64\OpenWithProgids]
+"MATLAB.mexw64.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mexw64\Versions\MATLAB.mexw64.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mexw64.9.3.0]
+@="MATLAB MEX"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-63"
+
+[HKEY_CLASSES_ROOT\MATLAB.mexw64.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mexw64.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mexw64\OpenWithProgids]
+"MATLAB.mexw64.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mexw64\OpenWithList]
+
+;ADD MN FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mn]
+@="MATLAB.mn.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mn\OpenWithProgids]
+"MATLAB.mn.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mn\Versions\MATLAB.mn.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0]
+@="MuPAD Notebook"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-66"
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mn.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\Shell\Open\ddeexec]
+@="mupad('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mn.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mn\OpenWithProgids]
+"MATLAB.mn.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mn\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MU FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mu]
+@="MATLAB.mu.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mu\OpenWithProgids]
+"MATLAB.mu.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mu\Versions\MATLAB.mu.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0]
+@="MuPAD Code"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-67"
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mu.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\Shell\Open\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.mu.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mu\OpenWithProgids]
+"MATLAB.mu.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mu\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MUPHLP FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.muphlp]
+@="MATLAB.muphlp.9.3.0"
+
+[HKEY_CLASSES_ROOT\.muphlp\OpenWithProgids]
+"MATLAB.muphlp.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.muphlp\Versions\MATLAB.muphlp.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0]
+@="MuPAD Help"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-68"
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\muphlp.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\Shell\Open\ddeexec]
+@="doc(symengine, '%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.muphlp.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.muphlp\OpenWithProgids]
+"MATLAB.muphlp.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.muphlp\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD P FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.p]
+@="MATLAB.p.9.3.0"
+
+[HKEY_CLASSES_ROOT\.p\OpenWithProgids]
+"MATLAB.p.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.p\Versions\MATLAB.p.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.p.9.3.0]
+@="MATLAB P-code"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-60"
+
+[HKEY_CLASSES_ROOT\MATLAB.p.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\p.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.p\OpenWithProgids]
+"MATLAB.p.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.p\OpenWithList]
+
+;ADD SLX FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.slx]
+@="MATLAB.slx.9.3.0"
+
+[HKEY_CLASSES_ROOT\.slx\OpenWithProgids]
+"MATLAB.slx.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.slx\Versions\MATLAB.slx.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0]
+@="Simulink Model (SLX format)"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-73"
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\slx.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\Shell\Open\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.slx.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slx\OpenWithProgids]
+"MATLAB.slx.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slx\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD SSC FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.ssc]
+@="MATLAB.ssc.9.3.0"
+
+[HKEY_CLASSES_ROOT\.ssc\OpenWithProgids]
+"MATLAB.ssc.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.ssc\Versions\MATLAB.ssc.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0]
+@="Simscape Model"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-65"
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\ssc.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\Shell\Open\ddeexec]
+@="uiopen('%1',1)"
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.ssc.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ssc\OpenWithProgids]
+"MATLAB.ssc.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.ssc\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD XVC FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.xvc]
+@="MATLAB.xvc.9.3.0"
+
+[HKEY_CLASSES_ROOT\.xvc\OpenWithProgids]
+"MATLAB.xvc.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.xvc\Versions\MATLAB.xvc.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0]
+@="MuPAD Graphics"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-69"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\xvc.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\Shell\Open\ddeexec]
+@="mupad('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvc.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xvc\OpenWithProgids]
+"MATLAB.xvc.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xvc\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD XVZ FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.xvz]
+@="MATLAB.xvz.9.3.0"
+
+[HKEY_CLASSES_ROOT\.xvz\OpenWithProgids]
+"MATLAB.xvz.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.xvz\Versions\MATLAB.xvz.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0]
+@="MuPAD Graphics"
+"FriendlyTypeName"="@C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe,-70"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\xvz.ico,0"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\Shell\Open]
+@="Open"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\Shell\Open\command]
+@="\"C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\matlab.exe\""
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\Shell\Open\ddeexec]
+@="mupad('%1')"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\Shell\Open\ddeexec\application]
+@="ShellVerbs.Matlab.9.3.0"
+
+[HKEY_CLASSES_ROOT\MATLAB.xvz.9.3.0\Shell\Open\ddeexec\topic]
+@="system"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xvz\OpenWithProgids]
+"MATLAB.xvz.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.xvz\OpenWithList]
+"a"="MATLAB.exe"
+"MRUList"="a"
+
+;ADD MLAPP FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mlapp]
+@="MATLAB.mlapp.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mlapp\OpenWithProgids]
+"MATLAB.mlapp.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mlapp\Versions\MATLAB.mlapp.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mlapp.9.3.0]
+@="MATLAB Application"
+
+[HKEY_CLASSES_ROOT\MATLAB.mlapp.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mlapp.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlapp\OpenWithProgids]
+"MATLAB.mlapp.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlapp\OpenWithList]
+
+;ADD MLTBX FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mltbx]
+@="MATLAB.mltbx.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mltbx\OpenWithProgids]
+"MATLAB.mltbx.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mltbx\Versions\MATLAB.mltbx.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mltbx.9.3.0]
+@="MATLAB Toolbox"
+
+[HKEY_CLASSES_ROOT\MATLAB.mltbx.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mltbx.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mltbx\OpenWithProgids]
+"MATLAB.mltbx.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mltbx\OpenWithList]
+
+;ADD MLDATX FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mldatx]
+@="MATLAB.mldatx.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mldatx\OpenWithProgids]
+"MATLAB.mldatx.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mldatx\Versions\MATLAB.mldatx.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mldatx.9.3.0]
+@="Simulink Scenario"
+
+[HKEY_CLASSES_ROOT\MATLAB.mldatx.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mldatx.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mldatx\OpenWithProgids]
+"MATLAB.mldatx.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mldatx\OpenWithList]
+
+;ADD REQ FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.req]
+@="MATLAB.req.9.3.0"
+
+[HKEY_CLASSES_ROOT\.req\OpenWithProgids]
+"MATLAB.req.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.req\Versions\MATLAB.req.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.req.9.3.0]
+@="Simulink Requirements Link"
+
+[HKEY_CLASSES_ROOT\MATLAB.req.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\req.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.req\OpenWithProgids]
+"MATLAB.req.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.req\OpenWithList]
+
+;ADD SLDD FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.sldd]
+@="MATLAB.sldd.9.3.0"
+
+[HKEY_CLASSES_ROOT\.sldd\OpenWithProgids]
+"MATLAB.sldd.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.sldd\Versions\MATLAB.sldd.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.sldd.9.3.0]
+@="Simulink Dictionary"
+
+[HKEY_CLASSES_ROOT\MATLAB.sldd.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\sldd.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.sldd\OpenWithProgids]
+"MATLAB.sldd.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.sldd\OpenWithList]
+
+;ADD SLDDC FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.slddc]
+@="MATLAB.slddc.9.3.0"
+
+[HKEY_CLASSES_ROOT\.slddc\OpenWithProgids]
+"MATLAB.slddc.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.slddc\Versions\MATLAB.slddc.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.slddc.9.3.0]
+@="Simulink Dictionary"
+
+[HKEY_CLASSES_ROOT\MATLAB.slddc.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\slddc.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slddc\OpenWithProgids]
+"MATLAB.slddc.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slddc\OpenWithList]
+
+;ADD MLAPPINSTALL FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mlappinstall]
+@="MATLAB.mlappinstall.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mlappinstall\OpenWithProgids]
+"MATLAB.mlappinstall.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mlappinstall\Versions\MATLAB.mlappinstall.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mlappinstall.9.3.0]
+@="MATLAB Application"
+
+[HKEY_CLASSES_ROOT\MATLAB.mlappinstall.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mlappinstall.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlappinstall\OpenWithProgids]
+"MATLAB.mlappinstall.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlappinstall\OpenWithList]
+
+;ADD MLPKGINSTALL FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mlpkginstall]
+@="MATLAB.mlpkginstall.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mlpkginstall\OpenWithProgids]
+"MATLAB.mlpkginstall.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mlpkginstall\Versions\MATLAB.mlpkginstall.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mlpkginstall.9.3.0]
+@="MATLAB Support Package"
+
+[HKEY_CLASSES_ROOT\MATLAB.mlpkginstall.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mlpkginstall.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlpkginstall\OpenWithProgids]
+"MATLAB.mlpkginstall.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlpkginstall\OpenWithList]
+
+;ADD SLXP FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.slxp]
+@="MATLAB.slxp.9.3.0"
+
+[HKEY_CLASSES_ROOT\.slxp\OpenWithProgids]
+"MATLAB.slxp.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.slxp\Versions\MATLAB.slxp.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.slxp.9.3.0]
+@="Simulink Protected Model Package"
+
+[HKEY_CLASSES_ROOT\MATLAB.slxp.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\slxp.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slxp\OpenWithProgids]
+"MATLAB.slxp.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.slxp\OpenWithList]
+
+;ADD SLTX FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.sltx]
+@="MATLAB.sltx.9.3.0"
+
+[HKEY_CLASSES_ROOT\.sltx\OpenWithProgids]
+"MATLAB.sltx.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.sltx\Versions\MATLAB.sltx.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.sltx.9.3.0]
+@="Simulink Template"
+
+[HKEY_CLASSES_ROOT\MATLAB.sltx.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\sltx.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.sltx\OpenWithProgids]
+"MATLAB.sltx.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.sltx\OpenWithList]
+
+;ADD MLPRJ FILE ASSOCIATIONS
+
+[HKEY_CLASSES_ROOT\.mlprj]
+@="MATLAB.mlprj.9.3.0"
+
+[HKEY_CLASSES_ROOT\.mlprj\OpenWithProgids]
+"MATLAB.mlprj.9.3.0"=""
+
+[HKEY_CLASSES_ROOT\.mlprj\Versions\MATLAB.mlprj.9.3.0]
+"FileVersionMS"=dword:00090003
+"FileVersionLS"=dword:00000000
+
+[HKEY_CLASSES_ROOT\MATLAB.mlprj.9.3.0]
+@="MATLAB Project"
+
+[HKEY_CLASSES_ROOT\MATLAB.mlprj.9.3.0\DefaultIcon]
+@="C:\\Program Files\\MATLAB\\R2017b\\bin\\win64\\mlprj.ico,0"
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlprj\OpenWithProgids]
+"MATLAB.mlprj.9.3.0"=hex(0):
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.mlprj\OpenWithList]
+
