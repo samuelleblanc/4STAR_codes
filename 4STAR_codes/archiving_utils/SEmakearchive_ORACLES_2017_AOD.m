@@ -56,11 +56,15 @@ version_set('v4.0')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
+%starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
 %ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';%'E:\ORACLES\gas_ict\';
 %starinfo_path = 'F:\ORACLES\ORACLES_2017\starinfo\';%'E:\ORACLES\starinfo\';
 %starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';%'E:\ORACLES\starsun\';
 %gasfile_path = 'F:\ORACLES\ORACLES_2017\gas_summary\';%'E:\ORACLES\gas_summary\';
+
+starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';
+ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';
+
 
 if getUserName=='sleblan2';
     ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict_2017\';
@@ -78,7 +82,7 @@ if getUserName=='sleblan2';
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
-platform = 'P3';
+platform = 'ground';%'P3';
 gas_subtract = false;
 avg_wvl = true;
 
@@ -162,9 +166,9 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904'} ; %put one day string
+dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171025'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0] ; %set=1 to proces s
+jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
 %jproc=[         0          1          0          0          0          1          0          0          1          1          1          1          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
@@ -183,7 +187,8 @@ for i=idx_file_proc
     catch
         eval([infofile_(1:end-2),'(s)']);
     end
-    UTCflight=t2utch(s.flight);
+    %UTCflight=t2utch(s.flight);
+    UTCflight=t2utch(s.ground);
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
     
     %% build the Start_UTC time array, spaced at one second each
@@ -365,7 +370,8 @@ for i=idx_file_proc
         try;
             flag.utc = t2utch(flag.time.t);
         catch;
-            flag.utc = t2utch(flag.flags.time.t);
+            %flag.utc = t2utch(flag.flags.time.t);
+            flag.utc = t2utch(flag.t);
         end;
     end
     [ii,dt] = knnsearch(flag.utc,UTC');
