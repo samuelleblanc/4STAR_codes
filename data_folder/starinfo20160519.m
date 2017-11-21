@@ -1,4 +1,4 @@
-flight=[datenum(2016,5,29,22,52,02) datenum(2016,5,30,07,24,38)];
+flight=[datenum(2016,5,19,23,05,13) datenum(2016,5,20,7,11,48)];
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55)
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)];
 
@@ -6,7 +6,10 @@ flight=[datenum(2016,5,29,22,52,02) datenum(2016,5,30,07,24,38)];
 s.O3h=21; % Yohei's guess
 
 s.O3col=0.330;    % default
-s.NO2col=3e15;  % default
+s.NO2col=3e15;  % default 
+
+s.sd_aero_crit=0.01; 
+
 
 % other tweaks
 if isfield(s, 'Pst');

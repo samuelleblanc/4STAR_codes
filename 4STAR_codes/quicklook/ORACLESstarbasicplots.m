@@ -26,6 +26,7 @@ function ORACLESstarbasicplots(daystr, platform, savefigure)
 % MS   , 2016/04/06, modified to accomodate KORUS-AQ campaign data.
 % MS   , 2016/08/26, updated plotting gas fields for ORACLES
 % MS   , 2016/10/18, updating gas plots
+% MS   , 2017/10/23, fixed bugs: evalstarinfo(daystr, 'groundcomparison')
 %********************
 % set parameters
 %********************
@@ -70,7 +71,7 @@ colslist={'' c 1:13
 % 'VISonly' visc(3:9) 3:9
 
 % read auxiliary data from starinfo and select rows
-evalstarinfo(daystr, 'flight');
+%evalstarinfo(daystr, 'flight');
 if isequal(platform, 'flight');
     if ~exist('flight');
         error(['Specify flight time period in starinfo' daystr '.m.']);
@@ -86,7 +87,7 @@ elseif isequal(platform, 'ground');
     else
         tlim=t([1 end])';
     end;
-    evalstarinfo(daystr, 'groundcomparison');
+    %evalstarinfo(daystr, 'groundcomparison');
     if ~exist('groundcomparison');
         groundcomparison=tlim;
     end;
