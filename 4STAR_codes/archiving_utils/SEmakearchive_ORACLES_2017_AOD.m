@@ -49,6 +49,8 @@
 %                      correction, and notes on final archive.
 %                      Added new wavelengths and uncertainty comments
 % 2017-08-11, SL,v4.0, Ported over from ORACLES 2016
+% 2017-11-21, MS,    , tweaked line 196 to overcome archiving issues for
+%                      rooftests
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_2017_AOD
@@ -56,7 +58,16 @@ version_set('v4.0')
 %% set variables
 ICTdir = starpaths; %'C:\Users\sleblan2\Research\ORACLES\aod_ict\';
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
+%starsun_path = starpaths; %'C:\Users\sleblan2\Research\ORACLES\data\';
+%ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';%'E:\ORACLES\gas_ict\';
+%starinfo_path = 'F:\ORACLES\ORACLES_2017\starinfo\';%'E:\ORACLES\starinfo\';
+%starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';%'E:\ORACLES\starsun\';
+%gasfile_path = 'F:\ORACLES\ORACLES_2017\gas_summary\';%'E:\ORACLES\gas_summary\';
+
+starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';
+ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';
+
+
 if getUserName=='sleblan2';
     ICTdir = 'C:\Users\sleblan2\Research\ORACLES\aod_ict_2017\';
     starinfo_path = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
@@ -73,7 +84,7 @@ if getUserName=='sleblan2';
 end;
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
-platform = 'P3';
+platform = 'ground';%'P3';
 gas_subtract = false;
 avg_wvl = true;
 
@@ -91,7 +102,7 @@ HeaderInfo = {...
 NormalComments = {...
     'PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov';...
     'PLATFORM: NASA P3';...
-    'LOCATION: Based at Walvis Bay, Namibia, Exact aircraft latitude, longitude, altitude are included in the data records';...
+    'LOCATION: Based in Sao Tome. Exact aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research';...
     'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
@@ -101,7 +112,7 @@ NormalComments = {...
     'LLOD_FLAG: -8888';...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Samuel LeBlanc, samuel.leblanc@nasa.gov';...
-    'PROJECT_INFO: ORACLES 2017 deployment; August-September 2017; Based out of Sao Tomé';...
+    'PROJECT_INFO: ORACLES 2017 deployment; August-September 2017; Based out of Sao Tome';...
     'STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI.';...
     'OTHER_COMMENTS: N/A';...
     };
@@ -113,7 +124,7 @@ revComments = {...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
-specComments_extra_uncertainty = '';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
+specComments_extra_uncertainty = 'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -157,10 +168,10 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170807' '20170809' '20170812'} ; %put one day string
+dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171101'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          1          1          1] ; %set=1 to process
-jproc=[         0          0          1          1] ;
+jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
+%jproc=[         0          1          0          0          0          1          0          0          1          1          1          1          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -178,19 +189,32 @@ for i=idx_file_proc
     catch
         eval([infofile_(1:end-2),'(s)']);
     end
-    UTCflight=t2utch(s.flight);
+    %UTCflight=t2utch(s.flight);
+    UTCflight=t2utch(s.ground);
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
     
     %% build the Start_UTC time array, spaced at one second each
-    Start_UTCs = [UTCflight(1)*3600:UTCflight(2)*3600];
+    Start_UTCs = [UTCflight(1)*3600:(UTCflight(2)+24)*3600];% tweaked to allow day change
     UTC = Start_UTCs/3600.;
     num = length(Start_UTCs);
     
     %% get the special comments
     switch daystr
-        case '20140919'
+        case '20170819'
             specComments = {...
-                'Platinum day for over, under, and within cloud at sea ice edge.\n',...
+                'NIR spectrometer partial failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
+                };
+        case '20170821'
+            specComments = {...
+                'NIR spectrometer failure, all AOD with wavelengths larger than 1000 nm are to be ignored.\n',...
+                };    
+        case '20170831'
+            specComments = {...
+                'Window deposition for this flight may cause an overestimate in AOD of larger than 0.2 at 500 nm.\n',...
+                };
+        case '20170802'
+            specComments = {...
+                'Aborted flight, nearly no data.\n',...
                 };
         otherwise
             specComments = {};
@@ -225,6 +249,14 @@ for i=idx_file_proc
         error(['Problem loading the uncertainties in file:' starfile])
     end;
     
+    %% Special case processing for removing NIR aod values
+     switch daystr
+        case '20170819'
+            tau(:,1044:end) = NaN;
+        case '20170821'
+            tau(:,1044:end) = NaN;
+    end
+    
     %% Update the uncertainties with merge marks file saved in the starinfo
     add_uncert = false;
     correct_aod = false;
@@ -235,9 +267,10 @@ for i=idx_file_proc
         add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
-        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),1]);
+        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),length(save_wvls)]);
         specComments{end+1} = specComments_extra_uncertainty;
         add_uncert = true; correct_aod = false;
+        d.time = t;
     end
     
     %% extract special comments about response functions from note
@@ -288,10 +321,10 @@ for i=idx_file_proc
         qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
     elseif isfield(flag,'flags');
         qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
-        qual_flag = bitor(qual_flag,flag.flags.cirrus);
-        qual_flag = bitor(qual_flag,flag.flags.frost);
-        qual_flag = bitor(qual_flag,flag.flags.low_cloud);
-        qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds);
+        if isfield(flag.flags,'cirrus'); qual_flag = bitor(qual_flag,flag.flags.cirrus); end;
+        if isfield(flag.flags,'frost'); qual_flag = bitor(qual_flag,flag.flags.frost); end;
+        if isfield(flag.flags,'low_cloud'); qual_flag = bitor(qual_flag,flag.flags.low_cloud); end;
+        if isfield(flag.flags,'unspecified_clouds'); qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds); end;
     elseif isfield(flag,'before_or_after_flight');
         % only for automatic flagging
         if length(flag.before_or_after_flight) <1;
@@ -339,7 +372,8 @@ for i=idx_file_proc
         try;
             flag.utc = t2utch(flag.time.t);
         catch;
-            flag.utc = t2utch(flag.flags.time.t);
+            %flag.utc = t2utch(flag.flags.time.t);
+            flag.utc = t2utch(flag.t);
         end;
     end
     [ii,dt] = knnsearch(flag.utc,UTC');

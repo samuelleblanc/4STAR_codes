@@ -219,7 +219,13 @@ switch instrumentname;
             end;
         end;
     case {'4STARB'}
-        error('c0mod Not yet defined for 4STARB')
+        if t>=datenum([2017 08 01 0 0 0]);
+            daystr = '20170905';
+            filesuffix = 'compared_with_AATS_at_Ames_divbyTint';
+            model_atmosphere=2; %use midlat summer for NAAMES3
+        else
+            error('4STARB c0mod not yet implemented')
+        end;
     case {'2STAR'}
         if t>datenum([2015 1 1 0 0 0]); % first 2STARc0
             daystr = '20170527';

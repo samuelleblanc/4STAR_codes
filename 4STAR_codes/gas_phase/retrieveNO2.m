@@ -118,6 +118,12 @@ if plotting
         figure;
         plot(s.m_aero,1000*eta_residual(:,ires),'.','color',[0.8,0.8,0.8],'markersize',8);
         axis([min(s.m_aero) max(s.m_aero) -10 20]);
+        xlabel('airmass');ylabel('no2 eta ray-sub residual');
+        
+        figure;
+        plot(serial2Hh(s.t),1000*eta_residual(:,ires),'.','color',[0.8,0.8,0.8],'markersize',8);
+        axis([min(serial2Hh(s.t)) max(serial2Hh(s.t)) -10 20]);
+        xlabel('time');ylabel('eta ray-sub residual');
 end
 
 %% run retrieval
@@ -221,6 +227,7 @@ end
              %legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
              legend('total spectrum baseline and rayliegh subtracted','reconstructed spectrum','measured NO_{2} spectrum','fitted NO_{2} spectrum','residual');
              set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
+             axis([wstart wend -0.2 0.2]);
              pause;
          end
    end
@@ -248,7 +255,34 @@ end
     no2.no2resi          = RMSres;
     no2.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
     no2.no2SCD           = no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
+    
+    % save additional params:
+    % figure;
+    % plot(serial2Hh(s.t),s.QdVlr./s.QdVtot,'og');
+    % quad = s.QdVlr./s.QdVtot;
+    % figure;
+    % plot(serial2Hh(s.t(quad<=0.01&quad>=-0.01)),no2vcd_smooth(quad<=0.01&quad>=-0.01)/(Loschmidt/1000),'ob');hold on;
+    % no2vcd_smooth2 = smooth(no2vcd_smooth(quad<=0.01&quad>=-0.01),60,'rlowess');
+    % plot(serial2Hh(s.t(quad<=0.01&quad>=-0.01)),no2vcd_smooth2/(Loschmidt/1000),'xr');hold on;
+    % 
+    %     n.VCD_NO2   = no2vcd_smooth2/(Loschmidt/1000);
+    %     n.resid_NO2 = RMSres(quad<=0.01&quad>=-0.01);
+    %     n.UTC       = serial2Hh(s.t(quad<=0.01&quad>=-0.01));
+    %     n.Alt       = s.Alt(quad<=0.01&quad>=-0.01);
+    %     n.Latitude  = s.Lat(quad<=0.01&quad>=-0.01);
+    %     n.Longitude = s.Lon(quad<=0.01&quad>=-0.01);
+    
 
-   
+%     no2vcd_smooth2 = smooth(no2vcd_smooth,60,'rlowess');
+%     n.VCD_NO2   = no2vcd_smooth2(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2)/(Loschmidt/1000);
+%     n.resid_NO2 = RMSres(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2);
+%     n.UTC       = serial2Hh(s.t(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2));
+%     n.Alt       = s.Alt(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2);
+%     n.Latitude  = s.Lat(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2);
+%     n.Longitude = s.Lon(1000*eta_residual(:,ires)>0&1000*eta_residual(:,ires)<2);
+%     % save to mat
+%     si = strcat('D:\MichalsData\KORUS-AQ\OMI\pandora_4star\KORUS_AQ_Archive\korusaq-4STAR-NO2_DC8_','20160529','.mat');
+%     save(si,'-struct','n');
+% %    
 
 return;

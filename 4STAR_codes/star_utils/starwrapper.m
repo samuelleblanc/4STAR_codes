@@ -330,7 +330,9 @@ if ~isempty(strfind(lower(datatype),'vis'));
     sat_val = 65535;
     if strcmp(instrumentname,'2STAR'); sat_val=32767; end;
 elseif strmatch('nir', lower(datatype))
-    s.raw=fliplr(s.raw); % ascending order of the wavelength (reverse of the wavenumber)
+    if ~strcmp(instrumentname,'4STARB');
+       s.raw=fliplr(s.raw); % ascending order of the wavelength (reverse of the wavenumber)
+    end;
     s.w=nirw;
     s.c0=nirc0;
     s.c0err=nirc0err;
@@ -359,7 +361,9 @@ if exist('s2','var')
         s2.skyresperr = visresperr;
         s2.note(end+1,1)={visnote}; s2.note(end+1,1)={visnotec0};s2.note(end+1,1)={visnoteresp};
     elseif strmatch('nir', lower(datatype2));
-        s2.raw=fliplr(s2.raw); % ascending order of the wavelength (reverse of the wavenumber)
+        if ~strcmp(instrumentname,'4STARB');
+           s2.raw=fliplr(s2.raw); % ascending order of the wavelength (reverse of the wavenumber)
+        end;
         s2.w=nirw;
         s2.c0=nirc0;
         s2.c0err=nirc0err;
@@ -381,7 +385,7 @@ if exist('s2','var')
 end;
 
 %% run nonlinear correction on raw counts
-if toggle.applynonlinearcorr
+if toggle.applynonlinearcorr & ~strcmp(instrumentname,'4STARB')
     if toggle.verbose; disp('Applying nonlinear correction'), end;
     %if ~exist('vis_sun'), stophere; end;
     s_raw=correct_nonlinear(s.raw, toggle.verbose);

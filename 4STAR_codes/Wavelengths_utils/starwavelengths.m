@@ -9,7 +9,8 @@ function [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(t,inst
 % Samuel, v1.1, 2017/05/27, added instrumentname, to use tracking of other
 % instruments, namely here for 2STAR
 % Samuel, v1.2, 2017/06/01, updated 2STAR coefficients from zeiss documents
-version_set('1.2');
+% Samuel, v1.3, 2017/09/18, updated with proper 4STARB values.
+version_set('1.3');
 
 % development
 % Values change with renewed calibration and assessment. Update this file
@@ -43,7 +44,7 @@ switch instrumentname;
         end;
     case {'4STARB'}
         if t(1)>datenum([2015 1 1 1 0 0 0]);
-            C0 = 171.7;   
+            C0 = 171.7;
             C1 = 0.81254;
             C2 = -1.55568e-6;
             C3 = -1.59216e-8;
@@ -52,15 +53,19 @@ switch instrumentname;
             visw=visw/1000;
             visnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
             
-            C0n = 1700.28;   
-            C1n = -1.17334;
-            C2n = -0.000655055;
-            C3n = -7.06199e-7;
-            C4n = -1.14153e-9;
-            pn = 0:511;
-            nirw=C0n+C1n*pn+C2n*pn.^2+C3n*pn.^3+C4n*pn.^4;
-            nirw=nirw/1000;
+            Cn = [1700.28, -1.17334, -0.000655055, 7.06199E-07,-1.14153E-09];
+            pn = [0:511];
+            nirw = polyval(flip(Cn),pn);
+            nirw=flip(nirw)/1000;
             nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
+            
+            fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
+            load(which(fwhmfile));
+            visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
+            visnote=[visnote ' FWHM from ' fwhmfile '.'];
+            nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
+            nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
+            warning('Update the FWHM for 4STARB using the 4STAR values');
             
         end;
         %error('4STARB wavelengths not yet implemented')

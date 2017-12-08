@@ -1,3 +1,4 @@
+function [vis_resp nir_resp]=compare_resp_skycal();
 %% PURPOSE:
 %   Compare the response function from 2 different files
 %   Files must be identified in code
@@ -32,12 +33,13 @@
 %                  - Added toggle values for setting which field campaign
 %                  to use.
 %                  - cahnged labels for pre and post
+% Modified (v1.2): by Samuel LeBlanc, Santa Cruz, 2017-11-13
+%                  - added values for ORACLES 2017
 % -------------------------------------------------------------------------
 
 %% Start of function
-function [vis_resp nir_resp]=compare_resp_skycal();
-version_set('1.1');
-toggle.campaign = 'ARISE';
+version_set('1.2');
+toggle.campaign = 'ORACLES_2017';
 folder='C:\Users\sleblan2\Research\4STAR\cal\';
 
 spm='VIS';
@@ -50,9 +52,13 @@ switch toggle.campaign
         disp('Doing ARISE campaign')
         file1=['20140716\20140716_' spm '_SKY_Resp_from_20140716_003_' spm '_park_with_20140606091700HISS.dat'];
         file2=['20141024\20141024_' spm '_SKY_Resp_from_20141024_005_' spm '_park_with_20140606091700HISS.dat'];
+    case {'ORACLES_2017','oracles2','ORACLES2'}
+        disp('Doing ORACLES_2017 campaign')
+        file1=['20170620_CalLab\4STAR\20170620_VIS_SKY_Resp_from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS.dat'];
+        file2=['4STAR_20171102_callab\20171102_VIS_SKY_Resp_from_4STAR_20171102_005_VIS_ZEN_with_20160121125700HISS.dat'];
     otherwise
         disp(['No definitions for campaign :' toggle.campaign])
-        error('No files defined for this campaign')
+        error('No files defined for this campaign') 
 end
 
 disp('Importing Sky barrel response functions')

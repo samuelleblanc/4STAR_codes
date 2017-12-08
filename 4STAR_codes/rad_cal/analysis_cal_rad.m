@@ -25,7 +25,7 @@
 %  - radiance calibration file in .mat format
 %
 % EXAMPLE:
-%  
+%
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, NASA Ames, date unknown, 2014
@@ -44,9 +44,10 @@
 function rad_cal=analysis_cal_rad
 startup_plotting
 version_set('1.3');
+instrumentname = '4STAR';
 
 %get response function calibration file
-[file pname fi]=uigetfile('*.mat','Find calibration files .mat');
+[file pname fi]=uigetfile2('*.mat','Find calibration files .mat');
 %file='rad_cal.mat'
 %pname='C:\Users\Samuel\Research\4STAR\cal\20131120\2013_11_20.4STAR.NASA_Ames.Flynn\'
 %date='20131120'
@@ -56,6 +57,8 @@ version_set('1.3');
 %date='20141024';
 %date = '20150915';
 date = '20160330';
+date = '20170620';
+date = '20171102';
 
 disp(['Loading the matlab file: ' pname file])
 disp(['for Date: ' date])
@@ -64,36 +67,57 @@ load([pname file]);
 
 %% Check the linearity of the radiance calibrations with number of lamps
 %Build appropriate vectors
-vis_resp_lamps=[cal.Lamps_12.vis.mean_resp;cal.Lamps_9.vis.mean_resp;...
-                cal.Lamps_6.vis.mean_resp;cal.Lamps_3.vis.mean_resp;...
-                cal.Lamps_2.vis.mean_resp;cal.Lamps_1.vis.mean_resp];
 
-vis_std_lamps=[cal.Lamps_12.vis.std_resp;cal.Lamps_9.vis.std_resp;...
-                cal.Lamps_6.vis.std_resp;cal.Lamps_3.vis.std_resp;...
-                cal.Lamps_2.vis.std_resp;cal.Lamps_1.vis.std_resp];            
-            
-nir_resp_lamps=[cal.Lamps_12.nir.mean_resp;cal.Lamps_9.nir.mean_resp;...
-                cal.Lamps_6.nir.mean_resp;cal.Lamps_3.nir.mean_resp;...
-                cal.Lamps_2.nir.mean_resp;cal.Lamps_1.nir.mean_resp];
-
-nir_std_lamps=[cal.Lamps_12.nir.std_resp;cal.Lamps_9.nir.std_resp;...
-                cal.Lamps_6.nir.std_resp;cal.Lamps_3.nir.std_resp;...
-                cal.Lamps_2.nir.std_resp;cal.Lamps_1.nir.std_resp];   
-
-rad_nir=[cal.Lamps_12.nir.rad;...
-                cal.Lamps_9.nir.rad;...
-                cal.Lamps_6.nir.rad;...
-                cal.Lamps_3.nir.rad;...
-                cal.Lamps_2.nir.rad;...
-                cal.Lamps_1.nir.rad];
-
-rad_vis=[cal.Lamps_12.vis.rad;...
-                cal.Lamps_9.vis.rad;...
-                cal.Lamps_6.vis.rad;...
-                cal.Lamps_3.vis.rad;...
-                cal.Lamps_2.vis.rad;...
-                cal.Lamps_1.vis.rad];
-
+if isfield(cal,'Lamps_3');
+    vis_resp_lamps=[cal.Lamps_12.vis.mean_resp;cal.Lamps_9.vis.mean_resp;...
+        cal.Lamps_6.vis.mean_resp;cal.Lamps_3.vis.mean_resp;...
+        cal.Lamps_2.vis.mean_resp;cal.Lamps_1.vis.mean_resp];
+    
+    vis_std_lamps=[cal.Lamps_12.vis.std_resp;cal.Lamps_9.vis.std_resp;...
+        cal.Lamps_6.vis.std_resp;cal.Lamps_3.vis.std_resp;...
+        cal.Lamps_2.vis.std_resp;cal.Lamps_1.vis.std_resp];
+    
+    nir_resp_lamps=[cal.Lamps_12.nir.mean_resp;cal.Lamps_9.nir.mean_resp;...
+        cal.Lamps_6.nir.mean_resp;cal.Lamps_3.nir.mean_resp;...
+        cal.Lamps_2.nir.mean_resp;cal.Lamps_1.nir.mean_resp];
+    
+    nir_std_lamps=[cal.Lamps_12.nir.std_resp;cal.Lamps_9.nir.std_resp;...
+        cal.Lamps_6.nir.std_resp;cal.Lamps_3.nir.std_resp;...
+        cal.Lamps_2.nir.std_resp;cal.Lamps_1.nir.std_resp];
+    
+    rad_nir=[cal.Lamps_12.nir.rad;...
+        cal.Lamps_9.nir.rad;...
+        cal.Lamps_6.nir.rad;...
+        cal.Lamps_3.nir.rad;...
+        cal.Lamps_2.nir.rad;...
+        cal.Lamps_1.nir.rad];
+    
+    rad_vis=[cal.Lamps_12.vis.rad;...
+        cal.Lamps_9.vis.rad;...
+        cal.Lamps_6.vis.rad;...
+        cal.Lamps_3.vis.rad;...
+        cal.Lamps_2.vis.rad;...
+        cal.Lamps_1.vis.rad];
+    sublamps = false;
+else;
+    vis_resp_lamps=[cal.Lamps_12.vis.mean_resp;cal.Lamps_9.vis.mean_resp;...
+        cal.Lamps_6.vis.mean_resp];
+    vis_std_lamps=[cal.Lamps_12.vis.std_resp;cal.Lamps_9.vis.std_resp;...
+        cal.Lamps_6.vis.std_resp];
+    nir_resp_lamps=[cal.Lamps_12.nir.mean_resp;cal.Lamps_9.nir.mean_resp;...
+        cal.Lamps_6.nir.mean_resp];
+    nir_std_lamps=[cal.Lamps_12.nir.std_resp;cal.Lamps_9.nir.std_resp;...
+        cal.Lamps_6.nir.std_resp];
+    
+    rad_nir=[cal.Lamps_12.nir.rad;...
+        cal.Lamps_9.nir.rad;...
+        cal.Lamps_6.nir.rad];
+    
+    rad_vis=[cal.Lamps_12.vis.rad;...
+        cal.Lamps_9.vis.rad;...
+        cal.Lamps_6.vis.rad];
+    sublamps = true;
+end;
 %% plotting out the results
 figure(1);
 %colormap jet(1044);
@@ -116,7 +140,7 @@ legend('Response','Standard deviation');
 caxis([vis.nm(220) vis.nm(1044)]);
 h=colorbar('Ylim', [vis.nm(220) vis.nm(1044)]);
 ylabel(h,'Wavelength [nm]');
-ff=[pname '\' date '_resp_per_lamp_vis'];
+ff=[pname '\' instrumentname '_' date '_resp_per_lamp_vis'];
 save_fig(1,ff,true);
 
 
@@ -137,10 +161,11 @@ ylabel('Response [Cts/ms (Wm^-2 sr^-1 um^-1)^-1]');
 xlabel('Radiance [Wm^-2 sr^-1 um^-1]');
 legend('Response','Standard deviation');
 %colormap(cl);
-caxis([nir.nm(1) nir.nm(505)]);
-h=colorbar('Ylim', [nir.nm(1) nir.nm(505)]);
+nm_low = min([nir.nm(1) nir.nm(505)]);nm_high = max([nir.nm(1) nir.nm(505)]); 
+caxis([nm_low nm_high]);
+h=colorbar('Ylim', [nm_low nm_high]);
 ylabel(h,'Wavelength [nm]');
-ff=[pname '\' date '_resp_per_lamp_nir'];
+ff=[pname '\' instrumentname '_' date '_resp_per_lamp_nir'];
 save_fig(2,ff,true);
 
 %% building the response files
@@ -179,6 +204,36 @@ elseif date =='20160330';
     lampstr = 'Lamps_12';
     fnum = '018';
     st = '024';
+elseif date =='20170620';
+    ll = 9; % select the lamps-12
+    iint_vis = 3; % 12 ms int time
+    iint_nir = 3; % 150 ms int time
+    lampstr = 'Lamps_9';
+    fnum = '009'; % file number to use : for printing the right file
+    st = '013'; %last file analysed
+    if strcmp(instrumentname,'4STARB');
+        ll = 12; % select the lamps-12
+        iint_vis = 2; % 12 ms int time
+        iint_nir = 2; % 150 ms int time
+        lampstr = 'Lamps_12';
+        fnum = '013'; % file number to use : for printing the right file
+        st = '006'; %last file analysed
+    end;
+elseif date == '20171102';
+    ll = 9; % select the lamps-12
+    iint_vis = 3; % 12 ms int time
+    iint_nir = 3; % 150 ms int time
+    lampstr = 'Lamps_9';
+    fnum = '005'; % file number to use : for printing the right file
+    st = '006'; %last file analysed
+    if strcmp(instrumentname,'4STARB');
+        ll = 12; % select the lamps-12
+        iint_vis = 2; % 12 ms int time
+        iint_nir = 2; % 150 ms int time
+        lampstr = 'Lamps_9';
+        fnum = '004'; % file number to use : for printing the right file
+        st = '006'; %last file analysed
+    end;
 else
     ll=1; %select the lamps-9
     iint_vis=3;

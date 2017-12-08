@@ -33,28 +33,31 @@
 % Modified (v1.0): By Samuel LeBlanc, NASA Ames, 2015-01-27
 %          - changed the startup to startup_plotting
 %          - added version control using version_set
+% Modified (v1.1): By Samuel LeBlanc, Santa Cruz, 2017-12-04
+%          - Modified for use with ORACLES 2017 data
 % -------------------------------------------------------------------------
 
 %% Start of function
 function [filen]=gen_atmos
 startup_plotting;
-version_set('1.0');
+version_set('1.1');
 
 %% load the different files
 %4STAR
 datestr='20140919';
-dir='C:\Users\sleblan2\Research\ARISE\c130\20140919_Flight13\';
-fn=[dir datestr 'star.mat'];
+datestr='20170815';
+dir='C:\Users\sleblanc\Research\ORACLES\data_2017\';
+fn=[dir '4STAR_' datestr 'star.mat'];
 s=load(fn);
-utc_range=[19.3,22.9];
+utc_range=[15.2,16.4];
 
 % combine the 4STAR alt, temp, pressure, rh data
 star=combine_star_ZTPRH(s,utc_range);
-star.RH=star.RH+100.0;
+star.RH=star.RH; %+100.0;
 star.h2o=magnus(star.RH,star.Tst+273.15);%rh2nd(star.RH,star.Tst+273.15,star.Pst);
 
 %standard
-std=importdata([dir 'afglss.dat']);
+std=importdata([dir 'afglt.dat']);
 std.z=std.data(:,1).*1000.;
 std.p=std.data(:,2);
 std.t=std.data(:,3)-273.15;
@@ -67,7 +70,8 @@ std.co2=std.data(:,8);
 std.no2=std.data(:,9);
 
 %sounding
-snd=importdata([dir 'sounding_20140919.txt']);
+%snd=importdata([dir 'sounding_20140919.txt']);
+snd=importdata([dir 'sounding_FCPP_20170815.txt']);
 snd.z=snd.data(:,2);
 snd.p=snd.data(:,1);
 snd.t=snd.data(:,3);
@@ -83,7 +87,7 @@ plot(star.Pst,star.Z,'b.',snd.p,snd.z,'r.',std.p,std.z,'go');
 xlabel('Pressure [mb]');
 ylabel('Altitude [m]');
 title('Pressure');
-legend('C130','Sounding','Standard');
+legend('plane','Sounding','Standard');
 
 %Temperature
 subplot(2,2,2);
@@ -91,7 +95,7 @@ plot(star.Tst,star.Z,'b.',snd.t,snd.z,'r.',std.t,std.z,'go');
 xlabel('Temperature [°C]');
 ylabel('Altitude [m]');
 title('Temperature');
-legend('C130','Sounding','Standard');
+legend('plane','Sounding','Standard');
 
 %Relative Humidity
 subplot(2,2,3);
@@ -107,7 +111,7 @@ plot(star.h2o,star.Z,'b.',snd.h2o,snd.z,'r.',std.h2o,std.z,'go');
 xlabel('Water vapor number density [#/cm^-3]');
 ylabel('Altitude [m]');
 title('Water vapor');
-legend('C130','Sounding','Standard');
+legend('plane','Sounding','Standard');
 
 save_fig(1,[dir,'atm_profiles'],true);
 
@@ -150,8 +154,8 @@ atm.P(ip2)=std.Pz(ip2);
 
 % do the water vapor
 atm.H=star.Hz;
-ih1=find(isnan(atm.H));
-atm.H(ih1)=snd.Hz(ih1);
+%ih1=find(isnan(atm.H));
+%atm.H(ih1)=snd.Hz(ih1);
 ih2=find(isnan(atm.H));
 atm.H(ih2)=std.Hz(ih2);
 
@@ -180,7 +184,7 @@ disp(['Writing to file: ' filen]);
 head=[{'#    new atmosphere file created from atmosphere based on profiles of c130 on:' datestr},...
       {'# z(km) p(mb)   T(K)    air(cm^-3)  o3(cm^-3)   o2(cm^-3)   h2o(cm^-3)  co2(cm^-3)  no2(cm^-3)'}];
 %dlmwrite(filen,head,'/t');
-dlmwrite(filen,[atm.Z,atm.P,atm.T,atm.air,atm.o3,atm.o2,atm.H,atm.co2,atm.no2],'\t');
+dlmwrite(filen,[atm.Z,atm.P,atm.T,atm.air,atm.o3,atm.o2,atm.H,atm.co2,atm.no2],'delimiter','\t','precision',6);
 
 stophere
 return;

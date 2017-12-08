@@ -12,7 +12,18 @@ if ~exist('infile','var')||~exist(infile,'file')
     infile = getfullname('*NIR*;*VIS*','4STAR_F2','Select spectrometer file (NIR or VIS)');
 end
 
-spc.raw = rd_spc_raw_tcap_v2(infile);
+[folder0, file0, ext0]=fileparts(infile);
+file0str = strsplit(file0,'_');
+if strcmp(file0str{1},'4STARB');
+    is_4starb=true;
+    %disp('4STARB defined')
+else
+    is_4starb=false;
+    %disp('using 4STAR')
+end;
+    
+
+spc.raw = rd_spc_raw_tcap_v2(infile,is_4starb);
 spc = cleanup_raw_flds(spc);
 %%
 if isfield(spc.raw,'RHprecon')

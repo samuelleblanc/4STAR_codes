@@ -49,12 +49,16 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
-                if t>=datenum([2017 8 8 0 0 0]); % using averages of MLO and transit #3
+                if t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
+                    daystr = '20170815';
+                    %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
+                    filesuffix = 'refined_averaged_MLO_inflightsubset_polyfit';
+                elseif t>=datenum([2017 8 8 0 0 0]); % using averages of MLO and transit #3
                     daystr = '20170807';
                     filesuffix = 'refined_averaged_MLO_inflight';
                 elseif t>=datenum([2017 8 7 0 0 0]); %from Transit #3 to Ascension
                     daystr = '20170807';
-                    filesuffix = 'refined_langley_4STARpm';
+                    filesuffix = 'refined_langley_4STAR_subset_pm';
                 elseif t>=datenum([2017 8 1 0 0 0]); % From transit #1 Morning at WFF
                     daystr = '20170801';
                     filesuffix = 'refined_langley_4STAR_WFF_ground';
@@ -324,8 +328,13 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
+        if t>=datenum([2017 08 01 0 0 0]);
+            daystr = '20170905';
+            filesuffix = 'compared_with_AATS_at_Ames_divbyTint';
+        else
         error('4STARB starc0 not yet implemented')
-end; % case
+        end;
+    end; % case
 % read the file and return c0 values and notes
 if ~exist('visc0')
     if ~exist('filesuffix');

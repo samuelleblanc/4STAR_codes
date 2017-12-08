@@ -31,12 +31,13 @@
 %          - added comments and version control
 % Modified v1.1: by Samuel LeBlanc, NASA Ames, 2016-09-29
 %          - added control over nuber of header lines for 2016 version.
-%
+% MOdified v1.2: by Samuel LeBlanc, NASA Ames, 2017-11-07
+%          - added getnamedpath for easier locating of files
 % -------------------------------------------------------------------------
 
 %% Start of function
 function [archi] = get_hiss(in)
-version_set('1.1');
+version_set('1.2');
 
 % 4STAR radiance cal after TCAP2 and before SEAC4RS
 % Source:    Hiss                                        (ARC High Output Sphere)                                                                           
@@ -59,8 +60,11 @@ version_set('1.1');
 %%
 if ~exist('in','var')
 %    in = ['D:\case_studies\radiation_cals\spheres\HISS\20130605124300HISS.txt'];
+    savePath = pwd;
+    cd(getnamedpath('rad_cal_dir'));
    [fin nin]=uigetfile('*.txt','Select a calibrated radiance file of Sphere');
    in=strcat(nin,fin);
+   cd(savePath);
    %      in = getfullname(in,'radcals','Select a calibrated radiance file of Sphere');
 else
     while ~exist(in,'file')

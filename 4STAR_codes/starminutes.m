@@ -36,7 +36,7 @@
 %% Start of function
 function starminutes(varargin);
 
-if nargin==1;
+if nargin==1;   
     day = varargin{1};
     dir=starpaths(day);
     fnn=[dir filesep day 'star.mat'];
@@ -44,7 +44,7 @@ elseif nargin==2;
     day = varargin{1};
     fnn = varargin{2};
 else;
-    [fname,pname]=uigetfile(['*star.mat']);
+    [fname,pname]=uigetfile2(['*star.mat']);
     fnn=[pname fname];
 end;
 
@@ -91,6 +91,7 @@ end;
 
 try;
     ff = s.flight(1);
+    disp(['flight time:' datestr(s.flight(1)) ', ' datestr(s.flight(2))])
 catch;
     disp('-------- Minutes represent entire file --------')
     return;
