@@ -29,6 +29,7 @@ if ~exist('sfile','var')
 end
 ! This is the wrong location to save mat files.
 [pname_mat,~,~] = fileparts(sfile);
+pname_mat = getnamedpath('starksy')
 if ~exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
 end
@@ -48,13 +49,13 @@ end
 sunfile = (getfullname_([s.instrumentname, datestr(s.t(1),'_yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
 if ~isempty(sunfile)
     if ~exist('fig3','var')
-        fig3 = figure;
+        fig3 = figure_;
     end
     %             if ~isempty(get(gcf,'children'))
     %                 fig3 = figure;
     %             end
     if ~exist('fig2','var')
-        fig2 = figure;
+        fig2 = figure_;
     end
     
     sun = matfile(sunfile);
@@ -86,7 +87,7 @@ if ~isempty(sunfile)
         CWV = [];
     end
     
-    figure(fig2)
+    figure_(fig2)
     %                 ax2(1) = subplot(2,1,1);
     plot(startime, sun.Alt, 'o-', mean(s.t), mean(s.Alt),'rx'); legend('Alt', 'location','EastOutside');
     ylabel('Altitude')
@@ -97,7 +98,7 @@ if ~isempty(sunfile)
     zoom('on')
     %             dynamicDateTicks
     
-    figure(fig3);
+    figure_(fig3);
     if ~isempty(CWV)
         ax3(1) = subplot(2,1,1);
         plot((sun.t), tau_aero(:,anet), 'o'); legend('440 nm','673 nm','873 nm', 'Location','EastOutside');
@@ -172,7 +173,7 @@ s.flight_level = mean(s.Alt); % picking very low "ground level" sufficient for s
 % Should replace this with an actual determination based on a land-surface mapping.
 % Both gen_sky_inp_4STAR and gen_aip_cimel_need to be modified.
 
-[pname_mat,~,~] = fileparts(sfile);
+% [pname_mat,~,~] = fileparts(sfile);
 if exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
     delete([pname_mat, filesep,skytag,'_starsky.mat']);
 end

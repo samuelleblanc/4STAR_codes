@@ -7,7 +7,7 @@ for i=1:nargin
     if isstruct(argi);
         s = argi;
     else
-        if exist('vout')
+        if ~isempty(who('vout'))
             vout = {vout{:},argi};
         else
             vout = {argi};

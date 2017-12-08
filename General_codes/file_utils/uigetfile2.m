@@ -29,6 +29,7 @@ pname = strrep(userpath,';',filesep);
 if ~ispc
     pname = strrep(pname,':',filesep);
 end;
+pname = [pname, filesep]; pname = strrep(pname, [filesep, filesep], filesep);
 pathdir = [pname, 'filepaths',filesep];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');

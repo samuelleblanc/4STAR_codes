@@ -1,4 +1,4 @@
-function hybrid_4STAR_lang
+function STAR_hybrid_lang_air
 % Good hybrid Langleys 6/04 PM 6/05 AM
 
 % To first order, I can probably reduce biases from multiple scattering by
@@ -8,6 +8,9 @@ function hybrid_4STAR_lang
 % Then potentially iterate, using the initial Hybrid Co values to infer
 % slant-path transmittance.  This does not account for phase function
 
+% In this new version hybridsky files will be generated for each separate
+% potential hybrid langley case including potentially multple files for a
+% single flight.
 sky_file = getfullname_('*hybridsky*.mat','hybridsky','Select a hybrid sky file.');
 [sky] = load(sky_file); [~, filen, ext] = fileparts(sky_file); sky.fname = [filen,ext];
 starn.sky = strtok(filen,'_');
@@ -41,6 +44,8 @@ s4.vis_sun.wl = xstar_wl(s4.vis_sun);
 s4.nir_sun.wl = xstar_wl(s4.nir_sun);
 s4.vis_sun.rate =xstar_rate(s4.vis_sun.raw, s4.vis_sun.t, s4.vis_sun.Str, s4.vis_sun.Tint);
 s4.nir_sun.rate =xstar_rate(s4.nir_sun.raw, s4.nir_sun.t, s4.nir_sun.Str, s4.nir_sun.Tint);
+[s4.visc0, s4.nirc0]=starc0(s4.vis_sun.t(1),false,'4STAR');
+
 [s4.sza, s4.saz, s4.soldst, ~, ~, s4.sel, s4.am] = sunae(s4.vis_sun.Lat, s4.vis_sun.Lon, s4.vis_sun.t);
 [s4.m_ray, s4.m_aero, s4.m_H2O]=airmasses(s4.sza, s4.vis_sun.Alt);
 % MLO local pressure on 2017/06/07: mlo_met_metric.jpg = 683.2 mb
@@ -97,10 +102,10 @@ end
 
 figure_(205); plot(s4.am(xl_), Str1(xl_)+ log10(s4.vis_sun.rate(xl_,400)),'x-')
 menu('zoom into desired airmass range','OK');
-xl = xlim;
+xl_am = xlim;
 %s4.vis_sun.tr
 
-am_ = s4.am>xl(1)&s4.am<xl(2);
+am_ = s4.am>xl_am(1)&s4.am_am<xl(2);
 figure; plot(...
 s4.vis_sun.sky_CW(xl_&am_,400)./s4.vis_sun.rate(xl_&am_,400), ...
    Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'bx',...
@@ -109,7 +114,8 @@ s4.vis_sun.sky_CW(xl_&am_,400)./s4.vis_sun.rate(xl_&am_,400), ...
    (s4.vis_sun.sky_CW(xl_&am_,400).*s4.vis_sun.tr(xl_&am_,400))./s4.vis_sun.rate(xl_&am_,400), ...
    Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'kx',...
    (s4.vis_sun.sky_CCW(xl_&am_,400).*s4.vis_sun.tr(xl_&am_,400))./s4.vis_sun.rate(xl_&am_,400), ...
-   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'ko'); xl = xlim;
+   Str1(xl_&am_)+ log10(s4.vis_sun.rate(xl_&am_,400)),'ko'); 
+xl = xlim;
 legend('CW','CCW','CW ray','CCW ray');
 xlim([max([0,xl(1)]), min([10,xl(2)])]);
 
@@ -118,7 +124,17 @@ xlim([max([0,xl(1)]), min([10,xl(2)])]);
 %AATS wavelength to nSTAR pixel
 a2s_wii = interp1(s4.vis_sun.wl(~isNaN(s4.vis_sun.wl)), find(~isNaN(s4.vis_sun.wl)),aats.w,'nearest'); 
 good = true(size(s4.vis_sun.t(xl_&am_)));
+% zeroth order
+X = (s4.vis_sun.sky_CW(xl_&am_,a2s_wii(4))./s4.vis_sun.rate(xl_&am_,a2s_wii(4)));
+
+% adjust for slant-path transmittances to approximate multiple scattering
 X = (s4.vis_sun.sky_CW(xl_&am_,a2s_wii(4)).*s4.vis_sun.tr(xl_&am_,a2s_wii(4)))./s4.vis_sun.rate(xl_&am_,a2s_wii(4));
+
+% second order, corrects for changing flight-level albedo
+% X = X .* (1-tr.*SA)
+
+
+
 Y = Str1(xl_&am_)+ log(s4.vis_sun.rate(xl_&am_,a2s_wii(4))./s4.vis_sun.tr(xl_&am_,a2s_wii(4)));
 
 bad = isNaN(X) | isNaN(Y) | X < 0.01 | X > 50; 

@@ -44,8 +44,8 @@ xs4.dEl = xs4.sel -xs4.vis_sun.El_deg;
 xs4.dAz = xs4.saz -xs4.vis_sun.AZ_deg;
 quad_locked = xs4.vis_sun.Str==1 & abs(xs4.vis_sun.QdVlr./xs4.vis_sun.QdVtot) < 0.015 ...
    & abs(xs4.vis_sun.QdVtb./xs4.vis_sun.QdVtot) < 0.015;
-xs4.dEl(~quad_locked) = interp1(xs4.vis_sun.t(quad_locked), xs4.dEl(quad_locked), xs4.vis_sun.t(~quad_locked), 'pchip','extrap');
-xs4.dAz(~quad_locked) = interp1(xs4.vis_sun.t(quad_locked), xs4.dAz(quad_locked), xs4.vis_sun.t(~quad_locked), 'pchip','extrap');
+xs4.dEl(~quad_locked) = interp1(xs4.vis_sun.t(quad_locked), xs4.dEl(quad_locked), xs4.vis_sun.t(~quad_locked), 'nearest','extrap');
+xs4.dAz(~quad_locked) = interp1(xs4.vis_sun.t(quad_locked), xs4.dAz(quad_locked), xs4.vis_sun.t(~quad_locked), 'nearest','extrap');
 
 % Add titles or something to distinuish the value of some of these panels,
 % esp the center panel and panels 2,3 in second figure
@@ -64,7 +64,7 @@ legend('Az - SolAz, Quad-locked, interpolated to Sky')
 % [xs4.sza, xs4.saz, xs4.soldst, ~, ~, xs4.sel, xs4.am]
 % The scattering angles below are corrected for instantaneous quad-locked
 % offsets and for az_sun_sky offset of 3 deg.
-SA = scat_ang_degs(xs4.sza, xs4.saz, 90 - (xs4.vis_sun.El_deg +xs4.dEl) , xs4.vis_sun.AZ_deg+xs4.dAz);
+SA = scat_ang_degs(xs4.sza, xs4.saz, 90 - (xs4.vis_sun.El_deg + xs4.dEl) , xs4.vis_sun.AZ_deg + xs4.dAz);
 SA(xs4.vis_sun.Str==2) = scat_ang_degs(xs4.sza(xs4.vis_sun.Str==2), xs4.saz(xs4.vis_sun.Str==2),...
    90 - (xs4.vis_sun.El_deg(xs4.vis_sun.Str==2) +xs4.dEl(xs4.vis_sun.Str==2) - 3) , ...
    xs4.vis_sun.AZ_deg(xs4.vis_sun.Str==2)+xs4.dAz(xs4.vis_sun.Str==2));
@@ -96,7 +96,7 @@ xl = xlim;xl_ = serial2hs(xs4.vis_sun.t)>=xl(1) & serial2hs(xs4.vis_sun.t)<= xl(
 
 % Might need to be careful here about CW and CCW
 
-SA_round = 4.*round(.25.*SA(xs4.vis_sun.Str==2&serial2hs(xs4.vis_sun.t)>xl(1)&serial2hs(xs4.vis_sun.t)<xl(2)));
+SA_round = 5.*round(.2.*SA(xs4.vis_sun.Str==2&serial2hs(xs4.vis_sun.t)>xl(1)&serial2hs(xs4.vis_sun.t)<xl(2)));
 SA_hybrid = unique(SA_round);
 
 for s = length(SA_hybrid):-1:1
@@ -112,15 +112,22 @@ SA_ = false(size(SA)); SA_(xs4.vis_sun.Str==2 & xl_) = true;
 CW_ = (xs4.dAz - xs4.saz +xs4.vis_sun.AZ_deg)>1 & SA_; 
 CCW_ = (xs4.dAz - xs4.saz +xs4.vis_sun.AZ_deg)<-1 & SA_;
 SA_CW_ = SA_&CW_; SA_CCW_ = SA_&CCW_;
+
+
+
+
+%This isn't quite working... Need to produce plots and figure out what is
+%going on.
 % Identify leading and trailing edges of different SA orientations
 for s = length(SA_hybrid):-1:1   
+   SA_s_ = floor(5.*round(.2.*SA(2:end)))==SA_hybrid(s);
    CW_edge_i = false(size(xs4.vis_sun.t)); % leading edge
    CW_edge_j = CW_edge_i; % trailing edge
    CCW_edge_i = CW_edge_i; CCW_edge_j = CCW_edge_i;
-   CW_edge_i(2:end) = SA_CW_(1:end-1)==0 & SA_CW_(2:end)==1 & floor(round(SA(2:end)))==SA_hybrid(s); CW_edge_i = find(CW_edge_i);
-   CCW_edge_i(2:end) = SA_CCW_(1:end-1)==0 & SA_CCW_(2:end)==1 & floor(round(SA(2:end)))==SA_hybrid(s); CCW_edge_i = find(CCW_edge_i);
-   CW_edge_j(1:end-1) = SA_CW_(1:end-1)==1 & SA_CW_(2:end)==0 & floor(round(SA(1:end-1)))==SA_hybrid(s); CW_edge_j = find(CW_edge_j);
-   CCW_edge_j(1:end-1) = SA_CCW_(1:end-1)==1 & SA_CCW_(2:end)==0 & floor(round(SA(1:end-1)))==SA_hybrid(s); CCW_edge_j = find(CCW_edge_j);
+   CW_edge_i(2:end) = SA_CW_(1:end-1)==0 & SA_CW_(2:end)==1 & floor(5.*round(.2.*SA(2:end)))==SA_hybrid(s); CW_edge_i = find(CW_edge_i);     
+   CCW_edge_i(2:end) = SA_CCW_(1:end-1)==0 & SA_CCW_(2:end)==1 & floor(5.*round(.2.*SA(2:end)))==SA_hybrid(s); CCW_edge_i = find(CCW_edge_i);
+   CW_edge_j(1:end-1) = SA_CW_(1:end-1)==1 & SA_CW_(2:end)==0 & floor(5.*round(.2.*SA(1:end-1)))==SA_hybrid(s); CW_edge_j = find(CW_edge_j);
+   CCW_edge_j(1:end-1) = SA_CCW_(1:end-1)==1 & SA_CCW_(2:end)==0 & floor(5.*round(.2.*SA(1:end-1)))==SA_hybrid(s); CCW_edge_j = find(CCW_edge_j);
    CW_edge_j(CW_edge_j<CW_edge_i(1)) = []; CW_edge_i(CW_edge_i>CW_edge_j(end)) = [];
    CCW_edge_j(CCW_edge_j<CCW_edge_i(1)) = []; CCW_edge_i(CCW_edge_i>CCW_edge_j(end)) = [];
    CW_len = min([length(CW_edge_i),length(CW_edge_j)]);
@@ -199,6 +206,8 @@ for cc = length(CW.SA):-1:1
 end
 
 hybrid_sky.CW = CW; hybrid_sky.CCW = CCW;
-save([pname, strrep(s4_fname,'star.mat','_hybridsky.mat')],'-struct','hybrid_sky');
+
+hyb_stem = strrep(s4_fname,'star.mat',['_',datestr(mean(xs4.vis_sun.t(xl_)),'HHMM'),'UTC_hybridsky.mat']);
+save([pname, hyb_stem],'-struct','hybrid_sky');
 
 return

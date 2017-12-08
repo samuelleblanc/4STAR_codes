@@ -14,7 +14,8 @@ for ti = length(tints):-1:1
    these = plot([1:size(cts,2)],cts(shutter==0&tint==tints(ti),:),'-'); 
    if length(these)>1 recolor(these,find(shutter==0&tint==tints(ti)));end
    title(['Dark counts for Tint=',sprintf('%g ms',tints(ti))]);
-   pause(1)
+%    close(gcf);
+%    pause(.1)
    %    ok = menu('Continue...','Go');
    dark.t = time(shutter==0&tint==tints(ti)); dark.cts = cts(shutter==0&tint==tints(ti),:);
    % Linearly interpolate between darks.
@@ -37,5 +38,6 @@ for ti = length(tints):-1:1
    end
 % divide dark-subtracted values by integration time to get rate
 cts = cts ./ (tint*ones([1,size(cts,2)]));
+figure_(fig);
 close(fig);
 return

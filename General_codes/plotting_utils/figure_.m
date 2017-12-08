@@ -23,6 +23,11 @@ function H = figure_(H,pos)
 if nargin==0
     H = builtin('figure');
 else
+    if isgraphics(H)
+        pos.position = get(H,'position');
+        pos.units = get(H,'units');
+        pos.pos.windowstyle = get(H,'windowstyle');
+    end
     H = builtin('figure',H);
 end
 
@@ -43,7 +48,7 @@ end
 % figfile = [pathdir,'figpos.',num2str(num),'.mat'];
 
 % Load the current figpos file unless pos was supplied as an argument.
-if ~exist('pos','var') || isempty(pos)
+if isempty(who('pos')) || isempty(pos)
     pos = loadfigpos(H);
 else
     if ~isstruct(pos)&&length(pos)==4
@@ -62,7 +67,7 @@ end
 %     save(figfile,'-struct','pos')
 % end
 % if exist(figfile,'file')  
-if exist('pos','var') && ~isempty(pos) 
+if ~isempty(who('pos')) && ~isempty(pos) 
     set(H,'units',pos.units);
     if ~strcmp(get(H,'windowstyle'),'docked')
         set(H,'position',pos.position);
