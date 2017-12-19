@@ -33,10 +33,13 @@ function fig_names = starLangley_fx(fname_in,savefigure,fig_path,c0_filesuffix)
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Mauna Loa Observatory, 2017-06-04
 %                 based on starLangley
+% Modified (v1.1):Samuel LeBlanc, Moncton, NB, 2017-12-19
+%                 added colsub, for shortened airmass regression at shorter
+%                 wavelengths
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.0');
+version_set('1.1');
 
 %********************
 %% set parameters and santize inputs
@@ -77,10 +80,14 @@ AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 if strcmp(instrumentname,'2STAR')
     cols=[16   24   45   60   66   92   113   144   170   193];
     col = 60;
+    colsub = 24; %380 nm, seperated from others
+    colsplit = 40; % around 430 nm to split the cols sub and col
     info_title = '';
 elseif strcmp(instrumentname,'4STAR')
     cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
-    col = 408;
+    col = 408; % 500 nm
+    colsub = 258; % 380 nm, seperated from others
+    colsplit = 320; % around 430 nm, where to split the colsub and more
     info_title = ' with FORJ correction';
 end;
 starinfofile=['starinfo_' daystr(1:8)];
@@ -143,10 +150,18 @@ if savefigure;
     fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra '_Langleyplot_stdevs.png'])}];
 end;
 
+% redo analysis for colsub (shorter wavelengths without plotting
+[data0s, od0s, residuals]=Langley(m_aero(ok),rateaero(ok,colsub),stdev_mult);
+
 %% Plot the one langley for each stdev on seperate figures
 for k=1:numel(stdev_mult);
+    ok2s=ok((isfinite(residuals(:,k))==1)&(m_aero(ok)<=3.0));
+    [c0news(k,:), ods(k,:), residual2s, h]=Langley(m_aero(ok2s),rateaero(ok2s,1:colsplit), []);
     ok2=ok(isfinite(residual(:,k))==1);
-    [c0new(k,:), od(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,:), [], cols(4));
+    [c0new2(k,:), od2(k,:), residual2, h]=Langley(m_aero(ok2),rateaero(ok2,colsplit+1:end), [], cols(4)-colsplit);
+    c0new(k,:) = [[c0news(k,:)],[c0new2(k,:)]];
+    od(k,:) = [[ods(k,:)],[od2(k,:)]];
+
     %lstr=setspectrumcolor(h(:,1), w(cols));
     %lstr=setspectrumcolor(h(:,2), w(cols));
     hold on;
