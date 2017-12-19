@@ -42,7 +42,7 @@ SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
 rec = [1:length(star.t)];
 
 
-figure(100); sx(1) = subplot(3,1,1);
+figure_(100); sx(1) = subplot(3,1,1);
 plot(rec, star.Headng-star.Headng(1),'x',rec, star.pitch,'o',...
    rec, star.roll,'x', rec, star.Alt - star.Alt(1),'s');legend('Heading','pitch','roll','alt')
 sx(2) = subplot(3,1,2);
@@ -604,9 +604,9 @@ else
       %     star.SA(good_almB),star.skyrad(good_almB,star.aeronetcols(vis_pix)))
       
       if ~exist('fog','var')
-         fog = figure;
+         fog = figure_;
       else
-         figure(fog);
+         figure_(fog);
       end
       semilogy(star.SA(good_almA), ...
          star.skyrad(good_almA,star.aeronetcols(vis_pix)),'-o');

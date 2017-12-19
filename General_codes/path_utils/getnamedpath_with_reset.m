@@ -1,17 +1,34 @@
-function [fullpath] = getnamedpath(pathfile,dialog)
+function [fullpath] = getnamedpath(pathfile,dialog,reset)
 %% GETNAMEDPATH, called to obtain paths to 4STAR data, images, and Github data_folder
-% fullpath = getnamedpath(pathfile,dialog);
+% fullpath = getnamedpath(pathfile,dialog,reset);
 % 'pathfile' is a string indicating the filename of the mat-file where the 
 % path is stored. If pathfile not provided, or is empty then default to lastpath.mat
 % 'dialog' is a string that will be provided to the user to prompt for the
 % selection of an appropriate path if the supplied pathfile isn't found or
 % doesn't map to an existing directory.
+% 'reset' indicates whether to reset the pathfile contents.  It can be
+% provided as a string 'reset' or 'true' or 't', or as a numeric that will be cast
+% into a logical as reset = logical(reset), so 1 = true, ~1 = false.
 %
 % 2017-03-21, CJF: Modified for robustness. Potential replacement for starpaths
 % 2017-08-05, CJF: Handle alternate forms for argument "reset"
-% 2017-12-05, CJF: Removing 'RESET' argument
-version_set('1.1'); 
 
+version_set('1.1'); 
+% Handle whether "reset" is provided or not
+if ~exist('reset','var')
+   reset = false;
+else
+   % Handle incorrect class for "reset"
+   if ischar(reset)
+      reset = strcmpi(reset,'reset')||strcmpi(reset(1),'t');
+   end
+   try
+      reset = logical(reset);
+   catch
+      warning('Input argument "reset" should be logical, not NaN or complex. Ignoring...')
+      reset = false;
+   end
+end
 % Handle missing "dialog" argument
 if ~exist('dialog','var')||isempty(dialog)
    if exist('pathfile','var')&&~isempty(pathfile)
@@ -52,7 +69,6 @@ pname = pwd;
 % if it contains a non-existent directory then set reset to true.
 
 % If the pathfile exists, then load it.
-reset = false;
 if exist([pathdir, pathfile],'file')
    pname = load([pathdir,pathfile]);
    if isstruct(pname)
@@ -76,9 +92,14 @@ end
 % The downside to using uigetdir here is that the user can't see any of the
 % files since it only shows directories.  It can be nicer to select a file
 % within a directory and strip the filepath, so we let the user choose.
-
+pickdir = 0;
 if reset
-pname = setnamedpath(pathfile,[],dialog);
+   pname = uigetdir(pname,dialog);
+   if ~ischar(pname)
+      pname = [];
+   end
+   pname = [pname,filesep]; pname = strrep(pname, [filesep filesep], filesep);
+   save([pathdir,pathfile],'pname');
 end
 
 pname = [pname,filesep]; 

@@ -6,20 +6,20 @@ function [ output_args ] = bundle_un(inzip, outpath, over)
 % The default is 2, to overwrite if newer
 tmpdir = ['unzip_tmpdir_',datestr(now,'yyyy-mm-dd_HHMMSS')];
 [status, msg] = mkdir(tmpdir);
-if ~exist('inzip','var')||~exist(inzip,'file')
+if isempty(who('inzip')) || isempty(dir(inzip)) 
    inzip = getfullname('*.zip','bundle','Select a bundlefnt zipped file.');
 end
-while ~exist('outpath','var')||~exist(outpath,'dir')
+while isempty(who('outpath'))||~isdir(outpath)
    outpath = uigetdir;
 end
 if strcmp(outpath(end),filesep)
    outpath(end) = [];
 end
-if ~exist(outpath,'dir')
+if ~isdir(outpath)
    mkdir(outpath);
 end
 outpath = [outpath, filesep];
-if ~exist('over','var')
+if isempty(who('over'))
    over = 2;
 end
 if over<0
@@ -45,7 +45,7 @@ for f = length(files):-1:1
             N = 1;
             [there_path,~,~] = fileparts(there); there_path = [there_path filesep];
             dstr = datestr(now,'yyyymmdd_');
-            while exist([there_path,fun,dstr,num2str(N),ext])
+            while ~isempty(dir([there_path,fun,dstr,num2str(N),ext]))
                N = N+1;
             end
             % if exists and not same, rename existing appending fname with datestamp + n
