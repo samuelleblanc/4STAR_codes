@@ -64,8 +64,8 @@ starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\
 %starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';%'E:\ORACLES\starsun\';
 %gasfile_path = 'F:\ORACLES\ORACLES_2017\gas_summary\';%'E:\ORACLES\gas_summary\';
 
-starsun_path = 'F:\ORACLES\ORACLES_2017\starsun\';
-ICTdir = 'F:\ORACLES\ORACLES_2017\aod_ict\';
+starsun_path = 'E:\ORACLES\ORACLES_2017\starsun\';
+ICTdir = 'E:\ORACLES\ORACLES_2017\aod_ict\';
 
 
 if getUserName=='sleblan2';
@@ -168,7 +168,7 @@ form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
 
 %% prepare list of details for each flight
-dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171101'} ; %put one day string
+dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171026'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1] ; %set=1 to proces s
 %jproc=[         0          1          0          0          0          1          0          0          1          1          1          1          1          1          1          1          1          1          1] ;
