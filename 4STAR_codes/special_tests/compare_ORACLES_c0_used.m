@@ -3,8 +3,8 @@
 % not meant for creating new c0s
 close all
 clear all
-fp = 'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-fp_out = 'C:\Users\sleblan2\Research\ORACLES\plot\';
+fp = 'C:\Users\sleblanc\Research\4STAR_codes\data_folder\';
+fp_out = 'C:\Users\sleblanc\Research\ORACLES\plot\';
 
 i_avg = [2 3 4 5 6 7];
 
@@ -133,8 +133,8 @@ leg{i+1} = ['Averages with ' gdaystr];
 legend(p,leg,'location','northeastoutside');
 
 % Save the figures
-save_fig(fig,[fp_out 'ORACLES_cal_c0_' gdaystr]);
-save_fig(fig2,[fp_out 'ORACLES_cal_c0_relative_' gdaystr]);
+save_fig(fig,[fp_out 'ORACLES2016_cal_c0_' gdaystr]);
+save_fig(fig2,[fp_out 'ORACLES2016_cal_c0_relative_' gdaystr]);
 
 figure(fig2);
 ylim([96 104]);
