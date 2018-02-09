@@ -89,6 +89,13 @@ elseif strcmp(instrumentname,'4STAR')
     colsub = 258; % 380 nm, seperated from others
     colsplit = 320; % around 430 nm, where to split the colsub and more
     info_title = ' with FORJ correction';
+elseif strcmp(instrumentname,'4STARB')
+    cols=[225   258   347   408   432   539   627   761   869   969  1084  1109  1213  1439  1503]; % added NIR wavelength for plots
+    col = 408; % 500 nm
+    colsub = 258; % 380 nm, seperated from others
+    colsplit = 320; % around 430 nm, where to split the colsub and more
+    info_title = ' for 4STARB';    
+    
 end;
 starinfofile=['starinfo_' daystr(1:8)];
 s.dummy = '';

@@ -347,7 +347,7 @@ save_fig(figts,fname,0);
 pptcontents0=[pptcontents0; {[fname '.png'] 4}];
 
 %********************
-% map flight path and airmasses
+%% map flight path and airmasses
 %********************
 if isequal(platform, 'flight');
     % flight track map
@@ -507,7 +507,12 @@ fig_names{8} = [fname '.png'];
 save_fig(8,fname,0);
 pptcontents0=[pptcontents0; {fig_names{8} 4}];
 
+%% tau_aero plotting
+tau_aero = s.tau_aero;
+tau_aero_noscreening = s.tau_aero_noscreening;
+
 % tau aero noscreening
+
 if exist('tau_aero_noscreening');
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
@@ -516,6 +521,11 @@ if exist('tau_aero_noscreening');
             'filename', ['star' daystr platform 'tau_aero_noscreeningtseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
     end;
+end;
+
+if ~exist('tau_aero');
+    disp('Tau_aero not found, using the tau_aero_noscreeening instead')
+    tau_aero = tau_aero_noscreening;
 end;
 
 % tau aero

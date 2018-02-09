@@ -20,7 +20,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
 % SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
 % SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file 
-version_set('1.2');
+% SL v1.3: 2018/02/08: added special treatment of temperatures for 4STARB and conversion of temperatures of the spectrometers
+version_set('1.3');
 %********************
 % control input
 %********************
@@ -140,6 +141,23 @@ for i=1:length(filenames);
 end;
 contents=unique(contents)';
 clear cf cf0 ff cff filen fn i s type note;
+
+%********************
+%% Extra handling of the spectrometer temperature fields
+%********************
+if exist('track');
+    track.T_spec_uvis = track.T_spec_uvis-273.15;
+    track.T_spec_nir = track.T_spec_nir-273.15;
+end;
+
+%********************
+%% Special processing for 4STARB (differences in temp sensors)
+%********************
+if strcmp(instrumentname,'4STARB');
+    if exist('track');
+        track.T3 = ((track.T3+273.15)./1000.0)*23-30;
+    end;
+end;
 
 
 %********************
