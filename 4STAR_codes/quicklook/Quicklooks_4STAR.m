@@ -514,6 +514,31 @@ tau_aero_noscreening = s.tau_aero_noscreening;
 % tau aero noscreening
 
 if exist('tau_aero_noscreening');
+    figure;
+cm = hsv(length(cols));
+colormap(cm);
+hm = semilogy(m_aero(ok),rateaero(ok,cols(1))./c0new(1,cols(1)).*NaN,'.');hold on;
+for ii=1:length(cols);
+    hm = semilogy(m_aero(ok),rateaero(ok,cols(ii))./c0new(1,cols(ii)),'.','color',cm(ii,:));
+    hl = plot([0 max(m_aero(ok))],[c0new(1,cols(ii))' exp(log(c0new(1,cols(ii)))'-od(1,cols(ii))'*max(m_aero(ok)))]./c0new(1,cols(ii)),...
+        '-','color',cm(ii,:));
+    
+end;
+chi=get(gca,'children');
+set(gca,'children',flipud(chi));
+ylim([0.7,1]);
+set(gca,'ytick',[0.6,0.7,0.8,0.9,1.0]);
+xlim([0,20]);
+labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
+try;
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+catch;
+legend(labels);
+end;
+    
+    
+    
+    
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
         [h,filename]=spsun(daystr, 't', tau_aero_noscreening, '.', vars.Alt1e4{:}, mods{:}, ...
@@ -521,11 +546,6 @@ if exist('tau_aero_noscreening');
             'filename', ['star' daystr platform 'tau_aero_noscreeningtseries' colslist{k,1}]);
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
     end;
-end;
-
-if ~exist('tau_aero');
-    disp('Tau_aero not found, using the tau_aero_noscreeening instead')
-    tau_aero = tau_aero_noscreening;
 end;
 
 % tau aero
