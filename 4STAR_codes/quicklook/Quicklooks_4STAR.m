@@ -467,7 +467,7 @@ xlim([s.t(1)-0.01 s.t(end)+0.01]);
 title([tit ' - VIS Raw counts' ]);
 grid on;
 labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
-for ij=nw:nw+length(iwvln), labels{ij} = '.'; end;
+for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_visraw']);
@@ -476,9 +476,9 @@ save_fig(frv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{11} 4}];
 
 % plot the raw nir
-figure(7); nw = length(iwvln)
+figure(12); nw = length(iwvln)
 cm=hsv(nw+length(iwvlv));
-set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
+set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
 plot(s.t,s.raw(:,iwvln),'.');
 dynamicDateTicks;
 xlabel('UTC time');
@@ -489,16 +489,16 @@ grid on;
 labels = {};
 for ij=1:length(iwvlv), labels{ij} = '.'; end;
 lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
-labels = horzcat(labels',lbl_tmp')';
+labels = {labels{:},lbl_tmp{:}}';
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_nirraw']);
-fig_names{7} = [fname '.png'];
-save_fig(7,fname,0); 
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(12,fname,0); 
 pptcontents0=[pptcontents0; {fig_names{12} 4}];
 
 % plot the raw carpet
-figure(8);
+figure(13);
 colormap(parula);
 imagesc(s.t,s.w.*1000.0,s.raw');
 dynamicDateTicks;
@@ -507,8 +507,8 @@ ylabel('Wavelength [nm]');
 title([instrumentname ' - ' daystr ' - Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname daystr '_rawcarpet']);
-fig_names{8} = [fname '.png'];
-save_fig(8,fname,0);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(13,fname,0);
 pptcontents0=[pptcontents0; {fig_names{13} 4}];
 
 pptcontents0=[pptcontents0; {' ' 4}];
@@ -523,7 +523,7 @@ if exist('tau_aero_noscreening');
     % plot the tau_aero_noscreening vis
     faodv = figure;
     nw = length(iwvlv);
-    cm=hsv(nw);
+    cm=hsv(nw+length(iwvln));
     set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero_noscreening(:,iwvlv),'.');
     dynamicDateTicks;
@@ -531,9 +531,9 @@ if exist('tau_aero_noscreening');
     ylabel('tau_aero_noscreening');
     xlim([s.t(1)-0.01 s.t(end)+0.01]);
     title([tit ' - VIS AOD (no screening)' ]);
-    grid on;
+    grid on;    
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
-    for ij=nw:nw+length(iwvln), labels{ij} = '.'; end;
+    for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero_noscreening']);
@@ -543,8 +543,8 @@ if exist('tau_aero_noscreening');
 
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln)
-    cm=hsv(nw);
-    set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
+    cm=hsv(nw+length(iwvlv));
+    set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero_noscreening(:,iwvln),'.');
     dynamicDateTicks;
     xlabel('UTC time');
@@ -552,8 +552,10 @@ if exist('tau_aero_noscreening');
     xlim([s.t(1)-0.01 s.t(end)+0.01]);
     title([instrumentname ' - ' daystr ' - NIR AOD (no screening)' ]);
     grid on;
-    for ij=0:length(iwvlv), labels{ij} = '.'; end;
-    labels{ij:ij+nw} = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
+    labels = {};
+    for ij=1:length(iwvlv), labels{ij} = '.'; end;
+    lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
+    labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero_noscreening']);
@@ -571,7 +573,7 @@ if exist('tau_aero');
     % plot the tau_aero vis
     faodv_fl = figure;
     nw = length(iwvlv);
-    cm=hsv(nw);
+    cm=hsv(nw+length(iwvln));
     set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero(:,iwvlv),'.');
     dynamicDateTicks;
@@ -581,7 +583,7 @@ if exist('tau_aero');
     title([tit ' - VIS AOD' ]);
     grid on;
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
-    for ij=nw:nw+length(iwvln), labels{ij} = '.'; end;
+    for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero']);
@@ -591,8 +593,8 @@ if exist('tau_aero');
 
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln)
-    cm=hsv(nw);
-    set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
+    cm=hsv(nw+length(iwvlv));
+    set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero(:,iwvln),'.');
     dynamicDateTicks;
     xlabel('UTC time');
@@ -600,8 +602,10 @@ if exist('tau_aero');
     xlim([s.t(1)-0.01 s.t(end)+0.01]);
     title([instrumentname ' - ' daystr ' - NIR AOD' ]);
     grid on;
-    for ij=0:length(iwvlv), labels{ij} = '.'; end;
-    labels{ij:ij+nw} = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
+    labels = {};
+    for ij=1:length(iwvlv), labels{ij} = '.'; end;
+    lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
+    labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero']);
@@ -1009,6 +1013,5 @@ if savefigure;
             error('Paste either 1 or 4 figures per slide.');
         end;
     end;
-    pptfilename=fullfile(figurefolder, [daystr platform '.ppt']);
-    makeppt(pptfilename, [daystr ' ' platform], pptcontents{:});
+    makeppt(ppt_fname, [daystr ' ' platform], pptcontents{:});
 end;
