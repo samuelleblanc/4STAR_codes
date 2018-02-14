@@ -19,12 +19,12 @@ s.xtra_langleyfilesuffix = '_MLOFeb2018_day8';
 
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.262; % MLO obs from dobson brewer
+s.O3col=0.261; % MLO obs from dobson brewer
 s.NO2col=2.0e15; %  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=679.0; % this is for Ames 
+    s.Pst(find(s.Pst<10))=679.0; % this is measured at MLO
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 

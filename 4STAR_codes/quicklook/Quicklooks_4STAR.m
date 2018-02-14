@@ -237,7 +237,7 @@ title([instrumentname ' - ' daystr ' - airmasses']);
 fname = fullfile(p1,[instrumentname daystr '_airmass']);
 fig_names = {[fname '.png']};
 save_fig(1,fname,0);
-pptcontents0=[pptcontents0; {fig_names{1} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot temperatures and pressures
 figure(2);
@@ -255,7 +255,7 @@ title([instrumentname ' - ' daystr ' - Temperature and Pressure (precon)']);
 fname = fullfile(p1,[instrumentname daystr '_TnP']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(2,fname,0);
-pptcontents0=[pptcontents0; {fig_names{2} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the can temperatures and pressures (smoothed)
 % T&P from track
@@ -272,7 +272,7 @@ for ii={'T' 'P'};
     fname = fullfile(p1,[instrumentname daystr '_track_' ii{:}]);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figtp,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{3} 4}];
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 end;
 clear ii;
 
@@ -292,7 +292,7 @@ title([instrumentname ' - ' daystr ' - Solar Angles']);
 fname = fullfile(p1,[instrumentname daystr '_solarangles']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(5,fname,0);
-pptcontents0=[pptcontents0; {fig_names{4} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the quad signals
 figure(4);
@@ -313,7 +313,7 @@ legend('Quad top bottom','Quad Left right');
 fname = fullfile(p1,[instrumentname daystr '_Quad']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(4,fname,0);
-pptcontents0=[pptcontents0; {fig_names{5} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the orientation (Az El)
 figure(3);
@@ -329,7 +329,7 @@ title([instrumentname ' - ' daystr ' - Elevation and Azimuth angles']);
 fname = fullfile(p1,[instrumentname daystr '_El_Az']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(3,fname,0);
-pptcontents0=[pptcontents0; {fig_names{6} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot ambient Tst and Pst
 figts = figure;
@@ -344,7 +344,7 @@ title([instrumentname ' - ' daystr ' - Temperature and Pressure St']);
 fname = fullfile(p1,[instrumentname daystr '_Tst_Pst']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figts,fname,0);
-pptcontents0=[pptcontents0; {fig_names{7} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %********************
 %% map flight path and airmasses
@@ -372,7 +372,7 @@ if isequal(platform, 'flight');
     fname = fullfile(p1,[instrumentname daystr '_map']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figm,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{8} 1}];
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
     
     
     
@@ -416,7 +416,7 @@ end;
 fname = fullfile(p1,[instrumentname daystr '_vis_sats_parks_Tint']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figp,fname,0);
-pptcontents0=[pptcontents0; {fig_names{9} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 figp = figure;
 iw = 1100;
@@ -445,11 +445,43 @@ end;
 fname = fullfile(p1,[instrumentname daystr '_nir_sats_parks_Tint']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figp,fname,0);
-pptcontents0=[pptcontents0; {fig_names{10} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 pptcontents0=[pptcontents0; {' ' 4}];
 pptcontents0=[pptcontents0; {' ' 4}];
 
+%********************
+%% plot the darks
+%********************
+
+pptcontents0=[pptcontents0; {' ' 4}];
+pptcontents0=[pptcontents0; {' ' 4}];
+
+fdrkn = figure;
+[ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
+ylabel(ax(2),'Darks NIR 1213 nm');
+ylabel(ax(1),'NIR temp [°C]');
+ylim(ax(1),[0,50]); yticks(ax(1),[0,10,20,30,40,50]);
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+dynamicDateTicks;
+title([instrumentname ' - NIR darks and temperature']);
+fname = fullfile(p1,[instrumentname daystr '_nir_dark_T']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figp,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
+fdrkv = figure;
+[ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
+ylabel(ax(2),'Darks VIS 500 nm');
+ylabel(ax(1),'VIS temp [°C]');
+ylim(ax(1),[10,60]); yticks(ax(1),[10,20,30,40,50,60]);
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+dynamicDateTicks;
+title([instrumentname ' - VIS darks and temperature']);
+fname = fullfile(p1,[instrumentname daystr '_vis_dark_T']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figp,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %********************
 %% plot the data
@@ -473,7 +505,7 @@ lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_visraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frv,fname,0);
-pptcontents0=[pptcontents0; {fig_names{11} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the raw nir
 figure(12); nw = length(iwvln)
@@ -495,7 +527,7 @@ lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_nirraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(12,fname,0); 
-pptcontents0=[pptcontents0; {fig_names{12} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the raw carpet
 figure(13);
@@ -509,7 +541,7 @@ cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname daystr '_rawcarpet']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(13,fname,0);
-pptcontents0=[pptcontents0; {fig_names{13} 4}];
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 pptcontents0=[pptcontents0; {' ' 4}];
 
@@ -539,7 +571,7 @@ if exist('tau_aero_noscreening');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{14} 4}];
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln)
@@ -559,9 +591,9 @@ if exist('tau_aero_noscreening');
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero_noscreening']);
-    fig_names{15} = [fname '.png'];
+    fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0); 
-    pptcontents0=[pptcontents0; {fig_names{15} 4}];
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 else; 
     pptcontents0=[pptcontents0; {' ' 4}];
     pptcontents0=[pptcontents0; {' ' 4}];
@@ -589,7 +621,7 @@ if exist('tau_aero');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv_fl,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{16} 4}];
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln)
@@ -609,9 +641,9 @@ if exist('tau_aero');
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero']);
-    fig_names{17} = [fname '.png'];
+    fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0); 
-    pptcontents0=[pptcontents0; {fig_names{17} 4}];
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 else
     pptcontents0=[pptcontents0; {' ' 4}];
     pptcontents0=[pptcontents0; {' ' 4}];
@@ -989,6 +1021,24 @@ end;
 % % %         end;
 % % %     end;
 % % % end;
+
+%% Check if langley is defined
+if isfield(s,'langley')|isfield(s,'langley1');
+    % run the langley codes and get the figures;
+    langley_figs = starLangley_fx(fname_4starsun,1,p1,'_MLO_Feb2018');
+    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+end;
+
 
 %********************
 % Generate a new PowerPoint file
