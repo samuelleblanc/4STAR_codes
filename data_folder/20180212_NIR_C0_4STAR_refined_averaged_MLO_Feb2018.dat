@@ -1,6 +1,6 @@
-% C0 (TOA Count Rate, /ms) for 4STAR NIR spectrometer (512 channels) derived from (SEE Original files for sources) and recorded on 2018-02-14 08:46:21.
-% Langley at MLO and airborne Data outside 2.0x the STD of 501 nm Langley residuals were screened out. 
-% Including high Altitude rate spectra, matched to splined stratospheric AOD measured at MLO.
+% C0 (TOA Count Rate, /ms) for 4STAR NIR spectrometer (512 channels) derived from (SEE Original files for sources) and recorded on 2018-02-14 09:23:20.
+% Langley at MLO outside of 1.8x the STD of 501 nm Langley residuals were screened out. 
+% c0 from best days at MLO
 % Averages of c0 from multiple days including: , MLO -go-od, MLO -go-od, MLO -go-od, MLO -go-od. See the list of files below
 % 20180209_NIR_C0_refined_langley_4STARam_MLOFeb2018_day5_.dat
 % 20180210_NIR_C0_refined_langley_4STARam_MLOFeb2018_day6.dat
