@@ -261,6 +261,7 @@ subs = 0;
 while isfield(varin,sprintf('panel_%d',subs+1))
     subs = subs +1;
     sub.(sprintf('panel_%d',subs)) = varin.(sprintf('panel_%d',subs));
+    first.(sprintf('panel_%d',subs)) = true;
     subfields = fieldnames(sub.(sprintf('panel_%d',subs)));
     for sb = length(subfields):-1:1
         if size(sub.(sprintf('panel_%d',subs)).(subfields{sb}),1)==1
@@ -322,7 +323,7 @@ if subs>0
             lg = legend(sub.(sprintf('leg_str%d',sb))); set(lg,'interp','none');
             yl = ylim; % Capture these y-limits before plotting the values that failed screen
             for fd = 1:length(flds)
-                plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey);
+                plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey,'HandleVisibility','off');
                 uistack(h.(flds{fd}),'top')
             end
             grid('on')
@@ -332,6 +333,10 @@ if subs>0
                 yl = ylims.(sprintf('panel_%d',sb));
             end
             ylim(yl)
+            if first.(sprintf('panel_%d',sb));
+                xlims.(sprintf('panel_%d',sb)) = xlim;
+                first.(sprintf('panel_%d',sb)) = false;
+            end;
         end
         if time_choice ==1
             hax = handle(ax(sb)); dynamicDateTicks(hax);
@@ -381,7 +386,7 @@ hold('off')
 %%
 figure(tau_fig);
 h.col = plot([t(~screen);t(end)], real([tau(~screen);NaN]),'ko','MarkerFaceColor','k','MarkerSize',CircleSize); yl = ylim; hold('on');
-ax(end+1) = gca; lg=legend(field_name); set(lg,'interp','none');
+ax(end+1) = gca; lg=legend(field_name,'AutoUpdate','off'); set(lg,'interp','none');
 for bit = 1:nflags
     test = logical(bitget(screen,bit));
     plot([t(test);t(end)],real([tau(test);NaN]),syms(rem(bit,12)+1),'color',color(bit,:));
@@ -571,7 +576,7 @@ while ~done
     hold('on');
     for bit = 1:nflags
         test = logical(bitget(screen(:,FI),bit));
-        plot([t(test);t(end)],real([tau(test);NaN]),syms(rem(bit,12)+1),'color',color(bit,:));
+        plot([t(test);t(end)],real([tau(test);NaN]),syms(rem(bit,12)+1),'color',color(bit,:),'HandleVisibility','off');
     end
     uistack(h.col,'top');
     if isfield(ylims,'tau_fig')
@@ -613,6 +618,9 @@ while ~done
             semi_type = get(ax(sb),'yscale');
             yl = ylim;
             if isfield(sub,(sprintf('panel_%d',sb)))
+                if isfield(ylims,sprintf('panel_%d',sb))
+                    yl = ylims.(sprintf('panel_%d',sb));
+                end
                 sub.(sprintf('leg_str%d',sb)) = [];
                 flds = fieldnames(sub.(sprintf('panel_%d',sb)));
                 hold('off');
@@ -624,10 +632,11 @@ while ~done
                     sub.(sprintf('leg_str%d',sb)) = [sub.(sprintf('leg_str%d',sb)), {strrep(flds{fd},'_',' ')}];
                 end
                 lg = legend(sub.(sprintf('leg_str%d',sb))); set(lg,'interp','none');
+                ylim(yl);
                 % capture these y-limits before plotting the screened values
                 yl = ylim;
                 for fd = 1:length(flds)
-                    bbb =  plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey);
+                    bbb =  plot([t(screened>0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened>0);NaN]),syms(rem(fd,12)),'color',grey,'HandleVisibility','off');
                     uistack(bbb,'bottom');
                     %                     plot([t(screened==0);t(end)],real([sub.(sprintf('panel_%d',sb)).(flds{fd})(screened==0);NaN]),syms(rem(fd,12)),'color',aux_color(fd,:))
                 end
@@ -638,6 +647,7 @@ while ~done
                     yl = ylim.(sprintf('panel_%d',sb));
                 end
                 ylim(yl);
+                xlim(xlims.(sprintf('panel_%d',sb)));
             end
             if time_choice==1
                 dynamicDateTicks(gca);
@@ -682,6 +692,11 @@ if exist('leg_fig','var')
     figs.leg_fig.h = leg_fig;
     figs.leg_fig.pos = get(leg_fig,'position');
 end
+
+if abort;
+    flags = -999;
+end;
+
 return
 
 function t_ = flag_these_points(t, tau, flag_ax, v_,subpanes, sub,SELECTION_MODE);
