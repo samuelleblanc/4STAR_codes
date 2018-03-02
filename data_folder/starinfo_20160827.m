@@ -24,6 +24,7 @@ s.flagfilenameCWV  = '20160827_starflag_CWV_man_created20161017_2228by_MS.mat';
 s.flagfilenameO3   = '20160827_starflag_O3_man_created20161017_2230by_MS.mat';
 s.flagfilenameNO2  = '20160827_starflag_NO2_man_created20161017_2232by_MS.mat';
 s.flagfilenameHCOH = '20160827_starflag_HCOH_man_created20161017_2234by_MS.mat';
+s.flagacaod = '20160827_flag_acaod_sleblanc_20180302_150744.mat';
 
  
 % Ozone and other gases 

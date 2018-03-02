@@ -30,7 +30,8 @@ s.flagfilenameCWV  = '20160914_starflag_CWV_man_created20161017_1550by_MS.mat';
 s.flagfilenameO3   = '20160914_starflag_O3_man_created20161017_1551by_MS.mat';
 s.flagfilenameNO2  = '20160914_starflag_NO2_man_created20161017_2109by_MS.mat';
 s.flagfilenameHCOH = '20160914_starflag_HCOH_man_created20161017_2113by_MS.mat';
- 
+s.flagacaod = '20160914_flag_acaod_sleblanc_20180302_140618.mat';
+
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=680.25;  

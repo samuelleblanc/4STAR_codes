@@ -28,6 +28,7 @@ s.flagfilenameCWV  = '20160925_starflag_CWV_man_created20161017_2151by_MS.mat';
 s.flagfilenameO3   = '20160925_starflag_O3_man_created20161017_2149by_MS.mat';
 s.flagfilenameNO2  = '20160925_starflag_NO2_man_created20161017_2152by_MS.mat';
 s.flagfilenameHCOH = '20160925_starflag_HCOH_man_created20161017_2153by_MS.mat';
+s.flagacaod = '20160925_flag_acaod_sleblanc_20180302_144143.mat';
 
  
 % other tweaks 

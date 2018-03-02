@@ -15,6 +15,7 @@ s.flagfilenameCWV  = '20160830_starflag_CWV_man_created20161017_1254by_MS.mat';
 s.flagfilenameO3   = '20160830_starflag_O3_man_created20161017_1255by_MS.mat';
 s.flagfilenameNO2  = '20160830_starflag_NO2_man_created20161017_1302by_MS.mat';
 s.flagfilenameHCOH = '20160830_starflag_HCOH_man_created20161017_1305by_MS.mat';
+s.flagacaod = '20160830_flag_acaod_sleblanc_20180302_150616.mat';
  
 s.flight=[datenum(2016,8,30,7,9,12) datenum(2016,8,30,8,31,57)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 

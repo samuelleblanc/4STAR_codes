@@ -15,6 +15,7 @@ s.flagfilenameCWV  = '20160902_starflag_CWV_man_created20161017_1353by_MS.mat';
 s.flagfilenameO3   = '20160902_starflag_O3_man_created20161017_1354by_MS.mat';
 s.flagfilenameNO2  = '20160902_starflag_NO2_man_created20161017_1359by_MS.mat';
 s.flagfilenameHCOH = '20160902_starflag_HCOH_man_created20161017_1402by_MS.mat';
+s.flagacaod = '20160902_flag_acaod_sleblanc_20180302_145450.mat';
  
 s.flight=[datenum(2016,9,2,7,01,54) datenum(2016,9,2,14,58,31)]; 
 s.high_alt_c0 = [datenum(2016,9,2,9,52,0) datenum(2016,9,2,9,56,0)];

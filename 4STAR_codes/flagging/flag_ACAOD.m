@@ -62,26 +62,38 @@ if merge_read;
     qual_flag = ncread([pa fa],'qual_flag');
     
     try;
-        cdnc = ncread([pa fa],'CDNC');
-    catch; 
-        cdnc = ncread([pa fa],'PDI-CDNC_dNdlogd');
+        try;
+            cdnc = ncread([pa fa],'CDNC');
+        catch;
+            cdnc = ncread([pa fa],'PDI-CDNC_dNdlogd');
+        end;
+        cdnc(cdnc==-9999)=NaN;
+        cdn = sum(cdnc);
+    catch;
+        disp('No PDI for this day')
+        cdn = t.*0.0;
     end;
-    cdnc(cdnc==-9999)=NaN;
-    cdn = sum(cdnc);
     
     try;
-        scat = ncread([pa fa],'ScatTSI1_ATP');
-    catch; 
-        scat = ncread([pa fa],'Scat550TSI1');
+        try;
+            scat = ncread([pa fa],'ScatTSI1_ATP');
+        catch;
+            scat = ncread([pa fa],'Scat550TSI1');
+        end;
+        scat(scat>100000)=NaN;
+        sca = scat(2,:);
+        fl.low_scat = sca < 25.0;
+    catch;
+        disp('No scattering data')
+        sca = t.*0.0;
+        fl.low_scat = [];
     end;
-    scat(scat>100000)=NaN;
-    sca = scat(2,:);
 
     fl.qual_flag = qual_flag>0;
     fl.acaod = flag_abovecld;
     fl.incld = flag_incld;
     fl.belowcld = flag_belowcld;
-    fl.low_scat = sca < 25.0;
+
 else;
     [fa pa] = uigetfile2(['*' ';' '*.ict' ';' '*.ICT'],['Please select the 4STAR-AOD *.ict file for loading']);
     tt = split(fa,'_'); daystr = tt{3};
