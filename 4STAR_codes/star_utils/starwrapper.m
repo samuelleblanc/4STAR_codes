@@ -89,13 +89,15 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % SL: v2.7, 2016-08-23, Added information about the instrument name and
 %                       auto turn off of the running watervapor if the Optimization Toolbox is
 %                       not found.
-% MS, 2016-01-16, refined auto flags for gases statements (Lines 1006-1014)
+% MS, 2016-01-16,       refined auto flags for gases statements (Lines 1006-1014)
 % SL: v2.8, 2017-06-03, Sperated out the rawrelstd calculations, to include
 %                       support for multiinstruments
-% MS: 2017-07-22, omitted toggle gassubtract for O4 calculation/rateslant
+% MS: 2017-07-22,       omitted toggle gassubtract for O4 calculation/rateslant
 % CF: 2017-08-04,       Modified logic related to starpaths and getnamedpath
 %                       Meshed starwrapper with logic for new starflag
 %                       Added Alt_from_P to replace Alt==0 with pressure Altitude 
+% MS: 2018-03-26,       Modified tau_aero_subtract_all to accept retrieved
+%                       NO2 instead of constant tau_NO2
 
 version_set('2.9');  
 %********************
@@ -853,9 +855,10 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             
             % subtract derived gasess
             
+            %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
+            %                                             - s.tau_NO2 - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
             s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-                                                         - s.tau_NO2 - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
-            
+                                                         - s.gas.no2.no2OD - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
         end;
