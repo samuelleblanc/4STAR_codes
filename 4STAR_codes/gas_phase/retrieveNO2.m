@@ -43,6 +43,7 @@
 % MS, 2016-10-12, added features from retrieveNO2wfit
 %                 determined polynomial order for ORACLES
 %                 determined refSpec for ORACLES: 07-02 from MLO
+% MS, 2018-03-26, updating no2OD and filtering for subtraction purposes
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode)
@@ -184,10 +185,16 @@ end
        tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [no2SCDsmooth, sn] = boxxfilt(tplot, no2SCD, xts);
        no2vcd_smooth = real(no2SCDsmooth)./s.m_NO2;
+       % filter no2VCDsmooth for negative values
+       no2vcd_smooth(no2vcd_smooth<0) = NaN;
+       no2vcd_smooth(1000*eta_residual(:,ires)<0|1000*eta_residual(:,ires)>2) = NaN;
+       quad = s.QdVlr./s.QdVtot;
+       no2vcd_smooth(quad>=0.01|quad<=-0.01) = NaN;
+       no2OD = (no2vcd_smooth/Loschmidt)*no2_298Kcoef';
    end
     
     
-   % calculate error
+   % calculate
    tau_OD  = s.tau_tot_slant;
    no2Err  = (tau_OD(:,wln)'-RR_d(:,:))./repmat((no2_298Kcoef(wln)),1,length(s.t)); 
    MSEno2DU = real(((1/length(wln)-7)*sum(no2Err.^2))');                          
@@ -253,7 +260,7 @@ end
    % no2OD is the spectrum portion to subtract
     no2.no2_molec_cm2    = no2vcd_smooth;
     no2.no2resi          = RMSres;
-    no2.no2OD            = (real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+    no2.no2OD            = no2OD; %(real((((Loschmidt*ccoef_d(1,:))))')*no2_298Kcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
     no2.no2SCD           = no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
     
     % save additional params:
