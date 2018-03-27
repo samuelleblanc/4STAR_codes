@@ -98,8 +98,10 @@ function	s=starwrapper(s, s2, toggle, varargin)
 %                       Added Alt_from_P to replace Alt==0 with pressure Altitude 
 % MS: 2018-03-26,       Modified tau_aero_subtract_all to accept retrieved
 %                       NO2 instead of constant tau_NO2
+% MS: 2018-03-27,       fixed a bug in tau_aero_subtract_all that had NO2
+%                       added instead of subtracted !!! (--)
 
-version_set('2.9');  
+version_set('3.0');  
 %********************
 %% prepare for processing
 %********************
@@ -856,9 +858,9 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             % subtract derived gasess
             
             %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-            %                                             - s.tau_NO2 - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
+            %                                                s.tau_NO2 - s.gas.co2.co2OD - - s.gas.co2.ch4OD;  %tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
             s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-                                                         - s.gas.no2.no2OD - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%
+                                                            s.gas.no2.no2OD - s.gas.co2.co2OD - - s.gas.co2.ch4OD;%
             if toggle.verbose; disp('gases subtractions end'), end;
             %s.tau_aero=s.tau_aero_wvsubtract;
         end;

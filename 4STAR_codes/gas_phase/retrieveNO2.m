@@ -44,6 +44,8 @@
 %                 determined polynomial order for ORACLES
 %                 determined refSpec for ORACLES: 07-02 from MLO
 % MS, 2018-03-26, updating no2OD and filtering for subtraction purposes
+% MS, 2018-03-27, added NO2 column default values to filtered retrieved
+%                 fileds (instead of NaN's)
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode)
@@ -190,6 +192,8 @@ end
        no2vcd_smooth(1000*eta_residual(:,ires)<0|1000*eta_residual(:,ires)>2) = NaN;
        quad = s.QdVlr./s.QdVtot;
        no2vcd_smooth(quad>=0.01|quad<=-0.01) = NaN;
+       % insert default NO2 values in NaN's
+       no2vcd_smooth(isnan(no2vcd_smooth)) = s.NO2col;
        no2OD = (no2vcd_smooth/Loschmidt)*no2_298Kcoef';
    end
     
