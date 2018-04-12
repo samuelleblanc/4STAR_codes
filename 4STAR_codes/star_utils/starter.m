@@ -90,11 +90,14 @@ else % all other types
         else; % no spectrometer data, for example 20120722_001_VIS_SUN.dat.
             s.raw=[];
         end;
+        if length(s.Tint)~=length(s.t);
+            disp(['Problem with length of time array not matching in file: ' file])
+        end;
     end;
     s.header=header;
     s.row_labels={row_labels};
    if exist(file,'file')&&exist(file(1:end-1),'file')
       delete(file);
-      disp(['Deleted copy of ',file(1:end-1)])
+      disp(['Deleted altered copy of ',file(1:end-1)])
    end
 end;

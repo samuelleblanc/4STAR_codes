@@ -3,11 +3,11 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % consolidates 4STAR data from dat file(s) to a mat file.
 %
 % Input (leave blank or say 'ask' to prompt user interface)
-%   source: single/multiple dat file path(s), in a string or cell. 
-%   savematfile: a mat file path in a string. 
-% 
+%   source: single/multiple dat file path(s), in a string or cell.
+%   savematfile: a mat file path in a string.
+%
 % allstarmat(..., '-append') looks into an existing destination file and
-% updates it only with new source files - faster than a regular run.    
+% updates it only with new source files - faster than a regular run.
 %
 % Examples
 %   allstarmat; % this will prompt user interfaces
@@ -19,7 +19,7 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % CJF: 2013/12/05: edited lines 145 and following to strip empty records
 % SL (v1.0): 2014/10/15: added version control of this m-script via version_set and program_version
 % SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
-% SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file 
+% SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file
 % SL v1.3: 2018/02/08: added special treatment of temperatures for 4STARB and conversion of temperatures of the spectrometers
 version_set('1.3');
 %********************
@@ -110,6 +110,11 @@ for i=1:length(filenames);
                                 end;
                             end;
                         end;
+                        if ~isequal(type(end-4:end), 'track') & exist('vis_sun','var'); %not track and exist
+                            if length(vis_sun.t)~=length(vis_sun.raw(:,1));
+                                warning(['*** Problem with size of t and raw(:,1) starting with file: ' s.filename{1}])
+                            end;
+                        end;
                     else; % For each of FOVA, FOVP, SKYA, SKYP and MANUAL, create a multi-element structure.
                         s.filename=filenames(i);
                         s.filen=filen;
@@ -165,20 +170,20 @@ end;
 %********************
 for ii=1:length(contents);
     %cjf: fls and following for loop were introduced to remove empty filename elements
-    % Yohei, 2013/02/13, masks the lines, in order to better keep track of FOV records 
-    % CJF: unmasks and made changes to accommodate FOV and track files.  
+    % Yohei, 2013/02/13, masks the lines, in order to better keep track of FOV records
+    % CJF: unmasks and made changes to accommodate FOV and track files.
     fls = length(eval(contents{ii}));
     for fi = fls:-1:1
         try
-        if isempty(eval([contents{ii},'(',sprintf('%d',fi),').t']))
-            eval([contents{ii},'(',sprintf('%d',fi),') = [];']);
-        end
+            if isempty(eval([contents{ii},'(',sprintf('%d',fi),').t']))
+                eval([contents{ii},'(',sprintf('%d',fi),') = [];']);
+            end
         catch
             disp('Error in s struct?');
         end
-           
-    end
         
+    end
+    
     if ii==1 && append==0;
         save(savematfile, contents{ii},'-mat', '-v7','program_version');
     else
