@@ -78,7 +78,7 @@ switch instrumentname;
                     %filesuffix = 'refined_Langley_averaged_with_MLO_Nov17_airborne_Langley_and_highalt_AOD_on_20160927_ORACLES';
                     %filesuffix = 'refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1';
                     daystr = '20160924';
-                    filesuffix = 'refined_averaged_inflight_Langley_high_alts_transitback_ORACLES.dat';
+                    filesuffix = 'refined_averaged_inflight_Langley_high_alts_transitback_ORACLES';
                 elseif t>=datenum([2016 9 15 10 0 0])&t<datenum([2016 9 22 0 0 0]);
                     filesuffix = 'refined_averaged_inflight_Langley_high_alts_ORACLES';
                     daystr = '20160920';
@@ -332,7 +332,11 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
+        if t>=datenum([2018 2 11 0 0 0]); %for COSR 2018 and on
+                 daystr = '20180212';
+                 %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
+                 filesuffix = '4STARB_refined_averaged_good_MLO_Feb2018';
+        elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
                  daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = 'refined_langley_4STARBam_MLOFeb2018_day5_';
