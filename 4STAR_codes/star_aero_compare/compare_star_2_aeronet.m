@@ -32,8 +32,8 @@ if getUserName == 'sleblan2'; fp = 'C:\Users\sleblan2\Research\ORACLES\data_2017
 [file pname fi]=uigetfile2('*starsun*.mat','Find starsun file for comparison .mat',fp);
 
 disp(['Loading the matlab file: ' pname file])
-max_alt_diff = 50.0
-max_seconds_diff = 60.0
+max_alt_diff = 200.0
+max_seconds_diff = 360.0
 
 try; 
     load([pname file],'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt');
@@ -49,7 +49,8 @@ a = aeronet_read_lev([apname afile]);
 i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<1.5)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
 
 %% knnsearch to find the closest times to compare aeronet and 4STAR data
-% make sure to only have unique values
+% make sure to only have unique valuesSL331125766198
+
 [t_un,it_un] = unique(t(i));
 [idat,datdt] = knnsearch(t_un,a.jd);
 iidat = datdt<max_seconds_diff/(3600.0*24.0); % Distance no greater than 60.0 seconds.
