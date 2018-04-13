@@ -100,8 +100,9 @@ function	s=starwrapper(s, s2, toggle, varargin)
 %                       NO2 instead of constant tau_NO2
 % MS: 2018-03-27,       fixed a bug in tau_aero_subtract_all that had NO2
 %                       added instead of subtracted !!! (--)
+% SL: v3.1, 2018-04-12,       Changed the wavelengths on which polyfit is applied
 
-version_set('3.0');  
+version_set('3.1');  
 %********************
 %% prepare for processing
 %********************
