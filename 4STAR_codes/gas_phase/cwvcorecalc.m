@@ -52,7 +52,10 @@
 % MS: 2016-09-02: tweaked to account for erroneous altitudes
 % MS: 2016-11-02: fixing bug in calculating cwv.tau_OD_wvsubtract
 % SL: 2017-04-07: fix calculation of cwv.tau_OD_wvsubtract to be set to 0 when NaN or inf
-% -------------------------------------------------------------------------
+% MS: 2018-04-11: fixed bug of cwv2sub calculated from subtracting s.tau_aero
+%                 instead of tau_aero calculated from the polynomial fit (slant)
+%                 also corrected bug to save tau_aero_cwvsub into cwv struct instead of s
+% -----------------------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
 
@@ -138,7 +141,7 @@ tau_ODmodc0slant = -log(modc0Tw);
 %
 
 % initialize wv array for subtraction
-s.tau_aero_cwvsub = zeros(pp,qq);   % this is for cwv m1 retrieval
+cwv.tau_aero_cwvsub = zeros(pp,qq);   % this is for cwv m1 retrieval
 cwv.tau_OD_wvsubtract   = zeros(pp,qq);   % this is for cwv fit retreival (m2)
 %
 
@@ -401,7 +404,7 @@ end
      
 
      cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
-     s.tau_aero_cwvsub = s.tau_aero-cwv2sub;
+     cwv.tau_aero_cwvsub = tau_aero-cwv2sub;
      
 %      cwv2sub   =
 %      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original
