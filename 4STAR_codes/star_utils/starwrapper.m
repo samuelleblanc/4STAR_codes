@@ -985,7 +985,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
     
     % fit a polynomial curve to the non-strongly-absorbing wavelengths
-    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.aerosolcols),s.tau_aero(:,s.aerosolcols)); % polynomial separated into components for historic reasons
+    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
+    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
     s.tau_aero_polynomial=[a2 a1 a0];
     
     
