@@ -15,6 +15,7 @@ end
 s.flight=[datenum(2017,9,4,10,42,35) datenum(2017,9,4,16,21,15)]; 
 s.langley1 = [datenum(2017,9,4,11,5,00) datenum(2017,9,4,13,00,00)];
 s.xtra_langleyfilesuffix = '_shortairborne_';
+s.high_alt_c0 = [datenum(2017,9,4,12,15,0) datenum(2017,9,4,12,35,00)];
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  

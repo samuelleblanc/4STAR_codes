@@ -53,7 +53,11 @@ switch instrumentname;
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';
             elseif t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
-                if t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
+                if t>=datenum([2017 8 10 0 0 0]); % from averages including the polyfit aod from high altitude during transit
+                    daystr = '20170905';
+                    %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
+                    filesuffix = 'refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl';
+                elseif t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
                     daystr = '20170815';
                     %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                     filesuffix = 'refined_averaged_MLO_inflightsubset_polyfit';

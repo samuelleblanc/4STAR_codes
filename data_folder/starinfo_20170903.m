@@ -15,6 +15,7 @@ end
 s.flight=[datenum(2017,9,3,09,53,14) datenum(2017,9,3,19,14,21)]; 
 %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+s.high_alt_c0 = [datenum(2017,9,3,11,50,0) datenum(2017,9,3,12,5,00)];
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.278; % OMI overhead     

@@ -30,23 +30,28 @@ function Quickapply_newc0_2017
 % Written (v1.0): Samuel LeBlanc, NASA Ames Research Center, 2017-06-13
 % Modified (v1.1): Samuel LeBlanc, On lfight between Accra and Addis Ababa, 2017-08-24
 %                  ported over from 2016 for 2017
+% Modified (v1.2): Samuel LeBlanc, NASA Ames Research Center, 2018-04-12
+%                  added some days to check for 2017, and the new c0 to
+%                  use.
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.1');
+version_set('1.2');
 
 %% define paths and load starsun_for_starflag
 if isunix;
 fp = '/nobackup/sleblan2/ORACLES/data_2017/';
 else;
-fp = 'C:\Users\sleblan2\Research\ORACLES\data_2017\';
+fp = 'C:\Users\sleblanc\Research\ORACLES\data_2017\';
 end;
 days = ['809';'825';'827';'830';'831';'902';'904';'906';'908';'910';...
     '912';'914';'918';'920';'924';'925';'927';'929';'930'];
 
-days = ['912';'914';'918';'920'];
-days = ['924';'925';'927';'929';'930'];%'924';'925']
-days = ['813']
+%days = ['912';'914';'918';'920'];
+%days = ['924';'925';'927';'929';'930'];%'924';'925']
+%days = ['813']
+
+days = ['809';'812';'813';'817';'818';'821';'824';'826';'828';'903'];
 
 %c0f = '20160924_VIS_C0_refined_mix_Langley_airborne_MLO_high_alt_AOD_ORACLES_averages_v1.dat';
 c0f = '20160912_VIS_C0_refined_Langley_averaged_with_high_alt_inflight_ORACLES_notransist.dat';
@@ -66,6 +71,8 @@ c0f = '20170809_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit.dat';
 c0f = '20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';
+c0f = '20171205_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit_withAmes.dat';
+c0f = '20170905_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl.dat';
 
 newc0_visfile = [starpaths c0f];
 
