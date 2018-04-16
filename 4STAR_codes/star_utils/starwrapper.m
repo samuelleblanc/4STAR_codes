@@ -957,7 +957,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
         end;
         %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
         if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
-        [s.flags, good]=starflag_(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual
+        if ~isfield(s,'flagfilename');
+            [s.flags, good]=starflag_(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual
+        else;
+            s.flags = load(s.flagfilename);
+            [qual_flag,flag] = convert_flags_to_qual_flag(s.flags,s.t,s.flight);
+            good = ~qual_flag;
+            disp(['**** Flag file found in starinfo file using : ' s.flagfilename])
+        end;
         if toggle.runwatervapor;
             % apply auto gas flagging
             [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
@@ -973,7 +980,11 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
     %% apply flags to the calculated tau_aero_noscreening
     s.tau_aero=s.tau_aero_noscreening;
     if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3);
-        s.tau_aero(s.flags.bad_aod,:)=NaN;
+        try;
+            s.tau_aero(~good,:)=NaN;
+        catch;
+            s.tau_aero(s.flags.bad_aod,:)=NaN;
+        end;
     end;
     % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
     % 2014/07/18.
