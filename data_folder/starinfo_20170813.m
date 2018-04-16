@@ -27,7 +27,9 @@ s.flagfilenameO3   = '20170813_starflag_O3_man_created20170907_1215by_MS.mat';
 s.flagfilenameNO2  = '20170813_starflag_NO2_man_created20170907_1226by_MS.mat';
 s.flagfilenameHCOH = '20170830_starflag_auto_created_for_HCOH_20170905_2301.mat';
 
- 
+% Dirty flag file
+s.AODuncert_mergemark_file = '20170813_AOD_merge_marks.mat';
+
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=1013; % this is for Ames 

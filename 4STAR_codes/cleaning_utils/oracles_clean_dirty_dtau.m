@@ -14,7 +14,7 @@ function [mark, mrg_out] = oracles_clean_dirty_dtau
 
 version_set('v1.0')
 
-in_star_file = getfullname('*20160*starsun*.mat','starsun');
+in_star_file = getfullname('*201*starsun*.mat','starsun');
 % star_ = matfile(in_star_file);
 [~, fname, ext] = fileparts(in_star_file);
 star = load(in_star_file, 't','El_deg','AZstep','rateaero','m_aero','c0', 'aeronetcols', 'w','tau_aero');
@@ -56,7 +56,12 @@ cina(isNaN(sum(AODs(cina,wii),2)) | mrg.AOD_QualFlag_4STAR(cina)~=0) = [];
 cina_ = NaN(size(mrg.time)); cina_(cina) = 0;
 ainc_ = NaN(size(star.t)); ainc_(ainc) = 0;
 %mrg.SCAT550nm_dry_total_LARGE(mrg.SCAT550nm_dry_total_LARGE<-100) = NaN;
-mrg.Scattotal(2,mrg.Scattotal(2,:)<-100) = NaN;
+if isfield(mrg,'Scattotal');
+    scat = mrg.Scattotal;
+elseif isfield(mrg,'Scattotal_Tot');
+    scat = mrg.Scattotal_Tot;
+end;
+scat(2,scat(2,:)<-100) = NaN;
 if isfield(mrg,'CloudFlag_CPSPD_LARGE');
     cld = zeros(size(mrg.CloudFlag_CPSPD_LARGE)); cld(mrg.CloudFlag_CPSPD_LARGE~=1)=NaN;
 elseif isfield (mrg, 'CloudFlag');
@@ -80,7 +85,7 @@ blip.at_time= mrg.time(cina(1));
 blah = serial2hs(blip.at_time);
 blip.at_str = {num2str(blah)};
 blip.dAOD = blip.AOD_f2 - blip.AOD_b4;
-blip.sf(1) = 1;
+blip.sf(1) = 1.0;
 blip.m_aero(1) = mrg.m_aero(cina(1));
 blip.dCo = exp(-blip.dAOD .*(ones(size(blip.dAOD))*blip.m_aero));
            
@@ -136,6 +141,7 @@ while ~done
         axis(ax(2),vs(2,:));
     end
     
+
     try;
         ax(3) = axes('Position',get(ax(2),'Position'),...
             'XAxisLocation','top',...
@@ -144,7 +150,7 @@ while ~done
             'XColor','k','YColor','y');
         %linkaxes([ax(2) ax2],'x');
         hold on;
-        plot(serial2hs(mrg.time), mrg.CO_ppbv,'y.','Parent',ax(3));
+        plot(serial2hs(mrg.time), mrg.CO_ppbvt,'y.','Parent',ax(3));
         ylabel('CO [ppbv]'); ylim([0 400]);
         hold off;
         if exist('vs','var')
@@ -154,6 +160,7 @@ while ~done
         disp('NO CO')
         hold off;
     end;
+
     figure_(3);
     % ax(4) = subplot(4,1,2);
     plot(serial2hs(star.t), [ainc_+star.rateaero(:,star.i_501)./star.c0(star.i_501), ...
@@ -260,6 +267,9 @@ while ~done
                 mark.AOD_f2 = tmp(ij,:);
                 mark.dAOD = (mark.AOD_f2 - mark.AOD_b4).*(mark.sf'*ones([1,nAODs]));
                 mark.dCo = exp(-mark.dAOD .*(mark.m_aero'*ones([1,nAODs])));
+                if any(any(isnan(mark.dAOD)));
+                    stophere
+                end;
                 out = true;
             else
                 disp('You need to pick "before" and "after" periods and a period for "time"');
@@ -275,6 +285,7 @@ while ~done
             
                 really = menu('Really cancel?','Yes, really','Not really');
                 if really == 1
+                    done = true;
                     break
                 end
 
@@ -286,7 +297,7 @@ while ~done
     end % of while
     %     end
     xl = xlim;
-    if ~done        
+    if ~done;        
         for xx = length(ax):-1:1
             vs(xx,:) = axis(ax(xx));
         end
@@ -314,7 +325,7 @@ ffname = extract_date_from_starname(fname);
 save([p_out,ffname,'_AOD_marks.mat'],'-struct','mark');
 save([p_out,ffname,'_AOD_merge_marks.mat'],'-struct','mrg_out');
 fig_out = strrep(p_out,'mat','fig');
-if ~exist(fig_out,'dir')
+if ~exist(fig_out,'dir');
     mkdir(fig_out);
 end
 

@@ -28,6 +28,9 @@ s.flagfilenameNO2  = '20170826_starflag_NO2_man_created20170828_0954by_MS.mat';%
 s.flagfilenameHCOH = '20170826_starflag_auto_created_for_HCOH_20170828_0220.mat';
  
  
+% Dirty flag file
+s.AODuncert_mergemark_file = '20170826_AOD_merge_marks.mat';
+ 
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=1013; %

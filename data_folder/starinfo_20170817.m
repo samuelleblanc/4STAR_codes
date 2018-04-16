@@ -20,14 +20,16 @@ s.O3h=21; %
 s.O3col=0.278; % OMI overhead     
 s.NO2col=2.0e15; %  
 
-
 % flags
-%s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
+s.flagfilename     = '20170817_starflag_man_created_20170820_1503by_SL.mat'; 
 s.flagfilenameCWV  = '20170817_starflag_CWV_man_created20170907_1401by_MS.mat';
 s.flagfilenameO3   = '20170817_starflag_O3_man_created20170907_1412by_MS.mat';
 s.flagfilenameNO2  = '20170817_starflag_NO2_man_created20170907_1428by_MS.mat';
 s.flagfilenameHCOH = '20170817_starflag_auto_created_for_HCOH_20170905_1653.mat'; 
  
+% Dirty flag file
+s.AODuncert_mergemark_file = '20170817_AOD_merge_marks.mat';
+
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=1013; % this is for Ames 

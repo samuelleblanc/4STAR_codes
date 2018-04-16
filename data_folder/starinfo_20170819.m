@@ -23,7 +23,7 @@ s.NO2col=2.0e15; %
 
 
 % flags
-%s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
+s.flagfilename     = '20170819_starflag_man_created_20170821_1824by_SL.mat'; 
 s.flagfilenameCWV  = '20170819_starflag_CWV_man_created20170907_1453by_MS.mat';
 s.flagfilenameO3   = '20170819_starflag_O3_man_created20170907_1457by_MS.mat';
 s.flagfilenameNO2  = '20170819_starflag_NO2_man_created20170907_1459by_MS.mat';

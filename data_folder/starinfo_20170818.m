@@ -22,12 +22,14 @@ s.O3col=0.278; % OMI overhead
 s.NO2col=2.0e15; %  
 
 % flags
-%s.flagfilename     = '20170828_starflag_man_created20170829_0432by_MK.mat'; 
+s.flagfilename     = '20170818_starflag_man_created_20170821_1812by_SL.mat'; 
 s.flagfilenameCWV  = '20170818_starflag_CWV_man_created20170908_0914by_MS.mat';
 s.flagfilenameO3   = '20170818_starflag_O3_man_created20170908_0929by_MS.mat';
 s.flagfilenameNO2  = '20170818_starflag_NO2_man_created20170908_0937by_MS.mat';
 s.flagfilenameHCOH = '20170818_starflag_auto_created_for_HCOH_20170905_2128.mat'; 
  
+% Dirty flag file
+s.AODuncert_mergemark_file = '20170818_AOD_merge_marks.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
