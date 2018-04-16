@@ -150,7 +150,7 @@ clear cf cf0 ff cff filen fn i s type note;
 %********************
 %% Extra handling of the spectrometer temperature fields
 %********************
-if exist('track');
+if exist('track','var');
     track.T_spec_uvis = track.T_spec_uvis-273.15;
     track.T_spec_nir = track.T_spec_nir-273.15;
 end;
