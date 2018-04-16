@@ -44,12 +44,24 @@ if merge_read;
 
     t_n = ncread([pa fa],'time');
     t = datenum(t_n/3600.0/24.0+datenum(1970,1,1,0,0,0));
-    flag_mod = ncread([pa fa],'P3_module_flags');
-    alt = ncread([pa fa],'HAE_GPS_Altitude');
-
-    flag_belowcld = flag_mod==0;
-    flag_incld = flag_mod==1;
-    flag_abovecld = flag_mod==2;
+    try;
+        alt = ncread([pa fa],'HAE_GPS_Altitude');
+    catch;
+        alt = ncread([pa fa],'Sys_GPSAlt');
+    end;
+    
+    try;
+        flag_mod = ncread([pa fa],'P3_module_flags');
+        flag_belowcld = flag_mod==0;
+        flag_incld = flag_mod==1;
+        flag_abovecld = flag_mod==2;
+    catch;
+        cdp_conc = ncread([pa fa],'CDP_Conc');
+        rh = ncread([pa fa],'RH');
+        flag_belowcld = (cdp_conc<50.0) & (rh > 30.0) & (alt<1500.0);
+        flag_incld = cdp_conc>50.0;
+        flag_abovecld = (alt>600.0) & (alt <1600.0) & (cdp_conc<50.0);
+    end;
 
     aod = ncread([pa fa],'AOD');
     aod_wl = ncread([pa fa],'AODwavelength');
@@ -71,16 +83,26 @@ if merge_read;
         cdn = sum(cdnc);
     catch;
         disp('No PDI for this day')
-        cdn = t.*0.0;
+        try; 
+            cdp_conc = ncread([pa fa],'CDP_Conc');
+            cdn = cdp_conc;
+            cdn(cdn==-10000)=NaN;
+        catch;
+            cdn = t.*0.0;
+        end;
     end;
     
     try;
         try;
             scat = ncread([pa fa],'ScatTSI1_ATP');
         catch;
-            scat = ncread([pa fa],'Scat550TSI1');
+            try;
+                scat = ncread([pa fa],'Scat550TSI1');
+            catch;
+                scat = ncread([pa fa],'Scattotal_Tot');
+            end;
         end;
-        scat(scat>100000)=NaN;
+        scat(scat>100000)=NaN; scat(scat<-100)=NaN;
         sca = scat(2,:);
         fl.low_scat = sca < 25.0;
     catch;

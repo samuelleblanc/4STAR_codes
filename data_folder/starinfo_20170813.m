@@ -26,6 +26,7 @@ s.flagfilenameCWV  = '20170813_starflag_CWV_man_created20170907_1204by_MS.mat';
 s.flagfilenameO3   = '20170813_starflag_O3_man_created20170907_1215by_MS.mat';
 s.flagfilenameNO2  = '20170813_starflag_NO2_man_created20170907_1226by_MS.mat';
 s.flagfilenameHCOH = '20170830_starflag_auto_created_for_HCOH_20170905_2301.mat';
+s.flagacaod = '20170813_flag_acaod_sleblanc_20180416_163624.mat';
 
 % Dirty flag file
 s.AODuncert_mergemark_file = '20170813_AOD_merge_marks.mat';
