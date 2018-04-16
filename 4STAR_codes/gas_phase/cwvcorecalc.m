@@ -55,6 +55,7 @@
 % MS: 2018-04-11: fixed bug of cwv2sub calculated from subtracting s.tau_aero
 %                 instead of tau_aero calculated from the polynomial fit (slant)
 %                 also corrected bug to save tau_aero_cwvsub into cwv struct instead of s
+% MS: 2018-04-16: changed calculation for tau_aero_cwvsub (line 408)
 % -----------------------------------------------------------------------------------------
 %% function routine
 function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
@@ -404,7 +405,7 @@ end
      
 
      cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
-     cwv.tau_aero_cwvsub = tau_aero-cwv2sub;
+     cwv.tau_aero_cwvsub = s.tau_tot_slant - wvamount;% this is a structure with o2-o2 NIR subtracted
      
 %      cwv2sub   =
 %      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original
