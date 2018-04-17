@@ -26,7 +26,7 @@ s.flagfilenameCWV  = '20170824_starflag_CWV_man_created20170828_0724by_MS.mat';
 s.flagfilenameO3   = '20170824_starflag_O3_man_created20170828_0756by_MS.mat';
 s.flagfilenameNO2  = '20170824_starflag_NO2_man_created20170828_0829by_MS.mat';
 s.flagfilenameHCOH = '20170824_starflag_auto_created_for_HCOH_20170826_0228.mat';
- 
+s.flagacaod = '20170824_flag_acaod_sleblanc_20180416_201926.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
