@@ -21,7 +21,7 @@ s.O3col=0.278; % OMI overhead
 s.NO2col=2.0e15; %  
 
 % flags
-s.flagfilename     = '20170817_starflag_man_created_20170820_1503by_SL.mat'; 
+s.flagfilename     = '20170817_starflag_man_created20180419_1404by_SL.mat'; % modification on '20170817_starflag_man_created_20170820_1503by_SL.mat'; 
 s.flagfilenameCWV  = '20170817_starflag_CWV_man_created20170907_1401by_MS.mat';
 s.flagfilenameO3   = '20170817_starflag_O3_man_created20170907_1412by_MS.mat';
 s.flagfilenameNO2  = '20170817_starflag_NO2_man_created20170907_1428by_MS.mat';
