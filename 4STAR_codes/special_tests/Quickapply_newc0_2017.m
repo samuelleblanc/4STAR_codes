@@ -72,7 +72,7 @@ c0f = '20170815_VIS_C0_refined_averaged_MLO_inflight_polyfit_v2.dat';
 c0f = '20170815_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit.dat';
 c0f = '20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';
 c0f = '20171205_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit_withAmes.dat';
-c0f = '20170905_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl.dat';
+c0f = '20170905_VIS_C0_refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl_mid.dat';
 
 newc0_visfile = [starpaths c0f];
 

@@ -4,11 +4,11 @@ clear all
 fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 fp_out = getnamedpath('ORACLES_plot');
 asktosave = 1; %set if ask to save the figures
-i_avg = [1,3,4,5,6,7,9,11];
-filesuffix = ['refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl'];
+i_avg = [1,3,4,5,6,7,9,11,19];
+filesuffix = ['refined_averaged_MLO_inflightsubset_polyfit_withBonanza_specialshortwvl_mid'];
 label_daystr = '20170905';
 short_wvl_special_avg = true;
-i_avg_short = [1,3,9,11];
+i_avg_short = [1,3,9,11,19];
 
 vis_names = {'20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20170801_VIS_C0_refined_langley_4STAR_WFF_ground.dat';...
