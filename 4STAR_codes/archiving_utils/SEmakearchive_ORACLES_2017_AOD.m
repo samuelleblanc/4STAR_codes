@@ -115,7 +115,7 @@ info.Longitude = 'deg, Aircraft longitude (deg) at the indicated time';
 info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
 info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
 info.amass_aer = 'unitless, aerosol optical airmass';
-info.flag_acaod = 'unitless, flag indicating that this measurement is of Above Cloud AOD (1=ACAOD; 0=all other); measurement is above clouds but below aerosol layer, by manual inspection of 4STAR data and in situ measurements, clouds defined by a cloud drop concentration greater than 10/cm^3, the aerosol layer defined by either a disctinct decrease by a factor of 0.1 in AOD with increasing altitude or an in situ measured dry scattering coefficient at 500 nm of at least 50 1/Mm.';
+info.flag_acaod = 'unitless, flag indicating that this measurement is of Above Cloud AOD (1=ACAOD; 0=all other); measurement is above clouds but below aerosol layer, by manual inspection of 4STAR data and in situ measurements during nearby profiles, clouds defined by a cloud drop concentration greater than 10/cm^3, the aerosol layer defined by either a distinct decrease by a factor of 0.1 in AOD with increasing altitude or an in situ measured dry scattering coefficient at 500 nm of at least 50 1/Mm.';
 info.AOD_angstrom_470_865 = 'unitless, Angstrom exponent calculated from the AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
 info.AOD_polycoef_a2 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (2nd), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
 info.AOD_polycoef_a1 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (1st), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
@@ -159,8 +159,8 @@ originfo = info; origform = form; orignames = names;
 dslist={'20170801' '20170802' '20170807' '20170809' '20170812' '20170813' '20170815' '20170817' '20170818' '20170819' '20170821' '20170824' '20170826' '20170828' '20170830' '20170831' '20170902' '20170903' '20170904' '20171026'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-%jproc=[         0          0          0          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0          00          0] ;
-jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
+jproc=[         0          0          0          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0          00          0] ;
+%jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
 %jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
 
