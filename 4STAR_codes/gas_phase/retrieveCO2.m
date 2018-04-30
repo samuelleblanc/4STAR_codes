@@ -38,7 +38,7 @@
 % from gasessubtract.m
 % -------------------------------------------------------------------------
 %% function routine
-function [co2] = retrieveCO2(s,wstart,wend)
+function [co2] = retrieveCO2(s,wstart,wend,gxs)
 
 plotting = 0;
 % load cross-sections

@@ -45,7 +45,7 @@
 % MS, 2016-10-12, adjusted to be similar to recent NO2 scheme
 % -------------------------------------------------------------------------
 %% function routine
-function [hcoh] = retrieveHCOH(s,wstart,wend,mode)
+function [hcoh] = retrieveHCOH(s,wstart,wend,mode,gxs)
 
 plotting = 0;
 % load cross-sections

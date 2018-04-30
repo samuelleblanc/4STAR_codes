@@ -9,7 +9,7 @@
 % 
 %
 % CALLING SEQUENCE:
-%  function [gas] = retrieveGases(s)
+%  function [gas] = retrieveGases(s,gxs)
 %
 % INPUT:
 %  - s: starsun struct from starwarapper
@@ -46,29 +46,29 @@ function [gas] = retrieveGases(s)
  colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
  
 %% load cross-sections
-   loadCrossSections_global;
+gxs = get_GlobalCrossSections;
 %----------------------------------------------------------------------
 
 
 %% retrieve NO2
 
 
- [gas.no2] = retrieveNO2(s,0.460,0.490,1);
+ [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
 
 %% retrieve O3
 
- [gas.o3]  = retrieveO3(s,0.490,0.682,1);
+ [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
 
 %----------------------------------------------------------------------
 %% retrieve CO2
 
- [gas.co2]  = retrieveCO2(s,1.555,1.630);
+ [gas.co2]  = retrieveCO2(s,1.555,1.630,gxs);
    
 %% retrieve O2
 %  TBD
 
 %% retrieve HCOH
- [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1);
+ [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1,gxs);
              
 %% save gas data to .mat file
 
