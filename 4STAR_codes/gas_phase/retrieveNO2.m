@@ -48,7 +48,7 @@
 %                 fileds (instead of NaN's)
 % -------------------------------------------------------------------------
 %% function routine
-function [no2] = retrieveNO2(s,wstart,wend,mode)
+function [no2] = retrieveNO2(s,wstart,wend,mode,gxs)
 
 plotting = 0;
 % load cross-sections

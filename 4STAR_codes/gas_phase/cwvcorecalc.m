@@ -142,7 +142,7 @@ tau_ODmodc0slant = -log(modc0Tw);
 %
 
 % initialize wv array for subtraction
-cwv.tau_aero_cwvsub = zeros(pp,qq);   % this is for cwv m1 retrieval
+% cwv.tau_aero_cwvsub = zeros(pp,qq);   % this is for cwv m1 retrieval
 cwv.tau_OD_wvsubtract   = zeros(pp,qq);   % this is for cwv fit retreival (m2)
 %
 
@@ -214,10 +214,10 @@ end
  % upload a and b parameters (from LBLRTM - new spec FWHM)
  if model_atmosphere==1||model_atmosphere==2 %!!! check if xs should be related to calibration or measurement location 
      xs_ = 'H2O_cross_section_FWHM_new_spec_all_range_Tropical3400m.mat';
-%      xs = load(xs_); %xs  = load(fullfile(starpaths, xs_));
+%      xs = load(xs_); %xs  = load(which( xs_));
  else
      xs_ = 'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter6850m.mat';
-%      xs  = load(xs_); %xs = load(fullfile(starpaths, xs_));
+%      xs  = load(xs_); %xs = load(which( xs_));
  end
  xs = load(xs_);
  %
@@ -251,16 +251,16 @@ end
       cfit_H2O=ones(length(xs.wavelen),1);
  elseif model_atmosphere==3 % TCAP winter/ARISE
      % load altitude dependent coef.
-     alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
-     alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter1000m.mat'));
-     alt2000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter2000m.mat'));
-     alt3000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter3000m.mat'));
-     alt4000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter4000m.mat'));
-     alt5000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter5000m.mat'));
-     alt6000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat'));
-     alt7000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
-     alt8000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
-     alt9000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
+     alt0    = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter0m.mat'));
+     alt1000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter1000m.mat'));
+     alt2000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter2000m.mat'));
+     alt3000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter3000m.mat'));
+     alt4000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter4000m.mat'));
+     alt5000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter5000m.mat'));
+     alt6000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwin6000m.mat'));
+     alt7000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
+     alt8000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
+     alt9000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatWinter7000m.mat'));
      
       zkm_LBLRTM_calcs=[0:9];
       afit_H2O=[alt0.cs_sort(:,1) alt1000.cs_sort(:,1) alt2000.cs_sort(:,1) alt3000.cs_sort(:,1) alt4000.cs_sort(:,1) alt5000.cs_sort(:,1) alt6000.cs_sort(:,1) alt7000.cs_sort(:,1) alt8000.cs_sort(:,1) alt9000.cs_sort(:,1)];
@@ -315,21 +315,21 @@ end
          alt14000 = load('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat');
      else
          
-         alt0    = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));
-         alt1000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat'));
-         alt2000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum2000m.mat'));
-         alt3000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum3000m.mat'));
-         alt4000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum4000m.mat'));
-         alt5000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum5000m.mat'));
-         alt6000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));
-         alt7000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer7000m.mat'));
-         alt8000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer8000m.mat'));
-         alt9000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer9000m.mat'));
-         alt10000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer10000m.mat'));
-         alt11000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer11000m.mat'));
-         alt12000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer12000m.mat'));
-         alt13000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat'));
-         alt14000 = load(fullfile(starpaths,'H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat'));
+         alt0    = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum0m.mat'));
+         alt1000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum1000m.mat'));
+         alt2000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum2000m.mat'));
+         alt3000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum3000m.mat'));
+         alt4000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum4000m.mat'));
+         alt5000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum5000m.mat'));
+         alt6000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatwsum6000m.mat'));
+         alt7000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer7000m.mat'));
+         alt8000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer8000m.mat'));
+         alt9000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer9000m.mat'));
+         alt10000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer10000m.mat'));
+         alt11000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer11000m.mat'));
+         alt12000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer12000m.mat'));
+         alt13000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer13000m.mat'));
+         alt14000 = load(which('H2O_cross_section_FWHM_new_spec_all_range_midLatSummer14000m.mat'));
      end
 
 
@@ -405,7 +405,7 @@ end
      
 
      cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
-     cwv.tau_aero_cwvsub = s.tau_tot_slant - wvamount;% this is a structure with o2-o2 NIR subtracted
+     cwv.tau_aero_cwvsub = s.tau_tot_slant - cwv2sub;% this is a structure with o2-o2 NIR subtracted
      
 %      cwv2sub   =
 %      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original
@@ -465,7 +465,11 @@ end
 if cwvoptfit;
 swv_opt=[];
 wv_residual = [];
-
+if s.toggle.verbose
+   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+else
+   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','off','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+end
 for i = 1:length(s.t)
  % choose right altitude coef
     if model_atmosphere~=1 % run for airborne campaigns only
@@ -508,7 +512,7 @@ for i = 1:length(s.t)
        end
        
        % Set Options
-       options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%        options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
        
        % bounds
        if wrange==3
@@ -672,6 +676,7 @@ for i = 1:length(s.t)
     %cwv.tau_OD_wvsubtract(i,:) = tau_ODslant(i,:)-wvamount';% this is slant becuse it is used by gases routine;need to divide by airmass in comparison
     wvamount(isNaN(wvamount)) = 0; wvamount(isinf(wvamount)) = 0; % added by SL, 2017-04-07, to ensure that tau_OD_wvsubtract is always real
     cwv.tau_OD_wvsubtract(i,:) = s.tau_tot_slant(i,:)-wvamount;% this is a structure with o2-o2 NIR subtracted
+    wvOD(i,:) = real(wvamount);
     end
     
     % QA plot of tau_OD_wvsubtract vs.tau_ODslant
@@ -703,6 +708,7 @@ end % end of loop over all data points for wv retrieval
     % save in each wavelength range retrieval
     cwv.(lab2)     = cwv_opt;
     cwv.(labstd2)  = sqrt(wv_residual/length(wln));
+    cwv.wvOD = wvOD;
 end% end of optfit procedure
 end % end for loop over all wavelength range cases
 %

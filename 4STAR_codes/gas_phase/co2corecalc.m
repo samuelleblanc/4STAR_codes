@@ -11,6 +11,11 @@ tau_co2ch4_subtract = tau_OD;
 
 sc=[];
 sc_residual = [];
+if starsun.toggle.verbose
+   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+else
+   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','off','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+end
 
 for i = 1:length(starsun.t)
            
@@ -20,7 +25,7 @@ for i = 1:length(starsun.t)
     PAR  = [ch4coef(wln) co2coef(wln)];
        % Set Options
        
-       options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%        options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
        
        
        % bounds

@@ -6,6 +6,14 @@
  % MS, 2015-05-01, added HCOH and BrO cross sections
  %----------------------------------------------------------------------
  %function s= loadCrossSections
+ if isvar('gxs')
+    fields = fieldnames(gxs);
+    for f = 1:length(fields)
+       eval([fields{f} '= gxs.' fields{f} ';']);
+    end
+
+ else
+    
      Loschmidt=2.686763e19;             % molec/cm3*atm
      
      invis = 'visLambda.txt';
@@ -14,8 +22,8 @@
          vis.nm  = importdata(invis);
          nir.nm  = importdata(innir);
      else
-         vis.nm  = importdata(fullfile(starpaths,invis));
-         nir.nm  = importdata(fullfile(starpaths,innir));
+         vis.nm  = importdata(which(invis));
+         nir.nm  = importdata(which(innir));
      end
           
      % h2o
@@ -25,8 +33,8 @@
          watervis  = importdata(invis);
          waternir  = importdata(innir);
      else
-         watervis  = importdata(fullfile(starpaths,invis));
-         waternir  = importdata(fullfile(starpaths,innir));
+         watervis  = importdata(which(invis));
+         waternir  = importdata(which(innir));
      end
      water.visnm     = watervis.data(:,1);
      water.visXs     = watervis.data(:,2);
@@ -42,8 +50,8 @@
          o2vis  = importdata(invis);
          o2nir  = importdata(innir);
      else
-         o2vis  = importdata(fullfile(starpaths,invis));
-         o2nir  = importdata(fullfile(starpaths,innir));
+         o2vis  = importdata(which(invis));
+         o2nir  = importdata(which(innir));
      end
      o2.visnm     = o2vis.data(:,1);
      o2.visXs     = o2vis.data(:,2);
@@ -59,8 +67,8 @@
          co2vis  = importdata(invis);
          co2nir  = importdata(innir);
      else
-         co2vis  = importdata(fullfile(starpaths,invis));
-         co2nir  = importdata(fullfile(starpaths,innir));
+         co2vis  = importdata(which(invis));
+         co2nir  = importdata(which(innir));
      end
      co2.visnm     = co2vis.data(:,1);
      co2.visXs     = co2vis.data(:,2);
@@ -74,7 +82,7 @@
      if exist(invis,'file')
          ch4nir  = importdata(innir);
      else
-         ch4nir  = importdata(fullfile(starpaths,innir));
+         ch4nir  = importdata(which(innir));
      end
      ch4.nirnm     = ch4nir.data(:,1);
      ch4.nirXs     = ch4nir.data(:,2);
@@ -87,8 +95,8 @@
          o4vis  = importdata(invis);
          o4nir  = importdata(innir);
      else
-         o4vis  = importdata(fullfile(starpaths,invis));
-         o4nir  = importdata(fullfile(starpaths,innir));
+         o4vis  = importdata(which(invis));
+         o4nir  = importdata(which(innir));
      end
      o4.visnm     = o4vis.data(:,1);
      o4.visXs     = o4vis.data(:,2);
@@ -103,7 +111,7 @@
      if exist(invis,'file')
          no2vis  = importdata(invis);
      else
-         no2vis  = importdata(fullfile(starpaths,invis));
+         no2vis  = importdata(which(invis));
      end
  
      no2_220.visnm     = no2vis.data(:,1);
@@ -115,7 +123,7 @@
      if exist(invis,'file')
          no2vis  = importdata(invis);
      else
-         no2vis  = importdata(fullfile(starpaths,invis));
+         no2vis  = importdata(which(invis));
      end
      no2_298.visnm     = no2vis.data(:,1);
      no2_298.visXs     = no2vis.data(:,2);
@@ -126,7 +134,7 @@
      if exist(invis,'file')
          no2vis  = importdata(invis);
      else
-         no2vis  = importdata(fullfile(starpaths,invis));
+         no2vis  = importdata(which(invis));
      end
      no2.visnm     = no2vis(:,1);
      no2.visXs     = no2vis(:,2);
@@ -137,7 +145,7 @@
      if exist(invis,'file')
          o3vis  = importdata(invis);
      else
-         o3vis  = importdata(fullfile(starpaths,invis));
+         o3vis  = importdata(which(invis));
      end
      o3.visnm     = o3vis(:,1);
      o3.visXs     = o3vis(:,2);
@@ -148,7 +156,7 @@
      if exist(invis,'file')
          hcohvis  = importdata(invis);
      else
-         hcohvis  = importdata(fullfile(starpaths,invis));
+         hcohvis  = importdata(which(invis));
      end
      hcoh.visnm     = hcohvis(:,1);
      hcoh.visXs     = hcohvis(:,2);
@@ -158,7 +166,7 @@
      if exist(invis,'file')
          brovis  = importdata(invis);
      else
-         brovis  = importdata(fullfile(starpaths,invis));
+         brovis  = importdata(which(invis));
      end
      if isstruct(brovis)&&isfield(brovis,'data')
          brovis = brovis.data;
@@ -190,7 +198,7 @@
      brocoef = ([bro.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
      % hcoh
      hcohcoef = ([hcoh.visInterp; zeros(length(water.nirInterp ),1)])*Loschmidt;% convert to atmxcm
-     
+ end     
 %return;
      % plot cross sections
 %     figure;plot(vis.nm,water.visInterp,'-b');hold on;plot(nir.nm,water.nirInterp,'-r');hold on;
