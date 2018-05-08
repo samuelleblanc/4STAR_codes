@@ -1,3 +1,4 @@
+function fig_names = plot_FOVs(filein)
 %% Details of the program:
 % NAME:
 %   plot_FOVs
@@ -34,11 +35,13 @@
 %           -added version control
 % Modified v2.0: Samuel LeBlanc, 2017-05-28, Hilo, Hawaii
 %           - added multi instrument support
+% Modified v2.1: Samuel LeBlanc, 2018-05-08, NASA Ames Research Center
+%           - added returning of the figure names saved - for integration
+%           within quicklooks program
 % -------------------------------------------------------------------------
 
 %% Start of function
-function plot_FOVs(filein)
-version_set('1.0')
+version_set('2.1')
 %% setup and load the files
 if nargin<1 || isempty(filein)
     [filename, sourcefolder]=uigetfile2({'*star.mat';'*starfov.mat'},'Pick the star.mat or starfov.mat files');
@@ -60,12 +63,15 @@ else
     return
 end;
 
+fig_names = {};
+
 %% Now iterate through each fov structure
 if a(1)
     disp('doing the vis_fova')
   for i=1:length(s.vis_fova)
       disp(['..on file:' num2str(i)])
       ins=FOV_scan(s.vis_fova(i),instrumentname);
+      fig_names = [fig_names; ins.fig_name];
   end;
 end
 
@@ -74,6 +80,7 @@ if a(2)
   for i=1:length(s.nir_fova)
       disp(['..on file:' num2str(i)])
       ins=FOV_scan(s.nir_fova(i),instrumentname);
+      fig_names = [fig_names; ins.fig_name];
   end;
 end
 if p(1)
@@ -81,6 +88,7 @@ if p(1)
   for i=1:length(s.vis_fovp)
       disp(['..on file:' num2str(i)])
       ins=FOV_scan(s.vis_fovp(i),instrumentname);
+      fig_names = [fig_names; ins.fig_name];
   end;
 end
 if p(2)
@@ -88,6 +96,7 @@ if p(2)
   for i=1:length(s.nir_fovp)
       disp(['..on file:' num2str(i)])
       ins=FOV_scan(s.nir_fovp(i),instrumentname);
+      fig_names = [fig_names; ins.fig_name];
   end;
 end
 

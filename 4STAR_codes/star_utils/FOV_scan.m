@@ -47,11 +47,13 @@ function ins = FOV_scan(ins,instrumentname)
 %           - small bug fix in plotting
 % Modified (v2.0): Samuel LeBlanc, 2017-05-28, Hilo, Hawaii
 %           - added support for multiple instruments
-%
+% Modified (v2.1): Samuel LeBlanc, 2018-05-08, NASA Ames Research Center
+%           - added figure name saving to the ins struct as fig_name cell
+%           array
 % -------------------------------------------------------------------------
 
 %% Start of code
-version_set('2.0');
+version_set('2.1');
 if nargin<2;
     instrumentname = '4STAR';
 end;
@@ -77,6 +79,17 @@ end;
 %% Set correct variables
 % ins = ins.raw;
 if strcmp(instrumentname,'4STAR');
+    ins.AZ_deg = -1.*ins.AZstep./50;
+    ins.Az_deg = ins.AZ_deg;
+    ins.El_deg = -1.*ins.Elstep*360/5e4;
+    ins.minEl = min(ins.El_deg(ins.Str>0));
+    ins.maxEl = max(ins.El_deg(ins.Str>0));
+    ins.rangeEl = ins.maxEl-ins.minEl;
+    ins.minAz = min(ins.AZ_deg(ins.Str>0));
+    ins.maxAz = max(ins.AZ_deg(ins.Str>0));
+    ins.rangeAz = ins.maxAz-ins.minAz;
+    ins.Vscan = ins.rangeEl>ins.rangeAz;
+elseif strcmp(instrumentname,'4STARB');
     ins.AZ_deg = -1.*ins.AZstep./50;
     ins.Az_deg = ins.AZ_deg;
     ins.El_deg = -1.*ins.Elstep*360/5e4;
@@ -222,7 +235,7 @@ dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
 sza = (90-abs(ins.sunel)) + dza
 %saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));
 %saz = interp1(ins.t(tracking),abs(ins.AZ_deg(tracking)),ins.t,'linear','extrap')
-daz = ins.Az_deg(icenter) - ins.sunaz(icenter)
+daz = ins.AZ_deg(icenter) - ins.sunaz(icenter)
 saz = ins.sunaz + daz
 
 ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg)
@@ -232,12 +245,12 @@ ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg)
  %  90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), mean(ins.AZ_deg).*ones(size(ins.AZ_deg)));
 
 if ins.Vscan
-   ins.midAng = ins.El_deg(icenter) %mean(ins.El_deg);
+   ins.midAng = ins.El_deg(icenter); %mean(ins.El_deg);
    %ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
    ins.SA(ins.El_deg<ins.midAng) = -1.*ins.SA(ins.El_deg<ins.midAng);
    title_str = ['Vertical FOV'];
 else
-   ins.midAng = ins.AZ_deg(icenter) %mean(ins.AZ_deg);
+   ins.midAng = ins.AZ_deg(icenter); %mean(ins.AZ_deg);
    %ins.SA = scat_ang_degs(sza, saz,90-abs(ins.El_deg),ins.AZ_deg);
    ins.SA(ins.AZ_deg<ins.midAng) = -1.*ins.SA(ins.AZ_deg<ins.midAng);
    title_str = ['Horizontal FOV'];
@@ -255,6 +268,7 @@ light_ii = find(scan);
 SA_range = [min(ins.SA(light_ii(ii))), max(ins.SA(light_ii(ii)))];
 
 ins.good_pix = good_pix;
+ins.pname = [ins.pname filesep];
 save([ins.pname, ins.fname(1:end-4),'.mat'])
 %%
 
@@ -264,7 +278,7 @@ imagesc(ins.SA(light_ii(ii)), ins.nm, ins.CCD_norm(light_ii(ii),:)'); axis('xy')
 title([ins.fname ' normalized to range'], 'interp','none');
 xlabel('scattering angle');
 ylabel('wavelength');
-caxis([0.92, 1.03]);colorbar
+caxis([0.92, 1.03]);colorbar;
 if any(ins.nm<500)
     ylim([400,1000]);
 else
@@ -274,7 +288,7 @@ xlim([-1.5,1.5]);
 ax(1) = gca;
 
 %% normalize by each value at the center point
-ins.CCD_norm_zero = ins.CCD_norm./repmat(ins.CCD_norm(icenter,:),size(ins.t))
+ins.CCD_norm_zero = ins.CCD_norm./repmat(ins.CCD_norm(icenter,:),size(ins.t));
 
 %%
 
@@ -285,7 +299,7 @@ recolor(lines, ins.nm(good_pix));
 title({title_str;ins.fname},'interp','none');
 xlabel('Angle [degrees]');
 ylabel('Relative signal');
-c = colorbar
+c = colorbar;
 ylabel(c,'Wavelength [nm]')
 ylim([.94,1.08]);
 xlim([-1.5,1.5]);
@@ -294,7 +308,7 @@ v = axis;
 save_fig(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
-
+ins.fig_name = {[ins.pname, ins.fname(1:end-4),'.line_FOV.png']};
 %%
 % ./(ones(size(ins.time))*ins.rangeCCD);
 % fig7 = figure; 
@@ -321,12 +335,17 @@ ylabel('Quad V_x/V_t_o_t');
 
 
 %%
+figure(fig2);
+ylim([.98,1.02]);
+xlim([-1.5,1.5]);
 saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.fig']);
 saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.png']);
+ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.selected_lines.png']}];
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
 saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.fig']);
 saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']);
+ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']}];
 
 %%
 %ins.SA(3:end-2), ins.CCD_norm(3:end-2,good_pix)
@@ -344,7 +363,7 @@ imagesc(ins.SA(light_ii(ii)), ins.nm, ins.CCD_renorm(light_ii(ii),:)'); axis('xy
 title([ins.fname ' normalized to 0 deg'], 'interp','none');
 xlabel('scattering angle');
 ylabel('wavelength');
-caxis([0.92, 1.03]);colorbar
+caxis([0.92, 1.03]);colorbar;
 if any(ins.nm<500)
     ylim([400,1000]);
 else
@@ -357,6 +376,7 @@ axis(ax(2),v);
 
 saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
 saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
+ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']}];
 %%
 return
 %

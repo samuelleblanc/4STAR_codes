@@ -66,10 +66,11 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %        running them because they take a long time and the retrievals the
 %        first days here are probably not good because of clouds.
 % SL   , 2017/05/26, modified for easier plotting with data from MLO May 2017
+% SL   , 2018/05/08, added automated FOV plotting
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.0');
+version_set('1.1');
 
 %% Sanitize inputs and get file paths
 if nargin<1; % no file path set
@@ -113,6 +114,12 @@ tit = [instrumentname ' - ' daystr];
 % prepare for plotting
 %********************
 t = s.t;
+dt = s.t(end)-s.t(1);
+if dt>0.2;
+    ddt = 0.01;
+else;
+    ddt = 0.0005;
+end;
 %% get the track info
 track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
 track.P=[st.track.P1 st.track.P2 st.track.P3 st.track.P4];
@@ -231,7 +238,7 @@ plot(s.t,s.m_ray,'.r');
 grid on;
 legend({'m\_aero';'m\_ray'}');
 dynamicDateTicks;
-xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Airmass');
 title([instrumentname ' - ' daystr ' - airmasses']);
 fname = fullfile(p1,[instrumentname daystr '_airmass']);
@@ -246,7 +253,7 @@ dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 grid on; hold on;
 plot(ax(1),s.t,s.Tbox_C,'.r');
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]); xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)- ddt s.t(end)+ ddt]); xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 ylabel(ax(2),'RH [%]');
 ylabel(ax(1),'Temperature [^\circC]');
@@ -285,7 +292,7 @@ plot(s.t,s.sunaz,'+r');
 plot(s.t,s.sunel,'xg');
 dynamicDateTicks;
 grid on;
-xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Degrees [^\circ]')
 legend('SZA','Sun Az','Sun El');
 title([instrumentname ' - ' daystr ' - Solar Angles']);
@@ -307,7 +314,7 @@ plot(s.t,s.QdVtb,'+r');hold on;
 plot(s.t,s.QdVlr,'xg');
 dynamicDateTicks;grid on;
 hold off;
-xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Quad voltages [V]'); ylim([-1,1])
 legend('Quad top bottom','Quad Left right');
 fname = fullfile(p1,[instrumentname daystr '_Quad']);
@@ -322,7 +329,7 @@ dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 grid on;
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)-ddt s.t(end)+ddt]);xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 ylabel(ax(2),'Azimuth degrees [^\circ]')
 ylabel(ax(1),'Elevation degrees [^\circ]');
 title([instrumentname ' - ' daystr ' - Elevation and Azimuth angles']);
@@ -337,7 +344,7 @@ ax = plotyy(s.t,s.Tst,s.t,s.Pst);
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 grid on;
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)-ddt s.t(end)+ddt]);xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 ylabel(ax(2),'Pst [hPa]');
 ylabel(ax(1),'Tst [^\circC]');
 title([instrumentname ' - ' daystr ' - Temperature and Pressure St']);
@@ -402,7 +409,7 @@ plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'or');
 plot(s.t(s.sat_time==1),s.raw(s.sat_time==1,iw),'sy','markersize',4);
 hold off;
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)-ddt s.t(end)+ddt]);xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 ylabel(ax(2),'VIS Integration time [ms]')
 ylabel(ax(1),['Raw at ' num2str(s.w(iw).*1000.0,'%4.1f') ' nm [counts]']);
 title([instrumentname ' - ' daystr ' - Vis Raw counts, parks, saturation, Tint' ]);
@@ -431,7 +438,7 @@ plot(s.t(isnan(s.rate(:,iw))),s.raw(isnan(s.rate(:,iw)),iw),'or');
 plot(s.t(s.sat_time==1),s.raw(s.sat_time==1,iw),'sy','markersize',4);
 hold off;
 xlabel('UTC time');
-xlim(ax(1),[s.t(1)-0.01 s.t(end)+0.01]);xlim(ax(2),[s.t(1)-0.01 s.t(end)+0.01]);
+xlim(ax(1),[s.t(1)-ddt s.t(end)+ddt]);xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 ylabel(ax(2),'NIR Integration time [ms]')
 ylabel(ax(1),['Raw at ' num2str(s.w(iw).*1000.0,'%4.1f') ' nm [counts]']);
 title([instrumentname ' - ' daystr ' - NIR Raw counts, parks, saturation, Tint' ]);
@@ -447,15 +454,15 @@ fig_names = [fig_names,{[fname '.png']}];
 save_fig(figp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
-pptcontents0=[pptcontents0; {' ' 4}];
-pptcontents0=[pptcontents0; {' ' 4}];
+%pptcontents0=[pptcontents0; {' ' 4}];
+%pptcontents0=[pptcontents0; {' ' 4}];
 
 %********************
 %% plot the darks
 %********************
 
-pptcontents0=[pptcontents0; {' ' 4}];
-pptcontents0=[pptcontents0; {' ' 4}];
+%pptcontents0=[pptcontents0; {' ' 4}];
+%pptcontents0=[pptcontents0; {' ' 4}];
 
 fdrkn = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
@@ -467,20 +474,20 @@ dynamicDateTicks;
 title([instrumentname ' - NIR darks and temperature']);
 fname = fullfile(p1,[instrumentname daystr '_nir_dark_T']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(figp,fname,0);
+save_fig(fdrkn,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 fdrkv = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
 ylabel(ax(2),'Darks VIS 500 nm');
 ylabel(ax(1),'VIS temp [°C]');
-ylim(ax(1),[10,60]); yticks(ax(1),[10,20,30,40,50,60]);
+ylim(ax(1),[-5,10]); yticks(ax(1),[10,20,30,40,50,60]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - VIS darks and temperature']);
 fname = fullfile(p1,[instrumentname daystr '_vis_dark_T']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(figp,fname,0);
+save_fig(fdrkv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %********************
@@ -495,7 +502,7 @@ plot(s.t,s.raw(:,iwvlv),'.');
 dynamicDateTicks;
 xlabel('UTC time');
 ylabel('Raw [counts]');
-xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlim([s.t(1)-ddt s.t(end)+ddt]);
 title([tit ' - VIS Raw counts' ]);
 grid on;
 labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
@@ -515,7 +522,7 @@ plot(s.t,s.raw(:,iwvln),'.');
 dynamicDateTicks;
 xlabel('UTC time');
 ylabel('Raw [counts]');
-xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlim([s.t(1)-ddt s.t(end)+ddt]);
 title([instrumentname ' - ' daystr ' - NIR Raw counts' ]);
 grid on;
 labels = {};
@@ -534,7 +541,7 @@ figure(13);
 colormap(parula);
 imagesc(s.t,s.w.*1000.0,s.raw');
 dynamicDateTicks;
-xlabel('UTC time');xlim([s.t(1)-0.01 s.t(end)+0.01]);
+xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Wavelength [nm]');
 title([instrumentname ' - ' daystr ' - Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
@@ -561,7 +568,7 @@ if exist('tau_aero_noscreening');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero_noscreening');
-    xlim([s.t(1)-0.01 s.t(end)+0.01]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD (no screening)' ]);
     grid on;    
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
@@ -581,7 +588,7 @@ if exist('tau_aero_noscreening');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero_noscreening');
-    xlim([s.t(1)-0.01 s.t(end)+0.01]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([instrumentname ' - ' daystr ' - NIR AOD (no screening)' ]);
     grid on;
     labels = {};
@@ -611,7 +618,7 @@ if exist('tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
-    xlim([s.t(1)-0.01 s.t(end)+0.01]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
     grid on;
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
@@ -631,7 +638,7 @@ if exist('tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
-    xlim([s.t(1)-0.01 s.t(end)+0.01]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([instrumentname ' - ' daystr ' - NIR AOD' ]);
     grid on;
     labels = {};
@@ -1021,6 +1028,17 @@ end;
 % % %         end;
 % % %     end;
 % % % end;
+
+%% Check if FOVs were created, if so, plot them
+if isfield(st,'vis_fovp') | isfield(st,'vis_fova');
+    fov_figs = plot_FOVs(fname_4star);
+    for jj=1:length(fov_figs);
+        pptcontents0=[pptcontents0; {fov_figs{jj} 4}];
+    end;
+    for jo=1:mod(length(fov_figs),4);
+        pptcontents0=[pptcontents0; {' ' 4}];
+    end;
+end;
 
 %% Check if langley is defined
 if isfield(s,'langley')|isfield(s,'langley1');
