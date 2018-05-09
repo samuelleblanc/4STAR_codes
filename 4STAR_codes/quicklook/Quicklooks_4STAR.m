@@ -121,6 +121,7 @@ else;
     ddt = 0.0005;
 end;
 %% get the track info
+if strcmp(instrumentname,'4STARB'); st.track.T2 =st.track.T2+273.15; end;
 track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
 track.P=[st.track.P1 st.track.P2 st.track.P3 st.track.P4];
 bl=60/86400;
@@ -231,7 +232,7 @@ pptcontents0={};
 
 %% Plot the housekeeping data
 %plot airmasses
-figure(1);
+hsk = figure;
 plot(s.t,s.m_aero,'.b');
 hold on;
 plot(s.t,s.m_ray,'.r');
@@ -243,25 +244,37 @@ ylabel('Airmass');
 title([instrumentname ' - ' daystr ' - airmasses']);
 fname = fullfile(p1,[instrumentname daystr '_airmass']);
 fig_names = {[fname '.png']};
-save_fig(1,fname,0);
+save_fig(hsk,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot temperatures and pressures
-figure(2);
+ftnp = figure;
+subplot(3,1,[1,2])
 [ax,h1,h2] = plotyy(s.t,nfsmooth(s.Tprecon_C,60),s.t,nfsmooth(s.RHprecon_percent,60));
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
-grid on; hold on;
-plot(ax(1),s.t,s.Tbox_C,'.r');
+xticklabels([''])
+grid on;
+[lg,ic] = legend(starfieldname2label('Tprecon'),starfieldname2label('RHprecon'));
+for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
+
+ax2 = subplot(3,1,3)
+linkaxes([ax(1),ax(2),ax2],'x')
+plot(ax2,s.t,s.Tbox_C,'.','color', 	[0.5,0.5,0.5]); hold on;
+plot(ax2,s.t,nfsmooth(s.Tbox_C,60),'.g');
+grid on;
+dynamicDateTicks;
 xlabel('UTC time');
 xlim(ax(1),[s.t(1)- ddt s.t(end)+ ddt]); xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
-ylabel(ax(2),'RH [%]');
-ylabel(ax(1),'Temperature [^\circC]');
-legend(starfieldname2label('Tprecon'),starfieldname2label('Tbox'),starfieldname2label('RHprecon'));
-title([instrumentname ' - ' daystr ' - Temperature and Pressure (precon)']);
+ylabel(ax(2),'RH [%], smoothed over 60s');
+ylabel(ax(1),'Temperature [^\circC], smoothed over 60s');
+ylabel(ax2,'T [^\circC]');
+[lg,ic] = legend(['raw ' starfieldname2label('Tbox')],['smoothed over 60s ' starfieldname2label('Tbox')]);
+for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
+title(ax(1),[instrumentname ' - ' daystr ' - Temperature and Pressure (precon)']);
 fname = fullfile(p1,[instrumentname daystr '_TnP']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(2,fname,0);
+save_fig(ftnp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the can temperatures and pressures (smoothed)
@@ -271,7 +284,8 @@ for ii={'T' 'P'};
     figtp = figure;
     plot(st.track.t, ysm, '.');
     dynamicDateTicks;
-    lh=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']),'Location','Best');
+    [lh,ic]=legend(starfieldname2label([ii{:} '1']),starfieldname2label([ii{:} '2']),starfieldname2label([ii{:} '3']),starfieldname2label([ii{:} '4']),'Location','Best');
+    for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
     grid on;
     ylabel([ii{:} ', smoothed over ' num2str(bl*86400) ' s']);
     if strcmp(ii{:},'T'); title([tit ' - Temperature (head)']), else title([tit ' - Pressures (head)']), end;
@@ -285,7 +299,7 @@ clear ii;
 
 %% plot tracking details
 % plot the solar angles
-figure(5);
+ftrk = figure;
 plot(s.t,s.sza,'o');
 hold on;
 plot(s.t,s.sunaz,'+r');
@@ -298,11 +312,11 @@ legend('SZA','Sun Az','Sun El');
 title([instrumentname ' - ' daystr ' - Solar Angles']);
 fname = fullfile(p1,[instrumentname daystr '_solarangles']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(5,fname,0);
+save_fig(ftrk,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the quad signals
-figure(4);
+fqd = figure;
 ax1 = subplot(211);
 plot(s.t,s.QdVtot,'.b');
 ylabel('Total Quad voltages [V]');
@@ -319,11 +333,11 @@ ylabel('Quad voltages [V]'); ylim([-1,1])
 legend('Quad top bottom','Quad Left right');
 fname = fullfile(p1,[instrumentname daystr '_Quad']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(4,fname,0);
+save_fig(fqd,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the orientation (Az El)
-figure(3);
+fazel = figure;
 [ax,h1,h2] = plotyy(s.t,s.El_deg,s.t,s.AZ_deg);
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
@@ -335,7 +349,7 @@ ylabel(ax(1),'Elevation degrees [^\circ]');
 title([instrumentname ' - ' daystr ' - Elevation and Azimuth angles']);
 fname = fullfile(p1,[instrumentname daystr '_El_Az']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(3,fname,0);
+save_fig(fazel,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot ambient Tst and Pst
@@ -515,7 +529,7 @@ save_fig(frv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the raw nir
-figure(12); nw = length(iwvln)
+frnir = figure; nw = length(iwvln);
 cm=hsv(nw+length(iwvlv));
 set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
 plot(s.t,s.raw(:,iwvln),'.');
@@ -533,11 +547,11 @@ colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_nirraw']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(12,fname,0); 
+save_fig(frnir,fname,0); 
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the raw carpet
-figure(13);
+frcar = figure;
 colormap(parula);
 imagesc(s.t,s.w.*1000.0,s.raw');
 dynamicDateTicks;
@@ -547,7 +561,7 @@ title([instrumentname ' - ' daystr ' - Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname daystr '_rawcarpet']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(13,fname,0);
+save_fig(frcar,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 pptcontents0=[pptcontents0; {' ' 4}];
@@ -581,7 +595,7 @@ if exist('tau_aero_noscreening');
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
     % plot the tau_aero_noscreening nir
-    faodni = figure; nw = length(iwvln)
+    faodni = figure; nw = length(iwvln);
     cm=hsv(nw+length(iwvlv));
     set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero_noscreening(:,iwvln),'.');
@@ -631,7 +645,7 @@ if exist('tau_aero');
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
     % plot the tau_aero_noscreening nir
-    faodni = figure; nw = length(iwvln)
+    faodni = figure; nw = length(iwvln);
     cm=hsv(nw+length(iwvlv));
     set(gca, 'ColorOrder', cm(length(iwvlv)+1:end,:), 'NextPlot', 'replacechildren')
     plot(s.t,s.tau_aero(:,iwvln),'.');
@@ -1081,5 +1095,5 @@ if savefigure;
             error('Paste either 1 or 4 figures per slide.');
         end;
     end;
-    makeppt(ppt_fname, [daystr ' ' platform], pptcontents{:});
+    makeppt(ppt_fname, [instrumentname ' - '  daystr ' ' platform], pptcontents{:});
 end;
