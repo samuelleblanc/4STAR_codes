@@ -126,8 +126,8 @@ end
     % this is end member array (original cross sections)
     
     basis = [hcohcoef(wln), no2_298Kcoef(wln), -no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1)];
-    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
-    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
+    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
+    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
 
     % solve
     % x = real(Abasis\spectrum_sub');
