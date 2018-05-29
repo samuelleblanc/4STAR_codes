@@ -324,13 +324,13 @@ title([instrumentname ' - ' daystr ' - Quad voltages']);
 dynamicDateTicks;grid on;
 ax2 = subplot(212);
 linkaxes([ax1,ax2],'x')
-plot(s.t,s.QdVtb,'+r');hold on;
-plot(s.t,s.QdVlr,'xg');
+plot(s.t,s.QdVtb/s.QdVtot,'+r');hold on;
+plot(s.t,s.QdVlr/s.QdVtot,'xg');
 dynamicDateTicks;grid on;
 hold off;
 xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
-ylabel('Quad voltages [V]'); ylim([-1,1])
-legend('Quad top bottom','Quad Left right');
+ylabel('Quad voltages ratio'); ylim([-1,1])
+legend('Quad top bottom / Total','Quad Left right / Total');
 fname = fullfile(p1,[instrumentname daystr '_Quad']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fqd,fname,0);
@@ -370,17 +370,25 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 %********************
 %% map flight path and airmasses
 %********************
+if false;
 if isequal(platform, 'flight');
     % flight track map
     figm = figure;
-    ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'marker','.');
+    ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'.');
     leg = {'vis_sun'};
     fld = fields(st);
     fld_marks = '.+>^<vopx';
+    cls = 'krgbcmy';
     for ii = 1:length(fld);
         if isequal(lower(fld{ii}(1:3)),'vis');
+            if length(st.(fld{ii}))>1;
+                for jj=1:length(st.(fld{ii}));
+                    sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Lat,st.(fld{ii})(jj).t,4,cls(ii),fld_marks(ii));
+                end;
+            else;
             %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
-            sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,4,st.(fld{ii}).t,'marker',fld_marks(ii));
+                sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,st.(fld{ii}).t,4,cls(ii),fld_marks(ii));
+            end;
             leg = [leg; {fld{ii}}];
         end;
     end;
@@ -404,6 +412,8 @@ if isequal(platform, 'flight');
     % latitude and altitude
     % ...
 end;
+end;
+
 
 %********************
 %% Start plotting the raw signals
@@ -477,6 +487,18 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %pptcontents0=[pptcontents0; {' ' 4}];
 %pptcontents0=[pptcontents0; {' ' 4}];
+fdrkv = figure;
+[ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
+ylabel(ax(2),'Darks VIS 500 nm');
+ylabel(ax(1),'VIS temp [°C]');
+ylim(ax(1),[-5,10]); yticks(ax(1),[10,20,30,40,50,60]);
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+dynamicDateTicks;
+title([instrumentname ' - VIS darks and temperature']);
+fname = fullfile(p1,[instrumentname daystr '_vis_dark_T']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(fdrkv,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 fdrkn = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
@@ -489,19 +511,6 @@ title([instrumentname ' - NIR darks and temperature']);
 fname = fullfile(p1,[instrumentname daystr '_nir_dark_T']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fdrkn,fname,0);
-pptcontents0=[pptcontents0; {fig_names{end} 4}];
-
-fdrkv = figure;
-[ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
-ylabel(ax(2),'Darks VIS 500 nm');
-ylabel(ax(1),'VIS temp [°C]');
-ylim(ax(1),[-5,10]); yticks(ax(1),[10,20,30,40,50,60]);
-set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
-dynamicDateTicks;
-title([instrumentname ' - VIS darks and temperature']);
-fname = fullfile(p1,[instrumentname daystr '_vis_dark_T']);
-fig_names = [fig_names,{[fname '.png']}];
-save_fig(fdrkv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %********************
