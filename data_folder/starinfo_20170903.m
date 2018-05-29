@@ -12,22 +12,37 @@ else
 end
 
  
-s.flight=[datenum(2017,9,3,09,53,14) datenum(2017,9,3,19,14,21)]; 
-%s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
- s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-s.high_alt_c0 = [datenum(2017,9,3,11,50,0) datenum(2017,9,3,12,5,00)];
-% Ozone and other gases 
-s.O3h=21; %  
-s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+if(strcmp(s.instrumentname,'4STAR'))
+            s.flight=[datenum(2017,9,3,09,53,14) datenum(2017,9,3,19,14,21)]; 
+            %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
+             s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+            % Ozone and other gases 
+            s.O3h=21; %  
+            s.O3col=0.278; % OMI overhead     
+            s.NO2col=2.0e15; %   
 
-% flags
-s.flagfilename     = '20170903_starflag_man_created_20170916_1517by_SL.mat'; 
-s.flagfilenameCWV  = '20170903_starflag_CWV_man_created20170907_1036by_MS.mat';
-s.flagfilenameO3   = '20170903_starflag_O3_man_created20170907_1041by_MS.mat';
-s.flagfilenameNO2  = '20170903_starflag_NO2_man_created20170907_1048by_MS.mat';
-s.flagfilenameHCOH = '20170903_starflag_auto_created_for_HCOH_20170906_1258.mat';
-s.flagacaod = '20170903_flag_acaod_sleblanc_20180417_234726.mat';
+            % flags
+            s.flagfilename     = '20170903_starflag_man_created_20170916_1517by_SL.mat'; 
+            s.flagfilenameCWV  = '20170903_starflag_CWV_man_created20170907_1036by_MS.mat';
+            s.flagfilenameO3   = '20170903_starflag_O3_man_created20170907_1041by_MS.mat';
+            s.flagfilenameNO2  = '20170903_starflag_NO2_man_created20170907_1048by_MS.mat';
+            s.flagfilenameHCOH = '20170903_starflag_auto_created_for_HCOH_20170906_1258.mat';
+elseif(strcmp(s.instrumentname,'4STARB'))
+%             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
+            %s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
+             s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+            % Ozone and other gases 
+            s.O3h=21; %  
+            s.O3col=0.300; %    
+            s.NO2col=2.0e15; %  
+
+%             % flags
+%             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+%             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
+%             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
+%             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
+%             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
+end
  
 % other tweaks 
 if isfield(s, 'Pst'); 
