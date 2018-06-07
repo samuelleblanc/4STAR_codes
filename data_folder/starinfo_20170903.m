@@ -37,7 +37,7 @@ elseif(strcmp(s.instrumentname,'4STARB'))
             s.NO2col=2.0e15; %  
 
 %             % flags
-%             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+            s.flagfilename     = '20170903_starflag_man_created20180512_1503by_KP.mat'; 
 %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
 %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
 %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
