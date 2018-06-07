@@ -172,7 +172,7 @@ for i=1:length(lon)
     if icon_target
         fprintf(fid,'%s \n',['<Icon><href>http://maps.google.com/mapfiles/kml/shapes/target.png</href></Icon>']);
     else
-        fprintf(fid,'%s \n',['<Icon><href>http://science.arm.gov/~sleblanc/kml_fig/circle.png</href></Icon>']);
+        fprintf(fid,'%s \n',['<Icon><href>http://engineering.arm.gov/~sleblanc/kml_fig/circle.png</href></Icon>']);
     end;
     fprintf(fid,'%s \n','</IconStyle>');
     fprintf(fid,'%s \n','</Style>');

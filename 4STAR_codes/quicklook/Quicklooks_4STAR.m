@@ -324,12 +324,13 @@ title([instrumentname ' - ' daystr ' - Quad voltages']);
 dynamicDateTicks;grid on;
 ax2 = subplot(212);
 linkaxes([ax1,ax2],'x')
-plot(s.t,s.QdVtb/s.QdVtot,'+r');hold on;
-plot(s.t,s.QdVlr/s.QdVtot,'xg');
+plot(s.t,s.QdVtb./s.QdVtot,'+r');hold on;
+plot(s.t,s.QdVlr./s.QdVtot,'xg');
 dynamicDateTicks;grid on;
 hold off;
 xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Quad voltages ratio'); ylim([-1,1])
+ylim([-0.6,0.6])
 legend('Quad top bottom / Total','Quad Left right / Total');
 fname = fullfile(p1,[instrumentname daystr '_Quad']);
 fig_names = [fig_names,{[fname '.png']}];
@@ -632,7 +633,7 @@ end; %tau_aero_noscreening
 
 % plot the tau_aero
 if exist('tau_aero');
-    % plot the tau_aero vis
+    % plot the tau_aero vis; 
     faodv_fl = figure;
     nw = length(iwvlv);
     cm=hsv(nw+length(iwvln));
@@ -641,6 +642,8 @@ if exist('tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
+    if max(s.tau_aero(:,iwvlv))<1.2; tma = max(s.tau_aero(:,iwvlv))*1.05; else tma=1.2;
+    ylim([0.0,tma]);
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
     grid on;
