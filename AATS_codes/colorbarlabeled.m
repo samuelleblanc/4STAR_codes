@@ -4,8 +4,8 @@ function ch=colorbarlabeled(ystring)
 
 ch=colorbar;
 yl=get(ch,'ylabel');
-set(ch,'linewidth',1,'fontsize',16);
-set(yl,'linewidth',1,'fontsize',16);
+set(ch,'linewidth',1,'fontsize',12);
+set(yl,'linewidth',1,'fontsize',12);
 if nargin>=1;
     set(yl,'string',ystring);
 end;
