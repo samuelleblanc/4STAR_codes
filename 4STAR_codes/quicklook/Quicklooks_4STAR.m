@@ -111,7 +111,7 @@ end;
 tit = [instrumentname ' - ' daystr];
 
 %********************
-% prepare for plotting
+%% prepare for plotting
 %********************
 t = s.t;
 dt = s.t(end)-s.t(1);
@@ -120,6 +120,7 @@ if dt>0.2;
 else;
     ddt = 0.0005;
 end;
+
 %% get the track info
 if strcmp(instrumentname,'4STARB'); st.track.T2 =st.track.T2+273.15; end;
 track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
@@ -145,7 +146,7 @@ colslist={'' c 1:13
     'VISonly' visc(3:9) 3:9
     'NIRonly' nirc(11:13)+1044 11:13};
 iwvl = c; iwvlv = visc(1:10); iwvln = nirc(11:13)+1044;
-wvl = s.w(iwvl); wvlv = s.w(iwvlv); wvln = s.w(iwvln); 
+wvl = s.w(iwvl); wvlv = s.w(iwvlv); wvln = s.w(iwvln);
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
 if isfield(s,'gas')
@@ -173,10 +174,10 @@ catch
     eval([infofile_(1:end-2),'(s)']);
 end
 
-%% Load the flag filea and see if gas flags exist
+%% Load the flag files and see if gas flags exist
 if isfield(s, 'flagfilename');
     disp(['Loading flag file: ' s.flagfilename])
-    flagO3 = load(s.flagfilename);
+    flag = load(s.flagfilename);
     % read flags
     flag  = flag.manual_flags.screen;
 else;
@@ -229,28 +230,61 @@ end;
 pptcontents={}; % pairs of a figure file name and the number of figures per slide
 pptcontents0={};
 
+%% Set up fields to plot
+fld = fields(st);
+ifld  = cellfun(@(C) ischar(C) && strcmp(C(1:3),'nir') | strcmp(C(1:3),'tra') | strcmp(C(1:3),'pro'),fld);
+fld = {fld{~ifld}};
+fld = {fld{strcmp(fld,'vis_sun')},fld{strcmp(fld,'vis_zen')},fld{~strcmp(fld,'vis_sun')&~strcmp(fld,'vis_zen')}}; % sun and then zen on first positions;
+fld_marks = '.+>^<vopx';
+cls = 'krgbcmy';
 
+%********************
 %% Plot the housekeeping data
-%plot airmasses
-hsk = figure;
-plot(s.t,s.m_aero,'.b');
-hold on;
-plot(s.t,s.m_ray,'.r');
+%********************
+% plot altitude and modes
+falt = figure;
+sso = plot(s.t,s.Alt,[cls(1) fld_marks(1)]); hold on; leg={'vis_sun'}; plo = sso;
+for ii = 2:length(fld);
+    if length(st.(fld{ii}))>1;
+        for jj=1:length(st.(fld{ii})); sso = plot(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Alt,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8); end;
+    else;
+        sso = plot(st.(fld{ii}).t,st.(fld{ii}).Alt,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8);
+    end;
+    leg = [leg; {fld{ii}}];
+    plo = [plo sso];
+end;
 grid on;
-legend({'m\_aero';'m\_ray'}');
+ylabel('Altitude [m]'); xlabel('Time'); title([tit ' - Altitude vs. time']);
 dynamicDateTicks;
-xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
-ylabel('Airmass');
-title([instrumentname ' - ' daystr ' - airmasses']);
-fname = fullfile(p1,[instrumentname daystr '_airmass']);
+legend(plo,leg,'Interpreter', 'none');
+fname = fullfile(p1,[instrumentname daystr '_alt']);
 fig_names = {[fname '.png']};
-save_fig(hsk,fname,0);
+save_fig(falt,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
 
 % plot temperatures and pressures
 ftnp = figure;
 subplot(3,1,[1,2])
 [ax,h1,h2] = plotyy(s.t,nfsmooth(s.Tprecon_C,60),s.t,nfsmooth(s.RHprecon_percent,60));
+if length(find(nfsmooth(s.RHprecon_percent,60)>2.0))>300; 
+    set(ax(1),'Color',[1,0.5,0.5]);
+    text(ax(2),s.t(1),0.5,'RH Too high!');
+    set(ftnp, 'InvertHardCopy', 'off');
+end;
+
+if length(find(nfsmooth(s.Tprecon_C,60)>35.0))>300; 
+    set(ax(1),'Color',[1,0.5,0.0]);
+    text(ax(1),s.t(1),20,'Temperatures Too high! (larger than 35C)');
+    set(ftnp, 'InvertHardCopy', 'off');
+end;
+
+if std(nfsmooth(s.Tprecon_C,60))>2.5; 
+    set(ax(1),'Color',[1,0.5,0.0]);
+    text(ax(1),s.t(1),20,'Temperatures are too variable!','FontSize',18);
+    set(ftnp, 'InvertHardCopy', 'off');
+end;
+
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 xticklabels([''])
 grid on;
@@ -265,6 +299,7 @@ grid on;
 dynamicDateTicks;
 xlabel('UTC time');
 xlim(ax(1),[s.t(1)- ddt s.t(end)+ ddt]); xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
+ylim(ax(1),[10,40]); ylim(ax2,[-10;50]);yticks(ax(1),[10,15,20,25,30,35,40]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 ylabel(ax(2),'RH [%], smoothed over 60s');
 ylabel(ax(1),'Temperature [^\circC], smoothed over 60s');
@@ -297,7 +332,25 @@ for ii={'T' 'P'};
 end;
 clear ii;
 
+%plot airmasses
+hsk = figure;
+plot(s.t,s.m_aero,'.b');
+hold on;
+plot(s.t,s.m_ray,'.r');
+grid on;
+legend({'m\_aero';'m\_ray'}');
+dynamicDateTicks;
+xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
+ylabel('Airmass');
+title([instrumentname ' - ' daystr ' - airmasses']);
+fname = fullfile(p1,[instrumentname daystr '_airmass']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(hsk,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
+%********************
 %% plot tracking details
+%********************
 % plot the solar angles
 ftrk = figure;
 plot(s.t,s.sza,'o');
@@ -353,6 +406,9 @@ fig_names = [fig_names,{[fname '.png']}];
 save_fig(fazel,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
+%********************
+%% plot ambient data
+%********************
 % plot ambient Tst and Pst
 figts = figure;
 ax = plotyy(s.t,s.Tst,s.t,s.Pst);
@@ -368,52 +424,178 @@ fig_names = [fig_names,{[fname '.png']}];
 save_fig(figts,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
+% plot pitch and roll
+figpr = figure;
+[ax,h1,h2] = plotyy(s.t,s.pitch,s.t,s.roll);
+dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
+set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
+grid on;
+xlabel('UTC time');
+xlim(ax(1),[s.t(1)-ddt s.t(end)+ddt]);xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
+ylabel(ax(2),'Roll [^\circC]');
+ylabel(ax(1),'Pitch [^\circC]');
+title([instrumentname ' - ' daystr ' - Pitch and Roll']);
+fname = fullfile(p1,[instrumentname daystr '_Pitch_Roll']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(figpr,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
+% altitude
+falt = figure;
+plot(s.t,s.Alt,'.');
+dynamicDateTicks;
+grid on;
+xlabel('UTC time');
+xlim([s.t(1)-ddt s.t(end)+ddt]);
+ylabel('Altitude [m]');
+title([instrumentname ' - ' daystr ' - Altitude']);
+fname = fullfile(p1,[instrumentname daystr '_salt']);
+fig_names = [fig_names,{[fname '.png']}];
+save_fig(falt,fname,0);
+pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
 %********************
 %% map flight path and airmasses
 %********************
-if false;
+%if false;
 if isequal(platform, 'flight');
     % flight track map
     figm = figure;
-    ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'.');
+    ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'.'); plo = ss;
     leg = {'vis_sun'};
-    fld = fields(st);
-    fld_marks = '.+>^<vopx';
-    cls = 'krgbcmy';
-    for ii = 1:length(fld);
-        if isequal(lower(fld{ii}(1:3)),'vis');
-            if length(st.(fld{ii}))>1;
-                for jj=1:length(st.(fld{ii}));
-                    sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Lat,st.(fld{ii})(jj).t,4,cls(ii),fld_marks(ii));
-                end;
-            else;
-            %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
-                sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,st.(fld{ii}).t,4,cls(ii),fld_marks(ii));
+    hold on;
+
+    for ii = 2:length(fld);
+        if length(st.(fld{ii}))>1;
+            for jj=1:length(st.(fld{ii}));
+                sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Lat,8,st.(fld{ii})(jj).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
             end;
-            leg = [leg; {fld{ii}}];
+        else;
+            %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
+            sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,8,st.(fld{ii}).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
         end;
+        leg = [leg; {fld{ii}}];
+        plo = [plo sso];
     end;
     xlabel('Longitude [^\circ]')
     ylabel('Latitude [^\circ]');
-    title([tit ' - flight track map']);    
+    grid on;
+    title([tit ' - flight track map']);
     ch=colorbarlabeled('UTC');
     datetick(ch, 'y','keeplimits');
-    legend(leg);
+    legend(plo,leg,'Interpreter', 'none');
     fname = fullfile(p1,[instrumentname daystr '_map']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figm,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
     
     
+    % Longitude vs. time
+    figlt = figure;
+    sso = plot(st.vis_sun.t,st.vis_sun.Lon,[cls(1) fld_marks(1)]); hold on; leg={'vis_sun'}; plo = [sso];
+    for ii = 2:length(fld);
+        if length(st.(fld{ii}))>1;
+            for jj=1:length(st.(fld{ii})); sso = plot(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Lon,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8); end;
+        else;
+            sso = plot(st.(fld{ii}).t,st.(fld{ii}).Lon,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8);
+        end;
+        leg = [leg; {fld{ii}}];
+        plo = [plo sso];
+    end;
+    grid on;
+    ylabel('Longitude [^\circ]'); xlabel('Time'); title([tit ' - Longitude vs. time']);
+    dynamicDateTicks;
+    legend(plo,leg,'Interpreter', 'none');
+    fname = fullfile(p1,[instrumentname daystr '_lon_vs_time']);
+    fig_names = {[fname '.png']};
+    save_fig(figlt,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
     
-    % altitude
-    %...
-    % longitude and altitude
-    % ...
-    % latitude and altitude
-    % ...
+
+    % Latitude vs. time
+    figlat = figure;
+    sso = plot(st.vis_sun.t,st.vis_sun.Lat,[cls(1) fld_marks(1)]); hold on; leg={'vis_sun'}; plo = sso;
+    for ii = 2:length(fld);
+        if length(st.(fld{ii}))>1;
+            for jj=1:length(st.(fld{ii})); sso = plot(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Lat,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8); end;
+        else;
+            sso = plot(st.(fld{ii}).t,st.(fld{ii}).Lat,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8);
+        end;
+        leg = [leg; {fld{ii}}];
+        plo = [plo sso];
+    end;
+    grid on;
+    ylabel('Latitude [^\circ]'); xlabel('Time'); title([tit ' - Latitude vs. time']);
+    dynamicDateTicks;
+    legend(plo,leg,'Interpreter', 'none');
+    fname = fullfile(p1,[instrumentname daystr '_lat_vs_time']);
+    fig_names = {[fname '.png']};
+    save_fig(figlat,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
+    
+    
+    % Mode Latitude vs. altitude (colored by time)
+    figaltlat = figure;
+    ss = scatter(st.vis_sun.Lat,st.vis_sun.Alt,4,st.vis_sun.t,'.'); plo = ss;
+    leg = {'vis_sun'};
+    hold on;
+
+    for ii = 2:length(fld);
+        if length(st.(fld{ii}))>1;
+            for jj=1:length(st.(fld{ii}));
+                sso = scatter(st.(fld{ii})(jj).Lat,st.(fld{ii})(jj).Alt,8,st.(fld{ii})(jj).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
+            end;
+        else;
+            %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
+            sso = scatter(st.(fld{ii}).Lat,st.(fld{ii}).Alt,8,st.(fld{ii}).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
+        end;
+        leg = [leg; {fld{ii}}];
+        plo = [plo sso];
+    end;
+    xlabel('Latitude [^\circ]')
+    ylabel('Altitude [m]');
+    grid on;
+    title([tit ' - Altitude vs Latitude by modes']);
+    ch=colorbarlabeled('UTC');
+    datetick(ch, 'y','keeplimits');
+    legend(plo,leg,'Interpreter', 'none');
+    fname = fullfile(p1,[instrumentname daystr '_alt_vs_lat']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(figaltlat,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
+
+    
+    % Mode Latitude vs. altitude (colored by time)
+    figaltlon = figure;
+    ss = scatter(st.vis_sun.Lon,st.vis_sun.Alt,4,st.vis_sun.t,'.'); plo = ss;
+    leg = {'vis_sun'};
+    hold on;
+
+    for ii = 2:length(fld);
+        if length(st.(fld{ii}))>1;
+            for jj=1:length(st.(fld{ii}));
+                sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Alt,8,st.(fld{ii})(jj).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
+            end;
+        else;
+            %if isequal(lower(fld{ii}(5:end)),'sun'); continue, end;
+            sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Alt,8,st.(fld{ii}).t,'MarkerEdgeColor',cls(ii),'Marker',fld_marks(ii),'Sizedata',12);
+        end;
+        leg = [leg; {fld{ii}}];
+        plo = [plo sso];
+    end;
+    xlabel('Longitude [^\circ]')
+    ylabel('Altitude [m]');
+    grid on;
+    title([tit ' - Altitude vs Latitude by modes']);
+    ch=colorbarlabeled('UTC');
+    datetick(ch, 'y','keeplimits');
+    legend(plo,leg,'Interpreter', 'none');
+    fname = fullfile(p1,[instrumentname daystr '_alt_vs_lon']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(figaltlon,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 4}];
 end;
-end;
+%end;
 
 
 %********************
@@ -492,7 +674,7 @@ fdrkv = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
 ylabel(ax(2),'Darks VIS 500 nm');
 ylabel(ax(1),'VIS temp [°C]');
-ylim(ax(1),[-5,10]); yticks(ax(1),[10,20,30,40,50,60]);
+ylim(ax(1),[-5,5]); yticks(ax(1),[-5,-2.5,0,2.5,5]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - VIS darks and temperature']);
@@ -505,7 +687,7 @@ fdrkn = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
 ylabel(ax(2),'Darks NIR 1213 nm');
 ylabel(ax(1),'NIR temp [°C]');
-ylim(ax(1),[0,50]); yticks(ax(1),[0,10,20,30,40,50]);
+ylim(ax(1),[0,30]); yticks(ax(1),[0,10,20,30,40,50]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - NIR darks and temperature']);
@@ -557,7 +739,7 @@ colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile(p1,[instrumentname daystr '_nirraw']);
 fig_names = [fig_names,{[fname '.png']}];
-save_fig(frnir,fname,0); 
+save_fig(frnir,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot the raw carpet
@@ -577,6 +759,12 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 pptcontents0=[pptcontents0; {' ' 4}];
 
 %% tau_aero plotting
+try;
+    s.tau_aero(s.tau_aero(:,400)>3,:) = NaN;
+    tau_aero_mod = 'yes';
+catch
+    tau_aero_mod = 'no';
+end;
 tau_aero = s.tau_aero;
 tau_aero_noscreening = s.tau_aero_noscreening;
 
@@ -594,7 +782,7 @@ if exist('tau_aero_noscreening');
     ylabel('tau_aero_noscreening');
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD (no screening)' ]);
-    grid on;    
+    grid on;
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
     for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
@@ -602,8 +790,8 @@ if exist('tau_aero_noscreening');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{end} 4}];
-
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln);
     cm=hsv(nw+length(iwvlv));
@@ -623,17 +811,17 @@ if exist('tau_aero_noscreening');
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
-    save_fig(faodni,fname,0); 
-    pptcontents0=[pptcontents0; {fig_names{end} 4}];
-else; 
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
+    save_fig(faodni,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+else;
+    pptcontents0=[pptcontents0; {' ' 1}];
+    pptcontents0=[pptcontents0; {' ' 1}];
 end; %tau_aero_noscreening
 
 
 % plot the tau_aero
 if exist('tau_aero');
-    % plot the tau_aero vis; 
+    % plot the tau_aero vis;
     faodv_fl = figure;
     nw = length(iwvlv);
     cm=hsv(nw+length(iwvln));
@@ -642,7 +830,7 @@ if exist('tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
-    if max(s.tau_aero(:,iwvlv))<1.2; tma = max(s.tau_aero(:,iwvlv))*1.05; else tma=1.2;
+    if max(s.tau_aero(:,iwvlv))<1.2; tma = max(max(s.tau_aero(:,iwvlv)))*1.05; else tma=1.2; end;
     ylim([0.0,tma]);
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
@@ -654,8 +842,8 @@ if exist('tau_aero');
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv_fl,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{end} 4}];
-
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
     % plot the tau_aero_noscreening nir
     faodni = figure; nw = length(iwvln);
     cm=hsv(nw+length(iwvlv));
@@ -675,13 +863,92 @@ if exist('tau_aero');
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
-    save_fig(faodni,fname,0); 
-    pptcontents0=[pptcontents0; {fig_names{end} 4}];
+    save_fig(faodni,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
+    %% Now plot maps of AOD for flight data
+    if isequal(platform, 'flight');
+        % flight track map
+        [nul,i500] = min(abs(s.w-0.5));
+        figma = figure;
+        ss = scatter(s.Lon,s.Lat,8,s.tau_aero(:,i500),'o');
+        hold on;
+        utch = t2utch(s.t);
+        t_low = min(utch); t_high = max(utch); nt =floor((t_high-t_low)/0.25);
+        times_15min = linspace(floor(t_low),t_high,nt);
+        for q=1:nt;
+            [nul,iq] = min(abs(utch-times_15min(q)));
+            plot(s.Lon(iq),s.Lat(iq),'k+');
+            text(s.Lon(iq),s.Lat(iq),num2str(times_15min(q),4));
+        end;
+        xlabel('Longitude [^\circ]')
+        ylabel('Latitude [^\circ]');
+        grid on;
+        title([tit ' - AOD flight track map']);
+        ch=colorbarlabeled('AOD  500 nm');
+        fname = fullfile(p1,[instrumentname daystr '_map_aod']);
+        fig_names = [fig_names,{[fname '.png']}];
+        save_fig(figma,fname,0);
+        pptcontents0=[pptcontents0; {fig_names{end} 1}];
+
+         % flight track map
+        [nul,i500] = min(abs(s.w-500.0));[nul,i470] = min(abs(s.w-0.47));[nul,i865] = min(abs(s.w-0.865));
+        figloaltaod = figure;
+        ang=sca2angstrom(s.tau_aero(:,[i470 i865]), s.w([i470 i865]));
+        ss = scatter(s.Lon,s.Alt,(s.tau_aero(:,i500)+0.15).*30.0,ang,'o'); 
+        hold on;
+        for q=1:nt;
+            [nul,iq] = min(abs(utch-times_15min(q)));
+            plot(s.Lon(iq),double(s.Alt(iq)),'k+');
+            text(s.Lon(iq),double(s.Alt(iq)),num2str(times_15min(q),4));
+        end;
+        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.15).*30.0); 
+        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.15).*30.0); 
+        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.15).*30.0); 
+        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.15).*30.0); 
+        legend([ss1,ss2,ss3,ss4],[{'AOD_{500} 0.02'},{'AOD_{500} 0.1'},{'AOD_{500} 0.2'},{'AOD_{500} 0.4'}]);
+        xlabel('Longitude [^\circ]')
+        ylabel('Altitude [m]');
+        grid on;
+        title([tit ' - flight altitude vs. longitude, by angstrom']);
+        ch=colorbarlabeled('Angstrom');
+        fname = fullfile(p1,[instrumentname daystr '_lon_alt_ang']);
+        fig_names = [fig_names,{[fname '.png']}];
+        save_fig(figloaltaod,fname,0);
+        pptcontents0=[pptcontents0; {fig_names{end} 1}];
+        
+        % flight track map
+        figlaaltaod = figure;
+        ss = scatter(s.Lat,s.Alt,(s.tau_aero(:,i500)+0.15).*30.0,ang,'o'); 
+        hold on;
+        for q=1:nt;
+            [nul,iq] = min(abs(utch-times_15min(q)));
+            plot(s.Lat(iq),double(s.Alt(iq)),'k+');
+            text(s.Lat(iq),double(s.Alt(iq)),num2str(times_15min(q),4));
+        end;
+        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.15).*30.0); 
+        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.15).*30.0); 
+        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.15).*30.0); 
+        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.15).*30.0); 
+        legend([ss1,ss2,ss3,ss4],[{'AOD_{500} 0.02'},{'AOD_{500} 0.1'},{'AOD_{500} 0.2'},{'AOD_{500} 0.4'}]);
+        xlabel('Latitude [^\circ]')
+        ylabel('Altitude [m]');
+        grid on;
+        title([tit ' - flight altitude vs. latitude, by angstrom']);
+        ch=colorbarlabeled('Angstrom');
+        fname = fullfile(p1,[instrumentname daystr '_lat_alt_ang']);
+        fig_names = [fig_names,{[fname '.png']}];
+        save_fig(figlaaltaod,fname,0);
+        pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    end;
 else
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 1}];
+    pptcontents0=[pptcontents0; {' ' 1}];
 end; %tau_aero_noscreening
 
+%********************
+%% plot gas retrievals results
+%********************
 
 % water vapor
 
@@ -756,7 +1023,7 @@ else
 end;
 
 %********************
-% plot spectra in comparison with AATS-14
+%% plot spectra in comparison with AATS-14
 %********************
 if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat']))==2;
     [both, ~, aats]=staraatscompare(daystr);
@@ -1019,41 +1286,12 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
     %     end;
 end;
 
-%********************
-% plot FOV carpet
-%********************
-% % % v=who('-file', fullfile(starpaths, [daystr 'star.mat'])); % list all variables in the star.mat (not starsun.mat)
-% % % datatypelist={'vis_fova' 'nir_fova' 'vis_fovp' 'nir_fovp'};
-% % % existingfigures=get(0,'children');
-% % % for dtli=1:numel(datatypelist);
-% % %     datatype=datatypelist{dtli};
-% % %     if any(ismember(v, datatype)); % check if any FOV was taken
-% % %         load(fullfile(starpaths, [daystr 'star.mat']), datatype); % load the variable of the specific datatype
-% % %         eval(['v2=' datatype ';']);
-% % %         for i=1:numel(v2); % go through each set of FOV test
-% % %             if ~isempty(v2(i).t) && ~isempty(incl(nanmean(v2(i).t(1)),tlim)); % see if there is actually a data point
-% % %                 ins = FOV_scan(v2(i)); % run Connor's code
-% % %                 existingfigures2=get(0,'children');
-% % %                 newfigures=setxor(existingfigures,existingfigures2); % identify new figures
-% % %                 for nn=1:numel(newfigures);
-% % %                     figure(newfigures(nn));
-% % %                     [~,filename0,~]=fileparts(v2(i).filename{:});
-% % %                     filename=['star' filename0 'figure' num2str(nn)];
-% % %                     if savefigure;
-% % %                         starsas([filename '.fig, ' mfilename '.m'])
-% % %                     end;
-% % %                     pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}]; % prepare to save the figures in the PowerPoint file to be created
-% % %                     clear filename0 filename;
-% % %                 end;
-% % %                 for nn=1:ceil(numel(newfigures)/4)*4-numel(newfigures); % feed the ppt file with blank, so the next set of FOV plots go to a new page
-% % %                     pptcontents0=[pptcontents0; {' ' 4}];
-% % %                 end;
-% % %                 existingfigures=existingfigures2;
-% % %                 clear existingfigures2;
-% % %             end;
-% % %         end;
-% % %     end;
-% % % end;
+%% Check if dirty/clean time period was done, if so plot them
+if isfield(s,'dirty') & isfield(s,'clean');
+    [sdirty,sclean,sdiff,saved_fig_path] = stardirty(daystr,fname_4star,false);
+    pptcontents0=[pptcontents0; {saved_fig_path{1} 1}];
+    pptcontents0=[pptcontents0; {saved_fig_path{2} 1}];
+end;
 
 %% Check if FOVs were created, if so, plot them
 if isfield(st,'vis_fovp') | isfield(st,'vis_fova');
@@ -1069,7 +1307,8 @@ end;
 %% Check if langley is defined
 if isfield(s,'langley')|isfield(s,'langley1');
     % run the langley codes and get the figures;
-    langley_figs = starLangley_fx(fname_4starsun,1,p1,'_MLO_Feb2018');
+    if isfield(s,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
+    langley_figs = starLangley_fx(fname_4starsun,1,p1,xtra);
     pptcontents0=[pptcontents0; {langley_figs{1} 1}];
     pptcontents0=[pptcontents0; {langley_figs{2} 4}];
     pptcontents0=[pptcontents0; {langley_figs{3} 4}];

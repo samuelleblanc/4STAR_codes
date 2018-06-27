@@ -1,4 +1,4 @@
-function [sdirty,sclean,sdiff]=stardirty(daystr,fname,ask_to_save_fig)
+function [sdirty,sclean,sdiff,saved_fig_path]=stardirty(daystr,fname,ask_to_save_fig)
 %% PURPOSE:
 %   Analysis software for window cleaning effect
 %
@@ -38,10 +38,13 @@ function [sdirty,sclean,sdiff]=stardirty(daystr,fname,ask_to_save_fig)
 % Written (v1.0): Samuel LeBlanc, Santa Cruz, CA, 2016-10-17
 % Mdodifed (v1.1): Samuel LeBlanc, Santa Cruz, CA, 2016-10-18
 %                   - added value on the plot. and ask to save fig keyword
+% Modified (v1.2): Samuel LeBlanc, NASA Ames Research Center, 2018-06-26
+%                  added return of saved figure file paths, for integration
+%                  within quicklooks
 % -------------------------------------------------------------------------
 
 %% Start of function
-version_set('1.1');
+version_set('1.2');
 
 %% sanitize input
 if ~exist('daystr','var') || isempty(daystr)
@@ -117,9 +120,25 @@ sdiff.normdiff = sdiff.diff./sclean.mean*100.0;
 sdiff.transmit = sdirty.mean./sclean.mean;
 sdiff.daystr = daystr;
 
+%% Plot the time series
+figtdirt = figure;
+[nul,i500] = min(abs(s1.w.*1000.0-500.0));
+plot(s1.t,s1.rate(:,i500),'.'); hold on;
+plot(s1.t(sdirty.fl),s1.rate(sdirty.fl,i500),'r.');
+plot(s1.t(sclean.fl),s1.rate(sclean.fl,i500),'g.');
+ylim([20,23.5])
+legend('raw','dirty','clean');
+hold off; grid on;
+dynamicDateTicks;
+xlabel('Time')
+ylabel('Rate at 500 nm [cts/ms]');
+title([daystr ' - Dirty to clean LED lamp measurements'])
+save_fig(figtdirt,[p filesep daystr '_dirty_clean_time'],ask_to_save_fig);
+saved_fig_path = [p filesep daystr '_dirty_clean_time.png'];
+
 %% Now plot the appropriate spectra
-startup_plotting
-figure(1);
+%startup_plotting
+figdirt = figure;
 ax1=subplot(4,1,1);
 plot(s1.w,sdirty.mean,'r',s1.w,sclean.mean,'b')
 hold on;
@@ -132,6 +151,7 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  title(['Dirty and clean average spectra and stddev for ' daystr]);
  ylabel('Rate [cts/ms]');
  %xlabel('Wavelength [\mum]'); 
+ ylim([-5,80]);
  xlim([0.4,0.8]);
  grid on;
  
@@ -159,7 +179,28 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  else
      ylim([0,8]);
  end;
+ if sdiff.normdiff(600)<2.0;
+     text(0.6,2.0,'Window not very dirty (less than 2%) - no correction needed');
+ else;
+     text(0.6,2.0,'Window very dirty! Correction advised!','FontSize',18);
+ end;
  grid on;
+ 
+ [nul,i]=min(abs(s1.w-0.44));
+ disp(['Diff at 440 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
+ text(0.44,4.0,['Diff at 440 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)]);
+ disp(['Std Dev at 440 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)]) 
+ 
+ [nul,i]=min(abs(s1.w-0.65));
+ disp(['Diff at 650 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
+ text(0.65,0.0,['Diff at 650 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)]);
+ disp(['Std Dev at 650 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)])
+ 
+ [nul,i]=min(abs(s1.w-0.75));
+ disp(['Diff at 750 nm:' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
+ text(0.75,-4.0,['Diff at 750 nm:' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)]);
+ disp(['Std Dev at 750 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)])
+ 
  
  ax4=subplot(4,1,4);
  plot(s1.w,sdirty.mean./sclean.mean,'r')  
@@ -175,19 +216,11 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  xlabel('Wavelength [\mum]'); xlim([0.4,0.8]);
  grid on;
  linkaxes([ax1,axr,ax2,ax4],'x')
- save_fig(1,[p filesep daystr '_dirty_clean_spc'],ask_to_save_fig);
-  
- [nul,i]=min(abs(s1.w-0.44));
- disp(['Diff at 440 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
- disp(['Std Dev at 440 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)]) 
+ xlim([0.4,0.8]);
+ set(figdirt,'units','points','position',[50,100,700,700])
  
- [nul,i]=min(abs(s1.w-0.65));
- disp(['Diff at 650 nm: ' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
- disp(['Std Dev at 650 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)])
- 
- [nul,i]=min(abs(s1.w-0.75));
- disp(['Diff at 750 nm:' num2str((sdirty.mean(i)-sclean.mean(i))./sclean.mean(i).*100.0)])
- disp(['Std Dev at 750 nm: ' num2str(sdirty.stdev(i)./sclean.mean(i).*100.0)])
+ save_fig(figdirt,[p filesep daystr '_dirty_clean_spc'],ask_to_save_fig);
+ saved_fig_path = [{saved_fig_path} ; {[p filesep daystr '_dirty_clean_spc.png']}];
  
 % if nargin > 1; stophere, end;
 % savefile=[dir 'ARISE_' flightnum '_stardirty.mat'];
