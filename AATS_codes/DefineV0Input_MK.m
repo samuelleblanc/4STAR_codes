@@ -220,11 +220,66 @@ if(julian(day,month,year,12)>=julian(13,07,2013,12))
     flag_calib='MLOJuly2013mean'; %
 end
 
+if(julian(day,month,year,12)>=julian(1,11,2015,12))
+    V0=[11.9051	9.7043	8.2589	9.9804	9.6789	6.4124	6.9157	6.2115	7.5144	5.5587	7.7926	7.5854	7.3423	6.1373]; %%MLO mean 7/8-7/12/13
+    V0err_stat=[0.07	0.07	0.06	0.04	0.05	0.05	0.03	0.10	0.17	0.67	0.09	0.05	0.07	0.15]/100; %sample std for 7/8-7/12/13
+    flag_calib='?????'; 
+end
 
+% mean values
+if(julian(day,month,year,12)>=julian(19,01,2016,12))
+    V0=[11.9054	9.6851	5.2134	9.9951	9.7025	4.7456	6.8574	3.5308	7.3777	4.8778	7.8038	7.5877	7.1791	6.096]; %%MLO mean Jan-12-Jan-18/2016
+    V0err_stat=[0.0149	0.0176	0.0171	0.0075	0.0063	0.0092	0.0057	0.0139	0.0126	0.1398	0.00806	0.0053	0.0069	0.008]; %sample std for Jan-12-Jan-18/2016
+    flag_calib='MLOJan2016mean'; %
+end
 
+if(julian(day,month,year,12)>=julian(19,01,2016,12))
+    V0=[11.9054	9.6851	5.2134	9.9951	9.7025	4.7456	6.8574	3.5308	7.3777	4.8778	7.8038	7.5877	7.1791	6.096]; %%MLO mean Jan-12-Jan-18/2016
+    V0(3)= 7.6525;
+    V0(6)= 5.2402;
+    V0(8)= 6.7657;
+    V0(9)= 7.8691;
+    V0err_stat=[0.0149	0.0176	0.0171	0.0075	0.0063	0.0092	0.0057	0.0139	0.0126	0.1398	0.00806	0.0053	0.0069	0.008]; %sample std for Jan-12-Jan-18/2016
+    flag_calib='MLOJan2016meanadjusted'; % adjusted using Ames rooftop tests; see 20160317AATS.ppt.
+end
 
+if(julian(day,month,year,12)>=julian(09,08,2016,12)); % for ORACLES #1 at Walvis Bay, Namibia 
+% Note this clause is OBSOLETE, kept here for record-keeping. See the next
+% if-clause.
+    V0_Jan=[11.9054	9.6851	5.2134	9.9951	9.7025	4.7456	6.8574	3.5308	7.3777	4.8778	7.8038	7.5877	7.1791	6.096]; %%MLO mean Jan-12-Jan-18/2016
+    V0_Jan(3)= 7.6525;
+    V0_Jan(6)= 5.2402;
+    V0_Jan(8)= 6.7657;
+    V0_Jan(9)= 7.8691;
+    V0=V0_Jan.* [ 0.9953    0.9944    1.0093    0.9969    0.9972    1.0021    0.9962    1.0075  1.0139         0    1.0010    1.0017    0.9624    0.9924]; % June/July (0702-0707) 2016 MLO results; see AATS2016JuneJulyMLOamstdev_mult3V0Ratiocalculated.fig
+    V0(10)= V0_Jan(10); % !!! to be revised
+    V0err_stat=NaN(1,14); % !!! to be revised
+    flag_calib='MLOJuly2016tentative';
+end;
 
+% % for January - July 2016 (NAAMES #2) -  see AATSMLOJanJuly2016V0Errspectra.fig
+% if(julian(day,month,year,12)>=julian(01,05,2016,12)); % for NAAMES #2 
+%     load(fullfile(starpaths, '20160518aats.mat'),'V0')
+%     V0err_stat=[0.0149	0.0176	0.0171	0.0075	0.0063	0.0092	0.0057	0.0139	0.0126	0.1398	0.00806	0.0053	0.0069	0.008] ./ V0; %sample std for Jan-12-Jan-18/2016, divided by V0
+%     V0err_sys=[-0.0047   -0.0056    0.0092   -0.0031   -0.0028    0.0021   -0.0038 0.0074    0.0137         0    0.0010    0.0017   -0.0387   -0.0076] /2
+%     V0err = sqrt(V0err_stat.^2+V0err_sys.^2);
+% end;
+
+if(julian(day,month,year,12)>=julian(09,08,2016,12)); % for ORACLES #1 at Walvis Bay, Namibia 
+%     open('d:\figures\source\AATS2016NovemberMLOamstdev_mult3V0Ratiocalculated.fig');
+%     gg=findobj(gca,'linestyle','-','linewidth',2); relativechanges=get(gg,'ydata'); V0 = V0.*(1+(relativechanges-1)/2);     V0(10)= V0_Jan(10); % !!! to be revised
+    V0 = [11.8495    9.6340    7.7213    9.9705    9.6790    5.2491    6.8328  6.8181    7.9694    4.8778    7.8227    7.6092    6.8565    6.0717];
+    V0err_stat=[0.3431    0.2651    0.1496    0.1537    0.1464    0.1333    0.1019 0.1733    0.1660       NaN    0.0965    0.0557    0.3093    0.2470]/100; % this is std/mean
+    V0err_sys=[0.0005    0.0326   -0.0307    0.0641    0.0379   -0.0401    0.0213  0.0243   -0.1138         0    0.1420    0.1132   -0.7623    0.3641] / 100; % V0_MLOJulyNov2016Avg / V0_MLOJuly2016tentative. Thus these values referred to the relative changes between and mid-point and one bracket (already divided by two).
+    flag_calib='MLOJulyNov2016Avg';
+end;
 													
-
+if(julian(day,month,year,12)>=julian(01,05,2017,12)); % for the ground comparison during NAAMES #3, post-NAAMES #3, ... 
+%     open('d:\figures\source\AATS2016NovemberMLOamstdev_mult3V0RatiocalculatedAATS2017MayJuneMLOamstdev_mult3V0Ratiocalculated.fig.fig');
+    V0 = [ 11.8430    9.6110    7.7132    9.9585    9.6779    5.2409    6.8199    6.8418    7.9539         9.999    7.8529    7.6130    6.7282    6.0919];
+    V0err_stat=[0.0044    0.0043    0.0030    0.0037    0.0034    0.0044    0.0017    0.0008    0.0012       NaN    0.0017    0.0010    0.0008    0.0032]; % this is std/mean
+    V0err_sys=zeros(1,14)+0.0005; % !!! to be updated after the next MLO % V0_MLOJulyNov2016Avg / V0_MLOJuly2016tentative. Thus these values referred to the relative changes between and mid-point and one bracket (already divided by two).
+    flag_calib='MLOJulyNov2016Avg';
+end;
 
 
