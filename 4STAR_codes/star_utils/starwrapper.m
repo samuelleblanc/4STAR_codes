@@ -101,6 +101,7 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % MS: 2018-03-27,       fixed a bug in tau_aero_subtract_all that had NO2
 %                       added instead of subtracted !!! (--)
 % SL: v3.1, 2018-04-12,       Changed the wavelengths on which polyfit is applied
+% SL: v3.2, 2018-06-27, Added some filters to not run starflag on FORJ data
 
 version_set('3.1');
 %********************
@@ -782,7 +783,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
    %s.flagallcols
    %************************************************************
-   if toggle.dostarflag;
+   if toggle.dostarflag & isempty(strfind(lower(datatype),'forj'));
       if toggle.verbose; disp('Starting the starflag'), end;
       if isfield(s,'flagfilename')
          [fnul,pnul] = fileparts(s.flagfilename);
@@ -811,14 +812,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3);
+   if toggle.dostarflag & isempty(strfind(lower(datatype),'forj')) && (toggle.starflag_mode==1||toggle.starflag_mode==3);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
    end;
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
    % 2014/07/18.
    % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
    % apply flags to the calculated tau_aero_noscreening
-   if toggle.doflagging;
+   if toggle.doflagging & isempty(strfind(lower(datatype),'forj'));
       if toggle.booleanflagging;
          s.tau_aero(any(s.flagallcols,3),:)=NaN;
          s.tau_aero(any(s.flag,3))=NaN;
