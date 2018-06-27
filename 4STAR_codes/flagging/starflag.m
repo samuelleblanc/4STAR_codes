@@ -576,7 +576,11 @@ if (Mode==2)
     other_flagged = false(size(good));
     for fld = 1:length(no_mask)
         %other_flagged = other_flagged | flags.(no_mask{fld});
-        other_flags.(no_mask{fld}) = flags.(no_mask{fld});
+        try;
+            other_flags.(no_mask{fld}) = flags.(no_mask{fld});
+        catch;
+            disp(['no structure field: ' no_mask{fld}])
+        end;
     end
     % Output an m-file marking all other events not marked as bad_aerosol events
     other_flags.time = flags.time;
