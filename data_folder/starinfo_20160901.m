@@ -11,30 +11,15 @@ else
     s.toggle = update_toggle;
 end
 
- s.flight=[datenum(2016,9,24,6,43,04) datenum(2016,9,24,15,44,45)]; 
-
+ 
+% flight=[datenum(2016,6,18,17,00,00) datenum(2016,6,18,22,34,43)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-s.langley=[datenum(2016,9,24,7,1,06) datenum(2016,9,24,8,02,30)];
-s.dirty = [datenum(2016,9,24,16,01,00) datenum(2016,9,24,16,03,45)];
-s.clean = [datenum(2016,9,24,16,19,30) datenum(2016,9,24,16,22,30)];
  
 % Ozone and other gases 
-s.O3h=21; % 
-s.O3col=0.300; % Michal's guess     
-s.NO2col=2.0e15; % % 
-
-% flags
-% s.flagfilename = '20160924_starflag_man_created20160926_1939by_KP.mat'; 
-s.flagfilename = '20160924_starflag_man_created20180624_1435by_SL.mat';
-s.flagfilenameCWV  = '20160924_starflag_CWV_man_created20161017_2140by_MS.mat';
-s.flagfilenameO3   = '20160924_starflag_O3_man_created20161017_2141by_MS.mat';
-s.flagfilenameNO2  = '20160924_starflag_NO2_man_created20161017_2145by_MS.mat';
-s.flagfilenameHCOH = '20160924_starflag_HCOH_man_created20161017_2147by_MS.mat';
-s.flagacaod = '20160924_flag_acaod_sleblanc_20180302_143354.mat';
-
-%dirty correction
-s.AODuncert_mergemark_file = '20160924_AOD_merge_marks.mat';
+s.O3h=21; % Yohei's guess 
+s.O3col=0.268; % Yohei's guess     
+s.NO2col=2.0e15; % Yohei's guess  
  
 % other tweaks 
 if isfield(s, 'Pst'); 
