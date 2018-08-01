@@ -892,7 +892,7 @@ if exist('tau_aero');
         pptcontents0=[pptcontents0; {fig_names{end} 1}];
 
          % flight track map
-        [nul,i500] = min(abs(s.w-500.0));[nul,i470] = min(abs(s.w-0.47));[nul,i865] = min(abs(s.w-0.865));
+        [nul,i500] = min(abs(s.w-0.5));[nul,i470] = min(abs(s.w-0.47));[nul,i865] = min(abs(s.w-0.865));
         figloaltaod = figure;
         ang=sca2angstrom(s.tau_aero(:,[i470 i865]), s.w([i470 i865]));
         ss = scatter(s.Lon,s.Alt,(s.tau_aero(:,i500)+0.15).*30.0,ang,'o'); 
