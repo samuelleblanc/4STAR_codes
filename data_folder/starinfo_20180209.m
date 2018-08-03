@@ -24,7 +24,7 @@ s.NO2col=2.0e15; %
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=674.0; % this is for Ames 
+    s.Pst(find(s.Pst<10))=674.0; % this is for MLO 
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
