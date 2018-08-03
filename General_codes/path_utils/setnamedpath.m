@@ -95,7 +95,7 @@ else
             end
         else
             % if not, then load lastpath (if it exists) and
-            if isfile([pathdir,'lastpath.mat'])
+            if isafile([pathdir,'lastpath.mat'])
                 pname = load([pathdir,'lastpath.mat']);
             end
             if isstruct(pname)
