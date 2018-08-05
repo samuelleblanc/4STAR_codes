@@ -16,7 +16,7 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
         savematfile=unconfirmed_savematfile;
     end;
 else % ask for a full path
-%   defaultsavefolder=getnamedpath('starsun');
+   defaultsavefolder=getnamedpath('starsun');
 %     if (strcmp(getUserName,'sleblan2'));
 %         defaultsavefolder=get_last_used_path();
 %     else
@@ -26,7 +26,7 @@ else % ask for a full path
 %             defaultsavefolder='';
 %         end;
 %     end;
-    [savematfile, defaultsavefolder] = uiputfile2(fullfile(unconfirmed_savematfile), ...
+    [savematfile, defaultsavefolder] = uiputfile(fullfile(defaultsavefolder, unconfirmed_savematfile), ...
         'Save file as');
     if ~isequal(savematfile,0);
         savematfile=fullfile(defaultsavefolder,savematfile);

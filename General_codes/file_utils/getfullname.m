@@ -9,36 +9,42 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
 usrpath = userpath;
-if isempty(usrpath)
-    [~, usrpath]=system('hostname'); % somehow Yohei's laptop returns blank userpath; call for system hostname
-end;
-usrpath = [strrep(usrpath,pathsep,''),filesep];
-
+usrpath = strrep(usrpath,';','');
+if ~ispc
+   usrpath = strrep(usrpath,':','');
+end
+usrpath = [usrpath,filesep]; 
+% DRV = [];
+% usrpath = userpath;
+% if ~isempty(usrpath)&&strcmp(usrpath(2),':')
+%    DRV = usrpath(1:2), usrpath = usrpath(3:end);
+% end
+% pname = strrep(strrep(usrpath,';',filesep),':',filesep);
 pathdir = [usrpath,'filepaths',filesep];
-if ~isdir(pathdir)
-    mkdir(pathdir);
+if ~exist(pathdir,'dir')
+    mkdir(pname, 'filepaths');
 end
 
-if isempty(who('dialog'))||isempty(dialog)
-    if ~isempty(who('pathfile'))&&~isempty(pathfile)
+if ~exist('dialog','var')||isempty(dialog)
+    if exist('pathfile','var')&&~isempty(pathfile)
         dialog = ['Select a file for ',pathfile,'.'];
     else
         dialog = ['Select a file.'];
     end
 end
-if isempty(who('pathfile'))||isempty(pathfile)
+if ~exist('pathfile','var')||isempty(pathfile)
     pathfile = 'lastpath.mat';
 end
-if isempty(who('fspec'))||isempty(fspec)
+if ~exist('fspec','var')||isempty(fspec)
     fspec = '*.*';
 end
 if isempty(fspec)
     fspec = '*.*';
 end
 
-if isempty(dir([pathdir,pathfile]))&&~isempty(dir([pathdir,pathfile,'.mat']))
+if ~exist([pathdir,pathfile],'file')&&exist([pathdir,pathfile,'.mat'],'file')
     pathfile = [pathfile,'.mat'];
-elseif isempty(dir([pathdir,pathfile]))&&isempty(dir([pathdir,pathfile,'.mat']))
+elseif ~exist([pathdir,pathfile],'file')&&~exist([pathdir,pathfile,'.mat'],'file')
     if ~isempty(strfind(pathfile,'.mat'))
         newpathfile = pathfile;
     else
@@ -47,12 +53,12 @@ elseif isempty(dir([pathdir,pathfile]))&&isempty(dir([pathdir,pathfile,'.mat']))
     pathfile = 'lastpath.mat';
 end
 
-if ~isempty(dir([pathdir,pathfile]))
+if exist([pathdir,pathfile],'file')
     load([pathdir,pathfile]);
-    if isempty(who('pname'))||isempty(pname)
+    if ~exist('pname','var')||isempty(pname)
         pname = pwd;
     end
-    if ~ischar(pname)||~isdir(pname)
+    if ~ischar(pname)||~exist(pname,'dir')
         clear pname
         pname = [pwd,filesep];
     end
@@ -63,8 +69,7 @@ if ~strcmp(pname(end),filesep)
     pname = [pname, filesep];
 end
 [~,fname,ext] = fileparts(fspec);
-if (~isempty(dir(fspec))||~isempty(dir([pname,filesep,fname,ext])))&&~isdir(fspec)...
-        &&(isempty(strfind(fspec,'*'))&&isempty(strfind(fspec,'%'))&&isempty(strfind(fspec,'?')))
+if (exist(fspec,'file')||exist([pname,filesep,fname,ext],'file'))&&~exist(fspec,'dir')
     this = which(fspec,'-all');
     if isempty(this) % Then file exists, but not in path
         this = {fspec};
@@ -74,9 +79,9 @@ if (~isempty(dir(fspec))||~isempty(dir([pname,filesep,fname,ext])))&&~isdir(fspe
 else
     [pth,fstem,ext] = fileparts(fspec);
     fspec = [fstem,ext];
-    if isdir(pth)
+    if exist(pth,'dir')
         [fname,pname] = uigetfile([pth,filesep,fspec],dialog,'multiselect','on');
-    elseif isdir(pname)
+    elseif exist(pname,'dir')
         [fname,pname] = uigetfile([pname,filesep,fspec],dialog,'multiselect','on');
     else
         [fname,pname] = uigetfile(fspec,dialog,'multiselect','on');
@@ -91,7 +96,7 @@ if ~isequal(pname,0)
             fullname(L) = {fullfile(pname, fname{L})};
         end
     end
-    if ~isempty(who('newpathfile'))
+    if exist('newpathfile','var')
         save([pathdir,newpathfile], 'pname');
         pathfile = 'lastpath.mat';
         save([pathdir,pathfile],'pname');

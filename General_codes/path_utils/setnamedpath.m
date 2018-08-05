@@ -20,7 +20,7 @@ if isempty(who('pathfile'))||isempty(pathfile)
 end
 
 % Handle missing or empty "fspec" argument
-if ~isvar('fspec')||isempty(fspec)
+if ~isavar('fspec')||isempty(fspec)
     fspec = '';
 end
 fspec = strrep(fspec,[filesep filesep],filesep);
@@ -95,7 +95,9 @@ else
             end
         else
             % if not, then load lastpath (if it exists) and
-            if isfile([pathdir,'lastpath.mat'])
+            if isafile([pathdir,pathfile])
+                pname = load([pathdir, pathfile]);
+            elseif isafile([pathdir,'lastpath.mat'])
                 pname = load([pathdir,'lastpath.mat']);
             end
             if isstruct(pname)
