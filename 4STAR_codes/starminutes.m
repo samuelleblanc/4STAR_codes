@@ -50,7 +50,7 @@ end;
 
 s=load(fnn);
 version_set('1.1');
-uu=fieldnames(s)
+uu=fieldnames(s);
 for u=1:length(uu);
 nn=findstr(uu{u},'vis');
     if nn; 
