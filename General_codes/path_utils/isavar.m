@@ -1,5 +1,5 @@
-function TF = isvar(var)
-% TF = isvar(var)
+function TF = isavar(var)
+% TF = isavar(var)
 % Returns True if char string in var is a variable in the caller workspace
 % 'var' may be a single character array or a cell-array of char
 
