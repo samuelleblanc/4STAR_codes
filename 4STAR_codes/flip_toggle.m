@@ -1,5 +1,8 @@
-function toggle = flip_toggle(toggle)
+function toggle = flip_toggle(toggle,top_line)
 % toggle = flip_toggle(toggle)
+if ~isavar('top_line')
+   top_line = [];
+end
 toggle_ = toggle;
 togs = fieldnames(toggle);
 % for t = length(togs):-1:1
@@ -29,12 +32,12 @@ while ~done
       tog_str(t) = {[togs{t}, ': <',TF,'>']};
    end
    tog_str(ntogs+1) = {''}; tog_str(ntogs+2) = {'DONE'};tog_str(ntogs+3) = {'ABORT'};
-   mn = menu({'Select a toggle to change, "DONE" when finished, ';'"ABORT" to revert to original and quit'}, tog_str);
+   mn = menu({top_line;'Select a toggle to change, "DONE" when finished, ';'"ABORT" to revert to original and quit'}, tog_str);
    if mn<=length(togs)
       if islogical(toggle.(togs{mn}))
          toggle.(togs{mn}) = ~(toggle.(togs{mn}));
       else
-         tmp = input({togs{mn},'[',toggle.(togs{mn}),']'});
+         tmp = input([togs{mn},'[',num2str(toggle.(togs{mn})),'] ' ]);
          if ~isempty(tmp)
             toggle.(togs{mn}) = tmp;
          end

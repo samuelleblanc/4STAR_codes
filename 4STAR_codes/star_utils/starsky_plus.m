@@ -2,182 +2,109 @@ function s = starsky_plus(s)
 %  star = starsky_plus(star)
 % Augments a supplied sky scan struct "star" with additional info needed to
 % for running the AERONET retrieval
-% These include AOD, TOD (total optical depth), CWV, Ozone, flight-level
-% albedo and could include incorporation of flight telemetry to improve
-% scattering angle accuracy.
+% These include TOD (total optical depth), AOD, AGOD (absorbing gas OD), PWV, Ozone, flight-level
+% albedo.
+
+% Might change this create a skyscan struct containing only the relevant
+% measurements including time, lat, lon, alt, Az_gnd, El_gnd, SA, scan_type, skyrad,
+% anet_dl, CWV, O3_DU, TOD, AOD, AGOD, flt_lev_alb, land_fraction, rad_scale,
+% flight_level...
+
 if ~exist('s','var')
-    sfile = getfullname('*SKY*.mat','starsky','Select star sky mat file.');
-    s = load(sfile);
-    if isfield(s,'s_out')
-        s = s.s_out;
-    end
-end
-if isfield(s,'s_out')
-   s = s.s_out;
-end
-if isfield(s,'filename')
-   if iscell(s.filename)
-      [p,skytag,x] = fileparts(strrep(s.filename{1},'\',filesep));
-   else
-      [p,skytag,x] = fileparts(strrep(s.filename,'\',filesep));
+   sfile = getfullname('*STARSKY*.mat','starsky','Select star sky mat file.');
+   s = load(sfile);
+   if isfield(s,'s_out')
+      s = s.s_out;
    end
-    skytag = strrep(skytag,'_VIS_','_');skytag = strrep(skytag,'_NIR_','_');
+   s.filename  = {sfile};
+end
+if ~isstruct(s)&&isafile(s)
+   filename = s;
+   s = load(filename);
+   s.filename = {filename};
 end
 
-if ~exist('sfile','var')
-    sfile = s.filename{1};
-end
-! This is the wrong location to save mat files.
-[pname_mat,~,~] = fileparts(sfile);
-pname_mat = getnamedpath('starksy')
-if ~exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
-    save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
-end
-% Determine if on ground or airborne
-if geodist(s.Lat(1),s.Lon(1),s.Lat(end),s.Lon(end)) > 1000
-   % We are in the air so use ssfr or MODIS if no SSFR and below ???km
-[s.sfc_alb, time_out] = get_ssfr_flight_albedo(mean(s.t), s.w);
-else 
-   % Eventually pass in time or doy, but for now hardcode for SEACRS
-   % s.brdf = get_modis_brdf(s.Lat(1),s.Lon(1),doy);
-   s.brdf = get_modis_brdf(s.Lat(1),s.Lon(1));
-   [wl, wl_ii] = sort(s.brdf(:,1));
-   s.brdf = s.brdf(wl_ii,:);
-   % We are on ground so use supplied or MODIS
+on_ground = ~(geodist(s.Lat(1),s.Lon(1),s.Lat(end),s.Lon(end)) > 100);
+in_air = ~on_ground;
+if ~isfield(s.toggle,'no_SSFR')
+   s.toggle.no_SSFR = false;
 end
 
-sunfile = (getfullname_([s.instrumentname, datestr(s.t(1),'_yyyymmdd'),'starsun.mat'],'starsun','Select a starsun file'));
-if ~isempty(sunfile)
-    if ~exist('fig3','var')
-        fig3 = figure_;
-    end
-    %             if ~isempty(get(gcf,'children'))
-    %                 fig3 = figure;
-    %             end
-    if ~exist('fig2','var')
-        fig2 = figure_;
-    end
-    
-    sun = matfile(sunfile);
-    pp=numel(sun.t);
-    qq=size(s.rate,2);
-    dist = geodist(mean(s.Lat), mean(s.Lon), sun.Lat, sun.Lon)./1000;
-    startime = sun.t;
-    try
-        anet = sun.aeronetcols;
-    catch
-        anet = [332 624  880];
-    end
-    tau_aero = sun.tau_aero;
-%     tau_aero = tau_aero(:,anet);%tau_aero = tau_aero(:,anet);
-    tau=real(-log(sun.rate./repmat(sun.f,1,qq)./repmat(sun.c0,pp,1))./repmat(sun.m_aero,1,qq));
-%     tau = tau(:,anet);
-    tau_O3 = sun.tau_O3; %tau_O3 = tau_O3(:,anet);
-    try
-        tau_aero_ns = sun.tau_aero_noscreening; 
-        %tau_aero_ns = tau_aero_ns(:,anet);
-    catch
-        tau_aero_ns = tau_aero;
-        disp('No unscreened tau')
-    end
-    try
-        CWV = sun.CWV;
-    catch
-        disp('No CWV in this file')
-        CWV = [];
-    end
-    
-    figure_(fig2)
-    %                 ax2(1) = subplot(2,1,1);
-    plot(startime, sun.Alt, 'o-', mean(s.t), mean(s.Alt),'rx'); legend('Alt', 'location','EastOutside');
-    ylabel('Altitude')
-    ax2(1) = gca;
-    %             dynamicDateTicks;
-    %                 ax2(2) = subplot(2,1,2);
-    %                 plot(startime, dist, '-x', scan_table.time(r), 0, 'ro'); legend('geo dist', 'location','North');
-    zoom('on')
-    %             dynamicDateTicks
-    
-    figure_(fig3);
-    if ~isempty(CWV)
-        ax3(1) = subplot(2,1,1);
-        plot((sun.t), tau_aero(:,anet), 'o'); legend('440 nm','673 nm','873 nm', 'Location','EastOutside');
-        yl = ylim;
-        hold('on');
-        plot(sun.t, real(tau_aero_ns(:,anet)), 'k.');
-        plot(sun.t, real(tau_aero(:,anet)), 'o', [mean(s.t), mean(s.t)], yl,'r--'); ylim(yl)
-        title('4STAR AODs')
-        hold('off');
-        ax3(2) = subplot(2,1,2);
-        plot(startime, CWV, 'o'); yl2 = ylim;
-        plot(startime, CWV, 'o',[mean(s.t), mean(s.t)], yl2,'r--');
-        ylim(yl2);  legend('CWV','Location','EastOutside');
-        %                 dynamicDateTicks;
-    else
-        
-        plot((sun.t), real(tau_aero(:,anet)), 'o'); legend('440 nm','673 nm','873 nm', 'Location','EastOutside'); yl= ylim;
-        plot((sun.t), real(tau_aero(:,anet)), 'o',[mean(s.t), mean(s.t)], yl,'r--'); yl= ylim;
-        title('4STAR AODs')
-        %                 dynamicDateTicks;
-        ax3(1) = gca;
-        
-    end
-    zoom('on')
-    linkaxes([ax2 ax3],'x');
-    dynamicDateTicks(ax2,'linked');
-    dynamicDateTicks(ax3,'linked');
-    K = menu('Zoom and select action','Good','Questionable','BAD','SKIP');
-    if K <4
-        xl = xlim;
-        good_aod = startime>=xl(1) & startime<=xl(2) & tau_aero(:,anet(1))>0 &  tau_aero(:,anet(2))>0 &  tau_aero(:,anet(3))>0 ...
-            & tau_aero(:,anet(1))<2& tau_aero(:,anet(2))<2& tau_aero(:,anet(3))<2&~isNaN(tau_aero(:,anet(1)))&...
-            ~isNaN(tau_aero(:,anet(2)))&~isNaN(tau_aero(:,anet(3)));
-        s.tau_aero = mean(tau_aero(good_aod,:));
-        if sum(good_aod)==0
-            
-            good_aod = startime>=xl(1) & startime<=xl(2) & tau_aero_ns(:,anet(1))>0 &  tau_aero_ns(:,anet(2))>0 &  tau_aero_ns(:,anet(3))>0 ...
-                & tau_aero_ns(:,anet(1))<2& tau_aero_ns(:,anet(2))<2& tau_aero_ns(:,anet(3))<2&~isNaN(tau_aero_ns(:,anet(1)))&...
-                ~isNaN(tau_aero_ns(:,anet(2)))&~isNaN(tau_aero_ns(:,anet(3)));
-            s.tau_aero = mean(tau_aero_ns(good_aod,:));
-        end
+%This is a bit subtle.  In addition to merely testing for whether we are
+%deployed with SSFR (in the toggle), the logic below determines whether
+%get_ssfr_flight_albedo came up empty
+if in_air && ~s.toggle.no_SSFR
+   [flight_alb, out_time] = get_ssfr_flight_albedo(s.t,s.w);
+   imgdir = getnamedpath('star_images');
+   skyimgdir = [imgdir,s.fstem,filesep];
+   fig_out = [skyimgdir, s.fstem,s.created_str,'SSFR_albedo'];
+   saveas(gcf,[fig_out,'.fig']);
+   saveas(gcf,[fig_out,'.png']);
+   ppt_add_slide(s.pptname, fig_out);
+end
+no_SSFR = ~isavar('flight_alb')||isempty(flight_alb);
 
-        s.tau = mean(tau(good_aod,:));
-        s.tau_O3 = mean(tau_O3(good_aod,:));
-        if ~isempty(CWV)
-            good_cwv = startime>=xl(1) & startime<=xl(2) & CWV>0 &~isNaN(CWV);
-            s.PWV = mean(CWV(good_cwv));
-        end
-    end
+if in_air && ~no_SSFR
+   s.sfc_alb = flight_alb;
+elseif on_ground || no_SSFR
+   s.brdf = get_mcd_brdf(s.Lat,s.Lon,s.t, s.Alt);
 end
 
+if ~isfield(s,'brdf')&&~isavar('flight_alb')
+   % Strange that the above section provides sfc_alb in one case and brdf
+   % in another.  Not sure what to provide manually.
+   disp('Could not get albedo. Need manual help.')
+   %     pause; % Fill in albedo values below, or load from an aeronet ssa file, or get from MODIS, ...
+   alb = [0.022960,0.076110,0.336650,0.329370];
+   anet_wl = [.44,.675,.87,1.02];
+   s.sfc_alb = interp1(anet_wl, alb, s.w);
+   in = ~isnan(s.sfc_alb);
+   s.sfc_alb(in) = interp1(anet_wl, alb, s.w(in),'pchip');
+   s.sfc_alb(~in) = interp1(anet_wl, alb, s.w(~in),'nearest','extrap');
+   
+end
 
-!!
-if ~isfield(s,'PWV')
-    s.PWV = 1.7;
-end
-if ~isfield(s,'O3col')
-    s.O3col=0.330;
-end
-if s.O3col>1
-    s.O3col = s.O3col./1000;
-end
 % if ~isfield(s,'wind_speed')
 %     s.wind_speed= 7.5;
 % end
 % for SEAC4RS
+s.ground_level = s.flight_level/1000; % picking very low "ground level" sufficient for sea level or AMF ground level.
 s.land_fraction = 1;
 % Should replace this with an actual determination based on a land-surface
 % mapping.
-s.rad_scale = 1; % This is an adhoc means of adjusting radiance calibration for whatever reason.
-s.flight_level = mean(s.Alt); % picking very low "ground level" sufficient for sea level or AMF ground level.
-% Should replace this with an actual determination based on a land-surface mapping.
-% Both gen_sky_inp_4STAR and gen_aip_cimel_need to be modified.
-
-% [pname_mat,~,~] = fileparts(sfile);
-if exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
-    delete([pname_mat, filesep,skytag,'_starsky.mat']);
-end
-save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
+% s.rad_scale = 1; % This is an adhoc means of adjusting radiance calibration for whatever reason.
 
 
 return
+
+% Collecting bits of code here that had been in star_anet_aip_process_menu
+% and subsequent functions
+
+if iscell(s.filename)
+   s.filename = s.filename{1};
+end
+if isfield(s,'filename')
+   [p,skytag,x] = fileparts(s.filename);
+   skytag = strrep(skytag,'_VIS_','_');
+   skytag = strrep(skytag,'_NIR_','_');
+   skytag = strrep(skytag,'_starsky','');
+end
+pname_mat = getnamedpath('allstarmat');
+if contains(skytag,'_STARSKY')
+   skytag = strrep(skytag,'_STARSKY','_aSTARSKY');
+end
+
+if ~exist([pname_mat, skytag,'.mat'],'file')
+   save([pname_mat, skytag,'.mat'], '-struct','s');
+end
+
+star.pname_tagged = pname_tagged;
+star.fname_tagged = fname_tagged;
+
+disp(['This selection has been saved to ',fname_tagged]);
+
+% [pname_mat,~,~] = fileparts(sfile);
+% if exist([pname_mat, filesep,skytag,'_starsky.mat'],'file')
+%    delete([pname_mat, filesep,skytag,'_starsky.mat']);
+% end
+% save([pname_mat, filesep,skytag,'_starsky.mat'], '-struct','s');
