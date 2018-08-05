@@ -405,7 +405,7 @@ end
      
 
      cwv2sub   = -log(  exp(  -(ones([pp,1])*afit_H2Os1).*((avg_U1*ones([1,qq])*H2O_conv).^(ones([pp,1])*bfit_H2Os1))  )  );     
-     cwv.tau_aero_cwvsub = s.tau_tot_slant - cwv2sub;% this is a structure with o2-o2 NIR subtracted
+%      cwv.tau_aero_cwvsub = s.tau_tot_slant - wvamount;% this is a structure with o2-o2 NIR subtracted
      
 %      cwv2sub   =
 %      -log(exp(-afit_H2Os1.*(real(avg_U1(i)*H2O_conv)).^bfit_H2Os1)); % original

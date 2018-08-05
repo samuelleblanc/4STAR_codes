@@ -161,8 +161,8 @@ end
 
 %rate = rate(:,wln);
 %tau_OD = log(repmat(c0,length(s.t),1)./rate);
-ccoef=[];
-RR=[];
+
+
 % o3 inversion is being done on total slant path (not Rayleigh
 % subtracted)
 %         if     s.t(1) <= datenum([2016 8 25 0 0 0]);
@@ -174,7 +174,12 @@ RR=[];
 %                  rate = s.ratetot;
 %         end
 
-for k=1:length(s.t);
+% for k=1:length(s.t);
+ccoef=[]; ccoef = NaN([size(basis,2),length(s.t)]);
+RR=[]; RR = NaN([length(wln),length(s.t)]);
+suns = find(s.Str==1&s.Zn==0)';
+for k=suns
+
    %meas = log(c0'./rate(k,:)');
    meas = rate(k,:)';
    %         if     s.t(1) <= datenum([2016 8 25 0 0 0]);
@@ -190,8 +195,10 @@ for k=1:length(s.t);
    coef=basis\meas;
    %coefo3=basiso3\tau_OD(k,(wln))';
    recon=basis*coef;
-   RR=[RR recon];
-   ccoef=[ccoef coef];
+   RR(:,k) = recon;
+   ccoef(:,k) = coef;
+%    RR=[RR recon];
+%    ccoef=[ccoef coef];
 end
 
 % calculate vcd

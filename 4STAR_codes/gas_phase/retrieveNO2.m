@@ -78,7 +78,7 @@ loadCrossSections_global;
  
  % calculate residual spectrum (Rayleigh subtracted)
   eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
- 
+  eta_residual = NaN(size(eta));
   %ratesub=real(s.rate(:,wln)./(repmat(s.f,1,length(wln)))./tr(s.m_ray, s.tau_ray(:,wln)));
   %eta    =real(-log(ratesub./repmat(c0,length(s.t),1)));
   
@@ -89,7 +89,8 @@ loadCrossSections_global;
 % and any scattered contribution to the measurement
 % calculate linear fit and create residual spectrum
 
-for i=1:length(s.t)
+% for i=1:length(s.t)
+for i=find(s.Str==1 & s.Zn==0)'   
     p = polyfit(s.w(wln),eta(i,:),1);
     %p1 = p(1);
     %p0 = p(2);
