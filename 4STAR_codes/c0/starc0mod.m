@@ -94,7 +94,8 @@ end;
 switch instrumentname;
     case{'4STAR'}
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-            if t>=datenum([2015 9 16 0 0 0]); %
+            if t>=datenum([2016 8 16 0 0 0]); %
+               disp('Check if this should be 2015-09-16 instead of 2016-08-16...')
                 if now>=datenum([2017 2 01 0 0 0]) % use MLO May 2017 for ORACLES 2 (for now; wait until transit)
                     daystr='20170531';
                     filesuffix='modified_Langley_MLO_May2017'; % 
