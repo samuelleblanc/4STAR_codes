@@ -714,7 +714,9 @@ grid on;
 labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
 for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
 colormap(cm);
-lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
 fname = fullfile(p1,[instrumentname daystr '_visraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frv,fname,0);
@@ -736,7 +738,9 @@ for ij=1:length(iwvlv), labels{ij} = '.'; end;
 lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
 labels = {labels{:},lbl_tmp{:}}';
 colormap(cm);
-lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
 fname = fullfile(p1,[instrumentname daystr '_nirraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frnir,fname,0);
@@ -786,7 +790,9 @@ if exist('tau_aero_noscreening');
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
     for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
-    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv,fname,0);
@@ -808,7 +814,9 @@ if exist('tau_aero_noscreening');
     lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
     labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
-    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0);
@@ -838,7 +846,9 @@ if exist('tau_aero');
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
     for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
-    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
     fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv_fl,fname,0);
@@ -860,7 +870,9 @@ if exist('tau_aero');
     lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
     labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
-    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+end
     fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0);
@@ -952,7 +964,7 @@ end; %tau_aero_noscreening
 
 % water vapor
 
-if exist('cwv2plot');
+if exist('cwv2plot')&&isavar('vars');
     
     % apply flags
     cwv2plot(flagCWV==1) = NaN;
@@ -967,7 +979,7 @@ end;
 
 % O3
 
-if exist('o32plot');
+if exist('o32plot')&&isavar('vars');
     
     % apply flags
     o32plot(flagO3==1) = NaN;
@@ -981,7 +993,7 @@ end;
 
 % NO2
 
-if exist('no22plot');
+if exist('no22plot')&&isavar('vars');
     
     % apply flags
     o32plot(flagO3==1) = NaN;
@@ -999,7 +1011,7 @@ if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corr
     c0corrfactor=load(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']));
     tau_aero_scaled=tau_aero+(1./m_aero)*log(c0corrfactor);
 end;
-if exist('tau_aero_scaled');
+if exist('tau_aero_scaled')&&isavar('vars');
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
         [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, ...
