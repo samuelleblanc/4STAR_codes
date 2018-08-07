@@ -144,7 +144,7 @@ fig_names = {};
 
 if savefigure;
     ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
-    title([instrumentname ' - ' daystr xtra info_title])
+    title([instrumentname ' - ' daystr xtra info_title],'Interpreter','None')
     starsas([instrumentname daystr xtra '_Langleyplot_stdevs_zoom.fig, starLangley_fx.m'],u,fig_path);
     fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra '_Langleyplot_stdevs_zoom.png'])}];
     xlim([0,20]);
@@ -178,7 +178,7 @@ for k=1:numel(stdev_mult);
     ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
-    title([instrumentname ' ' starttstr ' - ' stoptstr ', STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr ', STDx' num2str(stdev_mult(k), '%0.1f')],'Interpreter','None');
     if savefigure;
         starsas([instrumentname daystr xtra 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra 'rateaerovairmass' num2str(stdev_mult(k), '%0.1f') 'xSTD.png'])}];
@@ -205,10 +205,10 @@ labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels);
+legend(labels,'Location','best');
 end;
 
-title([instrumentname ' multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
+title([instrumentname ' multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr],'Interpreter','None');
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')
 grid();
@@ -239,10 +239,10 @@ for ij=11:length(cols), labels{ij} = '.'; end;
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels);
+legend(labels,'Location','best');
 end;
 
-title([instrumentname ' VIS ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
+title([instrumentname ' VIS ' daystr xtra ' :'  starttstr ' - ' stoptstr],'Interpreter','None');
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')
 grid();
@@ -273,9 +273,9 @@ for ij=1:10, labels{ij} = '.'; end;
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels)
+legend(labels,'Location','best')
 end;
-title([instrumentname ' NIR multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
+title([instrumentname ' NIR multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr],'Interpreter','None');
 ylabel('Aerosol Count Rate normalized by c0')
 xlabel('Airmass factor')
 grid();
@@ -317,7 +317,7 @@ for k=1;
     starttstr=datestr(langley(1), 31);
     stoptstr=datestr(langley(2), 13);
     grid on;
-    title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')],'Interpreter','None');
     if savefigure;
         starsas([instrumentname daystr xtra 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra 'rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.png'])}];
@@ -338,7 +338,7 @@ for k=1;
     y = rateaero(ok,cols(4));
     ylim([min(y(:)) max([max(y(:)) data0])]);
     grid on;
-    title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
+    title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')],'Interpreter','None');
     if savefigure;
         starsas([instrumentname daystr xtra 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra 'rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.png'])}];
@@ -369,7 +369,7 @@ ylabel('C0');
 xlabel('Wavelength [\mum]');
 set(gca,'FontSize',14);
 grid on;
-title([instrumentname ' derived C0: ' starttstr ' - ' stoptstr xtra]);
+title([instrumentname ' derived C0: ' starttstr ' - ' stoptstr xtra],'Interpreter','None');
 if savefigure;
     starsas([instrumentname daystr xtra 'c0_spectravis.fig, starLangley_fx.m'],u,fig_path);
     fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra 'c0_spectravis.png'])}];
@@ -382,7 +382,7 @@ if ~strcmp(instrumentname,'2STAR');
     xlabel('Wavelength [\mum]');
     set(gca,'FontSize',14);
     grid on;
-    title([instrumentname ' derived C0 ' xtra ': ' starttstr ' - ' stoptstr xtra]);
+    title([instrumentname ' derived C0 ' xtra ': ' starttstr ' - ' stoptstr xtra],'Interpreter','None');
     if savefigure;
         starsas([instrumentname daystr xtra 'c0_spectranir.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname daystr xtra 'c0_spectranir.png'])}];
