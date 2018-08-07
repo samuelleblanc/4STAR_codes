@@ -2,11 +2,13 @@
 %close all
 clear all
 fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-if ~isunix;
-fp_out = 'C:\Users\sleblanc\Research\MLO\2018_Febuary\';
-else;
-fp_out = '/nobackup/sleblan2/ORACLES/plot/';
-end;
+fp_out = getnamedpath('MLOFeb2018');
+
+%if ~isunix;
+%fp_out = 'C:\Users\sleblanc\Research\MLO\2018_Febuary\';
+%else;
+%fp_out = '/nobackup/sleblan2/ORACLES/plot/';
+%end;
 asktosave = 1; %set if ask to save the figures
 i_avg = [1,2,3,4]+1;
 filesuffix = ['4STAR_refined_averaged_MLO_Feb2018'];
