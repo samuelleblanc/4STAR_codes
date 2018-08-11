@@ -6,6 +6,9 @@ TF = false;
 if isavar('in')
     out = dir(in);
     if ~isempty(out)
+        if ~isfield(out,'folder')
+            out.folder = [fileparts(in),filesep];
+        end
         out = fullfile(out.folder, out.name);
         TF =  ~isdir(in)&&~isempty(out)&&~isempty(strfind(out,in));
     end
