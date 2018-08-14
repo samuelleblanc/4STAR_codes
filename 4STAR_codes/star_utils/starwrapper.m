@@ -101,8 +101,11 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % MS: 2018-03-27,       fixed a bug in tau_aero_subtract_all that had NO2
 %                       added instead of subtracted !!! (--)
 % SL: v3.1, 2018-04-12,       Changed the wavelengths on which polyfit is applied
+% CJ: v3.2, 2018-08-12, Fixed bug in case applyforjcorr where the wrong
+% toggle was being set, and added logic to set toggle.applyforjcorr to
+% false if 2STAR, 4STARB, or forj measurement
 
-version_set('3.1');
+version_set('3.2');
 %********************
 %% prepare for processing
 %********************
@@ -165,7 +168,7 @@ if (~isempty(varargin))
                disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
             case {'applyforjcorr'}
                c=c+1;
-               toggle.applytempcorr=varargin{c};
+               toggle.applyforjcorr=varargin{c};
                disp(['applyforjcorr set to ' num2str(toggle.applyforjcorr)])
             otherwise
                error(['Invalid optional argument, ', ...
@@ -215,6 +218,9 @@ s2.note={};
 if toggle.verbose; disp('get data types'), end;
 [daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
 s.instrumentname = instrumentname;
+% if 2STAR, 4STARB, or a forj measurement then set applyforjcorr to false.
+toggle.applyforjcorr = toggle.applyforjcorr && ~strcmp(instrumentname,'2STAR')...
+   && ~strcmp(instrumentname,'4STARB') && isempty(strfind(lower(datatype),'forj'));
 if nargin>=(2+nnarg)
    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);s2.datatype = datatype2;
    if instrumentname~=instrumentname2;
@@ -516,7 +522,8 @@ if toggle.verbose; disp('adjusting the count rate'), end;
 % get correction values
 % set toggle.applyforjcorr to 2 for a two-way correction accounting for
 % the direction of az rotation, 1 for a one-way correction, 0 for no correction.
-if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
+if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj'))...
+      &&~strcmp(instrumentname,'2STAR')&&~strcmp(instrumentname,'4STARB'); % don't apply FORJ correction to FORJ test data, to avoid confusion.
    [forj_corr, detail] = get_forj_corr(s.t(1));
    % apply correction on s.rate
    AZ_deg_   = s.AZstep/(-50);

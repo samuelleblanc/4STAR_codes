@@ -89,7 +89,7 @@ if isfield(s,'filename')
    skytag = strrep(skytag,'_NIR_','_');
    skytag = strrep(skytag,'_starsky','');
 end
-pname_mat = getnamedpath('allstarmat');
+pname_mat = getnamedpath('starmat');
 if contains(skytag,'_STARSKY')
    skytag = strrep(skytag,'_STARSKY','_aSTARSKY');
 end

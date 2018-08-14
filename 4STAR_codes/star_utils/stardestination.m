@@ -16,7 +16,7 @@ if exist(folder0)==7; % looks like a full path is already given; do a minimum ch
         savematfile=unconfirmed_savematfile;
     end;
 else % ask for a full path
-   defaultsavefolder=getnamedpath('starsun');
+   defaultsavefolder=getnamedpath('starmat');
 %     if (strcmp(getUserName,'sleblan2'));
 %         defaultsavefolder=get_last_used_path();
 %     else

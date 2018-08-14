@@ -42,7 +42,7 @@ if isequal(lower(source), 'ask');
     end;
     if ~isempty(which('starpaths')); % look into pre-set path
         s=pwd;
-        [defaultsourcefolder, figurefolder, askforsourcefolder]=starpaths;
+        [defaultsourcefolder, figurefolder, askforsourcefolder]=starpaths;defaultsourcefolder = getnamedpath('stardat');
         if exist(fullfile(defaultsourcefolder, 'raw'))==7;
             defaultsourcefolder=fullfile(defaultsourcefolder, 'raw');
             cd(defaultsourcefolder);

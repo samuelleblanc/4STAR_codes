@@ -50,12 +50,12 @@ vv = version('-release');
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
    setnamedpath('rawstardat','Select the location for raw *.dat files...');
-   matfolder = setnamedpath('allstarmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]']);
+   matfolder = setnamedpath('starmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]']);
    setnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]');
    figurefolder=setnamedpath('star_images','4STAR image files.');
 else
    getnamedpath('rawstardat','Select the location for raw *STAR files...');
-   matfolder = getnamedpath('allstarmat','Select the location for "allstarmat" files...');
+   matfolder = getnamedpath('starmat','Select the location for "allstarmat" files...');
    getnamedpath('starsun', 'Select the location for starsun mat-file...');
    figurefolder=getnamedpath('star_images','4STAR image files.'); 
 end
