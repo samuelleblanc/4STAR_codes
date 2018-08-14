@@ -71,33 +71,36 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 
 %% function start
 version_set('1.1');
+%% prepare to save a PowerPoint file
+pptcontents={}; % pairs of a figure file name and the number of figures per slide
+pptcontents0={};
 
 %% Sanitize inputs and get file paths
 if nargin<1; % no file path set
-    [f1,p1] = uigetfile2('4STAR*starsun.mat','Choose 4STAR starsun file');
-    fname_4starsun = [p1 f1];
-    [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
-    fname_4star = [pt ft];
+    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
+    fname_4starsun = getfullname('4STAR*starsun.mat','starsun','Choose starsun file');  
+    [p1, f, ext0]=fileparts(fname_4starsun);
 elseif nargin<2;
     [p1, f, ext0]=fileparts(fname_4starsun);
-    [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
-    fname_4star = [pt ft];
+    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
+%     [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
+%     fname_4star = [pt ft];
 else;
     [p1, f, ext0]=fileparts(fname_4starsun);
 end;
-
+p1 = getnamedpath('starimg');
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
 savefigure = true;
 
 if nargin <3;
-    ppt_fname = fullfile(p1,[daystr '_' instrumentname '_Quicklooks.ppt']);
+    ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks.ppt']);
 end;
 
 %% Set up the load path of the files
-disp(['Loading 4STAR file: ' fname_4starsun])
-s = load(fname_4starsun);
-disp(['Loading 4STAR file: ' fname_4star])
+disp(['Loading 4STAR starmat file: ' fname_4star])
 st = load(fname_4star);
+disp(['Loading 4STAR starsun file: ' fname_4starsun])
+s = load(fname_4starsun);
 
 %********************
 %% set parameters and default titles
@@ -147,6 +150,25 @@ colslist={'' c 1:13
     'NIRonly' nirc(11:13)+1044 11:13};
 iwvl = c; iwvlv = visc(1:10); iwvln = nirc(11:13)+1044;
 wvl = s.w(iwvl); wvlv = s.w(iwvlv); wvln = s.w(iwvln);
+
+%% Check if langley is defined
+if isfield(s,'langley')||isfield(s,'langley1');
+    % run the langley codes and get the figures;
+    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
+    langley_figs = starLangley_fx_(s,1,p1,xtra);
+    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+end;
+
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
 if isfield(s,'gas')
@@ -226,9 +248,6 @@ elseif isequal(platform, 'ground');
     end;
 end;
 
-%% prepare to save a PowerPoint file
-pptcontents={}; % pairs of a figure file name and the number of figures per slide
-pptcontents0={};
 
 %% Set up fields to plot
 fld = fields(st);
@@ -265,11 +284,13 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot temperatures and pressures
 ftnp = figure;
-subplot(3,1,[1,2])
-[ax,h1,h2] = plotyy(s.t,nfsmooth(s.Tprecon_C,60),s.t,nfsmooth(s.RHprecon_percent,60));
-if length(find(nfsmooth(s.RHprecon_percent,60)>2.0))>300; 
+subplot(3,1,[1,2]);
+[Ts,tt] = nfsmooth(s.Tprecon_C,60);
+[RHs,rr] = nfsmooth(s.RHprecon_percent,60); high_RH = find(RHs>2);
+[ax,h1,h2] = plotyy(s.t(tt),Ts,s.t(rr),RHs);
+if length(high_RH)>300; 
     set(ax(1),'Color',[1,0.5,0.5]);
-    text(ax(2),s.t(1),0.5,'RH Too high!');
+    text(ax(2),s.t(1),0.5,'RH > 2% Too high!');
     set(ftnp, 'InvertHardCopy', 'off');
 end;
 
@@ -714,7 +735,7 @@ grid on;
 labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
 for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
 colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
+if license('test','Mapping_Toolbox')||~isempty(which('lcolorbar')); % check if the mapping toolbox exists
    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 end
 fname = fullfile(p1,[instrumentname daystr '_visraw']);
@@ -1316,23 +1337,23 @@ if isfield(st,'vis_fovp') | isfield(st,'vis_fova');
     end;
 end;
 
-%% Check if langley is defined
-if isfield(s,'langley')|isfield(s,'langley1');
-    % run the langley codes and get the figures;
-    if isfield(s,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
-    langley_figs = starLangley_fx(fname_4starsun,1,p1,xtra);
-    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
-end;
+% %% Check if langley is defined
+% if isfield(s,'langley')||isfield(s,'langley1');
+%     % run the langley codes and get the figures;
+%     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
+%     langley_figs = starLangley_fx(fname_4starsun,1,p1,xtra);
+%     pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+%     pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+%     pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+%     pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+%     pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+%     pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+%     pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+%     pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+%     pptcontents0=[pptcontents0; {' ' 4}];
+%     pptcontents0=[pptcontents0; {' ' 4}];
+%     pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+% end;
 
 
 %********************
