@@ -286,7 +286,7 @@ if std(nfsmooth(s.Tprecon_C,60))>2.5;
 end;
 
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
-xticklabels([''])
+set(gca,'xticklabel','')
 grid on;
 [lg,ic] = legend(starfieldname2label('Tprecon'),starfieldname2label('RHprecon'));
 for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
@@ -299,7 +299,7 @@ grid on;
 dynamicDateTicks;
 xlabel('UTC time');
 xlim(ax(1),[s.t(1)- ddt s.t(end)+ ddt]); xlim(ax(2),[s.t(1)-ddt s.t(end)+ddt]);
-ylim(ax(1),[10,40]); ylim(ax2,[-10;50]);yticks(ax(1),[10,15,20,25,30,35,40]);
+ylim(ax(1),[10,40]); ylim(ax2,[-10;50]);set(ax(1),'ytick',[10,15,20,25,30,35,40]); %yticks(ax(1),[10,15,20,25,30,35,40]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 ylabel(ax(2),'RH [%], smoothed over 60s');
 ylabel(ax(1),'Temperature [^\circC], smoothed over 60s');
@@ -674,7 +674,7 @@ fdrkv = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
 ylabel(ax(2),'Darks VIS 500 nm');
 ylabel(ax(1),'VIS temp [°C]');
-ylim(ax(1),[-5,5]); yticks(ax(1),[-5,-2.5,0,2.5,5]);
+ylim(ax(1),[-5,5]); set(ax(1),'ytick',[-5,-2.5,0,2.5,5]); %yticks(ax(1),[-5,-2.5,0,2.5,5]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - VIS darks and temperature']);
@@ -687,7 +687,7 @@ fdrkn = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
 ylabel(ax(2),'Darks NIR 1213 nm');
 ylabel(ax(1),'NIR temp [°C]');
-ylim(ax(1),[0,30]); yticks(ax(1),[0,10,20,30,40,50]);
+ylim(ax(1),[0,30]); set(ax(1),'ytick',[0,10,20,30,40,50]); %yticks(ax(1),[0,10,20,30,40,50]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - NIR darks and temperature']);
@@ -1307,7 +1307,7 @@ end;
 %% Check if langley is defined
 if isfield(s,'langley')|isfield(s,'langley1');
     % run the langley codes and get the figures;
-    if isfield(s,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
+    if isfield(s,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; else xtra = '_langley'; end;
     langley_figs = starLangley_fx(fname_4starsun,1,p1,xtra);
     pptcontents0=[pptcontents0; {langley_figs{1} 1}];
     pptcontents0=[pptcontents0; {langley_figs{2} 4}];

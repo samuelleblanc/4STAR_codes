@@ -14,15 +14,15 @@ toggle_out.computeerror=true;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = true;
+toggle_out.gassubtract = false;
 toggle_out.booleanflagging = true;
 toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
-toggle_out.doflagging = true; % for running any Yohei style flagging
+toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = false; 
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = true;
-toggle_out.applyforjcorr = false;
+toggle_out.runwatervapor = false;
+toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
@@ -33,11 +33,11 @@ toggle_out.skip_ppl = false;
 toggle_out.skip_alm = false;
 toggle_out.skip_lt_N = 0;
 toggle_out.skip_gt_N = inf;
-toggle_out.sky_tag = '_minusdAOD'; %_minusdRad'; % descriptive tag applied to input filename
+toggle_out.sky_tag = '_plusdRad'; % _minusdAOD'; %descriptive tag applied to input filename
 toggle_out.skyscan_manual = false; % true for skyscan manual selection, i.e. manual interaction and to set defaults
 toggle_out.sky_SA_min = 3.5;
 toggle_out.sky_El_min = 6;
-toggle_out.sky_dOD = -[0.018 0.013 0.01 0.01 0.02]; %<- 0912 %[0]; %-[0.036 0.03 0.03 0.03 0.036]; <-0920 % tod = tod + dOD %
+toggle_out.sky_dOD = 0; %-[0.018 0.013 0.01 0.01 0.02]; %<- 0912 %[0]; %-[0.036 0.03 0.03 0.03 0.036]; <-0920 % tod = tod + dOD %
 toggle_out.sky_rad_scale = 1;
 % load('RadUncAt4STARwl.mat','RadUncAt4STARwl');
 % toggle_out.sky_rad_scale = 1+0*RadUncAt4STARwl;
