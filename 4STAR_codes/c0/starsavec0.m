@@ -14,7 +14,7 @@ function starsavec0(filename, source, additionalnotes, w, c0, c0unc)
 % Yohei, 2012/10/19
 
 % prohibit overwriting, because keeping records of c0 files is important
-if exist(filename);
+if isavar(filename);
     error([filename ' exists.']);
 end;
 
