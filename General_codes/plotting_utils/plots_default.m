@@ -10,6 +10,7 @@ set(0,'DefaultLineLineWidth',2);
 set(0,'DefaultLineMarkerSize','factory');
 set(0,'DefaultAxesXGrid','on');
 set(0,'DefaultAxesYGrid','on');
+set(0,'DefaultTextInterp','none');
 set(groot, 'DefaultFigureColormap', jet);
 % new 2014b colororder
 cc = [0 0.4470 0.7410; 0.8500 0.3250 0.0980; 0.9290  0.6940  0.1250;...
