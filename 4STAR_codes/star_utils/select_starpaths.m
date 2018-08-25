@@ -1,4 +1,4 @@
-function [dataset,setname] = select_stardata
+function [paths,setname] = select_starpaths
 
 usrpath = userpath;
 if isempty(usrpath)
@@ -35,6 +35,6 @@ if mn==1
 else
    setname = men{mn};
 end
-dataset = set_starpaths(setname);
+paths = set_starpaths(setname);
 
 return
