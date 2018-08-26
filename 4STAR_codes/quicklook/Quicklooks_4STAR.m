@@ -67,10 +67,13 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %        first days here are probably not good because of clouds.
 % SL   , 2017/05/26, modified for easier plotting with data from MLO May 2017
 % SL   , 2018/05/08, added automated FOV plotting
+% CF   , 2018/08/26, moved Langley towards top, cosmetic changes to output
+%        filenames (inserted '_') for readability and consistency with
+%        other files
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.1');
+version_set('1.2');
 %% prepare to save a PowerPoint file
 pptcontents={}; % pairs of a figure file name and the number of figures per slide
 pptcontents0={};

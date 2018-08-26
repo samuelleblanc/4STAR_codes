@@ -12,7 +12,8 @@ function starsavec0(filename, source, additionalnotes, w, c0, c0unc)
 % See also starLangley.m and Langley.m.
 % 
 % Yohei, 2012/10/19
-
+% Connor, 2018-08-25: replace "exist" syntax with "isavar" for
+% back-compatability
 % prohibit overwriting, because keeping records of c0 files is important
 if isavar(filename);
     error([filename ' exists.']);

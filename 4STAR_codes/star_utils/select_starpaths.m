@@ -1,4 +1,30 @@
 function [paths,setname] = select_starpaths
+% [paths,setname] = select_starpaths
+%% Details of the program:
+% NAME:
+%   select_starpaths
+%
+% PURPOSE:
+%  Identify locations to find/save various 4STAR input/output files and
+%  associate this collection of locations with user-specified name
+%
+% INPUT: None
+%
+% OUTPUT:
+%  paths: struct containing the named paths 
+%  setname: user-supplied name for the collection of paths
+%
+% DEPENDENCIES:
+%  - set_starpaths
+%
+% NEEDED FILES:
+%
+% MODIFICATION HISTORY:
+% Written (v1.0): Connor Flynn, PNNL, 2018-08-14
+% -------------------------------------------------------------------------
+
+%% function start
+version_set('1.0');
 
 usrpath = userpath;
 if isempty(usrpath)

@@ -1,4 +1,30 @@
 function compare_Co
+%% Details of the program:
+% NAME:
+%   compare_Co
+%
+% PURPOSE:
+%  Select Cos to identify "best" averaged value.
+%
+% INPUT:
+%  Manual selection of a multiple Co files (produced from Quicklooks,
+%  starLangley_fx)
+%
+% OUTPUT:
+%  creates the averaged c0 file in user-selected folder with the
+%  original Co files
+%  creates images in a user-selected folder.
+%
+% NEEDED FILES:
+%  - collection of Co files and optionally a reference Co file
+%
+% MODIFICATION HISTORY:
+% Written (v1.0): Connor, MLO 2018 Aug and following, based on Compare_Co_* 
+-------------------------------------------------------------------------
+
+%% function start
+version_set('1.0');
+
 % Cheking some c0, and calculating the averages
 % Select a bunch of Co files
 % Display Cos in fig1.
