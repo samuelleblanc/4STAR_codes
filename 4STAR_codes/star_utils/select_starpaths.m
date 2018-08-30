@@ -40,6 +40,7 @@ end
 
 % Take a directory listing of pathdir *.mat
 % 
+men = {'lastdata'};
 mats = dir([pathdir,'*.mat']);
 for M = length(mats):-1:1
    [~,mat,x] = fileparts(mats(M).name);
