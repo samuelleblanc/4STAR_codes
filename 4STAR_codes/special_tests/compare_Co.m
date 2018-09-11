@@ -20,7 +20,7 @@ function compare_Co
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Connor, MLO 2018 Aug and following, based on Compare_Co_* 
--------------------------------------------------------------------------
+% -------------------------------------------------------------------------
 
 %% function start
 version_set('1.0');
@@ -316,6 +316,8 @@ nirsource_alt=cellstr(char(nir_names{i_avg}));
 vissource = '(SEE Original files for sources)';
 nirsource = '(SEE Original files for sources)';
 
+sav = menu('Save the resulting Co values to file?','Yes', 'No');
+if sav ==1
 disp(['Printing c0 file to :' visfilename])
 starsavec0(visfilename, vissource, [additionalnotes; vissource_alt], w_vis, visc0_avg, visc0_std);
 starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc0_avg, nirc0_std);
@@ -328,6 +330,7 @@ figure_(fig2);
 ylim([-4 4]);
 save_fig(fig2,[fp_out fignames '_cal_c0_relative_zoom'],asktosave);
 save_fig(fig3,[fp_out fignames '_cal_c0_avg_' gdaystr],asktosave);
+end
 
 return
 
