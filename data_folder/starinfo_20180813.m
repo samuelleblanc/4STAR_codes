@@ -13,36 +13,37 @@ else
 end
 
 s.langley1 = [datenum(2018,8,13,16,10,00) datenum(2018,8,13,18,30,00)]; %put in if condition below if different for different 4STARs
-            
-%             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-             s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-            % Ozone and other gases 
-            s.O3h=21; %  
-            s.O3col=0.270; %I think 270 DU was what  the dobson ozone was this morning?   
-            s.NO2col=2.0e15; %  
+
+s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
+% Ozone and other gases
+s.O3h=21; %
+s.O3col=0.270; %I think 270 DU was what  the dobson ozone was this morning?
+s.NO2col=2.0e15; %
 
             %really in these ones they're both the same-- but preserve the
             %below structure for consistency...
-
-if isfield(s,'instrumentname')&&strcmp(s.instrumentname,'4STAR')
-            % flags
-%             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
-%             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
-%             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
-%             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
-%             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
-elseif isfield(s,'instrumentname')&&strcmp(s.instrumentname,'4STARB')
-%             % flags
-%             s.flagfilename     = '20170831_starflag_man_created20180512_1333by_KP.mat'; 
-%             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
-%             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
-%             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
-%             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
+if isfield(s,'instrumentname')
+    if(strcmp(s.instrumentname,'4STAR'))
+    %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
+    %             flags
+    %             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+    %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
+    %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
+    %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
+    %             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
+    elseif(strcmp(s.instrumentname,'4STARB'))
+    %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
+    %             % flags
+    %             s.flagfilename     = '20170831_starflag_man_created20180512_1333by_KP.mat'; 
+    %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
+    %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
+    %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
+    %             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
+    end
 end
 % window deposition
 %s.AODuncert_constant_extra = 0.2;
- 
- 
+  
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=680.25; %MLO
