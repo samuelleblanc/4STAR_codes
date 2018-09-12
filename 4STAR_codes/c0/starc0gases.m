@@ -14,6 +14,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2016-10-28, changed KORUS O3 c0 to 0702
 % Modified, MS, 2017-07-22, added gases c0 for ORACLES 2017
 % Modified, MS, 2018-09-12, fixed time bug related toORACLES 2016 c0
+% Modified, MS, 2018-09-12, bug fix to starc0gases in NO2 refspec call
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -171,11 +172,11 @@ end;
                 end    
                 
              end % end of ORACLES 2016 option
-        
+        end
         % ORACLES 2017
         
         elseif t> datenum([2017 2 1 0 0 0]); % use MLO June-2017-ORACLES    
-        if now>=datenum([2017 2 1 0 0 0]);
+         if now>=datenum([2017 2 1 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
                     % use MLO c0
@@ -195,7 +196,7 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load(which(['20160531NO2refspec.mat']));
+                    tmp = load(which(['20170531NO2refspec.mat']));
                     c0gases = tmp;%.no2refspec;
                     
                     
@@ -213,12 +214,13 @@ end;
                     c0gases = tmp;%.hcohrefspec;
                 end    
                 
-            end
+             end
+            
         end; % end of ORACLES 2017 option
         
-        end; % end of c0 date options    
+    end; % end of c0 date options    
         
-    end
+      %end
     
     
     
