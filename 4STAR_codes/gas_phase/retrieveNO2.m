@@ -46,6 +46,8 @@
 % MS, 2018-03-26, updating no2OD and filtering for subtraction purposes
 % MS, 2018-03-27, added NO2 column default values to filtered retrieved
 %                 fileds (instead of NaN's)
+% MS, 2018-09-12, fixing bug using gxs-gas cross sections in starcogases
+%                 call
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode,gxs)
@@ -64,7 +66,7 @@ loadCrossSections_global;
  % select NO2 absorbing band to plot residuals for
  ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
  
- [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
+ [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode,gxs);
   
   if mode==0
       % when mode==0 need to choose wln

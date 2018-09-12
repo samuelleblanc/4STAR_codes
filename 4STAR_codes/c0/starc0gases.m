@@ -13,6 +13,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2016-08-24, applied refSpec to c0gases
 % Modified, MS, 2016-10-28, changed KORUS O3 c0 to 0702
 % Modified, MS, 2017-07-22, added gases c0 for ORACLES 2017
+% Modified, MS, 2018-09-12, fixed time bug related toORACLES 2016 c0
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -96,7 +97,7 @@ end;
         end; 
         
     %elseif t> datenum([2016 4 18 0 0 0]); % use MLO June-2016
-    elseif t> datenum([2016 6 30 0 0 0]); % use MLO June-2016-ORACLES    
+    elseif t> datenum([2016 6 30 0 0 0]) && t<=datenum([2017 2 1 0 0 0]); % use MLO June-2016-ORACLES    
         if now>=datenum([2016 4 18 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
