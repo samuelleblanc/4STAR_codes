@@ -70,6 +70,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 % CF   , 2018/08/26, moved Langley towards top, cosmetic changes to output
 %        filenames (inserted '_') for readability and consistency with
 %        other files
+% MS   , 2018-09-14, adding gas plots capability
 % -------------------------------------------------------------------------
 
 %% function start
@@ -178,15 +179,18 @@ end;
 
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
+%% call the gas 'gas'/'cwv' if does not exist in starsun
 if isfield(s,'gas')
     cwv2plot  =s.cwv.cwv940m1;
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
+    hcoh2plot =real(s.gas.hcoh.hcoh_DU);
 elseif exist([instrumentname daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
     gas   = load(strcat(gasfile_path,daystr{:},'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
     no22plot =gas.no2_molec_cm2;
+    hcoh2plot=gas.hcoh.hcoh_DU;
 else;
     disp('No gas data found. Skipping...') %otherwise just skip it if we haven't run gas retrievals
 end;
@@ -219,8 +223,9 @@ if isfield(s, 'flagfilenameO3');
     % read flags
     flagO3  = flagO3.manual_flags.screen;
 else
-    % don't flag
+    % flag only un-physical values
     flagO3   = zeros(length(s.t),1);
+    flagO3(o32plot<250 | o32plot> 450) = 1;
 end
 
 if isfield(s,'flagfilenameCWV');
@@ -229,9 +234,26 @@ if isfield(s,'flagfilenameCWV');
     flagCWV = flagCWV.manual_flags.screen;
 else;
     flagCWV  = zeros(length(s.t),1);
+    flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
 end;
 
-flagNO2  = ones(length(s.t),1);% flag all-bad calibration
+if isfield(s,'flagfilenameNO2');
+    disp(['Loading flag file: ' s.flagfilenameNO2])
+    flagNO2 = load(s.flagfilenameNO2);
+    flagNO2 = flagNO2.manual_flags.screen;
+else;
+    flagNO2  = zeros(length(s.t),1);
+    flagNO2(no22plot<0 | no22plot> 1e18) = 1;
+end;
+
+if isfield(s,'flagfilenameHCOH');
+    disp(['Loading flag file: ' s.flagfilenameHCOH])
+    flagHCOH = load(s.flagfilenameHCOH);
+    flagHCOH = flagHCOH.manual_flags.screen;
+else;
+    flagHCOH  = zeros(length(s.t),1);
+    flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
+end;
 
 
 %% read auxiliary data from starinfo and select rows
@@ -1090,11 +1112,22 @@ if exist('cwv2plot')&&isavar('vars');
     % apply flags
     cwv2plot(flagCWV==1) = NaN;
     
-    figure;
-    [h,filename]=spsun(daystr, 't', cwv2plot, '.', vars.Alt1e4{:}, mods{:}, ...
-        'cols', colslist{k,2}, 'ylabel', 'CWV [g/cm2]', ...
-        'filename', ['star' daystr platform 'cwvtseries' colslist{k,1}]);
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    fcwv_fl = figure;
+    plot(s.t,cwv2plot,'ob');
+    dynamicDateTicks;
+    xlabel('UTC time');
+    ylabel('CWV [g/cm^{2}]');
+    if max(cwv2plot)<1.2; tma = max(max(cwv2plot))*1.05; else tma=4.0; end;
+    ylim([0.0,tma]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
+    title([tit ' - CWV [g/cm^{2}]' ]);
+    grid on;
+   
+    fname = fullfile(p1,[instrumentname daystr '_cwv']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(fcwv_fl,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
 end;
 
 
@@ -1105,11 +1138,22 @@ if exist('o32plot')&&isavar('vars');
     % apply flags
     o32plot(flagO3==1) = NaN;
     
-    figure;
-    [h,filename]=spsun(daystr, 't', o32plot, '.', vars.Alt1e4{:}, mods{:}, ...
-        'cols', colslist{k,2}, 'ylabel', 'O3 [DU]', ...
-        'filename', ['star' daystr platform 'o3tseries' colslist{k,1}]);
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    fo3_fl = figure;
+    plot(s.t,o32plot,'og');
+    dynamicDateTicks;
+    xlabel('UTC time');
+    ylabel('O_{3} [DU]');
+    if max(o32plot)<400; tma = max(max(o32plot))*1.05; else tma=400; end;
+    if min(o32plot)<250; bma = min(min(o32plot))*1.05; else bma=250; end;
+    ylim([bma,tma]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
+    title([tit ' - O_{3} [DU]' ]);
+    grid on;
+   
+    fname = fullfile(p1,[instrumentname daystr '_o3']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(fo3_fl,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
 end;
 
 % NO2
@@ -1117,13 +1161,50 @@ end;
 if exist('no22plot')&&isavar('vars');
     
     % apply flags
-    o32plot(flagO3==1) = NaN;
+    no22plot(flagNO2==1) = NaN;
+    no22plot =no22plot/2.6867e16; % conversion to DU
     
-    figure;
-    [h,filename]=spsun(daystr, 't', no22plot, '.', vars.Alt1e4{:}, mods{:}, ...
-        'cols', colslist{k,2}, 'ylabel', 'NO2 [DU]', ...
-        'filename', ['star' daystr platform 'no2tseries' colslist{k,1}]);
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+    fno2_fl = figure;
+    plot(s.t,no22plot,'or');
+    dynamicDateTicks;
+    xlabel('UTC time');
+    ylabel('NO_{2} [DU]');
+    if max(no22plot)<4; tma = max(max(no22plot))*1.05; else tma=4; end;
+    ylim([0.0,tma]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
+    title([tit ' - NO_{2} [DU]' ]);
+    grid on;
+   
+    fname = fullfile(p1,[instrumentname daystr '_no2']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(fno2_fl,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
+end;
+
+% HCOH
+
+if exist('hcoh2plot');
+    
+    % apply flags
+    hcoh2plot(flagHCOH==1) = NaN;
+    
+    fhcoh_fl = figure;
+    plot(s.t,hcoh2plot,'om');
+    dynamicDateTicks;
+    xlabel('UTC time');
+    ylabel('HCOH [DU]');
+    if max(hcoh2plot)<10; tma = max(max(hcoh2plot))*1.05; else tma=10; end;
+    ylim([0.0,tma]);
+    xlim([s.t(1)-ddt s.t(end)+ddt]);
+    title([tit ' - HCOH [DU]' ]);
+    grid on;
+   
+    fname = fullfile(p1,[instrumentname daystr '_hcoh']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(fhcoh_fl,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    
 end;
 
 
