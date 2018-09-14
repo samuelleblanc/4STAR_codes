@@ -15,6 +15,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2017-07-22, added gases c0 for ORACLES 2017
 % Modified, MS, 2018-09-12, fixed time bug related toORACLES 2016 c0
 % Modified, MS, 2018-09-12, bug fix to starc0gases in NO2 refspec call
+% Modified, MS, 2018-09-14, updated file with ORACLEs 3 starc0gases
 %------------------------------------------------------------------------
 
 version_set('1.0');
