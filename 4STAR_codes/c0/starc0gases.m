@@ -175,7 +175,7 @@ end;
         end
         % ORACLES 2017
         
-        elseif t> datenum([2017 2 1 0 0 0]); % use MLO June-2017-ORACLES    
+        elseif t> datenum([2017 2 1 0 0 0]) && t<=datenum([2018 8 1 0 0 0]); % use MLO June-2017-ORACLES    
          if now>=datenum([2017 2 1 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
@@ -217,6 +217,49 @@ end;
              end
             
         end; % end of ORACLES 2017 option
+        
+        elseif t> datenum([2018 8 1 0 0 0]); % use MLO Aug-2018-ORACLES    
+         if now>=datenum([2018 8 1 0 0 0]);
+             if strcmp(gas,'O3')
+                if mode==0
+                    % use MLO c0
+                    tmp = importdata(which(['20180812_VIS_C0_refined_langley_4STAR_ground_langleyam.dat'])); 
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    
+                    tmp = load(which(['20180812O3refspec.mat']));
+                    c0gases = tmp;%.o3refspec;
+                end
+            elseif strcmp(gas,'NO2')
+                if mode==0
+                    % use MLO c0
+                   
+                    tmp = importdata(which(['20180812_VIS_C0_refined_langley_4STAR_ground_langleyam.dat'])); 
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load(which(['20180812NO2refspec.mat']));
+                    c0gases = tmp;%.no2refspec;
+                    
+                    
+                end
+                
+            elseif strcmp(gas,'HCOH')
+                if mode==0
+                    % use lamp FEL?
+                    tmp = importdata(which(['20180812_VIS_C0_refined_langley_4STAR_ground_langleyam.dat'])); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load(which(['20180812HCOHrefspec.mat']));
+                    
+                    c0gases = tmp;%.hcohrefspec;
+                end    
+                
+             end
+            
+        end; % end of ORACLES 2018 option
         
     end; % end of c0 date options    
         
