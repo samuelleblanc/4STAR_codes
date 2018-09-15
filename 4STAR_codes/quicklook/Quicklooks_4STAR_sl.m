@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
+function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
@@ -67,45 +67,51 @@ function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
 %        first days here are probably not good because of clouds.
 % SL   , 2017/05/26, modified for easier plotting with data from MLO May 2017
 % SL   , 2018/05/08, added automated FOV plotting
-% CF   , 2018/08/26, moved Langley towards top, cosmetic changes to output
-%        filenames (inserted '_') for readability and consistency with
-%        other files
-% MS   , 2018/09/14, updating gas plots into this version based on Connors
-%                    updates
+% MS   , 2018-09-14, adding gas plots capability
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.2');
-%% prepare to save a PowerPoint file
+version_set('1.1');
 set(groot, 'defaultAxesTickLabelInterpreter','None'); set(groot, 'defaultLegendInterpreter','None');
 set(groot, 'defaultAxesTitle','None'); 
 
-pptcontents={}; % pairs of a figure file name and the number of figures per slide
-pptcontents0={};
 
 %% Sanitize inputs and get file paths
 if nargin<1; % no file path set
-    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
-    fname_4starsun = getfullname('4STAR*starsun.mat','starsun','Choose starsun file');  
-    [p1, f, ext0]=fileparts(fname_4starsun);
+    [f1,p1] = uigetfile2('4STAR*starsun.mat','Choose 4STAR starsun file');
+    fname_4starsun = [p1 f1];
+    [p0, f, ext0]=fileparts(fname_4starsun);
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
+    if ~exist([p0 filesep f(1:end-3) ext0]);
+        [ft,pt] = uigetfile2([instrumentname '_' daystr '*star.mat'],'Choose the 4STAR star.mat file');
+        fname_4star = [pt ft];
+    else;
+        fname_4star = [p0 filesep f(1:end-3) ext0];
+    end;
 elseif nargin<2;
     [p1, f, ext0]=fileparts(fname_4starsun);
-    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
-%     [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
-%     fname_4star = [pt ft];
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
+    if ~exist([p0 filesep f(1:end-3) ext0]);
+        [ft,pt] = uigetfile2([instrumentname '_' daystr '*star.mat'],'Choose the 4STAR star.mat file');
+        fname_4star = [pt ft];
+    else;
+        fname_4star = [p0 filesep f(1:end-3) ext0];
+    end;
 else;
     [p1, f, ext0]=fileparts(fname_4starsun);
 end;
-p1 = getnamedpath('starimg');
+
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
 savefigure = true;
 
 if nargin <3;
-    ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks.ppt']);
+    ppt_fname = fullfile(p1,[daystr '_' instrumentname '_Quicklooks.ppt']);
 end;
 
 %% Set up the load path of the files
+disp(['Loading 4STAR file: ' fname_4star])
 st = load(fname_4star);
+disp(['Loading 4STAR file: ' fname_4starsun])
 s = load(fname_4starsun);
 
 %********************
@@ -159,25 +165,6 @@ colslist={'' c 1:13
     'NIRonly' nirc(11:13)+1044 11:13};
 iwvl = c; iwvlv = visc(1:10); iwvln = nirc(11:13)+1044;
 wvl = s.w(iwvl); wvlv = s.w(iwvlv); wvln = s.w(iwvln);
-
-%% Check if langley is defined
-if isfield(s,'langley')||isfield(s,'langley1');
-    % run the langley codes and get the figures;
-    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
-    langley_figs = starLangley_fx_(s,1,p1,xtra);
-    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
-end;
-
 
 %% call the gas 'gas'/'cwv' if does not exist in starsun
 if isfield(s,'gas')
@@ -255,6 +242,7 @@ else;
     flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
 end;
 
+
 %% read auxiliary data from starinfo and select rows
 if isequal(platform, 'flight');
     if ~isfield(s,'flight');
@@ -276,6 +264,9 @@ elseif isequal(platform, 'ground');
     end;
 end;
 
+%% prepare to save a PowerPoint file
+pptcontents={}; % pairs of a figure file name and the number of figures per slide
+pptcontents0={};
 
 %% Set up fields to plot
 fld = fields(st);
@@ -312,13 +303,11 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % plot temperatures and pressures in the spectrobox
 ftnp = figure;
-subplot(3,1,[1,2]);
-[Ts,tt] = nfsmooth(s.Tprecon_C,60);
-[RHs,rr] = nfsmooth(s.RHprecon_percent,60); high_RH = find(RHs>2);
-[ax,h1,h2] = plotyy(s.t(tt),Ts,s.t(rr),RHs);
-if length(high_RH)>300; 
+subplot(3,1,[1,2])
+[ax,h1,h2] = plotyy(s.t,nfsmooth(s.Tprecon_C,60),s.t,nfsmooth(s.RHprecon_percent,60));
+if length(find(nfsmooth(s.RHprecon_percent,60)>2.0))>300; 
     set(ax(1),'Color',[1,0.5,0.5]);
-    text(ax(2),s.t(1),0.5,'RH > 2% Too high!');
+    text(ax(2),s.t(1),0.5,'RH Too high!');
     set(ftnp, 'InvertHardCopy', 'off');
 end;
 
@@ -340,8 +329,8 @@ grid on;
 [lg,ic] = legend(starfieldname2label('Tprecon'),starfieldname2label('RHprecon'),'Location', 'Best');
 for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
 
-ax2 = subplot(3,1,3);
-linkaxes([ax(1),ax(2),ax2],'x');
+ax2 = subplot(3,1,3)
+linkaxes([ax(1),ax(2),ax2],'x')
 plot(ax2,s.t,s.Tbox_C,'.','color', 	[0.5,0.5,0.5]); hold on;
 plot(ax2,s.t,nfsmooth(s.Tbox_C,60),'.g');
 grid on;
@@ -404,7 +393,7 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 %plot airmasses
 hsk = figure;
-plot(s.t,real(s.m_aero),'.b');
+plot(s.t,s.m_aero,'.b');
 hold on;
 plot(s.t,s.m_ray,'.r');
 grid on;
@@ -413,7 +402,7 @@ dynamicDateTicks;
 xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Airmass');
 title([instrumentname ' - ' daystr ' - airmasses']);
-fname = fullfile(p1,[instrumentname '_' daystr '_airmass']);
+fname = fullfile(p1,[instrumentname daystr '_airmass']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(hsk,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -433,7 +422,7 @@ xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Degrees [^\circ]')
 legend('SZA','Sun Az','Sun El');
 title([instrumentname ' - ' daystr ' - Solar Angles']);
-fname = fullfile(p1,[instrumentname '_' daystr '_solarangles']);
+fname = fullfile(p1,[instrumentname daystr '_solarangles']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(ftrk,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -446,7 +435,7 @@ ylabel('Total Quad voltages [V]');
 title([instrumentname ' - ' daystr ' - Quad voltages']);
 dynamicDateTicks;grid on;
 ax2 = subplot(212);
-linkaxes([ax1,ax2],'x');
+linkaxes([ax1,ax2],'x')
 plot(s.t,s.QdVtb./s.QdVtot,'+r');hold on;
 plot(s.t,s.QdVlr./s.QdVtot,'xg');
 dynamicDateTicks;grid on;
@@ -455,7 +444,7 @@ xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Quad voltages ratio'); ylim([-1,1])
 ylim([-0.6,0.6])
 legend('Quad top bottom / Total','Quad Left right / Total');
-fname = fullfile(p1,[instrumentname '_' daystr '_Quad']);
+fname = fullfile(p1,[instrumentname daystr '_Quad']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fqd,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -474,7 +463,7 @@ pos1 = get(ax(1), 'Position');pos2 = get(ax(2), 'Position');
 set(ax(1), 'Position', [pos1(1) pos1(2) pos1(3)-0.08 pos1(4)]);
 set(ax(2), 'Position', [pos2(1) pos2(2) pos2(3)-0.08 pos2(4)]);
 title([instrumentname ' - ' daystr ' - Elevation and Azimuth angles']);
-fname = fullfile(p1,[instrumentname '_' daystr '_El_Az']);
+fname = fullfile(p1,[instrumentname daystr '_El_Az']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fazel,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -514,7 +503,7 @@ set(ax(2), 'Position', [pos2(1) pos2(2) pos2(3)-0.08 pos2(4)]);
 ylabel(ax(2),'Roll [^\circ]','Interpreter','tex');
 ylabel(ax(1),'Pitch [^\circ]','Interpreter','tex');
 title([instrumentname ' - ' daystr ' - Pitch and Roll']);
-fname = fullfile(p1,[instrumentname '_' daystr '_Pitch_Roll']);
+fname = fullfile(p1,[instrumentname daystr '_Pitch_Roll']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figpr,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -528,7 +517,7 @@ xlabel('UTC time');
 xlim([s.t(1)-ddt s.t(end)+ddt]);
 ylabel('Altitude [m]');
 title([instrumentname ' - ' daystr ' - Altitude']);
-fname = fullfile(p1,[instrumentname '_' daystr '_alt']);
+fname = fullfile(p1,[instrumentname daystr '_salt']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(falt,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -563,7 +552,7 @@ if isequal(platform, 'flight');
     ch=colorbarlabeled('UTC');
     datetick(ch, 'y','keeplimits');
     legend(plo,leg,'Interpreter', 'none');
-    fname = fullfile(p1,[instrumentname '_' daystr '_map']);
+    fname = fullfile(p1,[instrumentname daystr '_map']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figm,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -585,7 +574,7 @@ if isequal(platform, 'flight');
     ylabel('Longitude [^\circ]'); xlabel('Time'); title([tit ' - Longitude vs. time']);
     dynamicDateTicks;
     legend(plo,leg,'Interpreter', 'none');
-    fname = fullfile(p1,[instrumentname '_' daystr '_lon_vs_time']);
+    fname = fullfile(p1,[instrumentname daystr '_lon_vs_time']);
     fig_names = {[fname '.png']};
     save_fig(figlt,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -607,7 +596,7 @@ if isequal(platform, 'flight');
     ylabel('Latitude [^\circ]'); xlabel('Time'); title([tit ' - Latitude vs. time']);
     dynamicDateTicks;
     legend(plo,leg,'Interpreter', 'none');
-    fname = fullfile(p1,[instrumentname '_' daystr '_lat_vs_time']);
+    fname = fullfile(p1,[instrumentname daystr '_lat_vs_time']);
     fig_names = {[fname '.png']};
     save_fig(figlat,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -638,7 +627,7 @@ if isequal(platform, 'flight');
     ch=colorbarlabeled('UTC');
     datetick(ch, 'y','keeplimits');
     legend(plo,leg,'Interpreter', 'none');
-    fname = fullfile(p1,[instrumentname '_' daystr '_alt_vs_lat']);
+    fname = fullfile(p1,[instrumentname daystr '_alt_vs_lat']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figaltlat,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -669,7 +658,7 @@ if isequal(platform, 'flight');
     ch=colorbarlabeled('UTC');
     datetick(ch, 'y','keeplimits');
     legend(plo,leg,'Interpreter', 'none');
-    fname = fullfile(p1,[instrumentname '_' daystr '_alt_vs_lon']);
+    fname = fullfile(p1,[instrumentname daystr '_alt_vs_lon']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(figaltlon,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -708,7 +697,7 @@ else;
     lpos = get(a,'Position');
     text(lpos(2),lpos(1),'No saturation','Units','normalized');
 end;
-fname = fullfile(p1,[instrumentname '_' daystr '_vis_sats_parks_Tint']);
+fname = fullfile(p1,[instrumentname daystr '_vis_sats_parks_Tint']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -740,7 +729,7 @@ else;
     lpos = get(a,'Position');
     text(lpos(2),lpos(1),'No saturation','Units','normalized');
 end;
-fname = fullfile(p1,[instrumentname '_' daystr '_nir_sats_parks_Tint']);
+fname = fullfile(p1,[instrumentname daystr '_nir_sats_parks_Tint']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -762,7 +751,7 @@ ylim(ax(1),[-5,5]); set(ax(1),'ytick',[-5,-2.5,0,2.5,5]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - VIS darks and temperature']);
-fname = fullfile(p1,[instrumentname '_' daystr '_vis_dark_T']);
+fname = fullfile(p1,[instrumentname daystr '_vis_dark_T']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fdrkv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -775,7 +764,7 @@ ylim(ax(1),[0,30]); set(ax(1),'ytick',[0,10,20,30,40,50]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
 title([instrumentname ' - NIR darks and temperature']);
-fname = fullfile(p1,[instrumentname '_' daystr '_nir_dark_T']);
+fname = fullfile(p1,[instrumentname daystr '_nir_dark_T']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(fdrkn,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -798,10 +787,8 @@ grid on;
 labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
 for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
 colormap(cm);
-if license('test','Mapping_Toolbox')||~isempty(which('lcolorbar')); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-fname = fullfile(p1,[instrumentname '_' daystr '_visraw']);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile(p1,[instrumentname daystr '_visraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frv,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -822,10 +809,8 @@ for ij=1:length(iwvlv), labels{ij} = '.'; end;
 lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
 labels = {labels{:},lbl_tmp{:}}';
 colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-fname = fullfile(p1,[instrumentname '_' daystr '_nirraw']);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile(p1,[instrumentname daystr '_nirraw']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frnir,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -849,7 +834,7 @@ end;
 yticklabels(labls);
 title([instrumentname ' - ' daystr ' - All Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
-fname = fullfile(p1,[instrumentname '_' daystr '_rawcarpet']);
+fname = fullfile(p1,[instrumentname daystr '_rawcarpet']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(frcar,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -883,10 +868,8 @@ if exist('tau_aero_noscreening');
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
     for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-    fname = fullfile(p1,[instrumentname '_' daystr '_vis_tau_aero_noscreening']);
+    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+    fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -907,10 +890,8 @@ end
     lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
     labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-    fname = fullfile(p1,[instrumentname '_' daystr '_nir_tau_aero_noscreening']);
+    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+    fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero_noscreening']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -939,10 +920,8 @@ if exist('tau_aero');
     labels = strread(num2str(wvlv.*1000.0,'%5.0f'),'%s');
     for ij=nw+1:nw+length(iwvln), labels{ij} = '.'; end;
     colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-    fname = fullfile(p1,[instrumentname '_' daystr '_vis_tau_aero']);
+    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+    fname = fullfile(p1,[instrumentname daystr '_vis_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodv_fl,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -963,10 +942,8 @@ end
     lbl_tmp = strread(num2str(wvln.*1000.0,'%5.0f'),'%s');
     labels = {labels{:},lbl_tmp{:}}';
     colormap(cm);
-if license('test','Mapping_Toolbox'); % check if the mapping toolbox exists
-   lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-end
-    fname = fullfile(p1,[instrumentname '_' daystr '_nir_tau_aero']);
+    lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+    fname = fullfile(p1,[instrumentname daystr '_nir_tau_aero']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(faodni,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -991,7 +968,7 @@ end
         grid on;
         title([tit ' - AOD flight track map']);
         ch=colorbarlabeled('AOD  500 nm');
-        fname = fullfile(p1,[instrumentname '_' daystr '_map_aod']);
+        fname = fullfile(p1,[instrumentname daystr '_map_aod']);
         fig_names = [fig_names,{[fname '.png']}];
         save_fig(figma,fname,0);
         pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1017,7 +994,7 @@ end
         grid on;
         title([tit ' - flight altitude vs. longitude, by angstrom']);
         ch=colorbarlabeled('Angstrom');
-        fname = fullfile(p1,[instrumentname '_' daystr '_lon_alt_ang']);
+        fname = fullfile(p1,[instrumentname daystr '_lon_alt_ang']);
         fig_names = [fig_names,{[fname '.png']}];
         save_fig(figloaltaod,fname,0);
         pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1041,7 +1018,7 @@ end
         grid on;
         title([tit ' - flight altitude vs. latitude, by angstrom']);
         ch=colorbarlabeled('Angstrom');
-        fname = fullfile(p1,[instrumentname '_' daystr '_lat_alt_ang']);
+        fname = fullfile(p1,[instrumentname daystr '_lat_alt_ang']);
         fig_names = [fig_names,{[fname '.png']}];
         save_fig(figlaaltaod,fname,0);
         pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1212,7 +1189,7 @@ if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corr
     c0corrfactor=load(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']));
     tau_aero_scaled=tau_aero+(1./m_aero)*log(c0corrfactor);
 end;
-if exist('tau_aero_scaled')&&isavar('vars');
+if exist('tau_aero_scaled');
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
         [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, ...
@@ -1527,6 +1504,27 @@ if isfield(st,'vis_fovp') | isfield(st,'vis_fova');
     for jo=1:mod(length(fov_figs),4);
         pptcontents0=[pptcontents0; {' ' 4}];
     end;
+end;
+
+%% Check if langley is defined
+if isfield(s,'langley')|isfield(s,'langley1');
+    % run the langley codes and get the figures;
+    if isfield(s,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; else; xtra='_langley'; end;
+    langley_figs = starLangley_fx(fname_4starsun,1,p1,xtra);
+    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{5} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{6} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{7} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{8} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
 end;
 
 
