@@ -12,7 +12,7 @@ else
     s.toggle = update_toggle;
 end
 
-s.langley1 = [datenum(2018,8,13,16,10,00) datenum(2018,8,13,18,20,00)]; %put in if condition below if different for different 4STARs
+s.langley1 = [datenum(2018,8,12,16,10,00) datenum(2018,8,13,18,20,00)]; %put in if condition below if different for different 4STARs
             
 %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
              s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
