@@ -68,6 +68,8 @@ function [visc0mod, nirc0mod, visnote, nirnote, visc0moderr, nirc0moderr,model_a
 % Modified, Samuel LeBlanc, 2017-05-28, v2.0, modified to use the
 %                   instrumentname input variable (support for multiple instruments)
 % Modified, Michal Segal, 2017-07-24, added c0 for ORACLES 2
+% Modified, Michal Segal, 2018-09-14, updated modified Langley for ORACLES
+%                                     3; using MLO Aug-2018 data
 % -------------------------------------------------------------------------
 %% function routine
 version_set('2.0');
@@ -95,7 +97,12 @@ switch instrumentname;
     case{'4STAR'}
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2015 9 16 0 0 0]); %
-                if now>=datenum([2017 2 01 0 0 0]) % use MLO May 2017 for ORACLES 2 (for now; wait until transit)
+                if now>=datenum([2018 8 01 0 0 0]) % use MLO Aug 2018 for ORACLES 3 (for now; wait until transit)
+                    daystr='20180812';
+                    filesuffix='modified_langley_4STAR_MLO'; % 
+                    model_atmosphere=2; %use MidLat summer for ORACLES
+                    %elseif now>=datenum([2016 3 17 0 0 0]); % KORUS transit for KORUS-AQ
+                elseif now>=datenum([2017 2 01 0 0 0]) % use MLO May 2017 for ORACLES 2 (for now; wait until transit)
                     daystr='20170531';
                     filesuffix='modified_Langley_MLO_May2017'; % 
                     model_atmosphere=2; %use MidLat summer for ORACLES
