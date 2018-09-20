@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
+function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
