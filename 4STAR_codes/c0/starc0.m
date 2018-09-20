@@ -27,9 +27,12 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v1.9, 2016-11-09, updated c0 from mean MLO 2016 to KORUS
 % SL, v1.10, 2017-04-07, updated c0 from mean MLO 2016 November for ORACLES
 % SL, v2.0, 2017-05-27, Updates to use multiple different instruments,
+% MS, v2.1, 2018-09-14, updated c0 from MLO 20180812 (tentative) for ORCLES 3 
+% MS, v2.1, 2018-09-14, updated mean c0 from MLO Aug-2018 for ORACLES 3
+
 % defined via instrumentname variable, defaults to 4STAR
 
-version_set('2.0');
+version_set('2.1');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -48,7 +51,10 @@ switch instrumentname;
     case {'4STAR'}
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-            if t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
+            if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
+                 daystr = '20180811';
+                 filesuffix = 'refined_Langley_averaged_with_MLO_2018_Aug_11_12';
+            elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
                  daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';

@@ -46,6 +46,8 @@
 % MS, 2018-03-26, updating no2OD and filtering for subtraction purposes
 % MS, 2018-03-27, added NO2 column default values to filtered retrieved
 %                 fileds (instead of NaN's)
+% MS, 2018-09-12, fixing bug using gxs-gas cross sections in starcogases
+%                 call
 % -------------------------------------------------------------------------
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode,gxs)

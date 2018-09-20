@@ -1,6 +1,7 @@
-function s = starinfo(s)
+function s = starinfo_yyyymmdd(s)
+% s = starinfo_yyyymmdd(s) for use as template
 
-if exist('s','var')&&isfield(s,'t')&&~isempty(s.t)
+if exist('s','var') && isfield(s,'t') && ~isempty(s.t)
    daystr = datestr(s.t(1),'yyyymmdd');
 else
    daystr=evalin('caller','daystr');
