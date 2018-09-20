@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
+function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
@@ -225,9 +225,7 @@ if isfield(s, 'flagfilenameO3');
 else
     % flag only un-physical values
     flagO3   = zeros(length(s.t),1);
-    if isvar('o32plot')==1 %bug fix: check if gas retrievals are being run before calling o32plot
-        flagO3(o32plot<250 | o32plot> 450) = 1;
-    end
+    flagO3(o32plot<250 | o32plot> 450) = 1;
 end
 
 if isfield(s,'flagfilenameCWV');
@@ -236,9 +234,7 @@ if isfield(s,'flagfilenameCWV');
     flagCWV = flagCWV.manual_flags.screen;
 else;
     flagCWV  = zeros(length(s.t),1);
-    if isvar('cwv2plot')==1 %bug fix: check if gas retrievals are being run before calling cwv2plot
-        flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
-    end
+    flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
 end;
 
 if isfield(s,'flagfilenameNO2');
@@ -247,9 +243,7 @@ if isfield(s,'flagfilenameNO2');
     flagNO2 = flagNO2.manual_flags.screen;
 else;
     flagNO2  = zeros(length(s.t),1);
-    if isvar('no22plot')==1 %bug fix: check if gas retrievals are being run before calling no22plot
-        flagNO2(no22plot<0 | no22plot> 1e18) = 1;
-    end
+    flagNO2(no22plot<0 | no22plot> 1e18) = 1;
 end;
 
 if isfield(s,'flagfilenameHCOH');
@@ -258,9 +252,7 @@ if isfield(s,'flagfilenameHCOH');
     flagHCOH = flagHCOH.manual_flags.screen;
 else;
     flagHCOH  = zeros(length(s.t),1);
-    if isvar('hcoh2plot')==1 %bug fix: check if gas retrievals are being run before calling hcoh2plot
-        flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
-    end
+    flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
 end;
 
 %% read auxiliary data from starinfo and select rows
@@ -854,7 +846,7 @@ for jj =200:200:1600;
     [nul,imin] = min(abs(iswl.*1000.0-jj));
     labls = [labls;sprintf('%4.0f',s.w(imin).*1000.0)];
 end;
-set(gca,'ytick',str2num(labls)); %yticklabels(labls); %yticklabels is not compatible with 2013b.
+yticklabels(labls);
 title([instrumentname ' - ' daystr ' - All Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname '_' daystr '_rawcarpet']);
@@ -1095,7 +1087,7 @@ if exist('tau_aero');
     xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
     ylabel('Wavelength [nm]');
     axis('xy');
-    set(gca,'ytick',str2num(labls)); %yticklabels(labls); %yticklabels is not compatible with 2013b.    
+    yticklabels(labls);
     title([instrumentname ' - ' daystr ' - tau_aero spectra' ]);
     cb = colorbarlabeled('tau_aero');
     fname = fullfile(p1,[instrumentname daystr '_spectra_aod_carpet']);
