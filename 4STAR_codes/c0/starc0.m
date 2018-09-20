@@ -53,7 +53,7 @@ switch instrumentname;
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
                  daystr = '20180811';
-                 filesuffix = 'refined_Langley_averaged_with_MLO_2018_Aug_11_12';
+                 filesuffix = '4STAR_refined_Langley_averaged_with_MLO_2018_Aug_11_12';
             elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
                  daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
