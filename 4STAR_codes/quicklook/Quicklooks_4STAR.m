@@ -74,6 +74,8 @@ function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
 %                    updates
 % MS   , 2018-09-20, updated a bug in refering to gases plot range when
 %                    var2plot doesn't exist
+% MS   , 2018-09-20, fixed backcompatability bug using ytick instead of
+%                    yticklabels
 % -------------------------------------------------------------------------
 
 %% function start
@@ -856,7 +858,7 @@ for jj =200:200:1600;
     [nul,imin] = min(abs(iswl.*1000.0-jj));
     labls = [labls;sprintf('%4.0f',s.w(imin).*1000.0)];
 end;
-yticklabels(labls);
+set(gca,'ytick',str2num(labls)); %yticklabels(labls)#yticklabels(labls);
 title([instrumentname ' - ' daystr ' - All Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname '_' daystr '_rawcarpet']);
@@ -1097,7 +1099,7 @@ if exist('tau_aero');
     xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
     ylabel('Wavelength [nm]');
     axis('xy');
-    yticklabels(labls);
+    set(gca,'ytick',str2num(labls));%yticklabels(labls);
     title([instrumentname ' - ' daystr ' - tau_aero spectra' ]);
     cb = colorbarlabeled('tau_aero');
     fname = fullfile(p1,[instrumentname daystr '_spectra_aod_carpet']);
