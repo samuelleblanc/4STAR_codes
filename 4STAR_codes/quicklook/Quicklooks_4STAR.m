@@ -1080,7 +1080,7 @@ if exist('tau_aero');
         plot(s.w.*1000.0,s.tau_aero(ik,:),'.');
         labels{i} = datestr(s.t(ik),'HH:MM');
     end;
-    xlabel('Wavelenght [nm]'); xlim([350,1700]);
+    xlabel('Wavelength [nm]'); xlim([350,1700]);
     ylabel('tau_aero','Interpreter','None');
     title([daystr ' - Spectra of AOD'])
     colormap(cm)
