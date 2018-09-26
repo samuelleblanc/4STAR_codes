@@ -63,7 +63,9 @@ if exist([pathdir, pathfile],'file')
       end
    end
    if isempty(pname)||~isdir(pname)
-      reset = true;
+      reset = true; 
+      [~,pthfile,~]= fileparts(pathfile);
+      pthfile = ['Path in "',pthfile,'" does not exist. ']; 
    end
 else % reset it
    reset = true;
@@ -78,6 +80,9 @@ end
 % within a directory and strip the filepath, so we let the user choose.
 
 if reset
+    if isavar('pthfile')&&~isempty(pthfile)
+        dialog = [pthfile, dialog];
+    end
 pname = setnamedpath(pathfile,[],dialog);
 end
 

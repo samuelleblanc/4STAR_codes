@@ -3,17 +3,17 @@ function TF = isafile(in)
 % Intended to replace exist(var,'file') usage since it doesn't compile
 
 TF = false;
-if isavar('in')&&~isempty(in)
+if isavar('in')
     out = dir(in);
     if ~isempty(out)
         if ~isfield(out,'folder')
-            [out.folder,~,~] = fileparts(in);
+            out.folder = [fileparts(in),filesep];
         end
         out = fullfile(out.folder, out.name);
         TF =  ~isdir(in)&&~isempty(out)&&~isempty(strfind(out,in));
     end
 end
-    %nested function isvar
+    %nested function isavar
     function TF = isavar(var)
         TF = false;
         if ~isempty(who('var'))
