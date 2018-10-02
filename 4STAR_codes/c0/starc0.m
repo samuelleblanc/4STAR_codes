@@ -30,10 +30,11 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v2.1, 2018-09-14, updated c0 from MLO 20180812 (tentative) for ORCLES 3 
 % MS, v2.1, 2018-09-14, updated mean c0 from MLO Aug-2018 for ORACLES 3
 % MS, v2.1, 2018-09-20, updated suffix of starc0 for 4STAR for ORACLES 3
-
+% MS, v.2.2 2018-10-01, added transmittance functionality for 4STARB
+%                       cross-sections
 % defined via instrumentname variable, defaults to 4STAR
 
-version_set('2.1');
+version_set('2.2');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -440,8 +441,15 @@ if verbose; disp(['Using the C0 from ' visfilename]), end;
 % return channels used for AOD fitting
 [visc,nirc]=starchannelsatAATS(t,instrumentname);
 cross_sections=taugases(t,'vis',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
-visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
-h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
+if strcmp(instrumentname,'4STAR')
+    visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
+    h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
+elseif strcmp(instrumentname,'4STARB')
+    Loschmidt=2.686763e19;             % molec/cm3*atm
+    visaerosolcols1=find(exp(-cross_sections.h2o*Loschmidt*1000)>0.9999 & cross_sections.o2<1e-25);
+    h2o=abs(exp(-cross_sections.h2o*Loschmidt*1000));
+end
+% filter
 h2ook=find(isfinite(h2o)==1 & imag(h2o)==0);
 h2ong=find(isfinite(h2o)==0 | imag(h2o)~=0);
 h2o4ng=interp1(log(cross_sections.wln(h2ook)),h2o(h2ook), log(cross_sections.wln));
@@ -452,7 +460,12 @@ visaerosolcols=find(h2o>0.9997 & cross_sections.o2<1e-27); % Yohei 2013/01/28
 % visaerosolcols=union(visaerosolcols1,visaerosolcols2(:));
 if ~strcmp(instrumentname,'2STAR');
     cross_sections=taugases(t,'nir',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
-    h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
+    if strcmp(instrumentname,'4STAR')
+        h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
+    elseif strcmp(instrumentname,'4STARB')
+        Loschmidt=2.686763e19;  
+        h2o=abs(exp(-cross_sections.h2o*Loschmidt*1000)); % Yohei 2013/01/28
+    end
     niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01/28
     % niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
     % niraerosolcols1=[];
