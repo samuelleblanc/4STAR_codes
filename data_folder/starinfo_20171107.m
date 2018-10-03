@@ -13,7 +13,7 @@ end
 
  
 s.ground=[datenum(2017,11,7,15,11,35) datenum(2017,11,8,0,26,24)]; 
-% s.langley1 = [datenum(2017,8,23,11,00,09) datenum(2017,8,23,12,24,52)];
+s.langley1 = [datenum(2017,11,07,14,50,00) datenum(2017,11,07,17,30,00)]; %approximately air mass 12-2 during this period...
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
