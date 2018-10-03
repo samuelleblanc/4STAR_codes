@@ -17,8 +17,8 @@ s.langley1 = [datenum(2017,10,24,14,50,00) datenum(2017,10,24,17,30,00)]; %appro
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.278; % guess    
-s.NO2col=2.0e15; % 
+s.O3col=0.249; % estimated average from OMI over northern CA, from Giovanni 
+s.NO2col=4.0e15; % estimated average from OMI over northern CA, from Giovanni 
 
 % flags
 %s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 

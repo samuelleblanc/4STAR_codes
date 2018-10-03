@@ -17,8 +17,8 @@ s.ground=[datenum(2017,11,7,15,11,35) datenum(2017,11,8,0,26,24)];
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+s.O3col=0.270; % no OMI data this day... estimated as between the value of the 6th, and the 8th
+s.NO2col=5.0e15; %  no OMI data this day... estimated as between the value of the 6th, and the 9th (two nearest days)
  
 % other tweaks 
 if isfield(s, 'Pst'); 

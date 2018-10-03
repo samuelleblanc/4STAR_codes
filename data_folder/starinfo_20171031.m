@@ -17,8 +17,8 @@ s.langley1 = [datenum(2017,10,31,14,50,00) datenum(2017,10,31,17,30,00)]; %appro
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+s.O3col=0.254; % estimated average from OMI over northern CA, from Giovanni 
+s.NO2col=3.7e15; % estimated average from OMI over northern CA, from Giovanni 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
