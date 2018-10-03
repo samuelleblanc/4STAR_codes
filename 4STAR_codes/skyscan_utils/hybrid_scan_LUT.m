@@ -1,141 +1,83 @@
-function hybrid_scan_LUT% Produce a look-up table for every 1-degree of SZA with (dAz, dEl) pairs
+function hybrid_scan_LUT
+% hybrid_scan_LUT
+% Produce a look-up table for every 1-degree of SZA with (dAz, dEl) pairs
+% Saves results as ASCII files *.asc  in named path 'hyscan_LUTs'
+% Files are named as: "hyscan_SZA_N_LUT.asc wehre N is the supplied SZA
+% LUTs contain six columns: SA , El, dEl, dAz, ddEl, ddAz 
+% dEl and dAz are moves relative to solar position. 
+% dEl and dAz are incremental moves from current 4STAR position. 
+% The supplied scan is for the CCW leg  For CW, multiply dAz and ddAz by -1 
 
-% sun_xyz = sph2cart(TH,PHI,1) (Th = azimuth, PHI = elevation = 90-ZA
-% Scraps for hybrid mode
-
-% After I get this initial stage working, modify to include overlapping
-% shallow angles and a definite dAz = 180 for both legs
-% v 0.2
-% Possibly working but no output yet.
-
-SAZ = 0;
-SZA_ = (0.5:0.5:90);
-SEL_ = 90-SZA_;
-%sun.xyz is vector locating sun in cartesian coords
-% the negative sign for SAZ corrects Az(0=north) frame to a RH axis system
-[sun.x, sun.y, sun.z] = sph2cart(-SAZ.*pi/180, SEL_.*pi/180,1);
-%axi is vector locating point in principle plane 90 degrees from sun
-[axi.x, axi.y, axi.z] = sph2cart((180-SAZ).*pi/180, (90-SEL_).*pi/180,1);
+% Connor, v1.0, 2018/09/25
+version_set('1.0');
 
 SA_set = [-10, -7, -5, -3.5, 3, 3.5, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 25, 30, 35, ...
    40, 45, 50, 60, 70, 80, 90, 100, 120, 140, 160, 180];
-target.SA = SA_set;
-target.SZA = SZA_;
-target.SEL = SEL_;
-target.CW.SA = NaN(length(SZA_),length(SA_set));
-target.CW.El = NaN(length(SZA_),length(SA_set));
-target.CW.dEl = NaN(length(SZA_),length(SA_set));
-target.CW.dAz = NaN(length(SZA_),length(SA_set));
-target.CW.ddEl = NaN(length(SZA_),length(SA_set));
-target.CW.ddAz = NaN(length(SZA_),length(SA_set));
-target.CCW.SA = NaN(length(SZA_),length(SA_set));
-target.CCW.El = NaN(length(SZA_),length(SA_set));
-target.CCW.dEl = NaN(length(SZA_),length(SA_set));
-target.CCW.dAz = NaN(length(SZA_),length(SA_set));
-target.CCW.ddEl = NaN(length(SZA_),length(SA_set));
-target.CCW.ddAz = NaN(length(SZA_),length(SA_set));
+SEL_ = [0.1 0.5:0.5:89.5, 89.9];
+SZA_ = 90-SEL_;  
 
 for za_i = 1:length(SZA_)
-   mark.EL = 90-SZA_(za_i);   
-   %Determine hybrid angles, CCW leg
-   SA_i = 1;
-   % Rotate until below El angle of 15 degrees
-   while mark.EL > 15
-      % Rotate vector at sun about orthogonal axis in PPL by desired SA_set
-      mark_xyz = rotVecAroundArbAxis([sun.x(za_i), sun.y(za_i), sun.z(za_i)], [axi.x(za_i), axi.y(za_i), axi.z(za_i)], SA_set(SA_i));
-      [mark.TH, mark.PHI, mark.z] = cart2sph(mark_xyz(1),mark_xyz(2),mark_xyz(3));
-      % Convert to degrees.
-      mark.TH_deg = (180./pi).*mark.TH; mark.PHI_deg = mark.PHI.*180./pi;
-      % Convert theta and phi to El, Za, Az
-      mark.EL = mark.PHI_deg; mark.ZA = 90-mark.EL;
-      mark.AZ = 360-mark.TH_deg;
-      % Compute SA to confirm.  This should agree with rotated angle SA_set
-      mark.SA = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, mark.AZ);
-      % Store the result
-      target.CCW.SA(za_i,SA_i) = mark.SA;
-      target.CCW.El(za_i,SA_i) = mark.EL;
-      target.CCW.dEl(za_i,SA_i) = SEL_(za_i)-mark.EL;
-      target.CCW.dAz(za_i,SA_i) = mark.AZ;
-      if mark.EL >15
-         SA_i = SA_i +1;
-      end
-   end
-   %Now complete the rest of the desired scattering angles as an Almucantar
-
-   last_Az= ceil(mod(mark.AZ-SAZ,180));
-   test_Az = last_Az:0.5:179.5;
-   % Compute SA for Az up to 180 at this fixed ZA
-   % then interpolate to find Az for the target Aeronet SA_set.
-   SA_t = zeros(size(test_Az));
-   for tAz = 1:length(test_Az)
-      SA_t(tAz) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, SAZ + test_Az(tAz));
-   end
-   Az_set = interp1(SA_t, test_Az, SA_set(SA_i+1:end),'nearest');
-   Az_set(isnan(Az_set)) = [];
-   for aa = 1:length(Az_set)
-      target.CCW.SA(za_i,SA_i+aa) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, Az_set(aa));
-      target.CCW.El(za_i,SA_i+aa) = mark.EL;
-      target.CCW.dEl(za_i,SA_i+aa) = mark.EL - SEL_(za_i);
-      target.CCW.dAz(za_i,SA_i+aa) = Az_set(aa);
-   end
-   target.CCW.SA(SA_i+aa+1) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, 180);
-   target.CCW.El(za_i,SA_i+aa+1) = mark.EL;
-   target.CCW.dEl(za_i,SA_i+aa+1) = mark.EL - SEL_(za_i);
-   target.CCW.dAz(za_i,SA_i+aa+1) = 180;
-   
-  
-   %Determine hybrid angles, CCW leg
-   mark.EL = 90-SZA_(za_i);
-   SA_i = 1;
-   % Rotate until below El angle of 15 degrees
-   while mark.EL > 15
-      % Rotate vector at sun about orthogonal axis in PPL by desired SA_set
-      mark_xyz = rotVecAroundArbAxis([sun.x(za_i), sun.y(za_i), sun.z(za_i)], [axi.x(za_i), axi.y(za_i), axi.z(za_i)], -SA_set(SA_i));
-      [mark.TH, mark.PHI, mark.z] = cart2sph(mark_xyz(1),mark_xyz(2),mark_xyz(3));
-      % Convert to degrees.
-      mark.TH_deg = (180./pi).*mark.TH; mark.PHI_deg = mark.PHI.*180./pi;
-      % Convert theta and phi to El, Za, Az
-      mark.EL = mark.PHI_deg; mark.ZA = 90-mark.EL;
-      mark.AZ = 360-mark.TH_deg;
-      % Compute SA to confirm.  This should agree with rotated angle SA_set
-      mark.SA = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, mark.AZ);
-      % Store the result
-      target.CW.SA(za_i,SA_i) = mark.SA;
-      target.CW.El(za_i,SA_i) = mark.EL;
-      target.CW.dEl(za_i,SA_i) = SEL_(za_i)-mark.EL;
-      target.CW.dAz(za_i,SA_i) = mark.AZ;
-      if mark.EL >15
-         SA_i = SA_i +1;
-      end
-   end
-   %Now complete the rest of the desired scattering angles as an Almucantar
-
-   last_Az= ceil(mod(mark.AZ-SAZ,180));
-   test_Az = last_Az:0.5:179.5;
-   % Compute SA for Az up to 180 at this fixed ZA
-   % then interpolate to find Az for the target Aeronet SA_set.
-   SA_t = zeros(size(test_Az));
-   for tAz = 1:length(test_Az)
-      SA_t(tAz) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, SAZ + test_Az(tAz));
-   end
-   Az_set = interp1(SA_t, test_Az, SA_set(SA_i+1:end),'nearest');
-   Az_set(isnan(Az_set)) = [];
-   for aa = 1:length(Az_set)
-      target.CW.SA(za_i,SA_i+aa) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, Az_set(aa));
-      target.CW.El(za_i,SA_i+aa) = mark.EL;
-      target.CW.dEl(za_i,SA_i+aa) = mark.EL - SEL_(za_i);
-      target.CW.dAz(za_i,SA_i+aa) = Az_set(aa);
-   end
-   target.CW.SA(SA_i+aa+1) = scat_ang_degs(SZA_(za_i), SAZ, mark.ZA, 180);
-   target.CW.El(za_i,SA_i+aa+1) = mark.EL;
-   target.CW.dEl(za_i,SA_i+aa+1) = mark.EL - SEL_(za_i);
-   target.CW.dAz(za_i,SA_i+aa+1) = 180;
-
+   mark.EL = SEL_(za_i); mark.ZA = 90-mark.EL;
+   mark.AZ = 20; mark.SA = 0;
+   SA_i = 0;   
+   scan= hyscan(SEL_(za_i), SA_set);
+%    scan.CW = hyscan(SEL_(za_i),-SA_set);
+   figure_(86);
+   plot3(scan.x, scan.y, scan.z,'k-',...
+      scan.x, -scan.y, scan.z,'r-');hold('on')
+   title(['Hybrid scan for SZA=',num2str(SZA_(za_i))]);
+   xlabel('x'); ylabel('y'); zlabel('z')
+   xl = xlim; yl = ylim; zl = zlim;
+   ll(1) = min([xl,yl,zl]); ll(2) = max([xl,yl,zl]);
+   axis('square');
+   xlim(ll); ylim(ll); zlim(ll);
+%    pause(.01)
+   write_hyscan(scan);      
 end
-target.CCW.ddEl(:,1) = target.CCW.dEl(:,1); target.CCW.ddEl(:,2:end) = diff(target.CCW.dEl,1,2);
-target.CCW.ddAz(:,1) = target.CCW.dAz(:,1); target.CCW.ddAz(:,2:end) = diff(target.CCW.dAz,1,2);
+return
 
-target.CW.ddEl(:,1) = target.CW.dEl(:,1); target.CW.ddEl(:,2:end) = diff(target.CW.dEl,1,2);
-target.CW.ddAz(:,1) = target.CW.dAz(:,1); target.CW.ddAz(:,2:end) = diff(target.CW.dAz,1,2);
+function write_hyscan(scan)
+hyscan_out = getnamedpath('hyscan_LUTs');
+LUT_name = ['hyscan_SZA_',strrep(num2str(scan.SZA),'.','p'),'_LUT.asc'];
+title = ['% ',LUT_name];
+comment_1 = ['% dEl and dAz are moves relative to solar position.'];
+comment_2 = ['% dEl and dAz are incremental moves from current 4STAR position.'];
+comment_3 = ['% This is for CCW leg.  For CW, multiply dAz and ddAz by -1'];
+header = ['SA , El, dEl, dAz, ddEl, ddAz'];
+txt = [scan.SA; scan.El; scan.dEl; scan.dAz; scan.ddEl; scan.ddAz];
+fid = fopen([hyscan_out, LUT_name],'w');
+fprintf(fid, '%s \n',title);
+fprintf(fid, '%s \n',comment_1);
+fprintf(fid, '%s \n',comment_2);
+fprintf(fid, '%s \n',comment_3);
+fprintf(fid, '%s \n',header);
+fprintf(fid, '%2.1f, %2.1f, %2.1f, %2.1f, %2.1f, %2.1f \n', txt);
+fclose(fid);
+
+return
+
+
+function plots
+figure;
+plot3(target.CCW.x(1,:), target.CCW.y(1,:), target.CCW.z(1,:),'ok-');
+hold('on');
+scatter3(target.CCW.x(1,:), target.CCW.y(1,:), target.CCW.z(1,:),...
+32,target.CCW.SA(1,:));
+xlabel('x'); ylabel('y'); zlabel('z')
+xl = xlim; yl = ylim; zl = zlim;
+ll(1) = min([xl,yl,zl]); ll(2) = max([xl,yl,zl]);
+axis('square');
+xlim(ll); ylim(ll); zlim(ll);
+
+
+figure_(86);
+plot3(target.CCW.x(aa,:), target.CCW.y(aa,:), target.CCW.z(aa,:),'ok-',...
+   target.CW.x(aa,:), target.CW.y(aa,:), target.CW.z(aa,:),'or-');
+hold('on');
+xlabel('x'); ylabel('y'); zlabel('z')
+xl = xlim; yl = ylim; zl = zlim;
+ll(1) = min([xl,yl,zl]); ll(2) = max([xl,yl,zl]);
+axis('square');
+xlim(ll); ylim(ll); zlim(ll);
 
 return
