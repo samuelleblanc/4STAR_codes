@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
+function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
@@ -73,6 +73,10 @@ function fig_names = Quicklooks_4STAR_cf(fname_4starsun,fname_4star,ppt_fname);
 % MS   , 2018-09-14, adding gas plots capability
 % MS   , 2018/09/14, updating gas plots into this version based on Connors
 %                    updates
+% MS   , 2018-09-20, updated a bug in refering to gases plot range when
+%                    var2plot doesn't exist
+% MS   , 2018-09-20, fixed backcompatability bug using ytick instead of
+%                    yticklabels
 % -------------------------------------------------------------------------
 
 %% function start
@@ -239,7 +243,9 @@ if isfield(s, 'flagfilenameO3');
 elseif isavar('o32plot')
     % flag only un-physical values
     flagO3   = zeros(length(s.t),1);
-    flagO3(o32plot<250 | o32plot> 450) = 1;
+    if isvar('o32plot')==1 
+        flagO3(o32plot<250 | o32plot> 450) = 1;
+    end
 end
 
 if isfield(s,'flagfilenameCWV');
@@ -248,7 +254,9 @@ if isfield(s,'flagfilenameCWV');
     flagCWV = flagCWV.manual_flags.screen;
 elseif isavar('cwv2plot')
     flagCWV  = zeros(length(s.t),1);
-    flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
+    if isvar('cwv2plot')==1
+        flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
+    end
 end;
 
 if isfield(s,'flagfilenameNO2');
@@ -257,7 +265,9 @@ if isfield(s,'flagfilenameNO2');
     flagNO2 = flagNO2.manual_flags.screen;
 elseif isavar('no22plot')
     flagNO2  = zeros(length(s.t),1);
-    flagNO2(no22plot<0 | no22plot> 1e18) = 1;
+    if isvar('no22plot')==1
+        flagNO2(no22plot<0 | no22plot> 1e18) = 1;
+    end
 end;
 
 if isfield(s,'flagfilenameHCOH');
@@ -266,7 +276,9 @@ if isfield(s,'flagfilenameHCOH');
     flagHCOH = flagHCOH.manual_flags.screen;
 elseif isavar('hcoh2plot')
     flagHCOH  = zeros(length(s.t),1);
-    flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
+    if isvar('hcoh2plot')==1
+        flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
+    end
 end;
 
 
@@ -869,7 +881,7 @@ for jj =200:200:1600;
     [nul,imin] = min(abs(iswl.*1000.0-jj));
     labls = [labls;sprintf('%4.0f',s.w(imin).*1000.0)];
 end;
-yticklabels(labls);
+set(gca,'ytick',str2num(labls)); %yticklabels(labls)#yticklabels(labls);
 title([instrumentname ' - ' daystr ' - All Raw counts' ]);
 cb = colorbarlabeled('Raw counts');
 fname = fullfile(p1,[instrumentname '_' daystr '_rawcarpet']);
@@ -1128,7 +1140,7 @@ if exist('tau_aero')
     xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
     ylabel('Wavelength [nm]');
     axis('xy');
-    yticklabels(labls);
+    set(gca,'ytick',str2num(labls));%yticklabels(labls);
     title([instrumentname ' - ' daystr ' - tau_aero spectra' ]);
     cb = colorbarlabeled('tau_aero');
     fname = fullfile(p1,[instrumentname daystr '_spectra_aod_carpet']);
