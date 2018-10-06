@@ -160,7 +160,7 @@ originfo = info; origform = form; orignames = names;
 dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-jproc=[         0          0          0          0          1           0] ;
+jproc=[         0          0          0          0          1           1] ;
 %jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
 %jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
@@ -195,9 +195,9 @@ for i=idx_file_proc
     
     %% get the special comments
     switch daystr
-        case '20170802'
+        case '20180930'
             specComments = {...
-                'Aborted flight, nearly no data.\n',...
+                'P3 Power issues during flight resulting in inoperation of 4STAR during roughly the latter half the flight.\n',...
                 };
         otherwise
             specComments = {};
