@@ -12,7 +12,7 @@ else
     s.toggle = update_toggle;
 end
 
-%s.langley1 = [datenum(2018,9,22,17,01,00) datenum(2018,9,22,19,10,00)]; %put in if condition below if different for different 4STARs
+s.langley1 = [datenum(2018,10,05,5,35,00) datenum(2018,10,05,7,8,00)]; %put in if condition below if different for different 4STARs
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
              
@@ -23,11 +23,11 @@ s.NO2col=2.0e15; %
 
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
-                 s.flight=[datenum(2018,10,02,7,00,59) datenum(2018,10,02,15,17,41)];
+                 s.flight=[datenum(2018,10,05,4,5,30) datenum(2018,10,05,12,54,50)];
                  
-                 s.AODuncert_constant_extra = 0.04;
+                 s.AODuncert_constant_extra = 0.05;
     %             flags
-                 s.flagfilename     = '20181002_starflag_man_created20181004_1448by_SL.mat'; 
+                 %s.flagfilename     = '20180927_starflag_man_created20180928_1121by_SL.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';

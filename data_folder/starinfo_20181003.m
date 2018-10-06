@@ -23,11 +23,11 @@ s.NO2col=2.0e15; %
 
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
-                 s.flight=[datenum(2018,10,02,7,00,59) datenum(2018,10,02,15,17,41)];
+                 s.flight=[datenum(2018,10,03,6,56,29) datenum(2018,10,03,15,14,17)];
                  
-                 s.AODuncert_constant_extra = 0.04;
+                 s.AODuncert_constant_extra = 0.07;
     %             flags
-                 s.flagfilename     = '20181002_starflag_man_created20181004_1448by_SL.mat'; 
+                 %s.flagfilename     = '20180927_starflag_man_created20180928_1121by_SL.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
