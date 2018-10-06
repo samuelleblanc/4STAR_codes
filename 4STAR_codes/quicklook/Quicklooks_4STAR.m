@@ -192,8 +192,8 @@ if isfield(s,'langley')||isfield(s,'langley1');
     pptcontents0=[pptcontents0; {' ' 4}];
     pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
     pptcontents0=[pptcontents0; {langley_figs{end} 1}];
-end;
-end;
+end
+end
 
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
@@ -203,15 +203,15 @@ if isfield(s,'gas')
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
     hcoh2plot =real(s.gas.hcoh.hcoh_DU);
-elseif exist([instrumentname daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
-    gas   = load(strcat(gasfile_path,daystr{:},'_gas_summary.mat'));
+elseif exist([getnamedpath('starsun') daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
+    gas   = load(strcat(getnamedpath('starsun'),daystr,'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
     no22plot =gas.no2_molec_cm2;
-    hcoh2plot=gas.hcoh.hcoh_DU;
-else;
+    hcoh2plot=gas.hcoh_DU;
+else
     disp('No gas data found. Skipping...') %otherwise just skip it if we haven't run gas retrievals
-end;
+end
 
 %% filter the gas fields to plot
 % read starinfo files
@@ -1134,7 +1134,7 @@ if exist('tau_aero')
 
     fspcar = figure('pos',[100,100,1000,800]);
     colormap(parula);
-    s.tau_aero(find(s.tau_aero<-0.1)) = NaN;
+    s.tau_aero(find(s.tau_aero<-0.1)) = NaN;s.tau_aero(find(s.tau_aero>1.5)) = NaN;
     imagesc(s.t,s.w.*1000.0,s.tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
@@ -1360,7 +1360,7 @@ end;
 
 % zenith radiance time series
 starzenfile=fullfile(starpaths, [daystr 'starzen.mat']);
-if exist(starzenfile);
+if exist(starzenfile)
     load(starzenfile, 'Alt');
     figure;
     [h,filename]=spzen(daystr, 't', 'rad', '.', 't', Alt/100, mods{:}, ...
@@ -1369,18 +1369,18 @@ if exist(starzenfile);
     pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
 else
     warning([starzenfile ' does not exist. No zenith radiance plot is created.']);
-end;
+end
 
 %********************
 %% plot spectra in comparison with AATS-14
 %********************
-if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat']))==2;
+if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat']))==2
     [both, ~, aats]=staraatscompare(daystr);
     both.rows=incl(both.t, tlim);
     % 4STAR AATS time-series comparison, wavelength by wavelength
-    for ii=[1:9 11:13];
+    for ii=[1:9 11:13]
         figure;
-        if isfield(both, 'tau_aero') & isfield(both, 'dtau_aero');
+        if isfield(both, 'tau_aero') & isfield(both, 'dtau_aero')
             ph=plot(both.t(both.rows),both.tau_aero(both.rows,c(ii)), '.', ...
                 aats.t,aats.tau_aero(ii,:), '.', ...
                 both.t(both.rows), both.dtau_aero(both.rows,ii), '.', ...
@@ -1397,7 +1397,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
                 ['AATS ' num2str(aats.w(ii)*1000, '%0.2f') ' nm'], ...
                 '4STAR-AATS', ...
                 'Transmittance Ratio, 4STAR/AATS, -1');
-        elseif isfield(both, 'tau_aero_noscreening');
+        elseif isfield(both, 'tau_aero_noscreening')
             ph=plot(both.t(both.rows),both.tau_aero_noscreening(both.rows,c(ii)), '.', ...
                 aats.t,aats.tau_aero(ii,:), '.', ...
                 both.t(both.rows), both.dtau_aero(both.rows,ii), '.');
@@ -1407,7 +1407,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
             yl=ylim;
             ylim([max([yl(1) 0]) min([yl(2) 0.5])]);
             lh=legend(ph, ['4STAR ' num2str(both.w(c(ii))*1000, '%0.2f') ' nm'],['AATS ' num2str(aats.w(ii)*1000, '%0.2f') ' nm']);
-        else; % no longer used; for record keeping
+        else % no longer used; for record keeping
             ph=plot(both.t(both.rows),both.tau_aero_noscreening(both.rows,c(ii)), '.b', ...
                 both.t(both.rows),both.tau_aero_noscreening(both.rows,c(ii))-repmat(tau_aero_ref(c(ii)),size(both.rows)), '.b', ...
                 aats.t,aats.tau_aero(ii,:), '.');
@@ -1419,7 +1419,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
             yl=ylim;
             ylim([max([yl(1) 0]) min([yl(2) 0.5])]);
             lh=legend(ph, ['4STAR ' num2str(both.w(c(ii))*1000, '%0.2f') ' nm'],['AATS ' num2str(aats.w(ii)*1000, '%0.2f') ' nm']);
-        end;
+        end
         ggla;
         grid on;
         dateticky('x','keeplimits');
@@ -1428,15 +1428,15 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         title(daystr);
         set(lh,'fontsize',12,'location','best');
         filename=['star' daystr 'AATS' ystr(regexp(ystr,'\w')) '_' num2str(aats.w(ii)*1000, '%0.0f') 'nm'];
-        if savefigure;
+        if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
-        end;
+        end
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
     end
     
     % time series of the delta tau_aero at all overlapping wavelengths
-    if isfield(both, 'tau_aero') & isfield(both, 'dtau_aero');
-        for k=1:size(colslist,1); % for multiple sets of wavelengths
+    if isfield(both, 'tau_aero') & isfield(both, 'dtau_aero')
+        for k=1:size(colslist,1) % for multiple sets of wavelengths
             cols=colslist{k,3};
             figure;
             ph=plot(both.t(both.rows), both.dtau_aero(both.rows,cols), '.');
@@ -1459,15 +1459,15 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
             lh=legend(ph,lstr);
             set(lh,'fontsize',12,'location','best');
             filename=['star' daystr 'AATS' ystr(regexp(ystr,'\w')) colslist{k,1}];
-            if savefigure;
+            if savefigure
                 starsas([filename '.fig, ' mfilename '.m'])
-            end;
+            end
             pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-        end;
-    end;
+        end
+    end
     
     % transmittance ratio, 4STAR/AATS, against wavelengths
-    if ~exist('groundcomparison');
+    if ~exist('groundcomparison')
         rows=incl(both.t, groundcomparison);
         % extrapolate to non-AATS wavelengths
         aatsgoodviscols=[2:7 9];
@@ -1506,9 +1506,9 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         ylabel('Tr. Ratio, 4STAR/AATS');
         title([daystr ' ' datestr(groundcomparison(1), 13) ' - ' datestr(groundcomparison(end), 13)]);
         filename=['star' daystr datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'AATStrratio'];
-        if savefigure;
+        if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
-        end;
+        end
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
         % plot spectra
         figure;
@@ -1524,11 +1524,11 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
         ylabel('Optical Depth');
         title([daystr ' ' datestr(groundcomparison(1), 13) ' - ' datestr(groundcomparison(end), 13)]);
         filename=['star' daystr datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'tau_aero_scaledspectra'];
-        if savefigure;
+        if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
-        end;
+        end
         pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
-    end;
+    end
     
     % % %     % spectra, average
     % % %     figure;
@@ -1633,7 +1633,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
     %         starsas(['star' daystr 'raterelativeratiotoAATSvm_aero' 'NIRonly.fig, SEquickplots.m'])
     %         pause(3);
     %     end;
-end;
+end
 
 %% Check a delta c0
 if isfield(s,'ground');  isflight = false; elseif isfield(s,'flight'); isflight = true; else; isflight = false; end;
@@ -1647,9 +1647,9 @@ pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
 pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
 
 %% Plot high alt aod with alt trace for dirty - clean checking
-if false; %isflight
+if false %isflight
     fighalt = figure; 
-    flt_alt = s.Alt>5000.0;
+    flt_alt = find(s.Alt>5000.0);
     subplot(2,1,1);
     plot(s.t(flt_alt),s.tau_aero(flt_alt,iwvlv(4)),'.');
     subplot(2,1,2);
@@ -1657,28 +1657,28 @@ if false; %isflight
 end
 
 %% Check if dirty/clean time period was done, if so plot them
-if isfield(s,'dirty') & isfield(s,'clean');
+if isfield(s,'dirty') & isfield(s,'clean')
     [sdirty,sclean,sdiff,saved_fig_path] = stardirty(daystr,fname_4star,false);
     pptcontents0=[pptcontents0; {saved_fig_path{1} 1}];
     pptcontents0=[pptcontents0; {saved_fig_path{2} 1}];
-end;
+end
 
 %% Check if FOVs were created, if so, plot them
-if isfield(st,'vis_fovp') | isfield(st,'vis_fova');
+if isfield(st,'vis_fovp') | isfield(st,'vis_fova')
     fov_figs = plot_FOVs(fname_4star);
-    for jj=1:length(fov_figs);
+    for jj=1:length(fov_figs)
         pptcontents0=[pptcontents0; {fov_figs{jj} 4}];
-    end;
-    for jo=1:mod(length(fov_figs),4);
+    end
+    for jo=1:mod(length(fov_figs),4)
         pptcontents0=[pptcontents0; {' ' 4}];
-    end;
-end;
+    end
+end
 
 %% Check if langley is defined
-if ~plotting_langley_first;
-if isfield(s,'langley')||isfield(s,'langley1');
+if ~plotting_langley_first
+if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
-    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
+    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
     langley_figs = starLangley_fx_(s,1,p1,xtra);
     pptcontents0=[pptcontents0; {langley_figs{1} 1}];
     pptcontents0=[pptcontents0; {langley_figs{2} 4}];
@@ -1692,8 +1692,8 @@ if isfield(s,'langley')||isfield(s,'langley1');
     pptcontents0=[pptcontents0; {' ' 4}];
     pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
     pptcontents0=[pptcontents0; {langley_figs{end} 1}];
-end;
-end;
+end
+end
 
 %% Print out the toggle states
 
@@ -1703,25 +1703,25 @@ end;
 %********************
 % Generate a new PowerPoint file
 %********************
-if savefigure;
+if savefigure
     % sort out the PowerPoint contents
     idx4=[];
-    for ii=1:size(pptcontents0,1);
-        if pptcontents0{ii,2}==1;
+    for ii=1:size(pptcontents0,1)
+        if pptcontents0{ii,2}==1
             pptcontents=[pptcontents; {pptcontents0(ii,1)}];
-        elseif pptcontents0{ii,2}==4;
+        elseif pptcontents0{ii,2}==4
             idx4=[idx4 ii];
-            if numel(idx4)==4 || ii==size(pptcontents0,1) || pptcontents0{ii+1,2}~=4;
-                if numel(idx4)>=3;
+            if numel(idx4)==4 || ii==size(pptcontents0,1) || pptcontents0{ii+1,2}~=4
+                if numel(idx4)>=3
                     pptcontents=[pptcontents; {pptcontents0(idx4,1)}];
                 else
                     pptcontents=[pptcontents; {[pptcontents0(idx4,1);' ';' ']}];
                 end;
                 idx4=[];
-            end;
+            end
         else
             error('Paste either 1 or 4 figures per slide.');
-        end;
-    end;
+        end
+    end
     makeppt(ppt_fname, [instrumentname ' - '  daystr ' ' platform], pptcontents{:});
-end;
+end

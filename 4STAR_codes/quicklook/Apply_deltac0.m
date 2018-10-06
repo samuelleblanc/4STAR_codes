@@ -76,6 +76,15 @@ else;
     tit = 'All ground based ';
     xtra = '_ground';
 end;
+% filter out bad data
+aod_380nm(find(aod_380nm>1.5)) = NaN;
+aod_452nm(find(aod_452nm>1.5)) = NaN;
+aod_500nm(find(aod_500nm>1.5)) = NaN;
+aod_620nm(find(aod_620nm>1.5)) = NaN;
+aod_865nm(find(aod_865nm>1.5)) = NaN;
+aod_1040nm(find(aod_1040nm>1.5)) = NaN;
+aod_1215nm(find(aod_1215nm>1.5)) = NaN;
+
 cm = hsv(n);
 colormap(cm);
 
