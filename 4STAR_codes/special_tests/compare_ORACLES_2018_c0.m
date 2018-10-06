@@ -4,26 +4,28 @@ clear all
 fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 fp_out = getnamedpath('ORACLES_plot');
 asktosave = 1; %set if ask to save the figures
-i_avg = [3,4,5];
+i_avg = [3,4,5,6];
 filesuffix = ['refined_averaged_4STAR_MLO_inflight'];
-label_daystr = '20180922';
+label_daystr = '20181005';
 short_wvl_special_avg = true;
-i_avg_short = [3,4,5];
+i_avg_short = [3,4,5,6];
 
 vis_names = {'20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018.dat';...
             '20180811_VIS_C0_refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12.dat';
             '20180921_4STAR_VIS_C0_refined_flight_langley_am.dat';...
-            '20180922_VIS_C0_4STAR_refined_flight_langley_am.dat'};
+            '20180922_VIS_C0_4STAR_refined_flight_langley_am.dat';...
+            '20181005_VIS_C0_4STAR_refined_flight_langley_am.dat'};
         
 nir_names = {'20170605_NIR_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20180212_NIR_C0_4STAR_refined_averaged_MLO_Feb2018.dat';...
             '20180811_NIR_C0_refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12.dat';
             '20180921_4STAR_NIR_C0_refined_flight_langley_am.dat';...
-            '20180922_NIR_C0_4STAR_refined_flight_langley_am.dat'};
+            '20180922_NIR_C0_4STAR_refined_flight_langley_am.dat';...
+            '20181005_NIR_C0_4STAR_refined_flight_langley_am.dat'};
          
 supp = {'MLO jun 2017';...%'MLO';'MLO';'MLO';'MLO';
-        'MLO feb 2018';'MLO aug 2018';'In flight';'In flight'};
+        'MLO feb 2018';'MLO aug 2018';'In flight';'In flight';'In flight'};
     
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
