@@ -243,7 +243,7 @@ if isfield(s, 'flagfilenameO3');
 elseif isavar('o32plot')
     % flag only un-physical values
     flagO3   = zeros(length(s.t),1);
-    if isvar('o32plot')==1 
+    if isavar('o32plot')==1 
         flagO3(o32plot<250 | o32plot> 450) = 1;
     end
 end
@@ -254,7 +254,7 @@ if isfield(s,'flagfilenameCWV');
     flagCWV = flagCWV.manual_flags.screen;
 elseif isavar('cwv2plot')
     flagCWV  = zeros(length(s.t),1);
-    if isvar('cwv2plot')==1
+    if isavar('cwv2plot')==1
         flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
     end
 end;
@@ -265,7 +265,7 @@ if isfield(s,'flagfilenameNO2');
     flagNO2 = flagNO2.manual_flags.screen;
 elseif isavar('no22plot')
     flagNO2  = zeros(length(s.t),1);
-    if isvar('no22plot')==1
+    if isavar('no22plot')==1
         flagNO2(no22plot<0 | no22plot> 1e18) = 1;
     end
 end;
@@ -276,7 +276,7 @@ if isfield(s,'flagfilenameHCOH');
     flagHCOH = flagHCOH.manual_flags.screen;
 elseif isavar('hcoh2plot')
     flagHCOH  = zeros(length(s.t),1);
-    if isvar('hcoh2plot')==1
+    if isavar('hcoh2plot')==1
         flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
     end
 end;
@@ -1052,17 +1052,17 @@ end
         [nul,i500] = min(abs(s.w-0.5));[nul,i470] = min(abs(s.w-0.47));[nul,i865] = min(abs(s.w-0.865));
         figloaltaod = figure;
         ang=sca2angstrom(s.tau_aero(:,[i470 i865]), s.w([i470 i865]));
-        ss = scatter(s.Lon,s.Alt,(s.tau_aero(:,i500)+0.15).*30.0,ang,'o'); 
+        ss = scatter(s.Lon,s.Alt,(s.tau_aero(:,i500)+0.25).*30.0,ang,'o'); 
         hold on;
         for q=1:nt;
             [nul,iq] = min(abs(utch-times_15min(q)));
             plot(s.Lon(iq),double(s.Alt(iq)),'k+');
             text(s.Lon(iq),double(s.Alt(iq)),num2str(times_15min(q),4));
         end;
-        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.15).*30.0); 
-        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.15).*30.0); 
-        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.15).*30.0); 
-        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.15).*30.0); 
+        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.25).*30.0); 
+        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.25).*30.0); 
+        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.25).*30.0); 
+        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.25).*30.0); 
         legend([ss1,ss2,ss3,ss4],[{'AOD_{500} 0.02'},{'AOD_{500} 0.1'},{'AOD_{500} 0.2'},{'AOD_{500} 0.4'}]);
         xlabel('Longitude [^\circ]')
         ylabel('Altitude [m]');
@@ -1076,17 +1076,17 @@ end
         
         % flight track map
         figlaaltaod = figure;
-        ss = scatter(s.Lat,s.Alt,(s.tau_aero(:,i500)+0.15).*30.0,ang,'o'); 
+        ss = scatter(s.Lat,s.Alt,(s.tau_aero(:,i500)+0.25).*30.0,ang,'o'); 
         hold on;
         for q=1:nt;
             [nul,iq] = min(abs(utch-times_15min(q)));
             plot(s.Lat(iq),double(s.Alt(iq)),'k+');
             text(s.Lat(iq),double(s.Alt(iq)),num2str(times_15min(q),4));
         end;
-        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.15).*30.0); 
-        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.15).*30.0); 
-        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.15).*30.0); 
-        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.15).*30.0); 
+        ss1 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.02+0.25).*30.0); 
+        ss2 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.1+0.25).*30.0); 
+        ss3 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.2+0.25).*30.0); 
+        ss4 = plot([NaN NaN],[NaN NaN],'ko','MarkerSize',(0.4+0.25).*30.0); 
         legend([ss1,ss2,ss3,ss4],[{'AOD_{500} 0.02'},{'AOD_{500} 0.1'},{'AOD_{500} 0.2'},{'AOD_{500} 0.4'}]);
         xlabel('Latitude [^\circ]')
         ylabel('Altitude [m]');
@@ -1646,6 +1646,15 @@ pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
 pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
 pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
 
+%% Plot high alt aod with alt trace for dirty - clean checking
+if false; %isflight
+    fighalt = figure; 
+    flt_alt = s.Alt>5000.0;
+    subplot(2,1,1);
+    plot(s.t(flt_alt),s.tau_aero(flt_alt,iwvlv(4)),'.');
+    subplot(2,1,2);
+    [ax,h1,h2] = plotyy(s.t,s.Alt,s.t,s.m_aero);
+end
 
 %% Check if dirty/clean time period was done, if so plot them
 if isfield(s,'dirty') & isfield(s,'clean');
