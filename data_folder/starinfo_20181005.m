@@ -21,6 +21,9 @@ s.O3h=21; %
 s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
 s.NO2col=2.0e15; %  
 
+s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45)];
+s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
+
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                  s.flight=[datenum(2018,10,05,4,5,30) datenum(2018,10,05,12,54,50)];
