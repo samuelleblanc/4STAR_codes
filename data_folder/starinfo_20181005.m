@@ -21,16 +21,16 @@ s.O3h=21; %
 s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
 s.NO2col=2.0e15; %  
 
-s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45)];
+s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                  s.flight=[datenum(2018,10,05,4,5,30) datenum(2018,10,05,12,54,50)];
                  
-                 s.AODuncert_constant_extra = 0.05;
+                 s.AODuncert_constant_extra = 0.06;
     %             flags
-                 %s.flagfilename     = '20180927_starflag_man_created20180928_1121by_SL.mat'; 
+                 s.flagfilename     = '20181005_starflag_man_created20181006_1508by_SL.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
