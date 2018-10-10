@@ -7,7 +7,7 @@ function toggle_out = update_toggle(toggle_in)
 
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
-toggle_out.verbose=false;
+toggle_out.verbose=true;
 toggle_out.saveadditionalvariables=true;
 toggle_out.savefigure=false;
 toggle_out.computeerror=true;
