@@ -90,7 +90,7 @@ plot(nircols,c0new_mean((length(viscols)+1):end),'-','color','k','linewidth',3);
 plot(nircols,c0new_unc1((length(viscols)+1):end),'--','color','k','linewidth',3)
 set(gca,'fontsize',14); title('C0 NIR mean'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0meanspectrum_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
+starsas('c0meanspectrum_4STARB_Oct2017roof_plusNAAMESinfield.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0meanspectrum_072016.pdf
 
@@ -118,8 +118,8 @@ xlim([100 1000])
 subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR normalized to mean Langley (in %)'); xlabel('\lambda')
 % ylim([-100 100])
-starsas('c0spectra_normalizedtoMLOmean_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
+starsas('c0spectra_normalizedtoMLOmean_4STARB_Oct2017roof_plusNAAMESinfield.fig','plot_Langleys_all.m')
 % print -dpdf c0spectra_normalizedtoMLOmean_MLONov2016.pdf
 
 %plot THE DIFFERENCE between all the spectra versus the mean spectrum, one line per Langley
@@ -234,10 +234,10 @@ starsas('c0spectra_differencefrommean_4STARB_Oct2017roof.fig','plot_Langleys_all
 % visfilename=fullfile(starpaths, 'June2016_VIS_C0_mean.dat');
 % nirfilename=fullfile(starpaths, 'June2016_NIR_C0_mean.dat');
 % source='MLOJune2016';
-visfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_VIS_Oct2017_rooftop_mean.dat')
-nirfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_NIR_Oct2017_rooftop_mean.dat')
-source='rooftopOct2017';
-additionalnotes='Based on the mean of c0s from 20171024, 1025, 1026, 1101, and 1107.  C0err=2*stdev the variability within these 5 langleys.';
+visfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_VIS_Oct2017_rooftop_withAATSfieldcomp_mean.dat')
+nirfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_NIR_Oct2017_rooftop_withAATSfieldcomp_mean.dat')
+source='rooftopOct2017+in-fieldSept2017';
+additionalnotes='Based on the mean of c0s from 20170918 (in-field PLUS 3% per Yohei''s analysis), and rooftop 20171024, 1025, 1026, 1101, and 1107.  C0err=2*stdev the variability within these 6 langleys.';
 % additionalnotes='Based on mean of c0s from 20160630, 20160702 (AM+PM), 20160703, 20160704, 20160705.  C0err=2*stdev the variability within these 6 langleys.';
-%         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols), c0new_unc1(:,viscols));
-%         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols), c0new_unc1(:,nircols));
+        starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols), c0new_unc1(:,viscols));
+        starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols), c0new_unc1(:,nircols));
