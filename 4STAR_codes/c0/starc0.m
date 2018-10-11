@@ -472,7 +472,12 @@ visaerosolcols=find(h2o>0.9997 & cross_sections.o2<1e-27); % Yohei 2013/01/28
 % visaerosolcols=union(visaerosolcols1,visaerosolcols2(:));
 if ~strcmp(instrumentname,'2STAR');
     cross_sections=taugases(t,'nir',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
-    h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
+    if strcmp(instrumentname,'4STAR')
+        h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)); % Yohei 2013/01/28
+    elseif strcmp(instrumentname,'4STARB')
+        Loschmidt=2.686763e19;  
+        h2o=abs(exp(-cross_sections.h2o*Loschmidt*1000)); % Yohei 2013/01/28
+    end
     niraerosolcols=find(h2o>=0.997 &  cross_sections.o2<1e-29)+1044; % Yohei 2013/01/28
     % niraerosolcols1=[(find(cross_sections.wln/1000>1.000 & cross_sections.wln/1000<1.08))' (find(cross_sections.wln/1000>1.520 & cross_sections.wln/1000<1.69))'];  % column direction transposed
     % niraerosolcols1=[];
