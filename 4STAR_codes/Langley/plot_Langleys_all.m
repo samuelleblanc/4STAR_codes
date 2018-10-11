@@ -11,39 +11,48 @@
 % clear all
 % load('c0s_fits_allgoodLangleys_July2016_1.8-12.mat')
 %come up with means of c0s:
-for j=1:length(goodlangleys)
-    eval(['c0new_all(:,j)=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
-    
-end
+% for j=1:length(goodlangleys)
+%     eval(['c0new_all(:,j)=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
+%     
+% end
 daycolor = {'c'    'r'    'g'    'b'    'k'    'm'   [0.47 0.31 0.45] [0.87 0.49 0] [.75 0.75 0] [0.5 0.5 0.5]    [0.2 1 0.8]    [0.9 0.8 0] [0.5 1 0] [1 0.5 0.2] [0 0.7 0.9] [0.2 0.5 0.7] };
 %%%adding c0s between MLO June and November 2016 (cannibalized from
 %%%Michal's plotLangleyCompare.m thanks!)
 % filelistVIS = {'20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2_v2','20160910_VIS_C0_refined_Langley_ORACLES2016_gnd','20161110_VIS_C0_refined_Langley_MLO_Nov2016','20161111_VIS_C0_refined_Langley_MLO_Nov2016'};
 % filelistNIR = {'20160823_NIR_C0_refined_Langley_ORACLES_WFF_gnd','20160825_NIR_C0_refined_Langley_ORACLES_transit2_v2','20160910_NIR_C0_refined_Langley_ORACLES2016_gnd','20161110_NIR_C0_refined_Langley_MLO_Nov2016','20161111_NIR_C0_refined_Langley_MLO_Nov2016'};
-% 
+alldays={'20171024','20171025','20171026','20171101','20171107','20170918'};%'20171031',%<--"hazy"? 1023: no airmass range, what's there is bad
+inst='4STARB';
+% dir('20171023*4STARB*.dat')
 % % prepare for plotting
 % colorlist_ = varycolor(140);
 % colorlist  = colorlist_(140:-10:1,:);
 
 %%%mean is JUST of the last MLO set...
-c0new_mean=nanmean(c0new_all,2)'; %flip it so its dimensions match the other c0s
-if exist('filelistVIS')
-    for i=1:length(filelistVIS)
-
-        tmp = importdata(strcat(starpaths,filelistVIS{:,i},'.dat'));
+% c0new_mean=nanmean(c0new_all,2)'; %flip it so its dimensions match the other c0s
+if exist('alldays')
+    for i=1:length(alldays)
+        infileVIS=dir([alldays{i},'*',inst,'_VIS_*.dat']);
+        disp(infileVIS.name)
+        filelistVIS{:,i}=infileVIS.name;
+        tmp = importdata((filelistVIS{:,i}));
         wln = tmp.data(:,2);
-        lang.(strcat('c0_',filelistVIS{:,i})) = tmp.data(:,3);
+        viscols=wln;
+        lang.(strcat('c0_',filelistVIS{:,i}(1:19))) = tmp.data(:,3);
 
-        tmp = importdata(strcat(starpaths,filelistNIR{:,i},'.dat'));
+        infileNIR=dir([alldays{i},'*',inst,'_NIR_*.dat']);
+        disp(infileNIR.name)
+        filelistNIR{:,i}=infileNIR.name;
+        tmp = importdata((filelistNIR{:,i}));
         wln = tmp.data(:,2);
-        lang.(strcat('c0_',filelistNIR{:,i})) = tmp.data(:,3);
+        nircols=wln;
+        lang.(strcat('c0_',filelistNIR{:,i}(1:19))) = tmp.data(:,3);
 
-        eval(['newORc0s(:,i)=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},'];'])
+        eval(['newORc0s(:,i)=[lang.c0_',filelistVIS{:,i}(1:19),'; lang.c0_',filelistNIR{:,i}(1:19),'];'])
         moregoodlangleys{i}=filelistVIS{i}(1:8);
-        eval(['c0new_',filelistVIS{i}(1:8),'=[lang.c0_',filelistVIS{:,i},'; lang.c0_',filelistNIR{:,i},']'';'])
+        eval(['c0new_',filelistVIS{i}(1:8),'=[lang.c0_',filelistVIS{:,i}(1:19),'; lang.c0_',filelistNIR{:,i}(1:19),']'';'])
     end
-c0new_all=[c0new_all newORc0s];
-goodlangleys=[goodlangleys,moregoodlangleys];
+c0new_all=[newORc0s];
+goodlangleys=[moregoodlangleys];
 
 end
     
@@ -56,32 +65,32 @@ for j=1:length(goodlangleys)
     eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
     subplot(2,1,1)
     hold on;
-    plot(1000*w(1:length(viscols)),c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+    plot(viscols,c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
     subplot(2,1,2)
     hold on;
-    plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+    plot(nircols,c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
 end
 subplot(2,1,1); legend(goodlangleys,'location','northwest')
 set(gca,'fontsize',14); title('C0 VIS'); xlabel('\lambda')
-ylim([0 800]); xlim([100 1000])
+ylim([0 1000]); xlim([100 1000])
 subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0allspectra_MLONov2016.fig','plot_Langleys_all.m')
+starsas('c0allspectra_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 
 
 %a plot just showing the spectrum of the mean
 figure; subplot(2,1,1); 
-plot(1000*w(1:length(viscols)),c0new_mean(1:length(viscols)),'-','color','k','linewidth',3); hold on
-plot(1000*w(1:length(viscols)),c0new_unc1(1:length(viscols)),'--','color','k','linewidth',3)
+plot(viscols,c0new_mean(1:length(viscols)),'-','color','k','linewidth',3); hold on
+plot(viscols,c0new_unc1(1:length(viscols)),'--','color','k','linewidth',3)
 set(gca,'fontsize',14); title('C0 VIS mean'); xlabel('\lambda')
-ylim([0 800]); xlim([100 1000])
+ylim([0 1000]); xlim([100 1000])
 subplot(2,1,2)
-plot(1000*w((length(viscols)+1):end),c0new_mean((length(viscols)+1):end),'-','color','k','linewidth',3); hold on
-plot(1000*w((length(viscols)+1):end),c0new_unc1((length(viscols)+1):end),'--','color','k','linewidth',3)
+plot(nircols,c0new_mean((length(viscols)+1):end),'-','color','k','linewidth',3); hold on
+plot(nircols,c0new_unc1((length(viscols)+1):end),'--','color','k','linewidth',3)
 set(gca,'fontsize',14); title('C0 NIR mean'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0meanspectrum_MLONov2016.fig','plot_Langleys_all.m')
+starsas('c0meanspectrum_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0meanspectrum_072016.pdf
 
@@ -93,12 +102,12 @@ for j=1:length(goodlangleys)
     eval(['c0new=100*(c0new_',goodlangleys{j},'(1,:)-c0new_mean)./c0new_mean;']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
     subplot(2,1,1)
     hold on;
-    plot(1000*w(1:length(viscols)),c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+    plot(viscols,c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
     grid on
     ylim([-4.8 4.8])
     subplot(2,1,2)
     hold on;
-    plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+    plot(nircols,c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
     grid on
     ylim([-4.8 4.8])
 end
@@ -109,7 +118,7 @@ xlim([100 1000])
 subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR normalized to mean Langley (in %)'); xlabel('\lambda')
 % ylim([-100 100])
-starsas('c0spectra_normalizedtoMLOmean_MLONov2016.fig','plot_Langleys_all.m')
+starsas('c0spectra_normalizedtoMLOmean_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
 % print -dpdf c0spectra_normalizedtoMLOmean_MLONov2016.pdf
 
@@ -119,112 +128,116 @@ for j=1:length(goodlangleys)
     eval(['c0new=(c0new_',goodlangleys{j},'(1,:)-c0new_mean);']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
     subplot(2,1,1)
     hold on;
-    plot(1000*w(1:length(viscols)),c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+    plot(viscols,c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
     subplot(2,1,2)
     hold on;
-    plot(1000*w((length(viscols)+1):end),c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+    plot(nircols,c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
 end
 subplot(2,1,1); legend(goodlangleys,'location','northwest')
-set(gca,'fontsize',14); title('C0 VIS difference from 9-Langley mean'); xlabel('\lambda')
+set(gca,'fontsize',14); title(['C0 VIS absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
 ylim([-10 10]); 
 xlim([100 1000])
 subplot(2,1,2)
-set(gca,'fontsize',14); title('C0 NIR difference from 9-Langley mean'); xlabel('\lambda')
+set(gca,'fontsize',14); title(['C0 NIR absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
 % ylim([-100 100])
 
-starsas('c0spectra_differencefrommean_MLONov2016.fig','plot_Langleys_all.m')
+starsas('c0spectra_differencefrommean_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0spectra_differencefrommean_072016.pdf
 
 
 
-%%plot one figure per langley, all wavelengths, normalized, for that
-%%langley.
-figure; 
-for j=7:length(goodlangleys)
-    subplot(2,2,j-6); hold on;
-    eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
-    eval(['slope=-slope_',goodlangleys{j},'(1,:);']) %NB: switched the negative sign here.
-    eval(['rateaero=rateaero_',goodlangleys{j},';']) %count rate, for the bin i (= at wavelength w(cols(i)) (y axis of scatter)-- *** the saved variables above
-    eval(['m_aero=m_aero_',goodlangleys{j},';']) %airmass (x axis of scatter)
-    
-    for i=1:length(cols)
-%     disp([num2str(1000*w(cols(i))),' nm'])
-        plot(m_aero,log(rateaero(:,cols(i))./c0new(cols(i))),'.','color',daycolor{i},'linestyle','none');
-%         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-%         plot(0:15,((0:15).*slope(:,cols(i))+log(c0new(:,cols(i)))),'-','color',daycolor{i},'linewidth',2);
-        set(gca,'fontsize',14);
-        title(goodlangleys{j}); xlabel('airmass'); ylabel('count rate')
-         xlim([1.5 12.5]); ylim([-0.2 0.05]);
-    end
-    axis square
-end
-legend('353.329',        '379.976',        '451.695',        '500.682',        '519.913',        '605.341',        '675.182',        '780.644',        '864.635',        '941.421',      '1019.9101',      '1064.2268',      '1235.8351',       '1558.728',      '1640.2518') %([num2str(1000*w(cols)),' nm'])
-starsas('Langleys_Nov2016_Part3_normalized.fig','plot_Langleys_all.m')
-% oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
-% print -dpdf Langleys_all072016_multiwavelength.pdf
-
-
-%plot all the Langleys (airmass v counts), one color per Langley, one
-%subplot per wavelength
+% %%plot one figure per langley, all wavelengths, normalized, for that
+% %%langley.
 % figure; 
-% for j=1:length(goodlangleys)
+% for j=7:length(goodlangleys)
+%     subplot(2,2,j-6); hold on;
 %     eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
 %     eval(['slope=-slope_',goodlangleys{j},'(1,:);']) %NB: switched the negative sign here.
 %     eval(['rateaero=rateaero_',goodlangleys{j},';']) %count rate, for the bin i (= at wavelength w(cols(i)) (y axis of scatter)-- *** the saved variables above
 %     eval(['m_aero=m_aero_',goodlangleys{j},';']) %airmass (x axis of scatter)
 %     
 %     for i=1:length(cols)
-%     disp([num2str(1000*w(cols(i))),' nm'])
-%     subplot(3,5,i); hold on;
-%         h=plot(m_aero,log(rateaero(:,cols(i))),'.','color',daycolor{j},'linestyle','none');
-%         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-%         plot(0:15,((0:15).*slope(:,cols(i))+log(c0new(:,cols(i)))),'-','color',daycolor{j},'linewidth',2);
+% %     disp([num2str(1000*w(cols(i))),' nm'])
+%         plot(m_aero,log(rateaero(:,cols(i))./c0new(cols(i))),'.','color',daycolor{i},'linestyle','none');
+% %         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+% %         plot(0:15,((0:15).*slope(:,cols(i))+log(c0new(:,cols(i)))),'-','color',daycolor{i},'linewidth',2);
 %         set(gca,'fontsize',14);
-%         title([num2str(1000*w(cols(i))),' nm']); xlabel('airmass'); ylabel('count rate')
+%         title(goodlangleys{j}); xlabel('airmass'); ylabel('count rate')
+%          xlim([1.5 12.5]); ylim([-0.2 0.05]);
 %     end
+%     axis square
 % end
-% legend(goodlangleys)
-% starsas('Langleys_all072016_multiwavelength.fig','plot_Langleys_all.m')
+% legend('353.329',        '379.976',        '451.695',        '500.682',        '519.913',        '605.341',        '675.182',        '780.644',        '864.635',        '941.421',      '1019.9101',      '1064.2268',      '1235.8351',       '1558.728',      '1640.2518') %([num2str(1000*w(cols)),' nm'])
+% starsas('Langleys_4STARB_Oct2017roof_Part3_normalized.fig','plot_Langleys_all.m')
 % % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % % print -dpdf Langleys_all072016_multiwavelength.pdf
-
-markershapeses={'.','x','+','^','v','>','<','s','d','p'};
-
-
-figure; 
-colornum=1;
-markernum=1;
-for i=1:length(cols)
-    for j=1:length(goodlangleys)
-        eval(['c0new_timeseries_',num2str(floor(1000*w(cols(i)))),'(j)=c0new_',goodlangleys{j},'(1,cols(i));'])
-        eval(['c0new_timeseries(j)=c0new_',goodlangleys{j},'(1,cols(i));'])
-    end
-    plot(c0new_timeseries,'marker',markershapeses{markernum},'color',daycolor{colornum},'linewidth',2); hold on;
-    if colornum==(length(daycolor))
-        colornum=1;
-    else colornum=colornum+1;
-    end    
-    if markernum==(length(markershapeses))
-        markernum=1;
-    else markernum=markernum+1;
-    end
-end
-set(gca,'fontsize',14)
-legend('353.3nm', '380.0nm', '451.7nm', '500.7nm', '519.9nm', '605.3nm', '675.2nm', '780.6nm', '864.6nm', '941.4nm', '1019.9nm', '1064.2nm', '1235.8nm', '1558.7nm', '1640.3nm')
-ax=gca;
-set(ax,'XTick',[1:1:length(goodlangleys)]);
-xlim([0.7 11.8])
-% set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112'})
-set(ax,'XTickLabel',{'1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})
-starsas('c0timeseries_Langleys_Nov2016_bywavelength.fig','plot_Langleys_all.m')
-% oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
-% print -dpdf c0timeseries_Langleys_Nov2016_bywavelength.pdf
+% 
+% 
+% %plot all the Langleys (airmass v counts), one color per Langley, one
+% %subplot per wavelength
+% % figure; 
+% % for j=1:length(goodlangleys)
+% %     eval(['c0new=c0new_',goodlangleys{j},'(1,:);']) %2-sigma c0s
+% %     eval(['slope=-slope_',goodlangleys{j},'(1,:);']) %NB: switched the negative sign here.
+% %     eval(['rateaero=rateaero_',goodlangleys{j},';']) %count rate, for the bin i (= at wavelength w(cols(i)) (y axis of scatter)-- *** the saved variables above
+% %     eval(['m_aero=m_aero_',goodlangleys{j},';']) %airmass (x axis of scatter)
+% %     
+% %     for i=1:length(cols)
+% %     disp([num2str(1000*w(cols(i))),' nm'])
+% %     subplot(3,5,i); hold on;
+% %         h=plot(m_aero,log(rateaero(:,cols(i))),'.','color',daycolor{j},'linestyle','none');
+% %         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+% %         plot(0:15,((0:15).*slope(:,cols(i))+log(c0new(:,cols(i)))),'-','color',daycolor{j},'linewidth',2);
+% %         set(gca,'fontsize',14);
+% %         title([num2str(1000*w(cols(i))),' nm']); xlabel('airmass'); ylabel('count rate')
+% %     end
+% % end
+% % legend(goodlangleys)
+% % starsas('Langleys_all072016_multiwavelength.fig','plot_Langleys_all.m')
+% % % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
+% % % print -dpdf Langleys_all072016_multiwavelength.pdf
+% 
+% markershapeses={'.','x','+','^','v','>','<','s','d','p'};
+% 
+% 
+% figure; 
+% colornum=1;
+% markernum=1;
+% for i=1:length(cols)
+%     for j=1:length(goodlangleys)
+%         eval(['c0new_timeseries_',num2str(floor(1000*w(cols(i)))),'(j)=c0new_',goodlangleys{j},'(1,cols(i));'])
+%         eval(['c0new_timeseries(j)=c0new_',goodlangleys{j},'(1,cols(i));'])
+%     end
+%     plot(c0new_timeseries,'marker',markershapeses{markernum},'color',daycolor{colornum},'linewidth',2); hold on;
+%     if colornum==(length(daycolor))
+%         colornum=1;
+%     else colornum=colornum+1;
+%     end    
+%     if markernum==(length(markershapeses))
+%         markernum=1;
+%     else markernum=markernum+1;
+%     end
+% end
+% set(gca,'fontsize',14)
+% legend('353.3nm', '380.0nm', '451.7nm', '500.7nm', '519.9nm', '605.3nm', '675.2nm', '780.6nm', '864.6nm', '941.4nm', '1019.9nm', '1064.2nm', '1235.8nm', '1558.7nm', '1640.3nm')
+% ax=gca;
+% set(ax,'XTick',[1:1:length(goodlangleys)]);
+% xlim([0.7 11.8])
+% % set(ax,'XTickLabel',{'0630','0702AM','0702PM','0703','0704','0705','0823','0825','0910','1110','1111','1112'})
+% set(ax,'XTickLabel',{'1110','1111','1112','1113','1114','1115AM','1115PM','1116AM','1116PM','1117'})
+% starsas('c0timeseries_Langleys_4STARB_Oct2017roof_bywavelength.fig','plot_Langleys_all.m')
+% % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
+% % print -dpdf c0timeseries_Langleys_Nov2016_bywavelength.pdf
 
 
 % visfilename=fullfile(starpaths, 'June2016_VIS_C0_mean.dat');
 % nirfilename=fullfile(starpaths, 'June2016_NIR_C0_mean.dat');
 % source='MLOJune2016';
+visfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_VIS_Oct2017_rooftop_mean.dat')
+nirfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_NIR_Oct2017_rooftop_mean.dat')
+source='rooftopOct2017';
+additionalnotes='Based on the mean of c0s from 20171024, 1025, 1026, 1101, and 1107.  C0err=2*stdev the variability within these 5 langleys.';
 % additionalnotes='Based on mean of c0s from 20160630, 20160702 (AM+PM), 20160703, 20160704, 20160705.  C0err=2*stdev the variability within these 6 langleys.';
 %         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols), c0new_unc1(:,viscols));
 %         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols), c0new_unc1(:,nircols));
