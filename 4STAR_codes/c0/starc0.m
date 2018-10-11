@@ -360,8 +360,13 @@ switch instrumentname;
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = 'refined_langley_4STARBam_MLOFeb2018_day5_';
         elseif t>=datenum([2017 08 20 0 0 0]);
-            daystr = '20170918';
-            filesuffix = 'compared_with_AATS_at_StJohns_version20171003225734up3pb';
+%             daystr = '20170918';
+%             filesuffix = 'compared_with_AATS_at_StJohns_version20171003225734up3p';
+            daystr = '20171107';
+            filesuffix = '4STARB_Oct2017_rooftop_withAATSfieldcomp_mean';
+%             daystr = '20171107';
+%             filesuffix = 'Oct2017_rooftop_mean';
+
         elseif t>=datenum([2017 08 01 0 0 0]);
             daystr = '20170905';
             filesuffix = 'compared_with_AATS_at_Ames_divbyTint';
@@ -448,8 +453,15 @@ if verbose; disp(['Using the C0 from ' visfilename]), end;
 % return channels used for AOD fitting
 [visc,nirc]=starchannelsatAATS(t,instrumentname);
 cross_sections=taugases(t,'vis',0,0,0,0,0.27,2.0e15,instrumentname); % put 0 degree as latitude for the application here; inputting the latitude would be cumbersome to no real effect.
-visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
-h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
+if strcmp(instrumentname,'4STAR')
+    visaerosolcols1=find(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob)>0.9999 & cross_sections.o2<1e-25);
+    h2o=abs(exp(-cross_sections.h2oa.*1000.^cross_sections.h2ob));
+elseif strcmp(instrumentname,'4STARB')
+    Loschmidt=2.686763e19;             % molec/cm3*atm
+    visaerosolcols1=find(exp(-cross_sections.h2o*Loschmidt*1000)>0.9999 & cross_sections.o2<1e-25);
+    h2o=abs(exp(-cross_sections.h2o*Loschmidt*1000));
+end
+
 h2ook=find(isfinite(h2o)==1 & imag(h2o)==0);
 h2ong=find(isfinite(h2o)==0 | imag(h2o)~=0);
 h2o4ng=interp1(log(cross_sections.wln(h2ook)),h2o(h2ook), log(cross_sections.wln));
