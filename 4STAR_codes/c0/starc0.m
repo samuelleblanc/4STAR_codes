@@ -64,9 +64,12 @@ switch instrumentname;
                      filesuffix = 'refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12';
                 end
             elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
-                 daystr = '20180209';
+                 %daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
-                 filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';
+                 %filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';
+                 daystr = '20181005';
+                 filesuffix = 'refined_averaged_4STAR_MLO_inflight_withFebMLO';
+                 
             elseif t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
                 if t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
                     daystr = '20170905';
