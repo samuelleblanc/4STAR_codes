@@ -70,6 +70,7 @@ end;
 
 [ff,pp]=fileparts(fnn);
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fnn});
+s.instrumentname = instrumentname;
 disp(['Doing for day: ' daystr])
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
