@@ -95,6 +95,6 @@ else % all other types
     s.row_labels={row_labels};
    if exist(file,'file')&&exist(file(1:end-1),'file')
       delete(file);
-      disp(['Deleted copy of ',file(1:end-1)])
+      disp(['Removed temprorary copy of ',file(1:end-1)])
    end
 end;

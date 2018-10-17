@@ -21,7 +21,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
 % SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file
 % SL v1.3: 2018/02/08: added special treatment of temperatures for 4STARB and conversion of temperatures of the spectrometers
-version_set('1.3');
+% SL v1.4: 2018/10/16: Treatment of badly named files by renaming in the file type treatment the most often occuring mode
+version_set('1.4');
 %********************
 % control input
 %********************
@@ -94,6 +95,17 @@ for i=1:length(filenames);
             try
                 s=starter(cf0); % read the raw file.
                 if ~isempty(s.t) && ((isfield(s, 'raw') && ~isempty(s.raw)) || (isfield(s, 'fname') && ~isempty(strfind(lower(s.fname), 'track')))); % time is given, and either raw isn't empty or it's a track file
+                    try %to handle wrongly named park files 
+                       if mode(s.Md)==1 && isequal(type(end-3:end), 'park')
+                           type = [type(1:end-4) 'sun'];
+                           filenames(i) = strrep(filenames(i),'park','SUN');
+                       elseif mode(s.Md)==8 && isequal(type(end-3:end), 'park')
+                           type = [type(1:end-4) 'zen'];
+                           filenames(i) = strrep(filenames(i),'park','ZEN');
+                       end
+                    catch
+                       type = type;
+                    end
                     contents=[contents;{type}];
                     if isequal(type(end-2:end), 'sun') || isequal(type(end-2:end), 'zen')  || isequal(type(end-3:end), 'park') || isequal(type(end-3:end), 'forj') || isequal(type(end-4:end), 'track');
                         s.filename=filenames(i);
