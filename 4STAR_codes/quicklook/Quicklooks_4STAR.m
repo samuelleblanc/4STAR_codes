@@ -548,7 +548,16 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 % altitude
 falt = figure;
-plot(s.t,s.Alt,'.');
+plot(s.t,s.Alt,'.');hold on;
+for ii = 2:length(fld);
+    if length(st.(fld{ii}))>1;
+        for jj=1:length(st.(fld{ii}));
+            sso = scatter(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Alt,1,'MarkerEdgeColor','k');
+        end;
+    else;
+        sso = scatter(st.(fld{ii}).t,st.(fld{ii}).Alt,1,'MarkerEdgeColor','k');
+    end;
+end;
 dynamicDateTicks;
 grid on;
 xlabel('UTC time');
@@ -1030,6 +1039,18 @@ end
         figma = figure;
         ss = scatter(s.Lon,s.Lat,8,s.tau_aero(:,i500),'o');
         hold on;
+        for ii = 2:length(fld);
+            if length(st.(fld{ii}))>1;
+                for jj=1:length(st.(fld{ii}));
+                    sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Lat,1,'MarkerEdgeColor','k');
+                end;
+            else;
+                sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,1,'MarkerEdgeColor','k');
+            end;
+            leg = [leg; {fld{ii}}];
+            plo = [plo sso];
+        end;
+        
         utch = t2utch(s.t);
         t_low = min(utch); t_high = max(utch); nt =floor((t_high-t_low)/0.5);
         times_15min = linspace(floor(t_low),t_high,nt);
@@ -1053,7 +1074,17 @@ end
         figloaltaod = figure;
         ang=sca2angstrom(s.tau_aero(:,[i470 i865]), s.w([i470 i865]));
         ss = scatter(s.Lon,s.Alt,(s.tau_aero(:,i500)+0.25).*30.0,ang,'o'); 
+        set(ss, 'SizeData', (s.tau_aero(:,i500)+0.25).*30.0);
         hold on;
+        for ii = 2:length(fld);
+            if length(st.(fld{ii}))>1;
+                for jj=1:length(st.(fld{ii}));
+                    sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Alt,1,'MarkerEdgeColor','k');
+                end;
+            else;
+                sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Alt,1,'MarkerEdgeColor','k');
+            end;
+        end;
         for q=1:nt;
             [nul,iq] = min(abs(utch-times_15min(q)));
             plot(s.Lon(iq),double(s.Alt(iq)),'k+');
@@ -1076,8 +1107,18 @@ end
         
         % flight track map
         figlaaltaod = figure;
-        ss = scatter(s.Lat,s.Alt,(s.tau_aero(:,i500)+0.25).*30.0,ang,'o'); 
+        ss = scatter(s.Lat,s.Alt,(s.tau_aero(:,i500)+0.25).*30.0,ang,'o');
+        set(ss, 'SizeData', (s.tau_aero(:,i500)+0.25).*30.0);
         hold on;
+        for ii = 2:length(fld);
+            if length(st.(fld{ii}))>1;
+                for jj=1:length(st.(fld{ii}));
+                    sso = scatter(st.(fld{ii})(jj).Lat,st.(fld{ii})(jj).Alt,1,'MarkerEdgeColor','k');
+                end;
+            else;
+                sso = scatter(st.(fld{ii}).Lat,st.(fld{ii}).Alt,1,'MarkerEdgeColor','k');
+            end;
+        end;
         for q=1:nt;
             [nul,iq] = min(abs(utch-times_15min(q)));
             plot(s.Lat(iq),double(s.Alt(iq)),'k+');
@@ -1640,7 +1681,7 @@ if isfield(s,'ground');  isflight = false; elseif isfield(s,'flight'); isflight 
 deltac0_figs = Apply_deltac0(fname_4starsun,+2.0,isflight);
 pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
 pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
-pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
+%pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
 deltac0_figs = Apply_deltac0(fname_4starsun,-2.0,isflight);
 pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
 pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
