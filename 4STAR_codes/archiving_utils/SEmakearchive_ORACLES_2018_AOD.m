@@ -157,10 +157,10 @@ form.flag_acaod = '%1.0f';
 originfo = info; origform = form; orignames = names;
 
 %% prepare list of details for each flight
-dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007' '20181010' '20181012' '20181015'} ; %put one day string
+dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007' '20181010' '20181012' '20181015' '20181017' '20181019' '20181021'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-jproc=[         0          0          0          0          0           0         0          0          0          0          0          1] ;
+jproc=[         0          0          0          0          0           0         0          0          0          0          0          0          0          1          0] ;
 %jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
 %jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
