@@ -162,25 +162,35 @@ clear cf cf0 ff cff filen fn i s type note;
 %********************
 %% Extra handling of the spectrometer temperature fields
 %********************
-if exist('track','var');
+if exist('track','var')
     track.T_spec_uvis = track.T_spec_uvis-273.15;
     track.T_spec_nir = track.T_spec_nir-273.15;
-end;
+end
 
 %********************
 %% Special processing for 4STARB (differences in temp sensors)
 %********************
-if strcmp(instrumentname,'4STARB');
-    if exist('track');
+if strcmp(instrumentname,'4STARB')
+    if exist('track')
         track.T3 = ((track.T3+273.15)./1000.0)*23-30;
-    end;
-end;
+    end
+end
 
+%********************
+%% Special filtering for problems in lat/lon fields
+%********************
+if exist('vis_sun')
+    dt = abs(diff(vis_sun.t));
+    dLo = abs(diff(vis_sun.Lon));
+    dLa = abs(diff(vis_sun.Lat));
+    vis_sun.Lon(dLo>(dt.*10.0+0.02)) = NaN;
+    vis_sun.Lat(dLa>(dt.*10.0+0.02)) = NaN;
+end
 
 %********************
 %% save
 %********************
-for ii=1:length(contents);
+for ii=1:length(contents)
     %cjf: fls and following for loop were introduced to remove empty filename elements
     % Yohei, 2013/02/13, masks the lines, in order to better keep track of FOV records
     % CJF: unmasks and made changes to accommodate FOV and track files.
@@ -196,12 +206,12 @@ for ii=1:length(contents);
         
     end
     
-    if ii==1 && append==0;
+    if ii==1 && append==0
         save(savematfile, contents{ii},'-mat', '-v7','program_version');
     else
         save(savematfile, contents{ii},'-mat', '-append','program_version');
-    end;
-end;
+    end
+end
 
 
 %********************
