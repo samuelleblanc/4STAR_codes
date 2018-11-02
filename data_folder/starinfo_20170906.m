@@ -15,7 +15,7 @@ end
 s.flight=[datenum(2017,9,6,09,29,57) datenum(2017,9,6,19,54,43)]; 
 % spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
 % datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
-% s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+ s.langley1 = [datenum(2017,9,6,10,00,00) datenum(2017,9,6,10,45,00)];
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
  
 % Ozone and other gases 
