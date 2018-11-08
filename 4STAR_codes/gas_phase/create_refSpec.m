@@ -45,6 +45,7 @@
 % MS, 2017-08-23, updated O3 from MLO DB
 % MS, 2018-09-12, updated refSpec for MLO Aug-2018
 % MS, 2018-10-02, updated O3 reference amount to MLO DB value
+% MS, 2018-11-07, updated refSpec for MLO Feb-2018
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -67,6 +68,10 @@ elseif strcmp(daystr,'20170605')
 elseif strcmp(daystr,'20180811')||strcmp(daystr,'20180812')||strcmp(daystr,'20180813')
     
      s = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_', daystr, 'starsun.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
+    
+elseif strcmp(daystr,'20180209')||strcmp(daystr,'20180210')||strcmp(daystr,'20180212')
+    
+     s = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_', daystr, 'starsun_nogases.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
     
 else
     s = load([starpaths,daystr,'starsun.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
@@ -102,6 +107,8 @@ if strcmp(gas,'O3')
         ref_spec.o3scdref = 270*ref_spec.mean_m;  % in [DU] this is from DB in MLO
     elseif strcmp(daystr,'20180813')
         ref_spec.o3scdref = 275*ref_spec.mean_m;  % in [DU] this is from DB in MLO
+    elseif strcmp(daystr,'20180209') || strcmp(daystr,'20180210')|| strcmp(daystr,'20180212')
+        ref_spec.o3scdref = 262*ref_spec.mean_m;  % in [DU] this is from DB in MLO
     end
     save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     
@@ -126,6 +133,8 @@ elseif strcmp(gas,'NO2')
         ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
         ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% this is from MLE
     elseif strcmp(daystr,'20180811') || strcmp(daystr,'20180812') || strcmp(daystr,'20180813')
+        ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
+    elseif strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212')
         ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
     end
     save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
@@ -168,7 +177,7 @@ end
 
 
 %clear s
-%% use refspec to retrieve quantities at MLO:
+%% use refspec to retrieve gas quantities and infer reference quantities at MLO:
 
 % upload data points:
 % MLO Jan-2016
@@ -187,9 +196,16 @@ end
 %dat3 = load(['F:\MLO2017\','4STAR_20170605starsun_am.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray');
 
 % MLO Aug-2018
-dat1 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180811starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
-dat2 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180812starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
-dat3 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180813starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+% dat1 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180811starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+% dat2 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180812starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+% dat3 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180813starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+
+% MLO Feb-2018
+dat1 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180209starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+dat2 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180210starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+dat3 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180212starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
+
+
 
 if strcmp(gas,'O3')
     ref_spec.o3refspec = meanspec;
@@ -244,7 +260,7 @@ elseif strcmp(gas,'HCOH')
     xlabel('airmass');ylabel('HCOH relative SCD');    
 end
 
-%% deduce reference spectrum gas amount to be added (compare to OMI)
+%% deduce reference spectrum gas amount to be added (compare to OMI/DB)
 if strcmp(gas,'O3')
     
         % bin airmass 1-5 into 100 bins
@@ -289,6 +305,16 @@ if strcmp(gas,'O3')
             y = [o3_1.o3SCD(dat1.m_O3<=8&dat1.m_O3>=4);
                  o3_2.o3SCD(dat2.m_O3<=8&dat2.m_O3>=4);
                  o3_3.o3SCD(dat3.m_O3<=8&dat3.m_O3>=4)];
+            y = real(y); 
+            
+         elseif strcmp(daystr,'20180209')||strcmp(daystr,'20180210')||strcmp(daystr,'20180212') 
+        % these airmass values are for MLO Feb-2018
+            x = [dat1.m_O3(dat1.m_O3<=4&dat1.m_O3>=1.5);
+                 dat2.m_O3(dat2.m_O3<=4&dat2.m_O3>=1.5);
+                 dat3.m_O3(dat3.m_O3<=4&dat3.m_O3>=1.5)];
+            y = [o3_1.o3SCD(dat1.m_O3<=4&dat1.m_O3>=1.5);
+                 o3_2.o3SCD(dat2.m_O3<=4&dat2.m_O3>=1.5);
+                 o3_3.o3SCD(dat3.m_O3<=4&dat3.m_O3>=1.5)];
             y = real(y); 
             
         end 
@@ -355,6 +381,17 @@ elseif strcmp(gas,'NO2')
                  no2_3.no2SCD(dat3.m_NO2<=4&dat3.m_NO2>=2)];
             y = real(y);   
             y(y<0) = NaN;
+            
+        elseif strcmp(daystr,'20180209')||strcmp(daystr,'20180210')||strcmp(daystr,'20180212')
+        % these airmass values are for MLO Aug-2018
+            x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=3);
+                 dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=3);
+                 dat3.m_NO2(dat3.m_NO2<=5&dat3.m_NO2>=3)];
+            y = [no2_1.no2SCD(dat1.m_NO2<=5&dat1.m_NO2>=3);
+                 no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=3);
+                 no2_3.no2SCD(dat3.m_NO2<=5&dat3.m_NO2>=3)];
+            y = real(y);   
+            y(y<0) = NaN;
         end
         
         binEdge = linspace(min(x),max(x),100);
@@ -413,6 +450,17 @@ elseif strcmp(gas,'HCOH')
                  hcoh_3.hcohSCD(dat3.m_NO2<=5&dat3.m_NO2>=2)];
             y = real(y);   
             y(y<0) = NaN;  
+            
+        elseif strcmp(daystr,'20180209')||strcmp(daystr,'20180210')||strcmp(daystr,'20180212') 
+        % these airmass values are for MLO Aug-2018
+            x = [dat1.m_NO2(dat1.m_NO2<=4&dat1.m_NO2>=2);
+                 dat2.m_NO2(dat2.m_NO2<=4&dat2.m_NO2>=2);
+                 dat3.m_NO2(dat3.m_NO2<=4&dat3.m_NO2>=2)];
+            y = [hcoh_1.hcohSCD(dat1.m_NO2<=4&dat1.m_NO2>=2);
+                 hcoh_2.hcohSCD(dat2.m_NO2<=4&dat2.m_NO2>=2);
+                 hcoh_3.hcohSCD(dat3.m_NO2<=4&dat3.m_NO2>=2)];
+            y = real(y);   
+            y(y<0) = NaN;  
         end
         
         binEdge = linspace(min(x),max(x),100);
@@ -456,6 +504,8 @@ elseif strcmp(gas,'O3') && (strcmp(daystr,'20180812') || strcmp(daystr,'20180813
     %ref_spec.o3scdref=abs(Sf(2));%263; this seems a bit too low
     % when running it with refSpec from 0812 it gave Sf(2)=365DU...
     ref_spec.o3scdref = 270; %MLO DB
+elseif strcmp(gas,'O3') && (strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212'))
+    ref_spec.o3scdref = abs(Sf(2));%20180209 deduced 333 vs. 315 of DB, 20180210 353, 20180212 342
     %save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
@@ -470,10 +520,17 @@ elseif strcmp(gas,'NO2') && (strcmp(daystr,'20180811')||strcmp(daystr,'20180812'
     ref_spec.no2scdref = 3e15; % since MLE seem too high (~5e16)
     %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'NO2refspec.mat'],'-struct','ref_spec');
+elseif strcmp(gas,'NO2') && (strcmp(daystr,'20180209')||strcmp(daystr,'20180210') ||strcmp(daystr,'20180212'))
+    ref_spec.no2scdref = 2.4e15; % since MLE seem too high (~4.7e16 for 20180212)
+    %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'NO2refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline? -24 from MLO 2017
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');   
 elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20180812')||strcmp(daystr,'20180813'))
     ref_spec.hcohscdref = abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline? -24 from MLO 2017
-    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'HCOHrefspec.mat'],'-struct','ref_spec');   
+    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'HCOHrefspec.mat'],'-struct','ref_spec'); 
+elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20180209')||strcmp(daystr,'20180210') ||strcmp(daystr,'20180212'))
+    ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline? -24 from MLO 2017
+    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'HCOHrefspec.mat'],'-struct','ref_spec');  
 end

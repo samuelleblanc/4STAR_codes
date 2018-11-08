@@ -18,6 +18,8 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2018-09-14, updated file with ORACLES 3 starc0gases
 % Modified, MS, 2018-10-02, fixed bug in ingesting the correct refSpec for 
 %                           ORACLES 2018 (took 2016 instead)
+% Modified, MS, 2018-11-07, added MLO-Feb-2018 results to be applied
+%                           on ORACLES 2018
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -178,7 +180,7 @@ end;
         end
         % ORACLES 2017
         
-        elseif t> datenum([2017 2 1 0 0 0]) && t<=datenum([2018 8 1 0 0 0]); % use MLO June-2017-ORACLES    
+        elseif t> datenum([2017 2 1 0 0 0]) && t<=datenum([2018 2 1 0 0 0]); % use MLO June-2017-ORACLES    
          if now>=datenum([2017 2 1 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
@@ -219,7 +221,51 @@ end;
                 
              end
             
-        end; % end of ORACLES 2017 option
+         end % end of ORACLES 2017 option
+         
+         
+         elseif t> datenum([2018 2 1 0 0 0]) && t<=datenum([2018 8 1 0 0 0]); % use for MLO-Feb-2018    
+         if now>=datenum([2018 2 1 0 0 0]);
+             if strcmp(gas,'O3')
+                if mode==0
+                    % use MLO c0
+                    tmp = importdata(which(['20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018.dat'])); 
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    
+                    tmp = load(which(['20180209O3refspec.mat']));
+                    c0gases = tmp;%.o3refspec;
+                end
+            elseif strcmp(gas,'NO2')
+                if mode==0
+                    % use MLO c0
+                   
+                    tmp = importdata(which(['20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018.dat'])); 
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load(which(['20180212NO2refspec.mat']));
+                    c0gases = tmp;%.no2refspec;
+                    
+                    
+                end
+                
+            elseif strcmp(gas,'HCOH')
+                if mode==0
+                    % use lamp FEL?
+                    tmp = importdata(which(['20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018.dat'])); % MLO-Jan-2016 mean
+                    c0gases = tmp.data(:,3);
+                elseif mode==1
+                    % use ref_spec
+                    tmp = load(which(['20180212HCOHrefspec.mat']));
+                    
+                    c0gases = tmp;%.hcohrefspec;
+                end    
+                
+             end
+            
+         end % end of MLO Feb-2018
         
         elseif t> datenum([2018 8 1 0 0 0]); % use MLO Aug-2018-ORACLES    
          if now>=datenum([2018 8 1 0 0 0]);

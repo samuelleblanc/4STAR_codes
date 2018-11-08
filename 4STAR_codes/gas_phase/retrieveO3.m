@@ -1,4 +1,4 @@
-function [o3] = retrieveO3(s,wstart,wend,mode,gxs)
+function [o3] = retrieveO3(s,wstart,wend,mode)
 %% Details of the function:
 % NAME:
 %   retrieveO3
@@ -50,6 +50,7 @@ function [o3] = retrieveO3(s,wstart,wend,mode,gxs)
 % MS, 2016-10-24, tweaked processing routine post-oracles to be as pre
 % MS, 2016-10-27, tweaked processing to match RH signals in spectrometer
 % MS, 2016-12-31, assigned specific processing for KORUS high RH days
+% MS, 2018-11-07, ommiting gxs (gas cross section input, which is not used)
 % -------------------------------------------------------------------------
 %% function routine
 
