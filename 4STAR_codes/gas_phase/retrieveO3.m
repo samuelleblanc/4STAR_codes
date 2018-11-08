@@ -1,4 +1,4 @@
-function [o3] = retrieveO3(s,wstart,wend,mode)
+function [o3] = retrieveO3(s,wstart,wend,mode,gxs)
 %% Details of the function:
 % NAME:
 %   retrieveO3
