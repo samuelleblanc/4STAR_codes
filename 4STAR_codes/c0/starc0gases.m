@@ -20,6 +20,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 %                           ORACLES 2018 (took 2016 instead)
 % Modified, MS, 2018-11-07, added MLO-Feb-2018 results to be applied
 %                           on ORACLES 2018
+% Modified, MS, 2018-11-08, changed refSpec of O3 to 20180212
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -234,7 +235,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     
-                    tmp = load(which(['20180209O3refspec.mat']));
+                    tmp = load(which(['20180212O3refspec.mat']));
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
