@@ -21,6 +21,7 @@ function [c0gases]=starc0gases(t,verbose,gas,mode)
 % Modified, MS, 2018-11-07, added MLO-Feb-2018 results to be applied
 %                           on ORACLES 2018
 % Modified, MS, 2018-11-08, changed refSpec of O3 to 20180212
+% Modified, MS, 2018-11-08, changed bug of updating ORACLES 2018
 %------------------------------------------------------------------------
 
 version_set('1.0');
@@ -268,7 +269,7 @@ end;
             
          end % end of MLO Feb-2018
         
-        elseif t> datenum([2018 8 1 0 0 0]); % use MLO Aug-2018-ORACLES    
+        elseif t> datenum([2018 8 1 0 0 0]); % use MLO Feb-2018-ORACLES    
          if now>=datenum([2018 8 1 0 0 0]);
              if strcmp(gas,'O3')
                 if mode==0
@@ -278,7 +279,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     
-                    tmp = load(which(['20180812O3refspec.mat']));
+                    tmp = load(which(['20180212O3refspec.mat']));
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
@@ -289,7 +290,7 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load(which(['20180812NO2refspec.mat']));
+                    tmp = load(which(['20180212NO2refspec.mat']));
                     c0gases = tmp;%.no2refspec;
                     
                     
@@ -302,7 +303,7 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load(which(['20180812HCOHrefspec.mat']));
+                    tmp = load(which(['20180212HCOHrefspec.mat']));
                     
                     c0gases = tmp;%.hcohrefspec;
                 end    
