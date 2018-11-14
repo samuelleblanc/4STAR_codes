@@ -24,7 +24,8 @@ s.O3col=0.289; %% guess from OMI daily average over the region (35-55N, 35-55W),
 s.NO2col=3.5e15; % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
 
 % flags
-s.flagfilename = '20170912_starflag_man_created20180524_1139by_KP.mat'; 
+s.flagfilename = '20170912_starflag_man_created20181113_1754by_KP.mat';
+% s.flagfilename = '20170912_starflag_man_created20180524_1139by_KP.mat'; 
 %s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';
 %s.flagfilenameCWV = '20160530_starflag_CWV_man_created20160701_1609by_MS.mat';
 
