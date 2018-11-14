@@ -108,7 +108,7 @@ revComments = {...
     'R0: The data are considered preliminary and not intended for publication. Final calibrations have not yet been applied. The data are subject to uncertainties associated with detector stability, cloud screening, transfer efficiency of light through fiber optic cable, diffuse light, tracking error, gas absorption and deposition on the front windows.'
     };
 
-specComments_extra_uncertainty = ''; %'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
+% specComments_extra_uncertainty = 'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -116,7 +116,7 @@ info.Latitude  = 'deg, Aircraft latitude (deg) at the indicated time';
 info.Longitude = 'deg, Aircraft longitude (deg) at the indicated time';
 info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
 info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
-info.cirrus_flag = 'unitless, Indicates likely presence of cirrus, may not be completed inclusive; 0=likely no cirrus, 1=cirrus';
+info.cirrus_flag = 'unitless, Indicates likely presence of cirrus, may not be completely inclusive; 0=no cirrus, 1=likely cirrus';
 info.amass_aer = 'unitless, aerosol optical airmass';
 info.AOD_angstrom_470_865 = 'unitless, Angstrom exponent calculated from the AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
 % info.AOD_polycoef_a2 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (2nd), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
@@ -159,15 +159,15 @@ form.cirrus_flag = '%1.0f';
 originfo = info; origform = form; orignames = names;
 
 %% prepare list of details for each flight
-dslist={'20170831','20170904','20170906','20170908','20170909','20170912','20170916','20170917','20170919'};
+dslist={'20170831','20170904','20170906','20170908','20170909','20170912','20170916','20170917','20170919','20170920'};
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          1          1          1          1          1          1          1          1]; 
+jproc=[         1          1          1          1          1          1          1          1          1          1]; 
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
 for i=idx_file_proc
     info = originfo; form = origform; names = orignames;
-    iradstart = 10; % the start of the field names related to wavelengths
+    iradstart = 8; % the start of the field names related to wavelengths
     
     %% get the flight time period
     daystr=dslist{i};
@@ -239,12 +239,16 @@ for i=idx_file_proc
     if isfield(s,'AODuncert_mergemark_file');
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
-        specComments{end+1} = specComments_extra_uncertainty;
+        if(exist('specComments_extra_uncertainty')) %KP: adding conditional here because it was putting an empty string in this array and throwing an error on writing
+            specComments{end+1} = specComments_extra_uncertainty;
+        end
         add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),length(save_wvls)]);
-        specComments{end+1} = specComments_extra_uncertainty;
+        if(exist('specComments_extra_uncertainty')) %KP: adding conditional here because it was putting an empty string in this array and throwing an error on writing
+            specComments{end+1} = specComments_extra_uncertainty;
+        end
         add_uncert = true; correct_aod = false;
         d.time = t;
     end
@@ -309,7 +313,7 @@ for i=idx_file_proc
     data.cirrus_flag(idd) = cirrus_flag(ii(idd)); %cirrus_flag
     
     %% Now go through the times of measurements, and fill up the related variables (AOD wavelengths)
-    disp('filing up the data')
+    disp('filling up the data')
     for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
     % make sure to only have unique values
     [tutc_unique,itutc_unique] = unique(tutc);
@@ -355,7 +359,7 @@ for i=idx_file_proc
         for nn=iradstart+length(save_wvls):length(names);
             ii = nn-iradstart-length(save_wvls)+1;
             [tutc_unique,itutc_unique] = unique(tutc);
-            data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+            data.(names{nn}) = interp1(tutc_unique,abs(tau_aero_err(itutc_unique,save_iwvls(ii))),UTC,'nearest');
             if add_uncert;  % if the add uncertainty exists then run that also.
                 if correct_aod;
                     it = find(diff(d.dCo(:,5))<-0.0001);
