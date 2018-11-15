@@ -505,7 +505,7 @@ elseif strcmp(gas,'O3') && (strcmp(daystr,'20180812') || strcmp(daystr,'20180813
     % when running it with refSpec from 0812 it gave Sf(2)=365DU...
     ref_spec.o3scdref = 270; %MLO DB
 elseif strcmp(gas,'O3') && (strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212'))
-    ref_spec.o3scdref = abs(Sf(2));%20180209 deduced 333 vs. 315 of DB, 20180210 353, 20180212 342
+    ref_spec.o3scdref = abs(Sf(2));%20180209 deduced 342 vs. 315 of DB, 20180210 353, 20180212 342
     %save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
