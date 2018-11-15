@@ -20,7 +20,8 @@ daycolor = {'c'    'r'    'g'    'b'    'k'    'm'   [0.47 0.31 0.45] [0.87 0.49
 %%%Michal's plotLangleyCompare.m thanks!)
 % filelistVIS = {'20160823_VIS_C0_refined_Langley_ORACLES_WFF_gnd','20160825_VIS_C0_refined_Langley_ORACLES_transit2_v2','20160910_VIS_C0_refined_Langley_ORACLES2016_gnd','20161110_VIS_C0_refined_Langley_MLO_Nov2016','20161111_VIS_C0_refined_Langley_MLO_Nov2016'};
 % filelistNIR = {'20160823_NIR_C0_refined_Langley_ORACLES_WFF_gnd','20160825_NIR_C0_refined_Langley_ORACLES_transit2_v2','20160910_NIR_C0_refined_Langley_ORACLES2016_gnd','20161110_NIR_C0_refined_Langley_MLO_Nov2016','20161111_NIR_C0_refined_Langley_MLO_Nov2016'};
-alldays={'20171024','20171025','20171026','20171101','20171107','20170918'};%'20171031',%<--"hazy"? 1023: no airmass range, what's there is bad
+% alldays={'20171024','20171025','20171026','20171101','20171107','20170906'};%,'20170918'};%'20171031',%<--"hazy"? 1023: no airmass range, what's there is bad
+alldays={'20171024','20171107','20170906','20170908'};%,'20170918','20170919'};%'20171031',%<--"hazy"? 1023: no airmass range, what's there is bad
 inst='4STARB';
 % dir('20171023*4STARB*.dat')
 % % prepare for plotting
@@ -76,7 +77,7 @@ ylim([0 1000]); xlim([100 1000])
 subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0allspectra_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
+% starsas('c0allspectra_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
 
 
 %a plot just showing the spectrum of the mean
@@ -90,13 +91,14 @@ plot(nircols,c0new_mean((length(viscols)+1):end),'-','color','k','linewidth',3);
 plot(nircols,c0new_unc1((length(viscols)+1):end),'--','color','k','linewidth',3)
 set(gca,'fontsize',14); title('C0 NIR mean'); xlabel('\lambda')
 ylim([0 20])
-starsas('c0meanspectrum_4STARB_Oct2017roof_plusNAAMESinfield.fig','plot_Langleys_all.m')
+% starsas('c0meanspectrum_4STARB_Oct2017roof_plusNAAMESinfield.fig','plot_Langleys_all.m')
 % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
 % print -dpdf c0meanspectrum_072016.pdf
 
 
 
 %plot all the spectra NORMALIZED TO MEAN, one line per Langley
+% c0new_mean=c0new_20170906; %1107;
 figure;
 for j=1:length(goodlangleys)
     eval(['c0new=100*(c0new_',goodlangleys{j},'(1,:)-c0new_mean)./c0new_mean;']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
@@ -119,31 +121,60 @@ subplot(2,1,2)
 set(gca,'fontsize',14); title('C0 NIR normalized to mean Langley (in %)'); xlabel('\lambda')
 % ylim([-100 100])
 oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
-starsas('c0spectra_normalizedtoMLOmean_4STARB_Oct2017roof_plusNAAMESinfield.fig','plot_Langleys_all.m')
+% starsas('c0spectra_normalizedtomean_4STARB_Oct2017plus0906.fig','plot_Langleys_all.m')
 % print -dpdf c0spectra_normalizedtoMLOmean_MLONov2016.pdf
 
-%plot THE DIFFERENCE between all the spectra versus the mean spectrum, one line per Langley
+
+
+%plot all the spectra NORMALIZED TO MEAN, one line per Langley
+% c0new_mean=c0new_20170906; %1107;
 figure;
 for j=1:length(goodlangleys)
-    eval(['c0new=(c0new_',goodlangleys{j},'(1,:)-c0new_mean);']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
+    eval(['c0new=100*(c0new_',goodlangleys{j},'(1,:)-c0new_20170906)./c0new_20170906;']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
     subplot(2,1,1)
     hold on;
     plot(viscols,c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+    grid on
+    ylim([-4.8 4.8])
     subplot(2,1,2)
     hold on;
     plot(nircols,c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+    grid on
+    ylim([-4.8 4.8])
 end
 subplot(2,1,1); legend(goodlangleys,'location','northwest')
-set(gca,'fontsize',14); title(['C0 VIS absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
-ylim([-10 10]); 
+set(gca,'fontsize',14); title('C0 VIS normalized to 0906 Langley (in %)'); xlabel('\lambda')
+% ylim([-30 30]); 
 xlim([100 1000])
 subplot(2,1,2)
-set(gca,'fontsize',14); title(['C0 NIR absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
+set(gca,'fontsize',14); title('C0 NIR normalized to mean Langley (in %)'); xlabel('\lambda')
 % ylim([-100 100])
+oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 9]);
+% starsas('c0spectra_normalizedto0906_4STARB_Oct2017plus0906.fig','plot_Langleys_all.m')
+% print -dpdf c0spectra_normalizedtoMLOmean_MLONov2016.pdf
 
-starsas('c0spectra_differencefrommean_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
-% oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
-% print -dpdf c0spectra_differencefrommean_072016.pdf
+% %plot THE DIFFERENCE between all the spectra versus the mean spectrum, one line per Langley
+% figure;
+% for j=1:length(goodlangleys)
+%     eval(['c0new=(c0new_',goodlangleys{j},'(1,:)-c0new_mean);']) %2-sigma c0s.  HERE c0new = *normalized* c0new. Only in this loop.
+%     subplot(2,1,1)
+%     hold on;
+%     plot(viscols,c0new(1:length(viscols)),'-','color',daycolor{j},'linewidth',2)
+%     subplot(2,1,2)
+%     hold on;
+%     plot(nircols,c0new((length(viscols)+1):end),'-','color',daycolor{j},'linewidth',2)
+% end
+% subplot(2,1,1); legend(goodlangleys,'location','northwest')
+% set(gca,'fontsize',14); title(['C0 VIS absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
+% ylim([-10 10]); 
+% xlim([100 1000])
+% subplot(2,1,2)
+% set(gca,'fontsize',14); title(['C0 NIR absolute difference from ',num2str(length(goodlangleys)),'-Langley mean']); xlabel('\lambda')
+% % ylim([-100 100])
+% 
+% % starsas('c0spectra_differencefrommean_4STARB_Oct2017roof.fig','plot_Langleys_all.m')
+% % oldSettings = fillPage(gcf, 'margins', [0 0 0 0], 'papersize', [14 10]);
+% % print -dpdf c0spectra_differencefrommean_072016.pdf
 
 
 
@@ -234,10 +265,10 @@ starsas('c0spectra_differencefrommean_4STARB_Oct2017roof.fig','plot_Langleys_all
 % visfilename=fullfile(starpaths, 'June2016_VIS_C0_mean.dat');
 % nirfilename=fullfile(starpaths, 'June2016_NIR_C0_mean.dat');
 % source='MLOJune2016';
-visfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_VIS_Oct2017_rooftop_withAATSfieldcomp_mean.dat')
-nirfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','4STARB_NIR_Oct2017_rooftop_withAATSfieldcomp_mean.dat')
-source='rooftopOct2017+in-fieldSept2017';
-additionalnotes='Based on the mean of c0s from 20170918 (in-field PLUS 3% per Yohei''s analysis), and rooftop 20171024, 1025, 1026, 1101, and 1107.  C0err=2*stdev the variability within these 6 langleys.';
+visfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','20171107_VIS_C0_4STARB_Oct2017_rooftop_mean_plus2inflights.dat')
+nirfilename=fullfile('C:\Users\kpistone\Documents\4STAR_codes\data_folder','20171107_NIR_C0_4STARB_Oct2017_rooftop_mean_plus2inflights.dat')
+source='rooftopOct2017+in-field6+8Sept2017';
+additionalnotes='Based on the mean of c0s from 20170906 and 0908 (in-flight partial langley), and rooftop 20171024, and 1107.  C0err=2*stdev the variability within these 4 langleys.';
 % additionalnotes='Based on mean of c0s from 20160630, 20160702 (AM+PM), 20160703, 20160704, 20160705.  C0err=2*stdev the variability within these 6 langleys.';
-        starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols), c0new_unc1(:,viscols));
-        starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols), c0new_unc1(:,nircols));
+%         starsavec0(visfilename, source, additionalnotes, w(viscols), c0new_mean(viscols), c0new_unc1(:,viscols));
+%         starsavec0(nirfilename, source, additionalnotes, w(nircols), c0new_mean(nircols), c0new_unc1(:,nircols));
