@@ -1206,6 +1206,14 @@ if exist('cwv2plot')
     
     fcwv_fl = figure;
     plot(s.t,cwv2plot,'ob');
+    try
+       yyaxis right
+       plot(s.t,s.Alt,'.');
+       ylabel('Altitude [m]')
+       yyaxis left
+    catch
+       nul = 0;
+    end
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('CWV [g/cm^{2}]');
@@ -1253,6 +1261,14 @@ if exist('o32plot');
     
     fo3_fl = figure;
     plot(s.t,o32plot,'og');
+    try
+       yyaxis right
+       plot(s.t,s.Alt,'.');
+       ylabel('Altitude [m]')
+       yyaxis left
+    catch
+       nul = 0;
+    end
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('O_{3} [DU]');
@@ -1301,6 +1317,14 @@ if exist('no22plot');
     
     fno2_fl = figure;
     plot(s.t,no22plot,'or');
+    try
+       yyaxis right
+       plot(s.t,s.Alt,'.');
+       ylabel('Altitude [m]')
+       yyaxis left
+    catch
+       nul = 0;
+    end
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('NO_{2} [DU]');
