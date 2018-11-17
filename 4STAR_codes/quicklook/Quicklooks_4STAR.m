@@ -230,7 +230,8 @@ if isfield(s, 'flagfilename');
     disp(['Loading flag file: ' s.flagfilename])
     flag = load(s.flagfilename);
     % read flags
-    flag  = flag.manual_flags.screen;
+    flag  = convert_flags_to_qual_flag(flag,s.t,s.flight);
+    %flag.manual_flags.screen;
 else;
     flag = zeros(length(s.t),1);
 end;
