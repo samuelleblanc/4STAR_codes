@@ -44,6 +44,7 @@
 % MS, 2017-07-22, edited for MLO 2017
 % MS, 2017-08-23, updated O3 from MLO DB
 % MS, 2018-09-12, updated refSpec for MLO Aug-2018
+% MS, 2018-10-02, updated O3 reference amount to MLO DB value
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -452,8 +453,9 @@ elseif strcmp(gas,'O3') && (strcmp(daystr,'20180811'))
     %save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'O3') && (strcmp(daystr,'20180812') || strcmp(daystr,'20180813'))
-    ref_spec.o3scdref=abs(Sf(2));%263
-    %ref_spec.o3scdref = 270; %MLO DB
+    %ref_spec.o3scdref=abs(Sf(2));%263; this seems a bit too low
+    % when running it with refSpec from 0812 it gave Sf(2)=365DU...
+    ref_spec.o3scdref = 270; %MLO DB
     %save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))

@@ -289,7 +289,7 @@ elseif exist(infofile)==2;
 else; % copy an existing old starinfo file and run it
    while dayspast<maxdayspast;
       dayspast=dayspast+1;
-      infofile_previous=fullfile(starpaths, ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
+      infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if exist(infofile_previous);
          copyfile(infofile_previous, infofile_);
          open(infofile_);

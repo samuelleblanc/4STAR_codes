@@ -29,6 +29,7 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % SL, v2.0, 2017-05-27, Updates to use multiple different instruments,
 % MS, v2.1, 2018-09-14, updated c0 from MLO 20180812 (tentative) for ORCLES 3 
 % MS, v2.1, 2018-09-14, updated mean c0 from MLO Aug-2018 for ORACLES 3
+% MS, v2.1, 2018-09-20, updated suffix of starc0 for 4STAR for ORACLES 3
 
 % defined via instrumentname variable, defaults to 4STAR
 
@@ -52,12 +53,23 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
-                 daystr = '20180811';
-                 filesuffix = 'refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12';
+                if t>=datenum([2018 9 24 0 0 0])
+                    daystr = '20181005';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                elseif t>=datenum([2018 9 21 0 0 0]) %From transit
+                     daystr = '20180922';
+                     filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                else
+                     daystr = '20180811';
+                     filesuffix = 'refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12';
+                end
             elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
-                 daystr = '20180209';
+                 %daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
-                 filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';
+                 %filesuffix = 'refined_langley_4STARam_MLOFeb2018_day5_';
+                 daystr = '20181005';
+                 filesuffix = 'refined_averaged_4STAR_MLO_inflight_withFebMLO';
+                 
             elseif t>=datenum([2017 2 1 0 0 0]); %for ORACLES 2017
                 if t>=datenum([2017 8 9 0 0 0]); % from averages including the polyfit aod from high altitude during transit
                     daystr = '20170905';
