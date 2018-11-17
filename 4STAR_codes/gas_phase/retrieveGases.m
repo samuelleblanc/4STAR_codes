@@ -45,6 +45,7 @@ function [gas] = retrieveGases(s)
  showfigure = 0;
  
  colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
+ warning('off','MATLAB:rankDeficientMatrix');
  
 %% load cross-sections
 gxs = get_GlobalCrossSections;
