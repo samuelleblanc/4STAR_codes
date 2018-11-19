@@ -359,7 +359,7 @@ switch instrumentname;
                  daystr = '20180209';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = 'refined_langley_4STARBam_MLOFeb2018_day5_';
-        elseif t>=datenum([2017 08 20 0 0 0]);
+        elseif t>=datenum([2017 08 20 0 0 0]); %NAAMES-3
 %             daystr = '20170918';
 %             filesuffix = 'compared_with_AATS_at_StJohns_version20171003225734up3p';
             daystr = '20171107';
