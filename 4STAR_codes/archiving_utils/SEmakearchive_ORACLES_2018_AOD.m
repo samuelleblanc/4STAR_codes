@@ -309,6 +309,7 @@ for i=idx_file_proc
                 flag.utc = t2utch(flag.flags.time.t);
             end
         end
+
     end
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.

@@ -45,29 +45,29 @@ for f = 1:length(files)
     try
         forj_out_ = TCAPII_forj_az_v2(vis);
         if ~isempty(forj_out_)
-        if ~exist('forj_out','var')
-            forj_out = forj_out_;
-        else
-            [forj_out.time, ij] = unique([forj_out.time, forj_out_.time]);
-            flds = fieldnames(forj_out);
-            for fld = 1:length(flds)
-                if ~strcmp(flds{fld},'meas')&&~strcmp(flds{fld},'time')&&~strcmp(flds{fld},'Az_deg')
-                    tmp = [forj_out.(flds{fld}); forj_out_.(flds{fld})];
-                    forj_out.(flds{fld}) = tmp(ij,:);
+            if ~exist('forj_out','var')
+                forj_out = forj_out_;
+            else
+                [forj_out.time, ij] = unique([forj_out.time, forj_out_.time]);
+                flds = fieldnames(forj_out);
+                for fld = 1:length(flds)
+                    if ~strcmp(flds{fld},'meas')&&~strcmp(flds{fld},'time')&&~strcmp(flds{fld},'Az_deg')
+                        tmp = [forj_out.(flds{fld}); forj_out_.(flds{fld})];
+                        forj_out.(flds{fld}) = tmp(ij,:);
+                    end
                 end
-            end            
-            forj_out.meas(end+1) = forj_out_.meas;
-            forj_out.meas = forj_out.meas(ij);
-            save([starpaths,'forj_all.mat'],'-struct','forj_out');
-            %save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
-            % save some more figures
-            %LED stability
-            f3 = [plot_dir,files(f).name(1:end-4), '_LEDstability'];
-            save_fig(3,f3,false);
-            % normalized signals
-            f4 = [plot_dir,files(f).name(1:end-4), '_NormalizedSignal'];
-            save_fig(4,f4,false);
-        end
+                forj_out.meas(end+1) = forj_out_.meas;
+                forj_out.meas = forj_out.meas(ij);
+                save([starpaths,'forj_all.mat'],'-struct','forj_out');
+                %save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
+                % save some more figures
+                %LED stability
+                f3 = [plot_dir,files(f).name(1:end-4), '_LEDstability'];
+                save_fig(3,f3,false);
+                % normalized signals
+                f4 = [plot_dir,files(f).name(1:end-4), '_NormalizedSignal'];
+                save_fig(4,f4,false);
+            end
         else
             disp('forj_out_ was empty')
         end
