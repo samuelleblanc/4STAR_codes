@@ -10,11 +10,11 @@ function out = star_modes(s,spc)
 % Merge into a single output using unique, perhaps with some rounding  
 % And possibly a stage allowing interactive selection of output fields.
 while ~exist('s','var')
-   s = getfullname('*star.mat','allstarmat','Select an allstarmat file.')
+   s = getfullname('*star.mat','starmat','Select an allstarmat file.')
 end
 if ischar(s)
    while ~exist(s,'file')
-      s = getfullname('*star.mat','allstarmat','Select an allstarmat file.')
+      s = getfullname('*star.mat','starmat','Select an allstarmat file.')
    end
    s_ = s; s = load(s); pname = [fileparts(s_),filesep];
 end

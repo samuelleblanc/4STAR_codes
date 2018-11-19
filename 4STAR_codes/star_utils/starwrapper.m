@@ -101,9 +101,12 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % MS: 2018-03-27,       fixed a bug in tau_aero_subtract_all that had NO2
 %                       added instead of subtracted !!! (--)
 % SL: v3.1, 2018-04-12,       Changed the wavelengths on which polyfit is applied
-% SL: v3.2, 2018-06-27, Added some filters to not run starflag on FORJ data
+% CJ: v3.2, 2018-08-12, Fixed bug in case applyforjcorr where the wrong
+% toggle was being set, and added logic to set toggle.applyforjcorr to
+% false if 2STAR, 4STARB, or forj measurement
+% SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
 
-version_set('3.1');
+version_set('3.3');
 %********************
 %% prepare for processing
 %********************
@@ -116,7 +119,7 @@ else
 end
 
 if isfield(s, 'toggle')
-   s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -166,7 +169,7 @@ if (~isempty(varargin))
                disp(['applytempcorr set to ' num2str(toggle.applytempcorr)])
             case {'applyforjcorr'}
                c=c+1;
-               toggle.applytempcorr=varargin{c};
+               toggle.applyforjcorr=varargin{c};
                disp(['applyforjcorr set to ' num2str(toggle.applyforjcorr)])
             otherwise
                error(['Invalid optional argument, ', ...
@@ -216,6 +219,9 @@ s2.note={};
 if toggle.verbose; disp('get data types'), end;
 [daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
 s.instrumentname = instrumentname;
+% if 2STAR, 4STARB, or a forj measurement then set applyforjcorr to false.
+toggle.applyforjcorr = toggle.applyforjcorr && ~strcmp(instrumentname,'2STAR')...
+   && ~strcmp(instrumentname,'4STARB') && isempty(strfind(lower(datatype),'forj'));
 if nargin>=(2+nnarg)
    [daystr2, filen2, datatype2,instrumentname2]=starfilenames2daystr(s2.filename, 1);s2.datatype = datatype2;
    if instrumentname~=instrumentname2;
@@ -232,18 +238,19 @@ s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=0.01; % variable for screening direct sun datanote
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(getnamedpath('starinfo'), ['starinfo' daystr '.m']);
-infofile2 = ['starinfo' daystr] % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
+infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
 if exist(infofile_)==2;
+   if toggle.editstarinfo
+      try
+         edit(infofile_) ; % open infofile in case user wants to edit it.
+         menu('Hit Done when finished editing the starinfo file...','Done');
+      catch me
+         disp(['Problem editing starinfo file. Please open manually: ' infofile_])
+      end
+   end;
    if toggle.dostarflag
-      if toggle.editstarinfo
-         try
-            edit(infofile_) ; % open infofile in case user wants to edit it.
-         catch me
-            disp(['Problem editing starinfo file. Please open manually: ' infofile_])
-         end
-      end;
       infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
       try
          s = infofnt(s);
@@ -283,7 +290,7 @@ elseif exist(infofile)==2;
 else; % copy an existing old starinfo file and run it
    while dayspast<maxdayspast;
       dayspast=dayspast+1;
-      infofile_previous=fullfile(starpaths, ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
+      infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if exist(infofile_previous);
          copyfile(infofile_previous, infofile_);
          open(infofile_);
@@ -516,7 +523,8 @@ if toggle.verbose; disp('adjusting the count rate'), end;
 % get correction values
 % set toggle.applyforjcorr to 2 for a two-way correction accounting for
 % the direction of az rotation, 1 for a one-way correction, 0 for no correction.
-if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj')); % don't apply FORJ correction to FORJ test data, to avoid confusion.
+if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj'))...
+      &&~strcmp(instrumentname,'2STAR')&&~strcmp(instrumentname,'4STARB'); % don't apply FORJ correction to FORJ test data, to avoid confusion.
    [forj_corr, detail] = get_forj_corr(s.t(1));
    % apply correction on s.rate
    AZ_deg_   = s.AZstep/(-50);
@@ -669,7 +677,9 @@ if toggle.hires_rayleigh;
          s.tau_r_err = tau_r_err_hires*sss';
       end;
    else;
+      if toggle.verbose
       disp('Hires_rayleigh correction not implemented for instruments other than 2STAR')
+      end
    end;
 end;
 
@@ -679,7 +689,7 @@ tau_noray_slant = -real(log(Tr_noray));
 tau_noray_vert = tau_noray_slant ./repmat(s.m_aero,1,qq);
 s.tau_tot_vert = tau_noray_vert + s.tau_ray; % This is really a "total" vertical optical depth
 
-sun_ = s.Zn==0&s.Str==1; sun_ii = find(sun_);
+sun_ = s.Zn==0&s.Str==1; 
 s.tau_tot_vert(~sun_,:) = NaN;
 
 [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
@@ -722,24 +732,24 @@ if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox
 end;
 if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'))||~isempty(strfind(lower(datatype),'sky'));
    if toggle.runwatervapor;
-      if toggle.verbose; disp('water vapor retrieval start'), end;
+      disp('water vapor retrieval start')
       [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
       
       % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
       s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
       
-      if toggle.verbose; disp('water vapor retrieval end'), end;
+      if toggle.verbose; disp('water vapor retrieval end'); end;
       % gases subtractions and o3/no2 conc [in DU] from fit
       %-----------------------------------------------------
       if toggle.gassubtract
-         if toggle.verbose; disp('gases subtractions start'), end;
+         disp('gases subtractions start')
          [s.gas] = retrieveGases(s);         
          % subtract derived gasess         
          s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;  %tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
          %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
          %                                                s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.ch4OD;%
-         if toggle.verbose; disp('gases subtractions end'), end
+         if toggle.verbose; disp('gases subtractions end'); end
          %s.tau_aero=s.tau_aero_wvsubtract;
       end;
       
@@ -783,21 +793,22 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
    %s.flagallcols
    %************************************************************
-   if toggle.dostarflag & isempty(strfind(lower(datatype),'forj'));
+   if toggle.dostarflag;
       if toggle.verbose; disp('Starting the starflag'), end;
       if isfield(s,'flagfilename')
-         [fnul,pnul] = fileparts(s.flagfilename);
-         dnul = strsplit(pnul,'_');
-         %             if dnul{1}==daystr;
-         %                 if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
-         % %                 if toggle.starflag_mode==1;
-         % %                     toggle.starflag_mode = 3;
-         % %                 end;
-         %             end
+         if toggle.verbose; disp(['** Found starflag file :' s.flagfilename ', Loading that instead']), end;
+         flag = load(s.flagfilename);
+         toggle.starflag_mode = 3;
+         try
+             s.flags = flags;
+         catch
+            s.flags.flagfile = s.flagfilename; 
+         end
+         [s.flags.bad_aod,flags] = convert_flags_to_qual_flag(flag,s.t,s.flight);
       end;
       %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
       if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
-      [s.flags, good]=starflag_(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual
+      if toggle.starflag_mode~=3, [s.flags, good]=starflag_(s,toggle.starflag_mode); end; % flagging=1 automatic, flagging=2 manual
       if toggle.runwatervapor;
          % apply auto gas flagging
          [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');
@@ -812,14 +823,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag & isempty(strfind(lower(datatype),'forj')) && (toggle.starflag_mode==1||toggle.starflag_mode==3);
+   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
    end;
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
    % 2014/07/18.
    % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
    % apply flags to the calculated tau_aero_noscreening
-   if toggle.doflagging & isempty(strfind(lower(datatype),'forj'));
+   if toggle.doflagging;
       if toggle.booleanflagging;
          s.tau_aero(any(s.flagallcols,3),:)=NaN;
          s.tau_aero(any(s.flag,3))=NaN;
@@ -1099,7 +1110,7 @@ if pp~=length(s2.t);
 end;
 pp=numel(s.t);
 qq=size(s.raw,2);
-ngap=numel(find(abs(s.t-s2.t)*86400>0.02));
+ngap=numel(find(abs(s.t-s2.t)*86400>0.1));
 if ngap==0;
 elseif ngap<pp*0.2; % less than 20% of the data have time differences. warn and proceed.
    warning([num2str(ngap) ' rows have different time stamps between the two arrays by greater than 0.02s.']);

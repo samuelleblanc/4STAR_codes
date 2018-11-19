@@ -20,5 +20,5 @@ if ~exist('matname','var')
 end
 matname = strrep(matname,'_small.mat', '.mat');
 f_out = strrep(matname,'.mat', '_small.mat');
-save(f_out,'-struct','s','-mat','-v7.3');
+save([getnamedpath('starsun'),f_out],'-struct','s','-mat','-v7.3');
 end

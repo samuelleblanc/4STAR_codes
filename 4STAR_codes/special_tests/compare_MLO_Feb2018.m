@@ -1,14 +1,7 @@
+function compare_MLO_Feb2018
 % Checking some c0, and calculating the averages for ORACLES 2017
-%close all
-clear all
-fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-fp_out = getnamedpath('MLOFeb2018');
-
-%if ~isunix;
-%fp_out = 'C:\Users\sleblanc\Research\MLO\2018_Febuary\';
-%else;
-%fp_out = '/nobackup/sleblan2/ORACLES/plot/';
-%end;
+fp = info_path;
+fp_out = getnamedpath('Co_plots');
 asktosave = 1; %set if ask to save the figures
 i_avg = [1,2,3,4]+1;
 filesuffix = ['4STAR_refined_averaged_MLO_Feb2018'];
@@ -42,14 +35,18 @@ supp = {'ORACLES best';'MLO good';'MLO good';'MLO good';'MLO good';...
         'ORACLES avg';'Ames roof average'};
     
 n = length(vis_names);
-c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
+% c0v = {}; c0rv = {}; c0n = {}; corn = {}; 
+leg = {};
 
-fig = figure('pos',[200 50 1600 400]); 
-plot([350,1000,1700],[0,0,0],'--k');
+% Picking an arbitrary number for the figure ID
+fig = figure_(100); 
+% Manually orient the window to fill the lower half of the screen.
+plot([350,1000,1700],[0,0,0],'--k');logy
 title('c0s from calibration date')
 hold on;
 
-fig2 = figure('pos',[200 450 1600 400]);
+fig2 = figure_(101);
+% Manually orient the window to fill the upper half of the screen.
 plot([350,1000,1700],[0,0,0],'--k');
 title('Normalized c0s from calibration date')
 hold on;
@@ -67,12 +64,12 @@ for i=1:n;
     end;
     visc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
     visc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
-    c0v{i} = visc0; c0rv{i} = visc0err;
+%     c0v{i} = visc0; c0rv{i} = visc0err;
     
     b=importdata(which(nirfilename));
     nirc0(i,:)=b.data(:,strcmp(lower(b.colheaders), 'c0'))';
     nirc0err(i,:)=b.data(:,strcmp(lower(b.colheaders), 'c0err'))';
-    c0n{i} = nirc0; c0rn{i} = nirc0err;
+%     c0n{i} = nirc0; c0rn{i} = nirc0err;
     
     w_vis = a.data(:,strcmp(lower(a.colheaders),'wavelength'));
     w_nir = b.data(:,strcmp(lower(b.colheaders),'wavelength'));
@@ -199,5 +196,4 @@ starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc
 
 disp(['Printing c0 file to :' visfilename])
 
-
-
+return

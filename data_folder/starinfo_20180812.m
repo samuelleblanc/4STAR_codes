@@ -21,8 +21,6 @@ s.langley1 = [datenum(2018,8,12,16,10,00) datenum(2018,8,12,18,30,00)]; %put in 
             s.O3col=0.270; %I think 270 DU was what  the dobson ozone was this morning?   
             s.NO2col=2.0e15; %  
 
-            %really in these ones they're both the same-- but preserve the
-            %below structure for consistency...
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                 % flags
@@ -74,4 +72,3 @@ for i=1:length(varNames)
 end;
 
 return
-

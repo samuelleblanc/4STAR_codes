@@ -38,11 +38,13 @@
 %                  - changed options to be more descriptive.
 % Modified (v1.3): by Samuel LeBlanc, Santa Cruz, June 26th, 2017
 %                  - added keywords to be selected via the asktopause variable
+% Modified (v1.4): by Connor, added call to figure_ and zoom('on') to put the figure to be
+% saved front and center
 % -------------------------------------------------------------------------
 
 %% Function routine
 function save_fig(pid,fi,asktopause)
-version_set('1.3');
+version_set('1.4');
 if nargin<3;
     asktopause=true; 
 elseif asktopause>1;
@@ -52,7 +54,7 @@ elseif asktopause>2;
     eval(['dbstop in ' s(2).name ' at ' num2str(s(2).line+1)])
     return
 end;
-
+figure_(pid); zoom('on');
 if asktopause 
   OK =menu('Plot saving?','Save figure and continue','Continue without saving','Exit and debug');
   if OK==3

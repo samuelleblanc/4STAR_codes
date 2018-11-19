@@ -77,14 +77,16 @@ loadCrossSections_global;
  
  % calculate residual spectrum (Rayleigh subtracted)
 eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
-
+eta_residual = NaN(size(eta));
 %% fit a linear line to spectra
 %===============================
 % linear fit calculated and subtracted from the spectrum to get an estimation of the aerosol amount 
 % and any scattered contribution to the measurement
 % calculate linear fit and create residual spectrum
 
-for i=1:length(s.t)
+% for i=1:length(s.t)
+suns = find(s.Str==1&s.Zn==0)';
+for i=suns   
     p = polyfit(s.w(wln),eta(i,:),1);
     %p1 = p(1);
     %p0 = p(2);
@@ -125,29 +127,37 @@ end
 
     % this is end member array (original cross sections)
     
-    basis = [hcohcoef(wln), no2_298Kcoef(wln), -no2coefdiff(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1)];
-    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
-    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1),((s.w(wln)').^4).*ones(length(wln),1)];
+    basis = [hcohcoef(wln), no2_298Kcoef(wln), -no2coefdiff(wln), o3coef(wln), o4coef(wln), ...
+       ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1), ...
+       ((s.w(wln)').^3).*ones(length(wln),1)];
+    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ...
+       ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1), ...
+       ((s.w(wln)').^3).*ones(length(wln),1), ((s.w(wln)').^3).*ones(length(wln),1), ((s.w(wln)').^4).*ones(length(wln),1)];
+    basis = [hcohcoef(wln), no2_298Kcoef(wln), brocoef(wln), o3coef(wln), o4coef(wln), ...
+       ones(length(wln),1), s.w(wln)'.*ones(length(wln),1), ((s.w(wln)').^2).*ones(length(wln),1),...
+       ((s.w(wln)').^3).*ones(length(wln),1), ((s.w(wln)').^4).*ones(length(wln),1)];
 
     % solve
     % x = real(Abasis\spectrum_sub');
     
-    ccoef_d=[];
-    RR_d=[];
-    
-    for k=1:length(s.t);
+%     ccoef_d=[];
+%     RR_d=[];
+%     
+%     for k=1:length(s.t);
+ccoef_d = NaN([size(basis,2),length(s.t)]);
+RR_d = NaN([length(wln),length(s.t)]);
+suns = find(s.Str==1&s.Zn==0)';
+for k=suns
+   coef=real(basis\eta(k,:)');
+   % coef=real(Abasis\spectrum_sub(k,:)');
+   % scale coef back
+   scoef = coef;%./scale;
+   % reconstruct spectrum
+   recon=basis*scoef;
+   RR_d(:,k) = recon;
+   ccoef_d(:,k)= scoef;
+end
 
-        coef=real(basis\eta(k,:)');
-        % coef=real(Abasis\spectrum_sub(k,:)');
-        % scale coef back
-        scoef = coef;%./scale;
-
-        % reconstruct spectrum
-        recon=basis*scoef;
-        RR_d=[RR_d recon];
-        ccoef_d=[ccoef_d scoef];
-    end 
-    
     % to get back to regular cross section:
     % test_spec=qno2*rno2;
     

@@ -35,15 +35,17 @@
 % MS, 2016-05-10, saving std field for cwv
 % MS, 2016-05-20, adding retrieveHCOH routine
 % MS, 2016-10-12, changed default NO2 wavelength range to 460-490 nm
+% SL, v1.1, 2018-09-20, Added verbose and messaging to the gas retrievals
 % -------------------------------------------------------------------------
 %% function routine
 
 function [gas] = retrieveGases(s)
 %----------------------------------------------------------------------
- version_set('1.0');
+ version_set('1.1');
  showfigure = 0;
  
  colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
+ warning('off','MATLAB:rankDeficientMatrix');
  
 %% load cross-sections
 gxs = get_GlobalCrossSections;
@@ -52,22 +54,23 @@ gxs = get_GlobalCrossSections;
 
 %% retrieve NO2
 
-
+if s.toggle.verbose; disp('Starting NO2 gas retrieval'), end
  [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
 
 %% retrieve O3
-
+if s.toggle.verbose; disp('Starting O3 gas retrieval'), end
  [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
 
 %----------------------------------------------------------------------
 %% retrieve CO2
-
+if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
  [gas.co2]  = retrieveCO2(s,1.555,1.630,gxs);
    
 %% retrieve O2
 %  TBD
 
 %% retrieve HCOH
+if s.toggle.verbose; disp('Starting HCOH gas retrieval'), end
  [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1,gxs);
              
 %% save gas data to .mat file

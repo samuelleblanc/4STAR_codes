@@ -50,7 +50,7 @@ end;
 
 s=load(fnn);
 version_set('1.1');
-uu=fieldnames(s)
+uu=fieldnames(s);
 for u=1:length(uu);
 nn=findstr(uu{u},'vis');
     if nn; 
@@ -70,6 +70,7 @@ end;
 
 [ff,pp]=fileparts(fnn);
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fnn});
+s.instrumentname = instrumentname;
 disp(['Doing for day: ' daystr])
 infofile_ = ['starinfo_' daystr '.m'];
 infofile = fullfile(starpaths, ['starinfo' daystr '.m']);

@@ -157,10 +157,10 @@ form.flag_acaod = '%1.0f';
 originfo = info; origform = form; orignames = names;
 
 %% prepare list of details for each flight
-dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007'} ; %put one day string
+dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007' '20181010' '20181012' '20181015' '20181017' '20181019' '20181021' '20181023' '20181025' '20181026' '20181027'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-jproc=[         0          0          0          0          0           0         0          0          1] ;
+jproc=[         0          0          0          0          0           0         0          0          0          0          0          0          0          0          0          0          1          0          0] ;
 %jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
 %jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
@@ -297,14 +297,19 @@ for i=idx_file_proc
     [qual_flag,flag] = convert_flags_to_qual_flag(flag,t,s.flight);
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
     % tweak for different flag files
-    if strcmp(daystr,'20170824') || strcmp(daystr,'20170831')|| strcmp(daystr,'20170812')|| strcmp(daystr,'20170817')
+    if strcmp(daystr,'20170824') || strcmp(daystr,'20170831')|| strcmp(daystr,'20170812')|| strcmp(daystr,'20170817') || strcmp(daystr,'20181012')
         flag.utc = t2utch(flag.flags.time.t);
     else
-        try;
+        try
             flag.utc = t2utch(flag.time.t);
-        catch;
-            flag.utc = t2utch(flag.t);
-        end;
+        catch
+            try
+                flag.utc = t2utch(flag.t);
+            catch
+                flag.utc = t2utch(flag.flags.time.t);
+            end
+        end
+
     end
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
