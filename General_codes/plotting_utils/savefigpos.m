@@ -16,7 +16,7 @@ if ~isempty(H)
    % append filesep
    pathdir = [usrpath,'fig_position',filesep];
    % If "filepaths" directory doesn't exist under userpath, create it
-   if ~exist(pathdir,'dir')
+   if ~isdir(pathdir)
       mkdir(usrpath, 'fig_position');
    end
    
