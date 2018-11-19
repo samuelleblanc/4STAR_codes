@@ -104,8 +104,9 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % CJ: v3.2, 2018-08-12, Fixed bug in case applyforjcorr where the wrong
 % toggle was being set, and added logic to set toggle.applyforjcorr to
 % false if 2STAR, 4STARB, or forj measurement
+% SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
 
-version_set('3.2');
+version_set('3.3');
 %********************
 %% prepare for processing
 %********************
@@ -795,18 +796,19 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    if toggle.dostarflag;
       if toggle.verbose; disp('Starting the starflag'), end;
       if isfield(s,'flagfilename')
-         [fnul,pnul] = fileparts(s.flagfilename);
-         dnul = strsplit(pnul,'_');
-         %             if dnul{1}==daystr;
-         %                 if toggle.verbose; disp('... Using the flagfile from starinfo'), end;
-         % %                 if toggle.starflag_mode==1;
-         % %                     toggle.starflag_mode = 3;
-         % %                 end;
-         %             end
+         if toggle.verbose; disp(['** Found starflag file :' s.flagfilename ', Loading that instead']), end;
+         flag = load(s.flagfilename);
+         toggle.starflag_mode = 3;
+         try
+             s.flags = flags;
+         catch
+            s.flags.flagfile = s.flagfilename; 
+         end
+         [s.flags.bad_aod,flags] = convert_flags_to_qual_flag(flag,s.t,s.flight);
       end;
       %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
       if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
-      [s.flags, good]=starflag_(s,toggle.starflag_mode); % flagging=1 automatic, flagging=2 manual
+      if toggle.starflag_mode~=3, [s.flags, good]=starflag_(s,toggle.starflag_mode); end; % flagging=1 automatic, flagging=2 manual
       if toggle.runwatervapor;
          % apply auto gas flagging
          [~, s.flagsCWV,  flagfile] = starflagGases(s, 1,'CWV');

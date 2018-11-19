@@ -27,7 +27,6 @@ s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                  s.flight=[datenum(2018,10,05,4,5,30) datenum(2018,10,05,12,54,50)];
-                 
                  s.AODuncert_constant_extra = 0.06;
     %             flags
                  s.flagfilename     = '20181005_starflag_man_created20181006_1508by_SL.mat'; 
