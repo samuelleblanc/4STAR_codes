@@ -50,6 +50,7 @@ function [o3] = retrieveO3(s,wstart,wend,mode,gxs)
 % MS, 2016-10-24, tweaked processing routine post-oracles to be as pre
 % MS, 2016-10-27, tweaked processing to match RH signals in spectrometer
 % MS, 2016-12-31, assigned specific processing for KORUS high RH days
+% MS, 2018-11-07, ommiting gxs (gas cross section input, which is not used)
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -113,7 +114,7 @@ end
 % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
 % c0  = c0_.data(wln,3);
 
-if     s.t(1) < datenum([2016 5 06 0 0 0]) || s.t(1) > datenum([2016 6 02 0 0 0])  && s.t(1) < datenum([2016 8 26 0 0 0]) || s.t(1) >= datenum([2016 10 26 0 0 0]);
+if     s.t(1) < datenum([2016 5 06 0 0 0]) || (s.t(1) > datenum([2016 6 02 0 0 0])  && s.t(1) < datenum([2016 8 26 0 0 0])) || (s.t(1) >= datenum([2016 10 26 0 0 0]) && s.t(1) < datenum([2017 1 01 0 0 0]));
    % pre-ORACLES - and some KORUS flights with low RH
    % fixed
    %       rate = s.rateslant;
@@ -138,7 +139,7 @@ elseif s.t(1) > datenum([2016 8 26 0 0 0]) && s.t(1) < datenum([2016 10 01 0 0 0
    
    
    basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
-      ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];% 2nd order doesn't work in oracles
+      ones(length(wln),1) s.w(wln)'.*ones(length(wln),1)];% 2nd order doesn't work in oracles 2016 (water vapor issues?)
    
 elseif s.t(1) == datenum([2016 10 21 0 0 0]);
    % post-ORACLES
@@ -154,6 +155,22 @@ elseif s.t(1) == datenum([2016 10 21 0 0 0]);
    
    basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
       ones(length(wln),1)];% this looks much more stable at Ames-water vapor interference
+  
+  
+elseif s.t(1) > datenum([2017 01 01 0 0 0]) && s.t(1) < datenum([2018 01 01 0 0 0]);
+   % this is for ORACLES 2017 
+   rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+   
+    basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
+      ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1)];%
+  
+  
+elseif s.t(1) > datenum([2018 01 01 0 0 0])
+   % this is for ORACLES 2018 and MLO campaigns
+   rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
+   
+     basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
+      ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1)];%
 end
 
 
