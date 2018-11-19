@@ -264,9 +264,24 @@ end;
             
         end; % end of ORACLES 2018 option
         
-    end; % end of c0 date options    
-        
-      %end
+    end; % end of c0 date options
     
+    if ~isavar('c0gases')||isempty(c0gases)
+       if mode==1
+          if strcmp(gas,'NO2')
+             c0gases = load(which(['20160702NO2refspec.mat']));
+          end
+          if strcmp(gas,'HCOH')
+             c0gases = load(which(['20170531HCOHrefspec.mat']));
+          end
+          if strcmp(gas,'O3')
+             c0gases = load(which(['20160825O3refspec.mat']));
+          end
+          
+       end
+    end
+    
+end
+
     
     
