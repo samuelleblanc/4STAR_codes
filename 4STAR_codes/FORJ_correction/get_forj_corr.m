@@ -1,6 +1,5 @@
 function [forj_corr, detail] = get_forj_corr(time)
 % forj_corr = get_forj_corr(time)
-% Returns the 
 %forj_all = load([getnamedpath('Github_data_folder'),'forj_all.mat']);
 forj_all = load(which('forj_all.mat'));% Michal's tweak to be able to run starsun...
 lower = max([1, find(forj_all.time<time,1,'last')]);

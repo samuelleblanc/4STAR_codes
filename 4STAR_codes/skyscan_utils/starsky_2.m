@@ -143,7 +143,7 @@ catch ME
    figure; plot(0:1,0:1,'o'); title(['Crashed during ',skyscan], 'interp','none');
    text(0.1,0.8,ME.identifier,'color','red');
    text(0.1,0.6,ME.message,'color','red','fontsize',8);
-   imgdir = getnamedpath('star_images');
+   imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,skyscan,filesep];
    saveas(gcf,[skyimgdir,skyscan,badtime_str, '.png']);
    copyfile2([imgdir,skyscan,'.ppt'],[imgdir,'bad.',skyscan,'.ppt']);
