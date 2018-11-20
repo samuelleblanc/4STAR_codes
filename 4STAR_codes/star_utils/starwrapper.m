@@ -805,6 +805,10 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
             s.flags.flagfile = s.flagfilename; 
          end
          [s.flags.bad_aod,flags] = convert_flags_to_qual_flag(flag,s.t,s.flight);
+         if length(s.t) ~= length(s.flags.bad_aod)
+             disp('*** Problem with size of the starflag, using automated flagging ***')
+             toggle.starflag_mode = 1;
+         end
       end;
       %if ~isfield(s, 'rawrelstd'), s.rawrelstd=s.rawstd./s.rawmean; end;
       if ~isfield(s,'roll'), s.roll = s.Alt.*0.0; end;
