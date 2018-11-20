@@ -1,4 +1,4 @@
-function [qual_flag,flag] = convert_flags_to_qual_flag(flag,t,flight);
+function [qual_flag,flag,cirrus] = convert_flags_to_qual_flag(flag,t,flight);
 %% Function to convert the various flags in the flags starflag struct
 % Can be applied to older starflags versions
 % qual_flag : 1 for bad aod, 0 for good aod
@@ -7,9 +7,17 @@ function [qual_flag,flag] = convert_flags_to_qual_flag(flag,t,flight);
 %% core of flas
 if isfield(flag,'manual_flags');
     qual_flag = ~flag.manual_flags.good;
+    try
+        cirrus = flag.cirrus;
+    catch
+       nul=0; 
+    end
 elseif isfield(flag,'flags');
     qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
-    if isfield(flag.flags,'cirrus'); qual_flag = bitor(qual_flag,flag.flags.cirrus); end;
+    if isfield(flag.flags,'cirrus'); 
+        qual_flag = bitor(qual_flag,flag.flags.cirrus); 
+        cirrus = flag.flags.cirrus;
+    end;
     if isfield(flag.flags,'frost'); qual_flag = bitor(qual_flag,flag.flags.frost); end;
     if isfield(flag.flags,'low_cloud'); qual_flag = bitor(qual_flag,flag.flags.low_cloud); end;
     if isfield(flag.flags,'unspecified_clouds'); qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds); end;

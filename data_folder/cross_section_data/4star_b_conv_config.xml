@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<convolution>
+  <paths>
+    <!-- upto 10 paths can be specified (index 0 to 9). Any file or directory name in the  -->
+    <!-- raw_spectra tree that begins with %? (where ? is a single digit) is expanded with -->
+    <!-- the correponding path.                                                            -->
+
+  </paths>
+  <general convol="std" conver="none" shift="0.000" conc="0" rmhdr="false" input="C:/Users/msegalro/matlab/4STAR_codes/data_folder/cross_section_data/CH4_1013mbar_short.xs" output="C:/Users/msegalro/matlab/4STAR_codes/data_folder/cross_section_data/ch4_1013mbar_conv_4starb_nir.xs" calib="C:/Users/msegalro/matlab/4STAR_codes/data_folder/cross_section_data/nirLambda_4starb_short.clb" ref="C:/Users/msegalro/matlab/4STAR_codes/data_folder/cross_section_data/sao2010_solref_air.dat" />
+  <con_slit>
+    <slit_func type="gaussian">
+      <file file="" />
+      <gaussian fwhm="0.000" wveDptFlag="true" file="C:/Users/msegalro/matlab/4STAR_codes/data_folder/cross_section_data/nirFWHM_4starb_short.slf" />
+      <lorentz width="0.000" degree="0" wveDptFlag="false" file="" />
+      <voigt fwhmleft="0.000" fwhmright="0.000" glrleft="0.000" glrright="0.000" wveDptFlag="false" file="" file2="" />
+      <error fwhm="0.000" width="0.000" wveDptFlag="false" file="" file2="" />
+      <agauss fwhm="0.000" asym="0.000" wveDptFlag="false" file="" file2="" />
+      <boxcarapod resolution="0.000" phase="0.000" />
+      <nbsapod resolution="0.000" phase="0.000" />
+    </slit_func>
+  </con_slit>
+  <dec_slit>
+    <slit_func type="file">
+      <file file="" />
+      <gaussian fwhm="0.000" wveDptFlag="false" file="" />
+      <lorentz width="0.000" degree="0" wveDptFlag="false" file="" />
+      <voigt fwhmleft="0.000" fwhmright="0.000" glrleft="0.000" glrright="0.000" wveDptFlag="false" file="" file2="" />
+      <error fwhm="0.000" width="0.000" wveDptFlag="false" file="" file2="" />
+      <agauss fwhm="0.000" asym="0.000" wveDptFlag="false" file="" file2="" />
+      <boxcarapod resolution="0.000" phase="0.000" />
+      <nbsapod resolution="0.000" phase="0.000" />
+    </slit_func>
+  </dec_slit>
+  <lowpass_filter selected="none">
+    <kaiser cutoff="0.000000" tolerance="0.000000" passband="0.000000" iterations="1" cal="false" fit="false" div="false" />
+    <boxcar width="1" iterations="1" cal="false" fit="false" div="false" />
+    <gaussian fwhm="0.000100" iterations="1" cal="false" fit="false" div="false" />
+    <triangular width="1" iterations="1" cal="false" fit="false" div="false" />
+    <savitzky_golay width="0" order="0" iterations="0" cal="false" fit="false" div="false" />
+    <binomial width="1" iterations="1" cal="false" fit="false" div="false" />
+  </lowpass_filter>
+  <highpass_filter selected="none">
+    <kaiser cutoff="0.000000" tolerance="0.000000" passband="0.000000" iterations="1" cal="false" fit="false" div="false" />
+    <boxcar width="1" iterations="1" cal="false" fit="false" div="false" />
+    <gaussian fwhm="0.000100" iterations="1" cal="false" fit="false" div="false" />
+    <triangular width="1" iterations="1" cal="false" fit="false" div="false" />
+    <savitzky_golay width="0" order="0" iterations="0" cal="false" fit="false" div="false" />
+    <binomial width="1" iterations="1" cal="false" fit="false" div="false" />
+  </highpass_filter>
+</convolution>

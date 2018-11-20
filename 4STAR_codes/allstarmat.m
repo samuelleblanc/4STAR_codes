@@ -170,8 +170,8 @@ end
 %********************
 %% Special processing for 4STARB (differences in temp sensors)
 %********************
-if strcmp(instrumentname,'4STARB')
-    if exist('track')
+if strcmp(instrumentname,'4STARB');
+    if isavar('track');
         track.T3 = ((track.T3+273.15)./1000.0)*23-30;
     end
 end

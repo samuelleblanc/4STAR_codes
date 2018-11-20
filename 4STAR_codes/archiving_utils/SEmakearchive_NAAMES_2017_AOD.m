@@ -67,7 +67,7 @@ prefix='NAAMES-4STARB-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % '
 rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'C130';
 gas_subtract = false;
-include_uncert = false;
+include_uncert = true;
 avg_wvl = true;
 deltatime_dAOD = 900.0; %time in seconds around the shift in AOD due to the window deposition
 dAOD_uncert_frac = 0.25; %fraction of the change in dAOD due to window deposition to be kept as extra uncertainty (default 20%, 0.2)
@@ -84,31 +84,31 @@ HeaderInfo = {...
     };
 
 NormalComments = {...
-    'PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov';...
+    'PI_CONTACT_INFO: jredemann@ou.edu';...
     'PLATFORM: NASA C-130';...
     'LOCATION: Based in St-Johns, Newfoundland, Canada. Aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
     'INSTRUMENT_INFO: (4STARB) Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research-B';...
-    'DATA_INFO: measurements represent Aerosol optical depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
-    'UNCERTAINTY: Nominal AOD uncertainty is wavelength-dependent, see specific reported uncertainty in the data fields.';...
+    'DATA_INFO: measurements represent Aerosol Optical Depth values of the column above the aircraft at measurement time nearest to Start_UTC.';...
+    'UNCERTAINTY: AOD uncertainty is wavelength-dependent, determined primarily by 2-sigma of the variability in calibration coefficients [Shinozuka et al 2013, doi:10.1002/2013JD020596] plus an additional constant to reflect 4STARB performance over NAAMES-3.  Consult PI for more detail.';...
     'ULOD_FLAG: -7777';...
     'ULOD_VALUE: N/A';...
     'LLOD_FLAG: -8888';...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Kristina Pistone, kristina.pistone@nasa.gov';...
     'PROJECT_INFO: NAAMES-3, 2017 deployment; August-September 2017';...
-    'STIPULATIONS_ON_USE: Use of these data requires PRIOR OK from the PI.';...
+    'STIPULATIONS_ON_USE: This is the initial public release of the 4STARB-AOD dataset for NAAMES-3. We strongly recommend that you consult the PI, both for updates to the dataset, and for the proper and most recent interpretation of the data for specific science use.';...
     'OTHER_COMMENTS: N/A';...
     };
 
 revComments = {...
     %'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
     %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
-    'R1: Updated processing and new cloud screened and tracking error screened data. ';...
+    'R1: Updated instrument calibration.  New screening of data for clouds and tracking errors. ';...
     'R0: The data are considered preliminary and not intended for publication. Final calibrations have not yet been applied. The data are subject to uncertainties associated with detector stability, cloud screening, transfer efficiency of light through fiber optic cable, diffuse light, tracking error, gas absorption and deposition on the front windows.'
     };
 
-specComments_extra_uncertainty = 'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
+% specComments_extra_uncertainty = 'The uncertainty for this flight has been increased to reflect the potential impact of deposition on the window.';%'AOD in this file has been adjusted to reflect impact of deposition on window.\n';
 
 %% Prepare details of which variables to save
 %info.Start_UTC = 'Fractional Seconds, Elapsed seconds from midnight UTC from 0 Hours UTC on day given by DATE';
@@ -116,17 +116,18 @@ info.Latitude  = 'deg, Aircraft latitude (deg) at the indicated time';
 info.Longitude = 'deg, Aircraft longitude (deg) at the indicated time';
 info.GPS_Alt   = 'm, Aircraft GPS geometric altitude (m) at the indicated time';
 info.qual_flag = 'unitless, quality of retrieved AOD: 0=good; 1=poor, due to clouds, tracking errors, or instrument stability';
+info.cirrus_flag = 'unitless, Indicates likely presence of cirrus, may not be completely inclusive; 0=no cirrus, 1=likely cirrus';
 info.amass_aer = 'unitless, aerosol optical airmass';
 info.AOD_angstrom_470_865 = 'unitless, Angstrom exponent calculated from the AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
-info.AOD_polycoef_a2 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (2nd), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
-info.AOD_polycoef_a1 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (1st), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
-info.AOD_polycoef_a0 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (0th), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
+% info.AOD_polycoef_a2 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (2nd), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
+% info.AOD_polycoef_a1 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (1st), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
+% info.AOD_polycoef_a0 = 'unitless, ln(AOD) vs ln(wavelength) polynomial fit coefficient (0th), to recreate aod at other wavelengths use spectral fit equation: log(AOD) = a2*log(wvl[nm])*log(wvl[nm]) + a1*log(wvl[nm]) + a0.';
 
 % wls = [355, 380,452, 470,501,520,530,532,550,606,620,660,675, 700,781,865,1020,1040,1064,1236,1250,1559,1627,1650];
 
-save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,699.7,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9,1558.7,1626.6,1650.1];
+save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9];
 % save_wvls  = [380.0,451.7,500.7,520,532.0,550.3,605.5,619.7,675.2,780.6,864.6,1019.9,1039.6,1039.6,1064.2,1235.8,1558.7,1626.6]; old
-iwvls_angs = [4,16];
+iwvls_angs = [4,15];
 [v,n] = starwavelengths(now,'4STARB'); wvl = [v,n].*1000.0;
 
 for i=1:length(save_wvls);
@@ -153,19 +154,20 @@ form.GPS_Alt = '%7.1f';
 form.Latitude = '%3.7f';
 form.Longitude = '%4.7f';
 form.qual_flag = '%1.0f';
+form.cirrus_flag = '%1.0f';
 
 originfo = info; origform = form; orignames = names;
 
 %% prepare list of details for each flight
-dslist={'20170831','20170904','20170906','20170908','20170909','20170912','20170916','20170917','20170919'};
+dslist={'20170831','20170904','20170906','20170908','20170909','20170912','20170916','20170917','20170919','20170920'};
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         0          0          0          0          0          1          1          1          1]; 
+jproc=[         1          1          1          1          1          1          1          1          1          1]; 
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
 for i=idx_file_proc
     info = originfo; form = origform; names = orignames;
-    iradstart = 10; % the start of the field names related to wavelengths
+    iradstart = 8; % the start of the field names related to wavelengths
     
     %% get the flight time period
     daystr=dslist{i};
@@ -180,6 +182,7 @@ for i=idx_file_proc
     catch
         eval([infofile_(1:end-2),'(s)']);
     end
+    s.AODuncert_constant_extra = 0.009;
     UTCflight=t2utch(s.flight);
     %UTCflight=t2utch(s.ground);
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
@@ -203,24 +206,24 @@ for i=idx_file_proc
     starfile = fullfile(starsun_path, ['4STARB_' daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
-    try;
-        load(starfile,'tau_aero_subtract_all');
-        tau = tau_aero_subtract_all;
-    catch;
-        disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
-        tau = tau_aero_noscreening;
-    end;
-    if gas_subtract;
-        try;
-            load(starfile,'tau_aero_subtract_all');
-            tau = tau_aero_subtract_all;
-        catch;
-            disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
-            tau = tau_aero_noscreening;
-        end;
-    else;
-        tau = tau_aero_noscreening;
-    end;
+%     try;
+%         load(starfile,'tau_aero_subtract_all');
+%         tau = tau_aero_subtract_all;
+%     catch;
+%         disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+        tau = tau_aero_noscreening; %we have no tau_aero_subtract_all because we had no gases running
+%     end;
+%     if gas_subtract;
+%         try;
+%             load(starfile,'tau_aero_subtract_all');
+%             tau = tau_aero_subtract_all;
+%         catch;
+%             disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
+%             tau = tau_aero_noscreening;
+%         end;
+%     else;
+%         tau = tau_aero_noscreening;
+%     end;
     
     if include_uncert;
         try;
@@ -236,12 +239,16 @@ for i=idx_file_proc
     if isfield(s,'AODuncert_mergemark_file');
         disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
         d = load(s.AODuncert_mergemark_file);
-        specComments{end+1} = specComments_extra_uncertainty;
+        if(exist('specComments_extra_uncertainty')) %KP: adding conditional here because it was putting an empty string in this array and throwing an error on writing
+            specComments{end+1} = specComments_extra_uncertainty;
+        end
         add_uncert = true; correct_aod = true;
     elseif isfield(s,'AODuncert_constant_extra');
         disp(['Applying constant AOD factor to existing AOD'])
         d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),length(save_wvls)]);
-        specComments{end+1} = specComments_extra_uncertainty;
+        if(exist('specComments_extra_uncertainty')) %KP: adding conditional here because it was putting an empty string in this array and throwing an error on writing
+            specComments{end+1} = specComments_extra_uncertainty;
+        end
         add_uncert = true; correct_aod = false;
         d.time = t;
     end
@@ -284,8 +291,12 @@ for i=idx_file_proc
     
     %% Combine the flag values
     disp('Setting the flags')
-    [qual_flag,flag] = convert_flags_to_qual_flag(flag,t,s.flight);
+    [qual_flag,flag,cirrus_flag] = convert_flags_to_qual_flag(flag,t,s.flight);
     data.qual_flag = Start_UTCs*0+1; % sets the default to 1
+    
+    %cirrus flag
+    data.cirrus_flag = Start_UTCs*0; % sets the default to 0
+    
     % tweak for different flag files
     if strcmp(daystr,'20170824') || strcmp(daystr,'20170831')|| strcmp(daystr,'20170812')|| strcmp(daystr,'20170817') || strcmp(daystr,'20170912')
         flag.utc = t2utch(flag.flags.time.t);
@@ -298,10 +309,11 @@ for i=idx_file_proc
     end
     [ii,dt] = knnsearch(flag.utc,UTC');
     idd = dt<1.0/3600.0; % Distance no greater than one second.
-    data.qual_flag(idd) = qual_flag(ii(idd));
+    data.qual_flag(idd) = qual_flag(ii(idd)); 
+    data.cirrus_flag(idd) = cirrus_flag(ii(idd)); %cirrus_flag
     
     %% Now go through the times of measurements, and fill up the related variables (AOD wavelengths)
-    disp('filing up the data')
+    disp('filling up the data')
     for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
     % make sure to only have unique values
     [tutc_unique,itutc_unique] = unique(tutc);
@@ -335,10 +347,10 @@ for i=idx_file_proc
     end;
     
     %% Get the Angstrom and the polyfit coefficients
-    [a2,a1,a0,ang,curvature]=polyfitaod(save_wvls,aod_saved'); % polynomial separated into components for historic reasons
-    data.AOD_polycoef_a2 = a2;
-    data.AOD_polycoef_a1 = a1;
-    data.AOD_polycoef_a0 = a0;
+%     [a2,a1,a0,ang,curvature]=polyfitaod(save_wvls,aod_saved'); % polynomial separated into components for historic reasons
+%     data.AOD_polycoef_a2 = a2;
+%     data.AOD_polycoef_a1 = a1;
+%     data.AOD_polycoef_a0 = a0;
     ae = sca2angstrom(aod_saved(iwvls_angs,:)', save_wvls(iwvls_angs));
     data.AOD_angstrom_470_865 = ae;
     
@@ -347,7 +359,7 @@ for i=idx_file_proc
         for nn=iradstart+length(save_wvls):length(names);
             ii = nn-iradstart-length(save_wvls)+1;
             [tutc_unique,itutc_unique] = unique(tutc);
-            data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
+            data.(names{nn}) = interp1(tutc_unique,abs(tau_aero_err(itutc_unique,save_iwvls(ii))),UTC,'nearest');
             if add_uncert;  % if the add uncertainty exists then run that also.
                 if correct_aod;
                     it = find(diff(d.dCo(:,5))<-0.0001);

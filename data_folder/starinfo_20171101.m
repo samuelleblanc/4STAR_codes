@@ -13,12 +13,12 @@ end
 
  
 s.ground=[datenum(2017,11,01,00,01,48) datenum(2017,11,01,22,33,12)]; 
-% s.langley1 = [datenum(2017,8,23,11,00,09) datenum(2017,8,23,12,24,52)];
+s.langley1 = [datenum(2017,11,01,14,50,00) datenum(2017,11,01,17,30,00)]; %approximately air mass 12-2 during this period...
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.278; % OMI overhead     
-s.NO2col=2.0e15; %   
+s.O3col=0.247; % estimated average from OMI over northern CA, from Giovanni   
+s.NO2col=6.5e15; % estimated average from OMI over northern CA, from Giovanni 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
