@@ -366,8 +366,6 @@ switch instrumentname;
 %             daystr = '20170918';
 %             filesuffix = 'compared_with_AATS_at_StJohns_version20171003225734up3p';
             daystr = '20171107';
-% %             filesuffix = '4STARB_Oct2017_rooftop_withAATSfieldcomp_mean';
-% %             daystr = '20171107';
 %             filesuffix = '4STARB_Oct2017_rooftop_mean';
             filesuffix = '4STARB_Oct2017_rooftop_mean_plus2inflights'; %testlatteronesonly'; 
 

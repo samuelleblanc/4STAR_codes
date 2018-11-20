@@ -261,11 +261,16 @@ end;
 return
 
 function [visaerosolcols,niraerosolcols] = starchannelsatANET(t)
-anet_wl = [440, 673, 873, 1022];
+% anet_wl = [440, 673, 873, 1022]; 
+anet_wl = [440, 673, 873, 995.5]; % substituting longest VIS spectrometer wavelength 
 [visw, nirw]=starwavelengths(nanmean(t));
 visaerosolcols = interp1(1000.*visw, [1:length(visw)],anet_wl,'nearest');
-niraerosolcols = interp1(1000.*nirw, [1:length(nirw)],anet_wl,'nearest')+1044;
+% visaerosolcols = interp1(1000.*visw, [1:length(visw)],anet_wl,'nearest','extrap');
+visaerosolcols = unique(visaerosolcols); 
+visaerosocols(visaerosolcols<1 | visaerosolcols>length(visw)) = NaN;
 visaerosolcols(isNaN(visaerosolcols))= [];
+
+niraerosolcols = interp1(1000.*nirw, [1:length(nirw)],anet_wl,'nearest')+1044;
 niraerosolcols(isNaN(niraerosolcols))= [];
 return
 % SSA441-T,SSA673-T,SSA873-T,SSA1022-T

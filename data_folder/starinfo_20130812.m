@@ -97,8 +97,6 @@ varNames=who();
 for i=1:length(varNames) 
   assignin('caller',varNames{i},eval(varNames{i})); 
 end; 
-end 
- 
 
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  

@@ -12,6 +12,7 @@ else
     s.toggle = update_toggle;
 end
 
+%            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.langley1 = [datenum(2018,8,12,16,10,00) datenum(2018,8,13,18,20,00)]; %put in if condition below if different for different 4STARs
             
 %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
@@ -21,17 +22,17 @@ s.langley1 = [datenum(2018,8,12,16,10,00) datenum(2018,8,13,18,20,00)]; %put in 
             s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
             s.NO2col=2.0e15; %  
 
-            %really in these ones they're both the same-- but preserve the
-            %below structure for consistency...
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
-                % flags
+    %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
+    %             flags
     %             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
     %             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
     elseif(strcmp(s.instrumentname,'4STARB'))
+    %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
     %             % flags
     %             s.flagfilename     = '20170831_starflag_man_created20180512_1333by_KP.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
@@ -42,8 +43,7 @@ if isfield(s,'instrumentname')
 end
 % window deposition
 %s.AODuncert_constant_extra = 0.2;
- 
- 
+  
 % other tweaks 
 if isfield(s, 'Pst'); 
     s.Pst(find(s.Pst<10))=680.25; %MLO

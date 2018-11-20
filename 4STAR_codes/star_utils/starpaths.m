@@ -1,4 +1,4 @@
-function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,raw,reset)
+function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source, raw, reset)
 %[matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,raw,reset)
 % returns paths for 4STAR folders.
 % Mandatory directory settings:
@@ -49,12 +49,12 @@ vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
 if exist('reset','var')&&reset
-   getnamedpath('rawstardat','Select the location for raw *.dat files...',reset);
-   matfolder = getnamedpath('starmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]'],'reset');
-   getnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]',reset);
-   figurefolder=getnamedpath('starfig','4STAR image files.',reset);
+   setnamedpath('stardat','Select the location for raw *.dat files...');
+   matfolder = setnamedpath('starmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]']);
+   setnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]');
+   figurefolder=setnamedpath('starfig','4STAR image files.');
 else
-   getnamedpath('rawstardat','Select the location for raw *STAR files...');
+   getnamedpath('stardat','Select the location for raw *STAR files...');
    matfolder = getnamedpath('starmat','Select the location for "allstarmat" files...');
    getnamedpath('starsun', 'Select the location for starsun mat-file...');
    figurefolder=getnamedpath('starfig','4STAR image files.'); 

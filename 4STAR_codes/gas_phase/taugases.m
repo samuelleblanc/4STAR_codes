@@ -22,6 +22,7 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 % MS, modified, 2018-10-01  Added 4STARB cross section functionality
 %----------------------------------------------------------------------
 version_set('v2.0')
+Loschmidt=2.686763e19; %molecules/cm3xatm%molecules/cm3xatm
 % set functionallity
 if ~exist('instrumentname'); % no instrumentname defaults to 4STAR
     instrumentname = '4STAR'; 
@@ -145,7 +146,7 @@ end; %switch instrumentname
 
 %% get NO2 optical depth
 
-Loschmidt=2.686763e19; %molecules/cm3xatm
+% Loschmidt=2.686763e19; %molecules/cm3xatm
 if nargin<8 || isempty(NO2col);
     NO2col=2.0e15; % molec/cm2
     O3col =0.300;  % atm x cm

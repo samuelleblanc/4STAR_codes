@@ -49,7 +49,7 @@ end
 if nargin<3 || isempty(savematfile) || isequal(savematfile, 'ask'); % if savematfile is not given, generate a default name and ask to modify it
     savematfile=[instrumentname '_' daystr skyn 'star' datatype '.mat'];
 end;
-savematfile=stardestination(savematfile);
+% savematfile=stardestination(savematfile);
 if isequal(savematfile, 0);
     return;
 elseif isequal(savematfile, sourcefile);

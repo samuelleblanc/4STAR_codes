@@ -11,23 +11,27 @@ else
     s.toggle = update_toggle;
 end
 
+% '10:24:42', '20:35:01'
+s.ground=[datenum(2017,9,18,10,0,42) datenum(2017,9,18,20,35,01)]; 
+% spirals=[datenum(2016,4,21,21,45,50) datenum(2016,4,21,21,56,55) 
+% datenum(2016,4,21,21,57,50) datenum(2016,4,21,22,12,00)]; 
+% s.langley=[datenum(2016,8,25,17,00,00) datenum(2016,8,25,19,15,00)];
+ s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
  
+% Ozone and other gases 
+s.O3h=21; % 
+s.O3col=0.300; % Michal's guess     
+s.NO2col=2.0e15; % % 
 
-%             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-            s.langley1 = [datenum(2017,9,18,12,29,42) datenum(2017,9,18,15,18,24)];
-             s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-            % Ozone and other gases 
-            s.O3h=21; %  
-            s.O3col=0.300; % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
-            s.NO2col=3.7e15; % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
-
-%             % flags
-%             s.flagfilename     = '20170903_starflag_man_created20180512_1503by_KP.mat'; 
+% flags
+%s.flagfilename = '20170917_starflag_man_created20180602_2202by_KP.mat'; 
+%s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';
+%s.flagfilenameCWV = '20160530_starflag_CWV_man_created20160701_1609by_MS.mat';
 
  
 % other tweaks 
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=1013; % this is for Ames 
+    s.Pst(find(s.Pst<10))=1013.25;  
 end; 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
     s.Lon(s.Lon==0 & s.Lat==0)=NaN; 

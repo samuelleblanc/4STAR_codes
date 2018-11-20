@@ -1,4 +1,4 @@
-function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix)
+function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_to_previous)
 %% Details of the program:
 % NAME:
 %   starLangley_fx
@@ -47,18 +47,24 @@ version_set('1.1');
 stdev_mult=1.8:0.3:3; % screening criteria, as multiples for standard deviation of the rateaero.
 col=408; % for screening. this should actually be plural - code to be developed
 
-if nargin<2;
+if nargin<2
     savefigure=1;
-end;
+    compare_to_previous = 0;
+end
 
-if nargin<3;
+if nargin<3
     fig_path = getnamedpath('starfig');
-end;
+    compare_to_previous = 0;
+end
+
+if nargin==3; 
+    compare_to_previous = 0;
+end
 
 filesuffix = ['_refined'];
-if nargin>3;
+if nargin>3
     filesuffix = [filesuffix c0_filesuffix];
-end;
+end
 u = who_u;
 %% load files
 % load(file, 't', 'w', 'rateaero', 'm_aero','AZstep','Lat','Lon','Tst','tau_aero','tau_aero_noscreening','Str');
@@ -406,7 +412,7 @@ if isnumeric(k) && k>=1; % save results from the screening/regression above
     source=[getnamedpath('starsun'),s.instrumentname, '_',s.daystr,'starsun.mat'];
 end;
 
-visfilename=fullfile(starpaths, [daystr,'_',s.instrumentname '_VIS_C0' filesuffix '.dat']);
+visfilename=fullfile(starpaths, [daystr, '_VIS_C0_' s.instrumentname filesuffix '.dat']);
 try;
     starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
 catch
@@ -421,5 +427,7 @@ if ~strcmp(instrumentname,'2STAR');
     end;
 end;
 
+
+%if compare_to_previous
 % be sure to modify starc0.m so that starsun.m will read the new c0 files.
 return

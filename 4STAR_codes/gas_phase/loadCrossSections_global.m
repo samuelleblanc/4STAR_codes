@@ -6,7 +6,7 @@
  % MS, 2015-05-01, added HCOH and BrO cross sections
  %----------------------------------------------------------------------
  %function s= loadCrossSections
- if isvar('gxs')
+ if isavar('gxs')
     fields = fieldnames(gxs);
     for f = 1:length(fields)
        eval([fields{f} '= gxs.' fields{f} ';']);

@@ -21,7 +21,8 @@ function [savematfile, contents]=allstarmat(source, savematfile, varargin)
 % SL v1.1: 2016/08/23: handling of the new filename format with instrument name in file
 % SL v1.2: 2016/09/28: added starminutes call at end, to summarize the minutes in each mode for the file
 % SL v1.3: 2018/02/08: added special treatment of temperatures for 4STARB and conversion of temperatures of the spectrometers
-version_set('1.3');
+% SL v1.4: 2018/10/16: Treatment of badly named files by renaming in the file type treatment the most often occuring mode
+version_set('1.4');
 %********************
 % control input
 %********************
@@ -94,6 +95,17 @@ for i=1:length(filenames);
             try
                 s=starter(cf0); % read the raw file.
                 if ~isempty(s.t) && ((isfield(s, 'raw') && ~isempty(s.raw)) || (isfield(s, 'fname') && ~isempty(strfind(lower(s.fname), 'track')))); % time is given, and either raw isn't empty or it's a track file
+                    try %to handle wrongly named park files 
+                       if mode(s.Md)==1 && isequal(type(end-3:end), 'park')
+                           type = [type(1:end-4) 'sun'];
+                           filenames(i) = strrep(filenames(i),'park','SUN');
+                       elseif mode(s.Md)==8 && isequal(type(end-3:end), 'park')
+                           type = [type(1:end-4) 'zen'];
+                           filenames(i) = strrep(filenames(i),'park','ZEN');
+                       end
+                    catch
+                       type = type;
+                    end
                     contents=[contents;{type}];
                     if isequal(type(end-2:end), 'sun') || isequal(type(end-2:end), 'zen')  || isequal(type(end-3:end), 'park') || isequal(type(end-3:end), 'forj') || isequal(type(end-4:end), 'track');
                         s.filename=filenames(i);
@@ -150,25 +162,35 @@ clear cf cf0 ff cff filen fn i s type note;
 %********************
 %% Extra handling of the spectrometer temperature fields
 %********************
-if exist('track','var');
+if exist('track','var')
     track.T_spec_uvis = track.T_spec_uvis-273.15;
     track.T_spec_nir = track.T_spec_nir-273.15;
-end;
+end
 
 %********************
 %% Special processing for 4STARB (differences in temp sensors)
 %********************
 if strcmp(instrumentname,'4STARB');
-    if isvar('track');
+    if isavar('track');
         track.T3 = ((track.T3+273.15)./1000.0)*23-30;
-    end;
-end;
+    end
+end
 
+%********************
+%% Special filtering for problems in lat/lon fields
+%********************
+if exist('vis_sun')
+    dt = abs(diff(vis_sun.t));
+    dLo = abs(diff(vis_sun.Lon));
+    dLa = abs(diff(vis_sun.Lat));
+    vis_sun.Lon(dLo>(dt.*10.0+0.02)) = NaN;
+    vis_sun.Lat(dLa>(dt.*10.0+0.02)) = NaN;
+end
 
 %********************
 %% save
 %********************
-for ii=1:length(contents);
+for ii=1:length(contents)
     %cjf: fls and following for loop were introduced to remove empty filename elements
     % Yohei, 2013/02/13, masks the lines, in order to better keep track of FOV records
     % CJF: unmasks and made changes to accommodate FOV and track files.
@@ -184,12 +206,12 @@ for ii=1:length(contents);
         
     end
     
-    if ii==1 && append==0;
+    if ii==1 && append==0
         save(savematfile, contents{ii},'-mat', '-v7','program_version');
     else
         save(savematfile, contents{ii},'-mat', '-append','program_version');
-    end;
-end;
+    end
+end
 
 
 %********************

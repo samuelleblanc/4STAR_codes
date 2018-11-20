@@ -16,7 +16,10 @@ end
 w=s.w; Lon=s.Lon; Lat=s.Lat; Alt=s.Alt; Pst=s.Pst; Tst=s.Tst; aerosolcols=s.aerosolcols;
 viscols=s.viscols; nircols=s.nircols; rateaero=s.rateaero;
 c0=s.c0; m_aero=s.m_aero; QdVlr=s.QdVlr; QdVtb=s.QdVtb; QdVtot=s.QdVtot; ng=s.ng;Md=s.Md;
-Str=s.Str; raw=s.raw; dark=s.dark;
+Str=s.Str; raw=s.raw; dark=s.dark; 
+%CJF:  Loop below uses t but never defined? Error popped up during sky scan
+%processing but I don't see how it could ever have run. Maybe catch 
+t = s.t;
 
 % Next attempt to load some fields that may not exist depending on starsun
 % version or toggle settings and populate them
@@ -145,6 +148,9 @@ inp.flight = flight;
 inp.Md = s.Md; 
 inp.Str = s.Str;
 inp.sd_aero_crit = s.sd_aero_crit;
+if ~isfield(s,'rawrelstd')&&isavar('rawrelstd') 
+   s.rawrelstd = rawrelstd;
+end
 inp.rawrelstd = s.rawrelstd(:,1);
 
 nm_380 = interp1(w,[1:length(w)],.38, 'nearest');

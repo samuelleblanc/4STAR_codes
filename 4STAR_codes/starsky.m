@@ -63,7 +63,7 @@ load(sourcefile,contents0{:});
 
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
-[mat_dir, fname, ext] = fileparts(savematfile);
+[mat_dir, fname, ext] = fileparts(which(savematfile));
 [matdir,imgdir] = starpaths;
 sky_str = {'skya';'skyp'}';
 % clear contents0
@@ -97,7 +97,7 @@ if exist('vis_skya','var')
             catch
                 save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
-            close('all')
+            %close('all')
         end
     end
     %     clear ss;
@@ -139,7 +139,7 @@ if exist('vis_skyp','var')
             catch
                 save([mat_dir,filesep,out,'.bad'],'-struct','s');
             end
-            close('all')
+            %close('all')
         end
     end
     %    clear ss;
