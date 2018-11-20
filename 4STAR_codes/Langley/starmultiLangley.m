@@ -26,9 +26,10 @@
 
 version_set('1.0');
 
-alldays={'20161110','20161111','20161112','20161113'};%,'20161114','20161115','20161116','20161117'}; %
+% alldays={'20161110','20161111','20161112','20161113'};%,'20161114','20161115','20161116','20161117'}; %
 % alldays={'20160630','20160702','20160703','20160704','20160705'};
 % alldays={'20160630','20160702','20160703','20160704','20160705','20161110','20161111'};
+alldays={'20171023','20171024','20171025','20171026','20171031','20171101','20171107'};
 daycolor={'c',      'r',        'g',        'b',        'k',        'm', [0.87 0.49 0],[0.2 0.5 0.7] };
 langmark={'.','+','x','o','s','^'};
 %********************
@@ -65,7 +66,7 @@ for daynum=1:length(alldays)%=5
     % elseif isequal(daystr, '20160426')
     %     source = '20160426starsun_constO3.mat';
     else
-        source=['4STAR_' daystr 'starsun.mat'];
+        source=['4STARB_' daystr 'starsun.mat'];
 %         source=[daystr 'starsun.mat'];
         %source=[daystr 'starsun_wFORJcorr_meanc0.mat'];
         % source='20140917starsunLangley.mat';% this is the original file made
@@ -77,7 +78,7 @@ for daynum=1:length(alldays)%=5
     AZ_deg    = mod(AZ_deg_,360); AZ_deg = round(AZ_deg);
 
     %starinfofile=fullfile(starpaths, ['starinfo' daystr(1:8) '.m']);
-    starinfofile=fullfile(starpaths, ['starinfo_' daystr(1:8) '.m']);
+    starinfofile=(['starinfo_' daystr(1:8) '.m']);
     s=importdata(starinfofile);
     %s1=s(strmatch('langley',s));
     s1=s(strncmp('langley',s,1));

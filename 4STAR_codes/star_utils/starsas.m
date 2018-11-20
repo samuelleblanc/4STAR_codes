@@ -91,7 +91,7 @@ if exist(fullfile(pathname,[figurename '.fig']))==2;
 end;
 disp(['Saving ' figurename '.fig under ' pathname]);
 saveas(gcf, fullfile(pathname, [figurename '.fig']), 'fig');
-set(gcf,'paperpositionmode','auto');
+% set(gcf,'paperpositionmode','auto'); %I don't like this line. it messes with my function that allows one to set the scale and size of figures especially when saved as a pdf
 try
     saveas(gcf, fullfile(pngsavedir, [figurename '.png']), 'png');
 catch; % patch figures do not seem to be converted to PNG.  try jpeg.

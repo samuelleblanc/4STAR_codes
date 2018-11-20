@@ -21,8 +21,8 @@ s.langley1=[datenum(2017,9,8,9,40,00) datenum(2017,9,8,10,00,15);
  
 % Ozone and other gases 
 s.O3h=21; % 
-s.O3col=0.300; % Michal's guess     
-s.NO2col=2.0e15; % % 
+s.O3col=0.273; %% guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni         
+s.NO2col=3.6e15; % % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
 
 % flags
 s.flagfilename = '20170908_starflag_man_created20180510_1434by_KP.mat'; 

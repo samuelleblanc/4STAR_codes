@@ -20,9 +20,8 @@ s.flight=[datenum(2017,9,6,09,29,57) datenum(2017,9,6,19,54,43)];
  
 % Ozone and other gases 
 s.O3h=21; % 
-s.O3col=0.300; % Michal's guess     
-s.NO2col=2.0e15; % % 
-
+s.O3col=0.285; %% guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
+s.NO2col=3.4e15; %% guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
 % flags
 s.flagfilename = '20170906_starflag_man_created20180527_2008by_KP.mat'; 
 %s.flagfilenameO3 = '20160530_starflag_O3_man_created20160701_1630by_MS.mat';

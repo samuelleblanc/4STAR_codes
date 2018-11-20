@@ -83,6 +83,8 @@ elseif isafile(mat_file)
       % force gas and cwv retrievals true for sky scans
       toggle.gassubtract = true; toggle.runwatervapor = true
       s=starwrapper(vis_sky, nir_sky,toggle);
+      s.toggle = toggle; %overwrite changes to toggle from within starwrapper
+      % which come from a re-load of update_toggle in starinfo
    end
 end
 % the logic here is unclear.  This should augment s.toggle with
@@ -105,7 +107,8 @@ if isfield(s.toggle,'flip_toggle')&&s.toggle.flip_toggle
 end
 % add variables and make adjustments common among all data types. Also
 % combine the two structures.
-skymat_dir = getnamedpath('starsky');img_dir = getnamedpath('star_images');
+paths = set_starpaths;
+skymat_dir = paths.starsky; img_dir = paths.starfig;
 s.toggle.gassubtract = true; s.toggle.runwatervapor = true;
 s.wl_ = false(size(s.w));
 s.wl_(s.aeronetcols) = true;
