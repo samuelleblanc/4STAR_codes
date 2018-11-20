@@ -13,12 +13,12 @@ end
 
  
 s.ground=[datenum(2017,10,25,14,18,40) datenum(2017,10,25,21,53,51)]; 
-%s.langley1 = [datenum(2017,6,8,15,35,00) datenum(2017,6,8,21,10,00)];
+s.langley1 = [datenum(2017,10,25,14,50,00) datenum(2017,10,25,17,30,00)]; %approximately air mass 12-2 during this period...
  s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.278; % guess    
-s.NO2col=2.0e15; % 
+s.O3col=0.254; % estimated average from OMI over northern CA, from Giovanni 
+s.NO2col=5.4e15; % estimated average from OMI over northern CA, from Giovanni 
 
 % flags
 %s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 

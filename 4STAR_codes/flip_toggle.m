@@ -15,22 +15,30 @@ togs = fieldnames(toggle);
 %       togs(t)= [];
 %    end
 % end
-ntogs = length(togs);
+
 done = false;
-while ~done   
+while ~done
    for t = length(togs):-1:1
       tog = togs(t);
-      if ~islogical(toggle.(togs{t}))
-         TF = num2str(toggle.(togs{t}));
-      else
-         if toggle.(togs{t})
-         TF = 'true';
-         else
-         TF = 'false';
+      if length(toggle.(togs{t}))>2
+         togs(t) = [];
+         if isavar('tog_str') 
+            tog_str(t) = [];
          end
+      else
+         if ~islogical(toggle.(togs{t}))
+            TF = num2str(toggle.(togs{t}));
+         else
+            if toggle.(togs{t})
+               TF = 'true';
+            else
+               TF = 'false';
+            end
+         end
+         tog_str(t) = {[togs{t}, ': <',TF,'>']};
       end
-      tog_str(t) = {[togs{t}, ': <',TF,'>']};
    end
+   ntogs = length(togs);
    tog_str(ntogs+1) = {''}; tog_str(ntogs+2) = {'DONE'};tog_str(ntogs+3) = {'ABORT'};
    mn = menu({top_line;'Select a toggle to change, "DONE" when finished, ';'"ABORT" to revert to original and quit'}, tog_str);
    if mn<=length(togs)

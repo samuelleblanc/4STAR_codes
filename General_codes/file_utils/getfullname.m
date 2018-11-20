@@ -22,7 +22,7 @@ usrpath = [usrpath,filesep];
 % pname = strrep(strrep(usrpath,';',filesep),':',filesep);
 pathdir = [usrpath,'filepaths',filesep];
 if ~exist(pathdir,'dir')
-    mkdir(pname, 'filepaths');
+    mkdir(usrpath, 'filepaths');
 end
 
 if ~exist('dialog','var')||isempty(dialog)

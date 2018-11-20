@@ -163,12 +163,15 @@ end;
 
 %% Plot the one langley for each stdev on seperate figures
 for k=1:numel(stdev_mult);
-    ok2s=ok((isfinite(residuals(:,k))==1)&(m_aero(ok)<=3.0));
-    [c0news(k,:), ods(k,:), residual2s, h]=Langley(m_aero(ok2s),s.rateaero(ok2s,1:colsplit), []);
+%     ok2s=ok((isfinite(residuals(:,k))==1)&(m_aero(ok)<=3.0));
+%     [c0news(k,:), ods(k,:), residual2s, h]=Langley(m_aero(ok2s),s.rateaero(ok2s,1:colsplit), []);
     ok2=ok(isfinite(residual(:,k))==1);
-    [c0new2(k,:), od2(k,:), residual2, h]=Langley(m_aero(ok2),s.rateaero(ok2,colsplit+1:end), [], cols(4)-colsplit);
-    c0new(k,:) = [[c0news(k,:)],[c0new2(k,:)]];
-    od(k,:) = [[ods(k,:)],[od2(k,:)]];
+%     [c0new2(k,:), od2(k,:), residual2, h]=Langley(m_aero(ok2),s.rateaero(ok2,colsplit+1:end), [], cols(4)-colsplit);
+    [c0new2(k,:), od2(k,:), residual2, h]=Langley(m_aero(ok2),s.rateaero(ok2,1:end), []);
+%     c0new(k,:) = [[c0news(k,:)],[c0new2(k,:)]];
+%     od(k,:) = [[ods(k,:)],[od2(k,:)]];
+    c0new(k,:) = [[c0new2(k,:)]];
+    od(k,:) = [[od2(k,:)]];
 
     %lstr=setspectrumcolor(h(:,1), w(cols));
     %lstr=setspectrumcolor(h(:,2), w(cols));

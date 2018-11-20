@@ -33,8 +33,8 @@ elseif(strcmp(s.instrumentname,'4STARB'))
              s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
             % Ozone and other gases 
             s.O3h=21; %  
-            s.O3col=0.300; %    
-            s.NO2col=2.0e15; %  
+            s.O3col=0.301; % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
+            s.NO2col=3.8e15; % guess from OMI daily average over the region (35-55N, 35-55W), as estimated from Giovanni     
 
 %             % flags
             s.flagfilename     = '20170904_starflag_man_created20180527_1628by_KP.mat'; 

@@ -130,6 +130,7 @@
      no2_298.visInterp = interp1(no2_298.visnm, no2_298.visXs, vis.nm,'pchip','extrap');
      
      % no2
+     % this is 254K
      invis = 'no2_vis4star.txt';
      if exist(invis,'file')
          no2vis  = importdata(invis);

@@ -4,6 +4,7 @@ function TF = isafile(in)
 
 TF = false;
 if isavar('in')
+    if length(in)==1 && iscell(in) && ischar(in{1}); in = in{1};end
     out = dir(in);
     if ~isempty(out)
         if ~isfield(out,'folder')

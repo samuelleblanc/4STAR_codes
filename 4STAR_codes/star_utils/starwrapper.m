@@ -191,7 +191,7 @@ end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 if isfield(s, 'toggle')
-   s.toggle = catstruct(toggle, s.toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = catstruct(s.toggle,toggle); % merge, overwrite s.toggle with toggle
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -358,7 +358,7 @@ elseif strmatch('nir', lower(datatype))
    sat_val = 32767;
 end;
 
-if toggle.verbose; disp('...calculating saturated points'); end;
+if toggle.verbose; disp('...calculating saturated points'); end
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
@@ -553,7 +553,7 @@ end
 if toggle.applystraycorr
    % this is constant correction (time dependent only)
    corr=straylightcorrection(serial2Hh(s.t),s.rate,s.w);
-   s.rate  = s.rate - repmat(corr,1,qq);
+   s.rate(s.Str==1,:)  = s.rate(s.Str==1,:) - repmat(corr(s.Str==1),1,qq);
 end
 
 %********************

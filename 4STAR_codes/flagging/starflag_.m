@@ -33,7 +33,7 @@ if ~exist('Mode','var') || Mode~=1
     Mode = 2;
 end
 
-upath = strrep(strrep(userpath,';',filesep),[filesep filesep],filesep);
+upath = strrep([strrep(userpath,';',filesep),filesep],[filesep filesep],filesep);
 tmp_file = [upath, '~starflags.mat'];
 if exist(tmp_file,'file')
       tmpio = matfile(tmp_file); 
@@ -80,28 +80,24 @@ if Mode==1 || fresh_start % Then output flag file with auto-generated flags
    end
 end
 if Mode~=1
-      op_name = menu('Who is flagging 4STAR data?','Yohei Shinozuka','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
-        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone','Yana Karol');
+      op_name = menu('Who is flagging 4STAR data?','Connor Flynn','John Livingston','Michal Segal Rozenhaimer',...
+        'Meloe Kacenelenbogen','Samuel LeBlanc','Jens Redemann','Kristina Pistone');
     op_name_str = '?';
     switch op_name
         case 1
-            op_name_str = 'YS';
-        case 2
             op_name_str = 'CF';
-        case 3
+        case 2
             op_name_str = 'JL';
-        case 4
+        case 3
             op_name_str = 'MS';
-        case 5
+        case 4
             op_name_str = 'MK';
-        case 6
+        case 5
             op_name_str = 'SL';
-        case 7
+        case 6
             op_name_str = 'JR'; 
-        case 8
-            op_name_str = 'KP';
-        case 8
-            op_name_str = 'YK';            
+        case 7
+            op_name_str = 'KP';        
     end
 
     

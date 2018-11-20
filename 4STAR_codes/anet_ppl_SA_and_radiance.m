@@ -18,5 +18,7 @@ dZa(n) = sscanf(flds{n},'%f');
 end
 ppl.dZa = dZa;
 ppl.SA = scat_ang_degs(0.*ones(size(dZa)), 0.*ones(size(dZa)), abs(dZa), 0.*ones(size(dZa)))';
-
+for t = length(ppl.time):-1:1
+ppl.zen_rad(t) = interp1(ppl.dZa, ppl.radiance(t,:), ppl.SolarZenithAngle_degrees_(t),'linear');
+end
 return
