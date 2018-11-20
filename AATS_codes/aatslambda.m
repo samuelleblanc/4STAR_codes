@@ -10,7 +10,7 @@ fwhm=[];
 V0=[];
 xsect=[];
 if t>=datenum([2016 10 30]); % filter swap (see AATS-14_Filter_ Use_20160305.xls); changes in the format of this function
-    xsect_dir=getnamedpath('AATS_xsect');
+    xsect_dir=getnamedpath('data_folder_github','Select the data_folder within your github tree for 4STAR_codes');
 %     if ~exist(xsect_dir);
 %         xsect_dir = fullfile(starpaths, 'source', 'AATS');
 %     end;
