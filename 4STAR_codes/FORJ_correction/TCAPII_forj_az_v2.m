@@ -1,5 +1,7 @@
-function [forj_vis_out, forj_vis] = TCAPII_forj_az_v2(vis)
+function [forj_vis_out, forj_vis,forj_fig_path] = TCAPII_forj_az_v2(vis)
 % v2 attempt to clean up darks and lights, added "lights" boolean
+% SL, 2018-11-20, added output of the forj_fig_path 
+
 if ~exist('vis','var')||~exist(vis,'file');
     vis = getfullname('*_VIS_FORJ.dat','forj','Select a forj data file.');
 end
@@ -270,6 +272,7 @@ xlim([0,360]);
 [pname, fstem,ext] = fileparts(forj_vis.fname);
 saveas(gcf,[plot_dir,fstem,'.png']);
 saveas(gcf,[plot_dir,fstem,'.fig']);
+forj_fig_path = [plot_dir,fstem,'.png'];
 %Sort and Bin the existing measurements in 1 degree increments
 %%
 else
