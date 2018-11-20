@@ -7,7 +7,7 @@ Collection of Matlab codes used for routine and special analysis of measurements
 - Includes codes for zenith radiance calculations (starzen)
 - Includes codes for sky scans, almucantar and principal plane (starsky, starskies)
 
-4STAR (Spectrometer for Sky-Scanning Sun-Tracking, Atmospheric Research) is an airborne sunphotometer instrumentdeveloped and operated from NASA Ames Research Center.  This code repository is mainly used for internal development of 4STAR analysis codes for the 4STAR/Sun-Sat research team. 
+4STAR (Spectrometer for Sky-Scanning Sun-Tracking, Atmospheric Research) is an airborne sunphotometer instrument developed and operated from the NASA Ames Research Center.  This code repository is mainly used for internal development of 4STAR analysis codes for the 4STAR/Sun-Sat research team. 
 
 These codes are grouped together in the 4STAR_codes subdirectory. General use codes can be found in the General_codes directory. AATS_codes combine some analysis software for 4STAR predecessor instrument, AATS-14 (Ames Airborne Tracking Sunphotometer). atm_codes represent a combination of codes for General and special 4STAR use specifically relating to atmosphere profile and modelling analysis. 
 
