@@ -1,5 +1,7 @@
 function gxs = get_GlobalCrossSections
 loadCrossSections_global
-save([fileparts(which('get_GlobalCrossSections')),filesep,'gxs.mat']);
+if ~isafile([fileparts(which('get_GlobalCrossSections')),filesep,'gxs.mat'])
+   save([fileparts(which('get_GlobalCrossSections')),filesep,'gxs.mat']);
+end
 gxs = load(which('gxs.mat'));
 return

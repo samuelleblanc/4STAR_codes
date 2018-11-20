@@ -34,6 +34,9 @@ end;
 % smooth the temperature record
 bl=60/86400;
 track.tsm=boxxfilt(track.t, track.T4, bl);
+if all(isNaN(track.tsm)); track.tsm=boxxfilt(track.t, track.T1, bl);end
+if all(isNaN(track.tsm)); track.tsm=boxxfilt(track.t, track.T2, bl);end
+if all(isNaN(track.tsm)); track.tsm=boxxfilt(track.t, track.T3, bl);end
 [track.tsorted, ii]=unique(track.t);
 difft=-2.0/60.0/24.0;
 tsm=interp1(track.tsorted-difft, track.tsm(ii), t);
