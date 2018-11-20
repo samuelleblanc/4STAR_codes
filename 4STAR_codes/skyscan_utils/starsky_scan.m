@@ -30,7 +30,7 @@ end
 [pname,fstem,ext] = fileparts(strrep(star.filename{1},'\',filesep));
 pname = [pname, filesep];
 fstem = strrep(fstem, '_VIS',''); star.fstem = fstem;
-imgdir = getnamedpath('star_images');
+paths = set_starpaths; imgdir = paths.starppt;
 if ~isdir([imgdir,star.fstem]);
    mkdir(imgdir, star.fstem);
 end
@@ -73,20 +73,23 @@ end
 if isfield(star,'gas')&&isfield(star.gas,'o3')&&isfield(star.gas.o3, 'o3DU');
    star.O3col = star.gas.o3.o3DU(sun_ii);
 end
-if star.O3col>1
+if star.O3col>8
    star.O3col = star.O3col./1000;
 end
 % end
+%% This section to test impact of different selection of wavelengths to compute 
 
-% This reproduces some of starwrapper ~675 in order to reduce file size by
+% This reproduces some of starwrapper ~717 in order to reduce file size by
 % not retaining an alternate version tau_noray_vert
 tau_noray_vert = star.tau_tot_vert -star.tau_ray;
 tau_abs_gas = star.tau_tot_vert -star.tau_ray - star.tau_aero_subtract_all;
 % This is similar to aodpolyfit except uses a reduced wavelength range
 % tailored to the expected wavelengths for the sky retrieval and will thus
 % generally better represent the wavelength dependence in this region
-w_ii = star.w_isubset_for_polyfit;
-w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];
+w_ii = [225,star.w_isubset_for_polyfit];
+% SEAC4RS and ORACLES seem to require different WL ranges 
+% w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
+w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
 PP_ = polyfit(log(star.w(w_ii)), log(star.tau_aero_subtract_all(sun_ii,w_ii)),3);
 tau_aero_subtract_all_fit = exp(polyval(PP_,log(star.w)));
 star.tau_abs_gas_fit=  tau_noray_vert - ones(size(star.t))*exp(polyval(PP_,log(star.w)));
@@ -102,8 +105,9 @@ plot(star.w(200:1044), tau_noray_vert(sun_ii,200:1044),'.m-', ...
 star.w(200:1044), exp(polyval(PP_,log(star.w(200:1044)))), '-',...   
    star.w(star.aeronetcols), exp(polyval(PP_,log(star.w(star.aeronetcols)))), 'o'); logx; logy;
 ylabel('optical depth');
-ylim([min(min(star.tau_aero_subtract_all(sun_ii,w_ii))).*.75,...
-    max(max(star.tau_aero_subtract_all(sun_ii,w_ii))).*1.5]);
+yl = ylim;
+ylim([min([yl(1),min(star.tau_aero_subtract_all(sun_ii,w_ii))]).*.75,...
+    max([yl(2),max(star.tau_aero_subtract_all(sun_ii,w_ii))]).*1.5]);
 lg = legend('tau noray vert','tau aero subtract all', ...
     'tau aero sub all fit',...
     'aeronet cols');
@@ -122,6 +126,9 @@ ylabel('optical depth')
 lg = legend('tot - tau_aero_subtract_all','tot - aero_fit'); set(lg,'interp','none', 'location','northwest')
 linkaxes(sx,'x');
 xlim([star.w(200), 1.02]);
+
+%% 
+
 if all(isNaN(tau_abs_gas(sun_ii,200:1044)))||...
       all(isNaN(star.tau_abs_gas_fit(sun_ii,200:1044)))||...
       all(isNaN(star.tau_abs_gas_fit(sun_ii,star.aeronetcols)))||...
