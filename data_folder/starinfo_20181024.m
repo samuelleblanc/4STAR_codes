@@ -21,16 +21,16 @@ s.O3h=21; %
 s.O3col=0.275; %
 s.NO2col=2.0e15; %  
 
-s.dirty = [datenum(2018,10,24,8,50,0) datenum(2018,10,24,9,00,0)];
-s.clean = [datenum(2018,10,24,9,13,0) datenum(2018,10,24,9,16,0)];
+%s.dirty = [datenum(2018,10,24,8,50,0) datenum(2018,10,24,9,00,0)];
+%s.clean = [datenum(2018,10,24,9,13,0) datenum(2018,10,24,9,16,0)];
 
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
-                 s.flight=[datenum(2018,10,23,6,52,0) datenum(2018,10,23,14,41,56)];
+                 s.ground=[datenum(2018,10,24,8,11,0) datenum(2018,10,24,9,37,30)];
                  
                  %s.AODuncert_constant_extra = 0.01;
     %             flags
-                 s.flagfilename     = '20181023_starflag_man_created20181119_1457by_SB.mat'; 
+                 %s.flagfilename     = '20181023_starflag_man_created20181119_1457by_SB.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
