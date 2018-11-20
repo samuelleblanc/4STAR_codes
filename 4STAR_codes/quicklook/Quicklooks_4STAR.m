@@ -203,7 +203,7 @@ if isfield(s,'gas')
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
     hcoh2plot =real(s.gas.hcoh.hcoh_DU);
-elseif exist([getnamedpath('starsun') daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
+elseif isafile([getnamedpath('starsun') daystr,'_gas_summary.mat']) %if the gas mat file exists...
     gas   = load(strcat(getnamedpath('starsun'),daystr,'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
