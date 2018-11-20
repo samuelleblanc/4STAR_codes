@@ -45,7 +45,7 @@ for in = 1:length(infiles)
    if isempty(contents0);
       savematfile=[];
       disp('no sky files')
-      disp('no sky files')
+
    else
       clear nir_skya nir_skyp vis_skya vis_skyp
       load(sourcefile,contents0{:});
@@ -79,9 +79,10 @@ for in = 1:length(infiles)
             filen = num2str(vis_sky(si).filen);
             if (vis_sky(si).filen>= toggle.skip_lt_N) ...
                   && (vis_sky(si).filen <= toggle.skip_gt_N)
-            s=starwrapper(vis_sky(si), nir_sky(si),toggle);
-%             try
-            s = starsky_2(s,s.toggle);
+               s=starwrapper(vis_sky(si), nir_sky(si),toggle);
+               s.toggle = toggle; %overwrite changes to toggle from within starwrapper
+               % which come from a re-load of update_toggle in starinfo
+               s = starsky_2(s,s.toggle);
 %             catch
 %                close('all');
 %                [~,fstem,~] = fileparts(s.filename{1}); fstem = strrep(fstem,'_VIS_','_*_');
