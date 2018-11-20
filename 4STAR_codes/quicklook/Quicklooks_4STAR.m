@@ -203,7 +203,7 @@ if isfield(s,'gas')
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
     hcoh2plot =real(s.gas.hcoh.hcoh_DU);
-elseif exist([getnamedpath('starsun') daystr,'_gas_summary.mat'],'file')==2 %if the gas mat file exists...
+elseif isafile([getnamedpath('starsun') daystr,'_gas_summary.mat']) %if the gas mat file exists...
     gas   = load(strcat(getnamedpath('starsun'),daystr,'_gas_summary.mat'));
     cwv2plot =gas.cwv;
     o32plot  =gas.o3DU;
@@ -912,7 +912,7 @@ tau_aero_noscreening = s.tau_aero_noscreening;
 
 % tau aero noscreening
 
-if exist('tau_aero_noscreening');
+if isavar('tau_aero_noscreening');
     % plot the tau_aero_noscreening vis
     faodv = figure;
     nw = length(iwvlv);
@@ -974,7 +974,7 @@ end; %tau_aero_noscreening
 
 
 % plot the tau_aero
-if exist('tau_aero');
+if isavar('tau_aero');
     % plot the tau_aero vis;
     faodv_fl = figure;
     nw = length(iwvlv);
@@ -1149,7 +1149,7 @@ end; %tau_aero_noscreening
 % ******************
 %% Plot sampled spectra of AOD to see spectral behavior
 % ******************
-if exist('tau_aero')
+if isavar('tau_aero')
     fspaod = figure;
     nl = 15;
     cm=hsv(nl);
@@ -1161,9 +1161,9 @@ if exist('tau_aero')
         ik = ji(floor(length(ji)./nl.*i));
         loglog(s.w.*1000.0,s.tau_aero(ik,:),'.');
         labels{i} = datestr(s.t(ik),'HH:MM');
-    end
+    end;
     ylim([0.0001,1.0]);
-    xlabel('Wavelenght [nm]'); xlim([350,1700]);
+    xlabel('Wavelength [nm]'); xlim([350,1700]);
     ylabel('tau_aero','Interpreter','None');
     title([daystr ' - Spectra of AOD'])
     colormap(cm)
@@ -1200,7 +1200,7 @@ end
 %********************
 
 %% water vapor
-if exist('cwv2plot')
+if isavar('cwv2plot')
     
     % apply flags
     cwv2plot(flagCWV==1) = NaN;
@@ -1255,7 +1255,7 @@ end;
 
 
 %% O3
-if exist('o32plot');
+if isavar('o32plot');
     
     % apply flags
     o32plot(flagO3==1) = NaN;
@@ -1311,7 +1311,7 @@ if exist('o32plot');
 end;
 
 %% NO2
-if exist('no22plot');
+if isavar('no22plot');
     % apply flags
     no22plot(flagNO2==1) = NaN;
     no22plot =no22plot/2.6867e16; % conversion to DU
@@ -1365,7 +1365,7 @@ if exist('no22plot');
 end;
 
 %% HCOH
-if exist('hcoh2plot');
+if isavar('hcoh2plot');
     % apply flags
     hcoh2plot(flagHCOH==1) = NaN;
     
@@ -1410,11 +1410,11 @@ end;
 
 
 %% tau aero after correction based on AATS
-if ~exist('tau_aero_scaled') && exist(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']))==2;
+if ~isavar('tau_aero_scaled') && isavar(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']))==2;
     c0corrfactor=load(fullfile(starpaths, ['star' daystr 'c0corrfactor.dat']));
     tau_aero_scaled=tau_aero+(1./m_aero)*log(c0corrfactor);
 end;
-if exist('tau_aero_scaled')&&isavar('vars');
+if isavar('tau_aero_scaled')&&isavar('vars');
     for k=1:size(colslist,1); % for multiple sets of wavelengths
         figure;
         [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, ...
@@ -1426,7 +1426,7 @@ end;
 
 % zenith radiance time series
 starzenfile=fullfile(starpaths, [daystr 'starzen.mat']);
-if exist(starzenfile)
+if isafile(starzenfile)
     load(starzenfile, 'Alt');
     figure;
     [h,filename]=spzen(daystr, 't', 'rad', '.', 't', Alt/100, mods{:}, ...
@@ -1440,7 +1440,7 @@ end
 %********************
 %% plot spectra in comparison with AATS-14
 %********************
-if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat']))==2
+if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat']))==2
     [both, ~, aats]=staraatscompare(daystr);
     both.rows=incl(both.t, tlim);
     % 4STAR AATS time-series comparison, wavelength by wavelength
@@ -1533,7 +1533,7 @@ if isequal(platform, 'ground') && exist(fullfile(starpaths, [daystr 'aats.mat'])
     end
     
     % transmittance ratio, 4STAR/AATS, against wavelengths
-    if ~exist('groundcomparison')
+    if ~isavar('groundcomparison')
         rows=incl(both.t, groundcomparison);
         % extrapolate to non-AATS wavelengths
         aatsgoodviscols=[2:7 9];

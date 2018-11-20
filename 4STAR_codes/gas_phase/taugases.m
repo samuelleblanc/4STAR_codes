@@ -19,6 +19,7 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 %                           'no' for KORUS-AQ
 % SL, modified, 2017-05-28  Modified codes to add multi-instrument
 %                           functionality via the instrumentname variable
+% MS, modified, 2018-10-01  Added 4STARB cross section functionality
 %----------------------------------------------------------------------
 version_set('v2.0')
 Loschmidt=2.686763e19; %molecules/cm3xatm%molecules/cm3xatm
@@ -56,7 +57,20 @@ else
 end
 
 if t(1)>=datenum([2012 7 3 0 0 0]);
-    cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
+    if strcmp(instrumentname,'4STAR')
+        cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
+    elseif strcmp(instrumentname,'4STARB')
+        cross_sections=load(which( 'cross_sections_4starb.mat'));
+        % adjusting field names according to haritage
+        cross_sections.wln = cross_sections.wln_4starb;
+        cross_sections.o3  = cross_sections.o3_vis_223K_interp;
+        cross_sections.no2 = cross_sections.no2_vis_254K_interp;
+        cross_sections.o2  = cross_sections.o2_vis_1013mbar_interp;
+        cross_sections.o4  = cross_sections.o4all;
+        cross_sections.co2 = cross_sections.co2_nir_1013mbar_interp;
+        cross_sections.ch4 = cross_sections.ch4_nir_1013mbar_interp;
+        cross_sections.h2o = cross_sections.h2o_vis_1013mbar_294K_interp;
+    end
     fn=fieldnames(cross_sections);
     for ff=1:length(fn);
         orig=cross_sections.(fn{ff});
@@ -111,7 +125,7 @@ end;
 
 switch instrumentname; % defaults to use 4STAR, here you put special code to modify 4STAR
     case {'4STARB'}
-        warning('Cross sections for 4STARB not yet calculated, using 4STAR')
+        warning('Cross sections for 4STARB are convolved using 4STAR-A FWHM values')
         nwl = size(cross_sections.wln);
     case {'2STAR'}
         warning('Gas phase cross sections for 2STAR not yet defined, using 4STAR and then convolving')
@@ -173,6 +187,9 @@ else
     tau_O4=O4_vercol*cross_sections.o4;
 end;
 tau_O2=zeros(nwl); % don't subtract O2 % O2_vercol*cross_sections.o2;
+
+%tau_CO2_CH4_N2O=zeros(size(cross_sections.wln)); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
+
 tau_CO2_CH4_N2O=zeros(nwl); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
 
 %% get O3 optical depths
