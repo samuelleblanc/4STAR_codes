@@ -24,7 +24,7 @@ infiles = getfullname('*star.mat','starmats','Select one or more star.mat files'
 if ischar(infiles)
    infiles = {infiles};
 end
-skymat_dir = getnamedpath('starsky');img_dir = getnamedpath('star_images');
+skymat_dir = getnamedpath('starsky');img_dir = getnamedpath('starimg');
 if isfield(toggle, 'skip_ppl')&&toggle.skip_ppl
    contentx = {'nir_skya';'vis_skya'};
 elseif isfield(toggle,'skip_alm')&&toggle.skip_alm

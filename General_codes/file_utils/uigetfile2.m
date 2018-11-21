@@ -36,7 +36,7 @@ if ~exist(pathdir,'dir')
 end
 % pathdir = [pathdir,filesep];
 
-lastDirMat = [pathdir, 'lastUsedDir.mat'];
+lastDirMat = [pathdir, 'lastpath.mat'];
 
 % save the present working directory
 savePath = pwd;

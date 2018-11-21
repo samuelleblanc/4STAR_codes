@@ -80,7 +80,7 @@ end
 
 % Check whether a valid directory has been provided in fspec
 % if not then browse...
-if isdir(fspec)
+if ~isempty(fspec)&&isdir(fspec)
     % clean up termination of fspec to have one and only one filesep
     save([pathdir,pathfile], 'pname');
 else
@@ -105,11 +105,14 @@ else
                     pname = pname.pname;
                 elseif isfield(pname, 'fpath')
                     pname = pname.fpath;
+                elseif isfield(pname,'lastUsedDir')
+                   pname = pname.lastUsedDir
                 end
             end
             if ~isdir(pname)
                 pname = pwd;
             end
+            pname = [pname, '..',filesep];
             if pickdir
                 [pname] = uigetdir([pname,fstem],dialog);
             else

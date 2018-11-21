@@ -708,7 +708,7 @@ ppt_add_slide(star.pptname, fig_out);
 % 
 % if isavar('fog')&&(star.isPPL||star.isALM)
 %    % Save figure
-%    img_dir = getnamedpath('star_images');
+%    img_dir = getnamedpath('starimg');
 %    fig_out = [img_dir,star.out,'.fig'];
 %    if exist(fig_out,'file')
 %       delete(fig_out);
