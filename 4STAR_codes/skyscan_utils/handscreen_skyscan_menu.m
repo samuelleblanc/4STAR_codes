@@ -79,7 +79,7 @@ if star.isPPL
 elseif star.isALM
    sky = 'alm_mod';
 end
-imgdir = getnamedpath('star_images');
+imgdir = getnamedpath('starimg');
 skyimgdir = [imgdir,star.fstem,filesep];
    fig_out = [skyimgdir, star.fstem,star.created_str,sky];
    saveas(gcf,[fig_out,'.fig']);

@@ -35,7 +35,7 @@ end
 %get_ssfr_flight_albedo came up empty
 if in_air && ~s.toggle.no_SSFR
    [flight_alb, out_time] = get_ssfr_flight_albedo(s.t,s.w);
-   imgdir = getnamedpath('star_images');
+   imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,s.fstem,filesep];
    fig_out = [skyimgdir, s.fstem,s.created_str,'SSFR_albedo'];
    saveas(gcf,[fig_out,'.fig']);

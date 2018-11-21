@@ -40,7 +40,7 @@ for F = length(skyinput):-1:1
       
       
       [~,fstem] = fileparts(fname_tagged); [~,fstem] = fileparts(fstem);
-      imgdir = getnamedpath('star_images');
+      imgdir = getnamedpath('starimg');
       if ~isdir([imgdir,fstem]);
          mkdir(imgdir, fstem);
       end
@@ -97,7 +97,7 @@ for F = length(skyinput):-1:1
                figure; plot(0:1,0:1,'o'); title(['Crashed during ',skyscan], 'interp','none');
                text(0.1,0.8,ME.identifier,'color','red');
                text(0.1,0.6,ME.message,'color','red','fontsize',8);
-               imgdir = getnamedpath('star_images');
+               imgdir = getnamedpath('starimg');
                skyimgdir = [imgdir,skyscan,filesep];
                saveas(gcf,[skyimgdir,skyscan, '.bad.png']);
                ppt_add_slide([imgdir,skyscan,'.ppt'], [skyimgdir,skyscan, '.bad']);
