@@ -53,7 +53,7 @@ usrpath = [strrep(usrpath,pathsep,''),filesep];
 % append filesep
 pathdir = [usrpath,'starpaths',filesep];
 % If "starpaths" directory doesn't exist under userpath, create it
-if ~isdir(pathdir)
+if ~isadir(pathdir)
     mkdir(usrpath, 'starpaths');
 end
 
@@ -73,9 +73,9 @@ end
 fields = fieldnames(data);
 for fld = 1:length(fields)
    field = fields{fld};
-   while ~isdir(data.(field)) 
-%    while ~isdir(data.(field)) || ~strcmp(data.(field),getnamedpath(field))
-      if isempty(data.(field)) || ~isdir(getnamedpath(field))
+   while ~isadir(data.(field)) 
+%    while ~isadir(data.(field)) || ~strcmp(data.(field),getnamedpath(field))
+      if isempty(data.(field)) || ~isadir(getnamedpath(field))
          data.(field) = setnamedpath(field);
       else
          data.(field) = setnamedpath(field,getnamedpath(field));

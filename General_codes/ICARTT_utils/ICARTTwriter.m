@@ -193,7 +193,7 @@ for i=1:numvar
 end
 
 %check directory
-if ~isdir(ICTdir)
+if ~isadir(ICTdir)
     yn = input(['ICTdir ' ICTdir ' does not exist. Create? y/n [y]: '],'s');
     if isempty(yn) || yn=='y'
         mkdir(ICTdir)

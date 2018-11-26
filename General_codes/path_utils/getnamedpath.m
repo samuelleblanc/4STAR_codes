@@ -62,7 +62,7 @@ if exist([pathdir, pathfile],'file')
          pname = pname.fpath;
       end
    end
-   if isempty(pname)||~isdir(pname)
+   if isempty(pname)||~isadir(pname)
       reset = true; 
       [~,pthfile,~]= fileparts(pathfile);
       pthfile = ['Path in "',pthfile,'" does not exist. ']; 
@@ -70,7 +70,7 @@ if exist([pathdir, pathfile],'file')
 else % reset it
    reset = true;
 end
-if ~isdir(pname)
+if ~isadir(pname)
    pname = pwd;
 end
 

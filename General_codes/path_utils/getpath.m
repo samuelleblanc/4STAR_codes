@@ -31,7 +31,7 @@ if isempty(ext)
 end
 
 if exist('infile','var')&&~isempty(infile)
-    if isdir(infile)
+    if isadir(infile)
         if strcmp(infile(end),filesep)
             outpath = infile;
         else

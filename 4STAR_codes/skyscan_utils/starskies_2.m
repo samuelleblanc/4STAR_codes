@@ -1,4 +1,4 @@
-function [savematfile, contents]=starskies_2(toggle)
+function [savematfile, contents]=starskies(toggle)
 % [savematfile, contents] = starskies(toggle)
 % Next-generation starskies supporting unattended/batch processing
 % including anet data level tests, tau_abs_gas_fit, alb from SSFR or ?,
