@@ -16,7 +16,7 @@ s.toggle = toggle;
 % No good time periods ([start end]) and memo for all pixels 
 %  flag: 1 for unknown or others, 2 for before and after measurements, 10 for unspecified type of clouds, 90 for cirrus, 100 for unspecified instrument trouble, 200 for instrument tests, 300 for frost. 
 s.ng=[]; 
-flight=[datenum('00:00:00') datenum('02:15:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
+s.flight=[s.t(1), s.t(end)]; 
 !!! A rough timing reported by Roy, to be updated. 
  
 % daystr=mfilename; 
@@ -34,18 +34,19 @@ s.O3col=0.300;  % Yohei's guess, to be updated
 s.NO2col=5e15; % Yohei's guess, to be updated 
  
 % other tweaks 
-s.Pst(find(s.Pst<10))=1013;  
- 
+if isfield(s,'Pst'); s.Pst(find(s.Pst<10))=1013; end 
 % Corrections  
-s.note=['See ' mfilename '.m for additional info. ' s.note]; 
+if isfield(s,'note') 
+   s.note(end+1)={['See ' mfilename '.m for additional info. ']} ; 
+   s.note = unique(s.note); 
+end
  
 %push variable to caller 
 varNames=who(); 
 for i=1:length(varNames) 
   assignin('caller',varNames{i},eval(varNames{i})); 
 end; 
-end 
- 
+
 
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  

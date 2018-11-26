@@ -17,7 +17,7 @@ s.toggle = toggle;
 % No good time periods ([start end]) and memo for all pixels 
 %  flag: 1 for unknown or others, 2 for before and after measurements, 10 for unspecified type of clouds, 90 for cirrus, 100 for unspecified instrument trouble, 200 for instrument tests, 300 for frost. 
 s.ng=[]; 
-flight=[datenum('17:58:48') datenum('26:42:42')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); % updated 27Sep13 JML 
+s.flight=[datenum('17:58:48') datenum('26:42:42')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); % updated 27Sep13 JML 
 smoke=[datenum('19:50:00') datenum('20:06:00')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
 % from Livingston's flight notes. 
 groundcomparison=[datenum('14:25:00') datenum('17:58:29')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 

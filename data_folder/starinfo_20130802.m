@@ -41,7 +41,10 @@ s.NO2col=5e15; % Yohei's guess, to be updated
 s.Pst(find(s.Pst<10))=1013;  
  
 % Corrections  
-s.note=['See ' mfilename '.m for additional info. ' s.note]; 
+if isfield(s,'note') 
+   s.note(end+1)={['See ' mfilename '.m for additional info. ']} ; 
+   s.note = unique(s.note); 
+end
  
 %push variable to caller 
 varNames=who(); 

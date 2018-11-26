@@ -4,7 +4,7 @@ if exist('s','var')&&isfield(s,'t')&&~isempty(s.t)
 else
    daystr=evalin('caller','daystr');
 end
-
+s.daystr = daystr; 
 toggle = update_toggle;
 if isfield(s, 'toggle')
    toggle = catstruct(s.toggle, toggle);
@@ -17,7 +17,7 @@ s.toggle = toggle;
  
 % No good time periods ([start end]) and memo for all pixels 
 %  flag: 1 for unknown or others, 2 for before and after measurements, 10 for unspecified type of clouds, 90 for cirrus, 100 for unspecified instrument trouble, 200 for instrument tests, 300 for frost. 
-s.daystr = datestr(s.t(1),'yyyymmdd'); 
+
 ng=[]; 
 % flight_=[datenum('16:17:50') datenum('24:06:11')]-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); % updated 27Sep13 JML 
 s.flight=[datenum('16:17:50') datenum('24:06:11')]-datenum('00:00:00')+floor(s.t(1)); % updated 27Sep13 JML 
@@ -98,7 +98,7 @@ if isfield(s, 'note');
     s.note(end+1,1) = {['See ' mfilename '.m for additional info. ']}; 
 end; 
  
-push variable to caller 
+%push variable to caller 
 varNames=who(); 
 for i=1:length(varNames) 
    if ~strcmp(varNames{i},'s') 

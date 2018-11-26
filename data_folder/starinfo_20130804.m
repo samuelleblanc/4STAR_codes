@@ -34,7 +34,7 @@ s.O3col=0.300;  % Yohei's guess, to be updated
 s.NO2col=5e15; % Yohei's guess, to be updated 
  
 % other tweaks 
-s.Pst(find(s.Pst<10))=1013;  
+if isfield(s,'Pst'); s.Pst(find(s.Pst<10))=1013; end 
  
 % Corrections  
 s.note=['See ' mfilename '.m for additional info. ' s.note]; 

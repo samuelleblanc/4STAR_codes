@@ -37,19 +37,16 @@ s.O3col=0.300;  % Yohei's guess, to be updated
 s.NO2col=5e15; % Yohei's guess, to be updated 
  
 % other tweaks 
-s.Pst(find(s.Pst<10))=1013;  
+if isfield(s,'Pst'); s.Pst(find(s.Pst<10))=1013;  end
  
 % Corrections  
-s.note=['See ' mfilename '.m for additional info. ' s.note]; 
+if isfield(s,'note'); s.note=['See ' mfilename '.m for additional info. ' s.note]; end
  
 %push variable to caller 
 varNames=who(); 
 for i=1:length(varNames) 
   assignin('caller',varNames{i},eval(varNames{i})); 
-end; 
-end 
- 
-
+end
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  
 % Creates potential for clobbering and makes collaborative coding more
