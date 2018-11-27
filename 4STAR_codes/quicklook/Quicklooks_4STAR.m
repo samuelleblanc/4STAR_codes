@@ -215,7 +215,7 @@ end
 
 %% filter the gas fields to plot
 % read starinfo files
-
+% 
 disp(['on day:' daystr])
 infofile_ = ['starinfo_' daystr '.m'];
 infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
@@ -226,7 +226,7 @@ catch
 end
 
 %% Load the flag files and see if gas flags exist
-if isfield(s, 'flagfilename');
+if isfield(s, 'flagfilename')&&isafile(s.flagfilename);
     disp(['Loading flag file: ' s.flagfilename])
     flag = load(s.flagfilename);
     % read flags
@@ -284,6 +284,7 @@ end;
 
 
 %% read auxiliary data from starinfo and select rows
+
 if isequal(platform, 'flight');
     if ~isfield(s,'flight');
         error(['Specify flight time period in starinfo_' daystr '.m.']);
@@ -980,12 +981,18 @@ if isavar('tau_aero');
     nw = length(iwvlv);
     cm=hsv(nw+length(iwvln));
     set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren')
-    plot(s.t,s.tau_aero(:,iwvlv),'.');
+    if isfield(s,'tau_aero_subtract')&&isfield(s,'tau_aero')&&...
+          ~all(size(s.tau_aero)==size(s.tau_aero_subtract))
+       plot(s.t,s.tau_aero_subtract(:,iwvlv),'.');
+    else
+       plot(s.t,s.tau_aero(:,iwvlv),'.');
+    end
+    
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
     if max(s.tau_aero(:,iwvlv))<1.2; tma = max(max(s.tau_aero(:,iwvlv)))*1.05; else tma=1.2; end;
-    ylim([0.0,tma]);
+    if tma>0 ylim([0.0,tma]); end
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
     grid on;
