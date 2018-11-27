@@ -34,7 +34,7 @@ usrpath = [strrep(usrpath,pathsep,''),filesep];
 % append filesep
 pathdir = [usrpath,'starpaths',filesep];
 % If "starpaths" directory doesn't exist under userpath, create it
-if ~isdir(pathdir)
+if ~isadir(pathdir)
     mkdir(usrpath, 'starpaths');
 end
 

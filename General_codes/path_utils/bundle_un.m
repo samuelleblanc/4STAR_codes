@@ -9,13 +9,13 @@ tmpdir = ['unzip_tmpdir_',datestr(now,'yyyy-mm-dd_HHMMSS')];
 if isempty(who('inzip')) || isempty(dir(inzip)) 
    inzip = getfullname('*.zip','bundle','Select a bundlefnt zipped file.');
 end
-while isempty(who('outpath'))||~isdir(outpath)
+while isempty(who('outpath'))||~isadir(outpath)
    outpath = getdir;
 end
 if strcmp(outpath(end),filesep)
    outpath(end) = [];
 end
-if ~isdir(outpath)
+if ~isadir(outpath)
    mkdir(outpath);
 end
 outpath = [outpath, filesep];

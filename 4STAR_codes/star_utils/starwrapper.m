@@ -496,7 +496,7 @@ course_changed = false(size(s.t));
 course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
 if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
    s.airborne = true;
-   warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+%    warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
    [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
 else
    s.airborne = false;

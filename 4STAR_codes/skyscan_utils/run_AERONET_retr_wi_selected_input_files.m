@@ -41,7 +41,7 @@ for F = length(skyinput):-1:1
       
       [~,fstem] = fileparts(fname_tagged); [~,fstem] = fileparts(fstem);
       imgdir = getnamedpath('starimg');
-      if ~isdir([imgdir,fstem]);
+      if ~isadir([imgdir,fstem]);
          mkdir(imgdir, fstem);
       end
       

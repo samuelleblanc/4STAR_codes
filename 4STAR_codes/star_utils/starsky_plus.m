@@ -38,6 +38,9 @@ if in_air && ~s.toggle.no_SSFR
    imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,s.fstem,filesep];
    fig_out = [skyimgdir, s.fstem,s.created_str,'SSFR_albedo'];
+   if ~isadir([imgdir,s.fstem]);
+       mkdir(imgdir, s.fstem);
+   end
    saveas(gcf,[fig_out,'.fig']);
    saveas(gcf,[fig_out,'.png']);
    ppt_add_slide(s.pptname, fig_out);

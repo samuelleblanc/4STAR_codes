@@ -145,6 +145,7 @@ catch ME
    text(0.1,0.6,ME.message,'color','red','fontsize',8);
    imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,skyscan,filesep];
+   if ~isadir([skyimgdir,skyscan]); mkdir(skyimgdir, skyscan); end
    saveas(gcf,[skyimgdir,skyscan,badtime_str, '.png']);
    copyfile2([imgdir,skyscan,'.ppt'],[imgdir,'bad.',skyscan,'.ppt']);
    ppt_add_title([imgdir,'bad.',skyscan,'.ppt'], [fstem,': ',badtime_str]);

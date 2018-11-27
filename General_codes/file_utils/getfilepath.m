@@ -63,7 +63,7 @@ if exist([pathdir, pathfile],'file')
 end
 
 % If the resulting path doesn't exist or if reset is true then use uigetdir to get a new one.
-if reset || ~isdir(pname)
+if reset || ~isadir(pname)
     pname = uigetdir(pname,dialog);
     if pname==0
         pname = [];
@@ -73,7 +73,7 @@ if reset || ~isdir(pname)
 end
 
 fpath = pname;
-if isdir(fpath)
+if isadir(fpath)
     save([pathdir,pathfile],'fpath');
     if exist('newpathfile','var')
         save([pathdir,newpathfile],'fpath');

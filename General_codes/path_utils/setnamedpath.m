@@ -4,7 +4,7 @@ function [fullpath] = setnamedpath(pathfile,fspec,dialog)
 % 'pathfile' is a string indicating the filename of the mat-file where the
 % path is stored. If pathfile not provided, or is empty then default to lastpath.mat
 % 'fspec' is a string containing either the explicit path to be used or
-% the starting point for a browse window if fspec is empty or ~isdir.
+% the starting point for a browse window if fspec is empty or ~isadir.
 % If fspec is a directory
 % Adding a wildcard to fspec will force browse.
 % 'dialog' is a string that will be provided to the user to prompt for the
@@ -74,20 +74,20 @@ usrpath = [strrep(usrpath,pathsep,''),filesep];
 % append filesep
 pathdir = [usrpath,'filepaths',filesep];
 % If "filepaths" directory doesn't exist under userpath, create it
-if ~isdir(pathdir)
+if ~isadir(pathdir)
     mkdir(usrpath, 'filepaths');
 end
 
 % Check whether a valid directory has been provided in fspec
 % if not then browse...
-if ~isempty(fspec)&&isdir(fspec)
+if ~isempty(fspec)&&isadir(fspec)
     % clean up termination of fspec to have one and only one filesep
     save([pathdir,pathfile], 'pname');
 else
-    !! Check this!!
-%     while ~isdir(pname)||isempty(pname)
+%     !! Check this!!
+%     while ~isadir(pname)||isempty(pname)
         % if not, check if fspec is a valid path stem plus mask.
-        if ~isempty(pname)&&isdir(pname)
+        if ~isempty(pname)&&isadir(pname)
             if pickdir
                 [pname] = uigetdir([pname,fstem],dialog);
             else
@@ -109,7 +109,7 @@ else
                    pname = pname.lastUsedDir
                 end
             end
-            if ~isdir(pname)
+            if ~isadir(pname)
                 pname = pwd;
             end
             pname = [pname, '..',filesep];
@@ -120,11 +120,11 @@ else
             end
         end
         pname = [pname, filesep]; pname = strrep(pname,[filesep filesep], filesep);        
-        if ~isempty(pname)&&isdir(pname)
+        if ~isempty(pname)&&isadir(pname)
             save([pathdir,'lastpath.mat'],'pname');
         end
 %     end
-    if ~isempty(pname)&&isdir(pname)
+    if ~isempty(pname)&&isadir(pname)
         save([pathdir,pathfile], 'pname');
     end
 end
@@ -152,19 +152,19 @@ fullpath = pname;
 %       end
 %    end
 % end
-% if ~isdir(pname)
+% if ~isadir(pname)
 %    pname = pwd; pname = strrep([pname, filesep],[filesep filesep],filesep);
 % end
 %
 % [fname_path,fname,ext] = fileparts(fspec);
-% if isdir(fspec)
+% if isadir(fspec)
 %    pname = strrep([fspec,filesep],[filesep filesep], filesep);
 % elseif ~isempty(who(fspec))
 %    pname = strrep([fname_path, filesep],[filesep filesep],filesep);
 % else
-%    if isdir(fname_path)
+%    if isadir(fname_path)
 %       [fname,pname] = uigetfile([fname_path,filesep,fname, ext],dialog);
-%    elseif isdir(pname)
+%    elseif isadir(pname)
 %       [fname,pname] = uigetfile([pname,filesep,fname, ext],dialog);
 %    else
 %       [fname,pname] = uigetfile([fname ext],dialog);

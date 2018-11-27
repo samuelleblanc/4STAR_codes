@@ -11,7 +11,7 @@ if isavar('in')
             out.folder = [fileparts(in),filesep];
         end
         out = fullfile(out.folder, out.name);
-        TF =  ~isdir(in)&&~isempty(out)&&~isempty(strfind(out,in));
+        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in));
     end
 end
     %nested function isavar
