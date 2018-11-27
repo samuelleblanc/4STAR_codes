@@ -56,23 +56,26 @@ gxs = get_GlobalCrossSections;
 
 if s.toggle.verbose; disp('Starting NO2 gas retrieval'), end
  [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
-
+if all(isnan(gas.no2.no2OD)) disp('Problem with NO2'); end
 %% retrieve O3
 if s.toggle.verbose; disp('Starting O3 gas retrieval'), end
  [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
-
+if all(isnan(gas.o3.o3OD)) disp('Problem with O3'); end
+if all(isnan(gas.o3.o4OD)) disp('Problem with O4OD in O3'); end
+if all(isnan(gas.o3.h2oOD)) disp('Problem with H2OOD O3'); end
 %----------------------------------------------------------------------
 %% retrieve CO2
 if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
  [gas.co2]  = retrieveCO2(s,1.555,1.630,gxs);
-   
+   if all(isnan(gas.co2.co2OD)) disp('Problem with CO2'); end
+   if all(isnan(gas.co2.ch4OD)) disp('Problem with ch4OD in CO2'); end
 %% retrieve O2
 %  TBD
 
 %% retrieve HCOH
 if s.toggle.verbose; disp('Starting HCOH gas retrieval'), end
  [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1,gxs);
-             
+   if all(isnan(gas.hcoh.hcohOD)) disp('Problem with hcoh'); end             
 %% save gas data to .mat file
 
    Loschmidt          = 2.686763e19; %molecules/cm2
