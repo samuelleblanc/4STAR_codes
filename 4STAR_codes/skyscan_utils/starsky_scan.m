@@ -31,7 +31,7 @@ end
 pname = [pname, filesep];
 fstem = strrep(fstem, '_VIS',''); star.fstem = fstem;
 paths = set_starpaths; imgdir = paths.starppt;
-if ~isdir([imgdir,star.fstem]);
+if ~isadir([imgdir,star.fstem]);
    mkdir(imgdir, star.fstem);
 end
 skyimgdir = [imgdir,star.fstem,filesep];
@@ -90,7 +90,7 @@ w_ii = [225,star.w_isubset_for_polyfit];
 % SEAC4RS and ORACLES seem to require different WL ranges 
 % w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
 w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
-PP_ = polyfit(log(star.w(w_ii)), log(star.tau_aero_subtract_all(sun_ii,w_ii)),3);
+PP_ = polyfit(log(star.w(w_ii)), real(log(star.tau_aero_subtract_all(sun_ii,w_ii))),3);
 tau_aero_subtract_all_fit = exp(polyval(PP_,log(star.w)));
 star.tau_abs_gas_fit=  tau_noray_vert - ones(size(star.t))*exp(polyval(PP_,log(star.w)));
 star.tau_abs_gas_fit(star.tau_abs_gas_fit<0) = 0;
@@ -135,7 +135,7 @@ if all(isNaN(tau_abs_gas(sun_ii,200:1044)))||...
       all(isNaN( tau_abs_gas(sun_ii,star.aeronetcols)))
    disp('Problem with gas absorption?')
    warning('Problem with gas absorption?');
-   pause(10)
+   pause(2)
 end
 
 fig_out = [skyimgdir, star.fstem,star.created_str,'AOD_AGOD_biplot'];
