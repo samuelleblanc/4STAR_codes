@@ -1,4 +1,4 @@
-function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr]=taugases(t, datatype, Alt, Pst, Lat, Lon, O3col, NO2col,instrumentname)
+function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err, tau_NO2_err, tau_O4_err, tau_CO2_CH4_N2O_abserr, tau_O2_]=taugases(t, datatype, Alt, Pst, Lat, Lon, O3col, NO2col,instrumentname)
 
 % development
 % NO2, O3 concentrations should be input from starinfo or OMI gridded file
@@ -181,6 +181,7 @@ end
 
 %% get O4 optical depths
 [O2_vercol,O4_vercol]=O2_VCYMSez(Alt, t, Lat);
+tau_O2_ = O2_vercol * cross_sections.o2;
 if isfield(cross_sections,'o4all'); % Yohei, 2013/01/16, for the legacy July 3, 2012 cross sections
     tau_O4=O4_vercol*cross_sections.o4all;
 else
