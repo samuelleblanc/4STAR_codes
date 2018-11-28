@@ -25,7 +25,7 @@ if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                  s.flight=[datenum(2018,9,22,13,08,15) datenum(2018,9,22,19,55,51)];
     %             flags
-    %             s.flagfilename     = '20170831_starflag_man_created20170902_2354by_MS.mat'; 
+                 s.flagfilename     = '20180922_starflag_man_created20181127_1926by_SL.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
