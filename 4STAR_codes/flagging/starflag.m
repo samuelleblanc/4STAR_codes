@@ -36,9 +36,10 @@ function [flags, good, flagfile] = starflag(s, Mode)
 %                       and doing some checks for already available starflag files defined in starinfo 
 % SL, v1.7, 2017-06-03, Modified for a different flagging based on instrument
 % MS, v1.8, 2017-09-03, commented line 577
+% SL, v1.9, 2018-11-27, changed the saving comment, and added a toggle for saving the mark files
 
 %% Start
-version_set('1.8');
+version_set('1.9');
 if ~exist('s','var')||isempty(s) % then select a starsun file to load parts of
     %        disp(['Loading data from ',daystr,'starsun.mat.  Please wait...']);
     s = [];
@@ -55,6 +56,9 @@ end;
 
 %% get the correct day information
 daystr = datestr(s.t(1),'yyyymmdd');
+if ~isfield(s.toggle,'save_marks_flags')
+    s.toggle.save_marks_flags = false;
+end
 if ~isfield(s,'sd_aero_crit') % read starinfo file
     daystr = datestr(s.t(1),'yyyymmdd');
     infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
@@ -566,13 +570,13 @@ if (Mode==2)
     flags.manual_flags = manual_flags;
     % Output an m-file representing all these flags in "ng" format
     [flag_all, flag_names_all, flag_tag_all] = cnvt_flags2ng(t, flags);
-    if ~isempty(flag_all)
+    if ~isempty(flag_all) & s.toggle.save_marks_flags
         [all_str, all_fname] = write_starflags_marks_file(flag_all,flag_names_all,flag_tag_all,daystr,'all', op_name_str,now_str);
     end
     
     % Output an m-file marking all not_good_aerosol events
     [flag_aod, flag_names_aod, flag_tag_aod] = cnvt_flags2ng(t, flags,~good);
-    if ~isempty(flag_aod)
+    if ~isempty(flag_aod) & s.toggle.save_marks_flags
         aod_str = write_starflags_marks_file(flag_aod,flag_names_aod,flag_tag_aod,daystr,'not_good_aerosol', op_name_str,now_str);
     end
     other_flagged = false(size(good));
@@ -587,7 +591,7 @@ if (Mode==2)
     % Output an m-file marking all other events not marked as bad_aerosol events
     other_flags.time = flags.time;
     [flag_other, flag_names_other, flag_tag_other] = cnvt_flags2ng(t, other_flags,other_flagged);
-    if ~isempty(flag_other)
+    if ~isempty(flag_other) & s.toggle.save_marks_flags
         other_str = write_starflags_marks_file(flag_other,flag_names_other,flag_tag_other,daystr,'other_flagged_events', op_name_str,now_str);
     end
     % Output an m-file marking cloud events (low cloud, cirrus, unspecified)
@@ -606,8 +610,13 @@ if (Mode==2)
         cloud_str = write_starflags_marks_file(flag_cloud,flag_names_cloud,flag_tag_cloud,daystr,'cloud_events', op_name_str,now_str);
     end
     
-    answer = menu('Write mask files, similar to "ng" in star_info, for selected flags?','Yes','No');
-    Mark_subset_file = answer ==1;
+    if ~s.toggle.save_marks_flags
+        answer = menu('Write mask files, similar to "ng" in star_info, for selected flags?','Yes','No');
+        Mark_subset_file = answer ==1;
+    else
+        Mark_subset_file = false;
+    end
+    
     flag_list = fieldnames(flags);
     for x = length(flag_list):-1:1
         if ~islogical(flags.(flag_list{x}))
@@ -676,7 +685,7 @@ if ~(Mode==3);
         disp(['Creating ',outmat]);
         save(outputfile,'-struct','flags');
     else
-        disp(['Appending to ',outmat]);
+        disp(['Appending to ',outputfile]);
         save(outputfile,'-append','-struct','flags');
     end
 end;

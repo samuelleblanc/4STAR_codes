@@ -26,6 +26,7 @@ toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
+toggle_out.save_marks_flags = false;
 toggle_out.no_SSFR = false;
 toggle_out.use_last_wl = false;
 toggle_out.flip_toggle = true;
