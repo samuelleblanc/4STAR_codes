@@ -56,9 +56,13 @@ end;
 
 %% get the correct day information
 daystr = datestr(s.t(1),'yyyymmdd');
+if ~isfield(s,'toggle')
+    s.toggle.dummy = true;
+end
 if ~isfield(s.toggle,'save_marks_flags')
     s.toggle.save_marks_flags = false;
 end
+
 if ~isfield(s,'sd_aero_crit') % read starinfo file
     daystr = datestr(s.t(1),'yyyymmdd');
     infofile = fullfile(starpaths, ['starinfo' daystr '.m']);
@@ -229,10 +233,12 @@ if ~(Mode==3)
     flags_matio = matfile(outputfile,'Writable',true);
     flags_matio.flagfile = flagfile;
 
-    mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
-    disp(['Corresponding "marks" m-file to: ',mark_fname])
-
+    if s.toggle.save_marks_flags
+        mark_fname = ['starflag_',daystr,'_',op_name_str,'_all_',now_str,'.m'];
+        disp(['Corresponding "marks" m-file to: ',mark_fname])
+    end
     [flags,flag_info] = cnvt_ng2flags(ng,t);
+    
 end;
 
 if isfield(s,'flight')
@@ -610,7 +616,7 @@ if (Mode==2)
         cloud_str = write_starflags_marks_file(flag_cloud,flag_names_cloud,flag_tag_cloud,daystr,'cloud_events', op_name_str,now_str);
     end
     
-    if ~s.toggle.save_marks_flags
+    if s.toggle.save_marks_flags
         answer = menu('Write mask files, similar to "ng" in star_info, for selected flags?','Yes','No');
         Mark_subset_file = answer ==1;
     else
