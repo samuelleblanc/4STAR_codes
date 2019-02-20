@@ -21,6 +21,9 @@ s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 s.O3h=21; %  
 s.O3col=0.261; % MLO obs from dobson brewer
 s.NO2col=2.0e15; %  
+
+%flags
+s.flagfilename = '20180318_starflag_man_created20190219_1646by_KP.mat';
  
 % other tweaks 
 if isfield(s, 'Pst'); 
