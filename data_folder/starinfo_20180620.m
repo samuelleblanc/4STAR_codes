@@ -11,14 +11,14 @@ else
     s.toggle = update_toggle;
 end
 
-s.flight=[datenum(2018,06,24,14,49,00) datenum(2018,6,24,19,14,00)]; 
+s.flight=[datenum(2018,06,20,14,50,59) datenum(2018,6,20,18,37,50)]; 
 %s.langley1 = [datenum(2018,02,15,17,11,00) datenum(2018,02,15,20,15,00)];
 s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 %s.xtra_langleyfilesuffix = '_MLOFeb2018_day11';
 %s.calreflector_time = [datenum(2018,2,10,20,37,0),datenum(2018,2,10,21,30,0)];
-s.dirty = [datenum(2018,06,24,20,32,00) datenum(2018,6,24,20,35,00)];
-s.clean = [datenum(2018,06,24,20,55,00) datenum(2018,6,24,20,58,00)];
-s.flagfilename = '20180624_starflag_man_created20190303_1921by_SL.mat';
+%s.dirty = [datenum(2018,06,18,20,15,00) datenum(2018,6,18,20,19,00)];
+%s.clean = [datenum(2018,06,18,20,55,00) datenum(2018,6,18,20,59,00)];
+s.flagfilename = '20180620_starflag_man_created20190303_1855by_SL.mat';
 
 % Ozone and other gases 
 s.O3h=21; %  

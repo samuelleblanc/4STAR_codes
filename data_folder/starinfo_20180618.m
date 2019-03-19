@@ -19,6 +19,8 @@ s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 s.dirty = [datenum(2018,06,18,20,15,00) datenum(2018,6,18,20,19,00)];
 s.clean = [datenum(2018,06,18,20,55,00) datenum(2018,6,18,20,59,00)];
 
+s.flagfilename = '20180618_starflag_man_created20190303_1608by_SL.mat';
+
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.261; % MLO obs from dobson brewer
