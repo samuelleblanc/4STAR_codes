@@ -1,5 +1,5 @@
-function cimel = read_cimel_aip(filename);
-%This should read any of the Aeronet files.  Not fully tested...
+function cimel = read_cimel_aip_v3(filename);
+%This should read Aeronet v3 inversion files.  
 if ~exist('filename', 'var')
    filename = getfullname('*.*','cimel');
 elseif ~exist(filename,'file')
