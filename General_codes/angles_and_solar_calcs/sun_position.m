@@ -66,16 +66,16 @@ function sun = sun_position(time, location)
 % time.sec = 30;
 % time.UTC = -7;
 
-location.longitude = 6.7082; 
-location.latitude = 0.378; 
-location.altitude = 30;
-time.year = 2017;
-time.month = 8;
-time.day = 21;  
-time.hour = 9;
-time.min = 52;
-time.sec = 00;
-time.UTC = 0;
+% location.longitude = 6.7082; 
+% location.latitude = 0.378; 
+% location.altitude = 30;
+% time.year = 2017;
+% time.month = 8;
+% time.day = 21;  
+% time.hour = 9;
+% time.min = 52;
+% time.sec = 00;
+% time.UTC = 0;
 %
 % sun = sun_position(time, location);
 %
