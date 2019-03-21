@@ -86,8 +86,8 @@ tau_abs_gas = star.tau_tot_vert -star.tau_ray - star.tau_aero_subtract_all;
 % This is similar to aodpolyfit except uses a reduced wavelength range
 % tailored to the expected wavelengths for the sky retrieval and will thus
 % generally better represent the wavelength dependence in this region
-w_ii = [225,star.w_isubset_for_polyfit];
-% SEAC4RS and ORACLES seem to require different WL ranges 
+w_ii = star.w_isubset_for_polyfit;
+% SEAC4RS and ORACLES seem to require different WL ranges % SL (2019-03-21) implemented this time dependent change into get_wvl_subset for where the w_isubset_for_polyfit is determined.
 % w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
 w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
 PP_ = polyfit(log(star.w(w_ii)), real(log(star.tau_aero_subtract_all(sun_ii,w_ii))),3);

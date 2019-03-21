@@ -8,10 +8,14 @@ function [iwvl,save_wvls] = get_wvl_subset(t,instrumentname)
 %       fit.  Hopefully this makes more plausible polyfit values than what
 %       the first version was.  
 %       also fixed the index for 1039.6 from 1095 to 1096.
+% Updated: SL, 2019-03-21, v1.1
+%       Added extra time differentiator for wvl_subset for handling
+%       SEAC4RS, and not ORACLES
+%       
 
 
 %%
-version_set('1.0');
+version_set('1.1');
 % control the input
 if nargin==0;
     t=now;
@@ -22,9 +26,12 @@ end;
 
 switch instrumentname;
     case {'4STAR'}
-        if t>datenum(2012,01,01,0,0,0) ; %from the start of 4STAR
+        if t>datenum(2016,01,01,0,0,0); % for measurements for ORACLES and after
             save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9,1558.7,1626.6,1650.1];
-            iwvl = [ 227    258    347    370     408     432     445     447     470     539  557     608     627     761     869    1084   1095   1109    1213    1222  1439   1492   1511];
+            iwvl = [227    258    347    370     408     432     445     447     470     539  557     608     627     761     869    1084   1095   1109    1213    1222  1439   1492   1511];
+        if t>datenum(2012,01,01,0,0,0) ; %from the start of 4STAR with SEAC4RS
+            save_wvls  = [353.3,354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,660.1,675.2,780.6,864.6,1019.9,1039.6,1064.2,1235.8,1249.9,1558.7,1626.6,1650.1];
+            iwvl = [225  227    258    347    370     408     432     445     447     470     539  557     608     627     761     869    1084   1095   1109    1213    1222  1439   1492   1511];
         end;
 
     case{'4STARB'}
