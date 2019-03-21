@@ -8,7 +8,9 @@ function [savematfile, contents]=starskies(toggle)
 %   sstarskies; % this prompts user interfaces
 %   [savematfile, contents]=starsun returns the path for the resulting mat-file and its contents.
 %
-version_set('1.0');
+% Modifications:
+% SL, v1.1, 2019-03-20, added excel file writing 
+version_set('1.1');
 %********************
 % regulate input and read source
 %********************
@@ -24,6 +26,11 @@ infiles = getfullname('*star.mat','starmats','Select one or more star.mat files'
 if ischar(infiles)
    infiles = {infiles};
 end
+
+[pname,fstem,ext] = fileparts(infiles{1});
+xls_fname = [pname filesep fstem '_Skyscan_Summary.xls'];
+if toggle.verbose; disp(['Excel Summary file saved to: ' xls_fname]), end;
+
 skymat_dir = getnamedpath('starsky');img_dir = getnamedpath('starimg');
 if isfield(toggle, 'skip_ppl')&&toggle.skip_ppl
    contentx = {'nir_skya';'vis_skya'};
@@ -89,10 +96,12 @@ for in = 1:length(infiles)
 %                warning(['Crashed while running ',fstem]);
 %                pause(4);
 %             end
+                [xls_fname] = print_skyscan_details_to_xls(s,xls_fname);
             toggle = s.toggle; close('all');
             end
          end
       end
    end
 end
+if toggle.verbose; disp(['Excel Summary file saved to: ' xls_fname]), end;
 return
