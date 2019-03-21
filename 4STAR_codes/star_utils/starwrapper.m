@@ -823,7 +823,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3);
+   if toggle.dostarflag && (length(s.flags.bad_aod)==length(s.t))&&(toggle.starflag_mode==1||toggle.starflag_mode==3);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
    end;
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
