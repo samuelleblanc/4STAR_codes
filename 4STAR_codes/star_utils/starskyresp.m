@@ -262,7 +262,7 @@ return
 
 function [visaerosolcols,niraerosolcols] = starchannelsatANET(t)
 % anet_wl = [440, 673, 873, 1022]; 
-anet_wl = [440, 673, 873, 995.5]; % substituting longest VIS spectrometer wavelength 
+anet_wl = [440, 675, 870, 995.5]; % substituting longest VIS spectrometer wavelength 
 [visw, nirw]=starwavelengths(nanmean(t));
 visaerosolcols = interp1(1000.*visw, [1:length(visw)],anet_wl,'nearest');
 % visaerosolcols = interp1(1000.*visw, [1:length(visw)],anet_wl,'nearest','extrap');
