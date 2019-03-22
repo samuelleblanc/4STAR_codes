@@ -49,21 +49,38 @@ no_SSFR = ~isavar('flight_alb')||isempty(flight_alb);
 
 if in_air && ~no_SSFR
    s.sfc_alb = flight_alb;
+   flag_modis_albedo = false;
 elseif on_ground || no_SSFR
-   s.brdf = get_mcd_brdf(s.Lat,s.Lon,s.t, s.Alt);
+%     try
+        s.brdf = get_mcd_brdf(s.Lat,s.Lon,s.t, s.Alt);
+        [table_AOD,table_SZA,table_fracdiffuse]=readMODIS_MCD43_fracdiffuse_table;
+        [frac_diffuse]=tableinterpolate(table_AOD,table_SZA,table_fracdiffuse,s.tau_aero(1,400),s.sza(1));
+        albedo_sfc = calc_sfc_albedo_Schaaf(s.brdf(:,2),s.brdf(:,3),s.brdf(:,4),frac_diffuse,s.sza(1));
+        flag_modis_albedo = true;
+%     catch
+%         flag_modis_albedo = false;
+%     end
 end
 
 if ~isfield(s,'brdf')&&~isavar('flight_alb')
    % Strange that the above section provides sfc_alb in one case and brdf
    % in another.  Not sure what to provide manually.
-   disp('Could not get albedo. Need manual help.')
-   %     pause; % Fill in albedo values below, or load from an aeronet ssa file, or get from MODIS, ...
-   alb = [0.022960,0.076110,0.336650,0.329370];
-   anet_wl = [.44,.675,.87,1.02];
-   s.sfc_alb = interp1(anet_wl, alb, s.w);
-   in = ~isnan(s.sfc_alb);
-   s.sfc_alb(in) = interp1(anet_wl, alb, s.w(in),'pchip');
-   s.sfc_alb(~in) = interp1(anet_wl, alb, s.w(~in),'nearest','extrap');
+   if flag_modis_albedo
+       disp('Got MODIS albedo')
+       s.sfc_alb = interp1(s.brdf(:,1),albedo_sfc,s.w);
+       in = ~isnan(s.sfc_alb);
+       s.sfc_alb(in) = interp1(s.brdf(:,1), albedo_sfc, s.w(in),'pchip');
+       s.sfc_alb(~in) = interp1(s.brdf(:,1), albedo_sfc, s.w(~in),'nearest','extrap');
+   else
+       disp('Could not get albedo. Need manual help.')
+       %     pause; % Fill in albedo values below, or load from an aeronet ssa file, or get from MODIS, ...
+       alb = [0.022960,0.076110,0.336650,0.329370];
+       anet_wl = [.44,.675,.87,1.02];
+       s.sfc_alb = interp1(anet_wl, alb, s.w);
+       in = ~isnan(s.sfc_alb);
+       s.sfc_alb(in) = interp1(anet_wl, alb, s.w(in),'pchip');
+       s.sfc_alb(~in) = interp1(anet_wl, alb, s.w(~in),'nearest','extrap');
+   end
    
 end
 
