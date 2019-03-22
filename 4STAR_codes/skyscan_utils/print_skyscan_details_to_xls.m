@@ -25,7 +25,7 @@ function [xls_fname] = print_skyscan_details_to_xls(s,xls_fname)
 
 version_set('v1.0')
 
-if ~isfile(xls_fname)
+if ~isafile(xls_fname)
     Title_line = {'Date','flight','filenumber','Start Time','End Time','Lat Start','Lat End','Lon Start','Lon End','Alt Start [m]','Alt End [m]','Skyscan type','Lowest Scat. angle [deg]','Highest Scat. angle [deg]','Notes'};
     xlswrite(xls_fname,Title_line,1,'A1');
 end
