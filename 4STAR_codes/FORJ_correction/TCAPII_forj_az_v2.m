@@ -79,7 +79,7 @@ mean_spec = mean(vis_spec(good&lights,:));
 %   xlim([300,800]);
 %%
 
-% v(:,1) = (pix>300)&(pix<343);
+v(:,1) = (pix>310)&(pix<320);
 % v(:,2) = (pix>=343)&(pix<392);
 % v(:,3) = (pix>=392)&(pix<540);
 % v(:,4) = (pix>=540)&(pix<625);
@@ -98,7 +98,7 @@ tots_v(:,9) = sum(vis_spec(:,v(:,9)),2); % sum of pixels in zone 9 vs time
 % tots_v(:,4) = sum(vis_spec(:,v(:,4)),2);
 % tots_v(:,3) = sum(vis_spec(:,v(:,3)),2);
 % tots_v(:,2) = sum(vis_spec(:,v(:,2)),2);
-% tots_v(:,1) = sum(vis_spec(:,v(:,1)),2);
+tots_v(:,1) = sum(vis_spec(:,v(:,1)),2);
 
 %%
 
@@ -217,17 +217,23 @@ forj_vis_out.meas(1).fstem = fstem;
 forj_vis_out.meas(1).time = forj_vis.time([1 end]);
 forj_vis_out.meas(1).Az_deg_CW = mod(forj_vis.t.Az_deg(good&lights&CW),360);
 forj_vis_out.meas(1).corr_CW = 1./(tots_v(good&lights&CW,9)./(ones([sum(good&lights&CW),1])*mean_tots_v_CW(9)));
+forj_vis_out.meas(1).corr_CW_shortwl = 1./(tots_v(good&lights&CW,1)./(ones([sum(good&lights&CW),1])*mean_tots_v_CW(1)));
 forj_vis_out.meas(1).Az_deg_CCW = mod(forj_vis.t.Az_deg((good&lights)&CCW),360);
 forj_vis_out.meas(1).corr_CCW = 1./(tots_v(good&lights&CCW,9)./(ones([sum(good&lights&CCW),1])*mean_tots_v_CCW(9)));
+forj_vis_out.meas(1).corr_CCW_shortwl = 1./(tots_v(good&lights&CCW,1)./(ones([sum(good&lights&CCW),1])*mean_tots_v_CCW(1)));
 forj_vis_out.Az_deg = [0:360];
 degs = forj_vis_out.Az_deg;
 for d = length(degs):-1:1
     d_ = forj_vis_out.meas.Az_deg_CW>=degs(d)&forj_vis_out.meas.Az_deg_CW<(degs(d)+1);
     forj_vis_out.corr_cw(d) = mean(forj_vis_out.meas.corr_CW(d_));
     forj_vis_out.corr_cw_std(d) = std(forj_vis_out.meas.corr_CW(d_));
+    forj_vis_out.corr_cw_shortwl(d) = mean(forj_vis_out.meas.corr_CW_shortwl(d_));
+    forj_vis_out.corr_cw_std_shortwl(d) = std(forj_vis_out.meas.corr_CW_shortwl(d_));
     d_ = forj_vis_out.meas.Az_deg_CCW>=degs(d)&forj_vis_out.meas.Az_deg_CCW<(degs(d)+1);    
     forj_vis_out.corr_ccw(d) = mean(forj_vis_out.meas.corr_CCW(d_));
     forj_vis_out.corr_ccw_std(d) = std(forj_vis_out.meas.corr_CCW(d_));
+    forj_vis_out.corr_ccw_shortwl(d) = mean(forj_vis_out.meas.corr_CCW_shortwl(d_));
+    forj_vis_out.corr_ccw_std_shortwl(d) = std(forj_vis_out.meas.corr_CCW_shortwl(d_));
 end 
 ends = [1 length(degs)];
 flds = fieldnames(forj_vis_out);
@@ -258,7 +264,7 @@ ax(1) = subplot(2,1,1);
 plot(forj_vis_out.Az_deg, forj_vis_out.corr_cw,'b-',forj_vis_out.Az_deg, forj_vis_out.corr_ccw,'r-',  forj_vis_out.Az_deg, forj_vis_out.corr,'k-');
 legend('CW','CCW','mean','location','southwest');
 title({'FORJ correction factor vs Azimuth axis: ';forj_vis.fname},'interp','none')
-ylabel('correction')
+ylabel('correction at 590 - 622 nm')
 
 ax(2) = subplot(2,1,2);
 plot(forj_vis_out.Az_deg, forj_vis_out.abs_diff,'xr-',forj_vis_out.Az_deg, forj_vis_out.corr_std,'-k');    
@@ -266,13 +272,39 @@ lg = legend('abs_diff','std_dev','location','northwest');set(lg,'interp','none')
 xlabel('Az degrees (zero is toward nose)');
 linkaxes(ax,'x');
 xlim([0,360]);
-%%
 
 %%
 [pname, fstem,ext] = fileparts(forj_vis.fname);
 saveas(gcf,[plot_dir,fstem,'.png']);
 saveas(gcf,[plot_dir,fstem,'.fig']);
 forj_fig_path = [plot_dir,fstem,'.png'];
+
+%% Redo plot for short wavelengths
+figure; 
+set(gcf,'position',[460    34   809   618]);
+ax(1) = subplot(2,1,1);
+forj_vis_out.corr_shortwl = (forj_vis_out.corr_cw_shortwl + forj_vis_out.corr_ccw_shortwl)./2 ;
+plot(forj_vis_out.Az_deg, forj_vis_out.corr_cw_shortwl,'b-',forj_vis_out.Az_deg, forj_vis_out.corr_ccw_shortwl,'r-',  forj_vis_out.Az_deg, forj_vis_out.corr_shortwl,'k-');
+legend('CW','CCW','mean','location','southwest');
+title({'FORJ short Wavelength correction factor vs Azimuth axis: ';forj_vis.fname},'interp','none')
+ylabel('correction at 422 - 430 nm')
+
+ax(2) = subplot(2,1,2);
+plot(forj_vis_out.Az_deg, forj_vis_out.abs_diff,'xr-',forj_vis_out.Az_deg, forj_vis_out.corr_std,'-k');    
+lg = legend('abs_diff','std_dev','location','northwest');set(lg,'interp','none');
+xlabel('Az degrees (zero is toward nose)');
+linkaxes(ax,'x');
+xlim([0,360]);
+
+[pname, fstem,ext] = fileparts(forj_vis.fname);
+saveas(gcf,[plot_dir,fstem,'_shortwl','.png']);
+saveas(gcf,[plot_dir,fstem,'_shortwl','.fig']);
+
+rmfield(forj_vis_out,'corr_cw_shortwl');
+rmfield(forj_vis_out,'corr_ccw_shortwl');
+rmfield(forj_vis_out,'corr_shortwl');
+%forj_fig_path = [plot_dir,fstem,'.png'];
+
 %Sort and Bin the existing measurements in 1 degree increments
 %%
 else

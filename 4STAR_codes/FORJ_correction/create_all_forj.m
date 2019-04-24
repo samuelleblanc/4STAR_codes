@@ -17,7 +17,7 @@ vis = getfullname('*_VIS_FORJ*.dat','Select Forj Az dat file.');
 nir = getfullname('*_NIR_FORJ*.dat','Select Forj Az dat file.');
 
 if ~exist('create_ppt','var')||isempty(dialog)
-    create_ppt = false;
+    create_ppt = true;
 end
 
 if create_ppt
