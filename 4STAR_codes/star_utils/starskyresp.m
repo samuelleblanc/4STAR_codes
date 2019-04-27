@@ -137,9 +137,16 @@ if isnumeric(t); % time of the measurement is given; return the response of the 
     elseif t >= datenum([2017 06 20 0 0 0]) && t< datenum([2017 08 27 0 0 0]);
         daystr = '20170620';
         filesuffix = 'from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS';
-    elseif t >= datenum([2017 08 27 0 0 0]) ;
+    elseif t >= datenum([2017 08 27 0 0 0]) && t< datenum([2017 12 10 0 0 0]);
+        % for ORACLES 2017 only ** to be updated
+        disp('Using bad sky barrel response function. Please update.')
         daystr = '20171102';
         filesuffix = 'from_4STAR_20171102_005_VIS_ZEN_with_20160121125700HISS';
+    elseif t >= datenum([2017 12 10 0 0 0]);
+        % for COSR and ORACLES 2018 - using updated radiance values from
+        % the spectralon panel tests
+        daystr = '20180210';
+        filesuffix = 'from_4STAR_Spectralon_panel_203709_with_4STAR_20180210_002';
     end;  
 else % special collections 
     % cjf: need to generate radiance cals from March data to be used at MLO
