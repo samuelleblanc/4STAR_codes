@@ -35,12 +35,14 @@ function [vis_resp nir_resp]=compare_resp_skycal();
 %                  - cahnged labels for pre and post
 % Modified (v1.2): by Samuel LeBlanc, Santa Cruz, 2017-11-13
 %                  - added values for ORACLES 2017
+% Modified (v1.3): by Samuel LeBlanc, Santa Cruz, 2019-04-26
+%                  - added values from ORACLES 2018, with Spectralon panel
 % -------------------------------------------------------------------------
 
 %% Start of function
-version_set('1.2');
-toggle.campaign = 'ORACLES_2017';
-folder='C:\Users\sleblan2\Research\4STAR\cal\';
+version_set('1.3');
+toggle.campaign = 'ORACLES_2018';
+folder=getnamedpath('starcal'); %'C:\Users\sleblan2\Research\4STAR\cal\';
 
 spm='VIS';
 switch toggle.campaign
@@ -56,6 +58,10 @@ switch toggle.campaign
         disp('Doing ORACLES_2017 campaign')
         file1=['20170620_CalLab\4STAR\20170620_VIS_SKY_Resp_from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS.dat'];
         file2=['4STAR_20171102_callab\20171102_VIS_SKY_Resp_from_4STAR_20171102_005_VIS_ZEN_with_20160121125700HISS.dat'];
+    case {'ORACLES_2018'}
+        disp('disp ORACLES_2018 campaign')
+        file1=['20170620_CalLab\4STAR\20170620_VIS_SKY_Resp_from_4STAR_20170620_009_VIS_ZEN_with_20160121125700HISS.dat'];
+        file2=['20180210_VIS_SKY_Resp_from_4STAR_Spectralon_panel_203709_with_4STAR_20180210_002.dat'];
     otherwise
         disp(['No definitions for campaign :' toggle.campaign])
         error('No files defined for this campaign') 
@@ -71,7 +77,7 @@ file2=strrep(file2,'VIS','NIR');%['20131120\2013_11_20.4STAR.NASA_Ames.Flynn\201
 [b_nir delimb headb]=importdata([folder file2]);
 
 %a format: Pix, Wavelength, resp, rate, rad
-
+%% Plotting
 %now set up the plotting to compare response functions
 disp('Plotting');
 figure(1);
