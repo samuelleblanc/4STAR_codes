@@ -12,9 +12,10 @@ else
 end
 
 s.ground=[datenum(2018,02,10,16,23,46) datenum(2018,2,10,22,55,04)]; 
-s.langley1 = [datenum(2018,02,10,17,11,00) datenum(2018,02,10,20,15,00)];
+%s.langley1 = [datenum(2018,02,10,17,11,00) datenum(2018,02,10,20,15,00)];
+s.langley1 = [datenum(2018,02,10,17,46,08) datenum(2018,02,10,19,15,00)]; %For airmass factor starting near 5, for whorter wavelengths
 s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-s.xtra_langleyfilesuffix = '_MLOFeb2018_day6';
+s.xtra_langleyfilesuffix = '_MLOFeb2018_day6_shortwvl';
 s.calreflector_time = [datenum(2018,2,10,20,37,0),datenum(2018,2,10,21,30,0)];
 
 % Ozone and other gases 

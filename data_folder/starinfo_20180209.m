@@ -13,9 +13,10 @@ end
 
  
 s.ground=[datenum(2018,02,9,16,23,46) datenum(2018,2,9,24,30,04)]; 
-s.langley1 = [datenum(2018,02,09,17,11,00) datenum(2018,02,09,20,30,00)];
+%s.langley1 = [datenum(2018,02,09,17,11,00) datenum(2018,02,09,20,30,00)];
+s.langley1 = [datenum(2018,02,09,17,46,00) datenum(2018,02,09,20,30,00)]; % For short airmass factor range for short wvl
 s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
-s.xtra_langleyfilesuffix = '_MLOFeb2018_day5';
+s.xtra_langleyfilesuffix = '_MLOFeb2018_day5_shortwvl';
 
 % Ozone and other gases 
 s.O3h=21; %  
