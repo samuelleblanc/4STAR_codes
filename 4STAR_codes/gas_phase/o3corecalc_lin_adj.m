@@ -21,12 +21,17 @@ tau_o3o4h2o_subtract = tau_OD;
 sc=[];
 sc_residual = [];
 o3_DU = [];
-if s.toggle.verbose
+%if s.toggle.verbose
        %options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-12,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
-        options = optimset('Algorithm','interior-point','LargeScale','off','TolFun',1e-4,'Display','notify-detailed','TolX',1e-4,'MaxFunEvals',1000);
+%        options = optimset('Algorithm','interior-point','LargeScale','off','TolFun',1e-4,'Display','notify-detailed','TolX',1e-4,'MaxFunEvals',1000);
         %options = optimset('Algorithm','levenberg-marquardt');
-else
+%else
    options = optimset('Algorithm','interior-point','LargeScale','off','TolFun',1e-4,'Display','off','TolX',1e-4,'MaxFunEvals',1000);
+%end
+
+if s.toggle.verbose
+    disp('Starting O3 Retrieval loop')
+    upd = textprogressbar(length(s.t));
 end
 for i = 1:length(s.t)
     
@@ -161,7 +166,7 @@ for i = 1:length(s.t)
                o3_DU = [o3_DU;NaN];
            
        end
-       
+       if s.toggle.verbose; upd(i); end;
 end
 
 %% save variables

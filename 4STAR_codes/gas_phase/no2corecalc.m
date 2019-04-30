@@ -18,6 +18,11 @@ sc=[];
 sc_residual = [];
 no2_DU = [];
 
+if starsun.toggle.verbose;
+    disp('Starting NO2 retrieval loop')
+    upd = textprogressbar(length(starsun.t));
+end
+
 for i = 1:length(starsun.t)
            
     %x0 = [0.3 1 0.3 0.05 -0.1 0.5]; % this is initial guess (-2 for 6th element -0.1 for 7th element)
@@ -33,7 +38,7 @@ for i = 1:length(starsun.t)
     PAR  = [no2coef(wln)/1000 o4coef(wln)*100000 o3coef(wln)];
        % Set Options
        
-       options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-12,'MaxFunEvals',1000);%optimset('Algorithm','sqp','TolFun',1e-12);%optimset('MaxIter', 400);
+       options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','off','TolX',1e-12,'MaxFunEvals',1000);%optimset('Algorithm','sqp','TolFun',1e-12);%optimset('MaxIter', 400);
        
        
        % bounds
@@ -145,7 +150,7 @@ for i = 1:length(starsun.t)
                     tau_aero_subtract(i,wln) = NaN(1,length(wln));
                end
        end
-       
+       if starsun.toggle.verbose; upd(i); end;
 end
 
 
