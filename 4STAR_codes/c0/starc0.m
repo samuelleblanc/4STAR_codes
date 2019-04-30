@@ -53,9 +53,30 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
-                if t>=datenum([2018 9 21 0 0 0])
-                    daystr = '20181005';
-                    filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                if t>=datenum([2018 9 21 0 0 0]) & t < datenum(2018,10,2,24,0,0) 
+                    % for the first part of ORACLES 2018. Very similar to
+                    % in-field, with added high alt, and short airmass Feb
+                    % MLO. Change of low wvls to take care of 420 nm 'feature'
+                    daystr = '20180921'; %20180921_VIS_C0_refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short.dat
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short';
+                    %previous in field archival (R0)
+                    %mostly good, too low in NIR, and too high in mid AOD,
+                    %not high enough in short wvl
+                    %daystr = '20181005'; 
+                    %filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                elseif t>=datenum(2018,10,3,0,0,0) & t<datenum(2018,10,4,0,0,0) 
+                    % Same as previous at longer wavl than 454 nm
+                    % Change special for this flight for 420 nm feature,
+                    % using high alt AERONET comparison to Misamfu
+                    daystr = '20181003';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withshort_highalt_only';
+                elseif t>datenum(2018,10,5,0,0,0) & t< datenum(2018,10,6,0,0,0)
+                    % Special case in between 
+                elseif t>=datenum(2018,10,4,0,0,0) % Default for any future times.
+                    % Same as 1005, but with averaging of high altitude
+                    % AERONET spectra for shrot wavelengths and short airmass range MLO
+                    daystr = '20181015';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short';
                 elseif t>=datenum([2018 9 20 0 0 0]) %From transit
                      daystr = '20180922';
                      filesuffix = 'refined_averaged_4STAR_MLO_inflight';
