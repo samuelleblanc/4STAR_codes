@@ -4,28 +4,51 @@ clear all
 fp = getnamedpath('starinfo'); %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 fp_out = getnamedpath('ORACLES_plot');
 asktosave = 1; %set if ask to save the figures
-i_avg = [1,4,5,6];
-filesuffix = ['refined_averaged_4STAR_MLO_inflight_withFebMLO'];
+i_avg = [4,5,6,7,8,9,10];
+filesuffix = ['refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short'];
+label_daystr = '20181015';
+i_avg_short = [4,5,6,7,9,10];
+%filesuffix = ['refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short'];
+%label_daystr = '20180921';
+%i_avg_short = [4,5,7,8];
+%filesuffix = ['refined_averaged_4STAR_MLO_inflight_highalt_withshort_highalt_only'];
+%label_daystr = '20181003';
+%i_avg_short = [11,11];
+filesuffix = ['refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial'];
 label_daystr = '20181005';
+i_avg_short = [4,6,7,8,10,11];
+filesuffix = ['refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial'];
+label_daystr = '20181007';
+i_avg_short = [6,7,9,11];
 short_wvl_special_avg = true;
-i_avg_short = [1,4,5,6];
 
 vis_names = {'20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018.dat';...
             '20170605_VIS_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20180811_VIS_C0_refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12.dat';
             '20180921_4STAR_VIS_C0_refined_flight_langley_am.dat';...
             '20180922_VIS_C0_4STAR_refined_flight_langley_am.dat';...
-            '20181005_VIS_C0_4STAR_refined_flight_langley_am.dat'};
+            '20181005_VIS_C0_4STAR_refined_flight_langley_am.dat';...
+            '20180212_VIS_C0_4STAR_refined_averaged_MLO_Feb2018_shortwvl.dat';...
+            '20180921_VIS_C0_refined_high_alt_low_m_frompolyfit_RaggedPoint.dat';...
+            '20181007_VIS_C0_refined_high_alt_low_m_frompolyfit_ElFarafa.dat';...
+            '20181015_VIS_C0_refined_high_alt_low_m_frompolyfit_ElFarafa.dat';...
+            '20181003_VIS_C0_refined_high_alt_low_m_frompolyfit_Misamfu.dat'};
         
 nir_names = {'20180212_NIR_C0_4STAR_refined_averaged_MLO_Feb2018.dat';...
             '20170605_NIR_C0_refined_Langley_MLO_May2017_averages.dat';...
             '20180811_NIR_C0_refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12.dat';
             '20180921_4STAR_NIR_C0_refined_flight_langley_am.dat';...
             '20180922_NIR_C0_4STAR_refined_flight_langley_am.dat';...
-            '20181005_NIR_C0_4STAR_refined_flight_langley_am.dat'};
+            '20181005_NIR_C0_4STAR_refined_flight_langley_am.dat';...
+            '20180212_NIR_C0_4STAR_refined_averaged_MLO_Feb2018_shortwvl.dat';...
+            '20180921_NIR_C0_refined_high_alt_low_m_frompolyfit_RaggedPoint.dat';...
+            '20181007_NIR_C0_refined_high_alt_low_m_frompolyfit_ElFarafa.dat';...
+            '20181015_NIR_C0_refined_high_alt_low_m_frompolyfit_ElFarafa.dat';...
+            '20181003_NIR_C0_refined_high_alt_low_m_frompolyfit_Misamfu.dat'};
          
-supp = {'MLO feb 2018';'MLO jun 2017';...%'MLO';'MLO';'MLO';'MLO';
-        'MLO aug 2018';'In flight';'In flight';'In flight'};
+supp = {'1 MLO feb 2018';'2 MLO jun 2017';...%'MLO';'MLO';'MLO';'MLO';
+        '3 MLO aug 2018';'4 In flight';'5 In flight';'6 In flight';...
+        '7 MLO feb 2018 short';'8 High alt';'9 High alt';'10 High alt';'11 High alt'};
     
 n = length(vis_names);
 c0v = {}; c0rv = {}; c0n = {}; corn = {}; leg = {};
@@ -115,12 +138,12 @@ nirc0_avg = mean(nirc0(i_avg,:));
 nirc0_std = std(nirc0(i_avg,:));
 
 if short_wvl_special_avg;
-    iw_short = (1:340);
+    iw_short = (1:350);
     visc0_avg(iw_short) = mean(visc0(i_avg_short,iw_short));
     visc0_std(iw_short) = std(visc0(i_avg_short,iw_short));
 end;
 
-gdaystr = vis_names{i_avg(end)}(1:8);
+gdaystr = label_daystr; %vis_names{i_avg(end)}(1:8);
 
 figure(fig2);
 l2 = plot(w_vis,visc0_avg./visc0(1,:).*100.0,'color','black');

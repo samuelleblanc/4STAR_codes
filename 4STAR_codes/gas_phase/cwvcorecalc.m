@@ -465,10 +465,14 @@ end
 if cwvoptfit;
 swv_opt=[];
 wv_residual = [];
-if s.toggle.verbose
-   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
-else
+%if s.toggle.verbose
+%   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%else
    options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-12,'Display','off','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%end
+if s.toggle.verbose
+    disp('Starting CWV retrieval loop...')
+    upd = textprogressbar(length(s.t),'updatestep',50);
 end
 for i = 1:length(s.t)
  % choose right altitude coef
@@ -695,7 +699,7 @@ for i = 1:length(s.t)
 %         axis([min(starsun.UTHh) max(starsun.UTHh) -0.0005 0.0005]);
 %         plot(starsun.UTHh,zeros(length(starsun.UTHh),1),'-m');hold off;
 %     end
-    
+if s.toggle.verbose; upd(i); end;    
 end % end of loop over all data points for wv retrieval
    cwv_opt = (swv_opt(:,1)/H2O_conv)./s.m_H2O;% retrieval is made on slant./starsun.m_H2O;  %conversion from slant path to vertical
    if wrange==4

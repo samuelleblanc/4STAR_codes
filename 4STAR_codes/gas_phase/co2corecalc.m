@@ -11,10 +11,15 @@ tau_co2ch4_subtract = tau_OD;
 
 sc=[];
 sc_residual = [];
-if starsun.toggle.verbose
-   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
-else
+%if starsun.toggle.verbose
+%   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%else
    options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','off','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
+%end
+
+if starsun.toggle.verbose
+    disp('Starting CO2 retrieval loop...')
+    upd = textprogressbar(length(starsun.t),'updatestep',50);
 end
 
 for i = 1:length(starsun.t)
@@ -83,7 +88,7 @@ for i = 1:length(starsun.t)
                sc_residual = [sc_residual;NaN];
            
        end
-       
+       if starsun.toggle.verbose; upd(i); end;   
 end
 
 %% correct spectrum to subtract

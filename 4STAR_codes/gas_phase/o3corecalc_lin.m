@@ -17,6 +17,11 @@ sc=[];
 sc_residual = [];
 o3_DU = [];
 
+if s.toggle.verbose
+    disp('Starting O3 retrieval loop...')
+    upd = textprogressbar(length(s.t));
+end
+
 for i = 1:length(s.t)
     
     % 3nd order initial guess:o3-300h2o-5000;o4-10000      
@@ -122,7 +127,7 @@ for i = 1:length(s.t)
                o3_DU = [o3_DU;NaN];
            
        end
-       
+       if s.toggle.verbose; udp(i); end;
 end
 
 %% save variables

@@ -15,6 +15,7 @@ end
 %s.langley1 = [datenum(2018,9,22,17,01,00) datenum(2018,9,22,19,10,00)]; %put in if condition below if different for different 4STARs
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
+s.high_alt_c0 = [datenum(2018,10,3,9,20,0) datenum(2018,10,3,9,25,0)];
 
 s.dirty = [datenum(2018,10,4,9,7,0) datenum(2018,10,4,9,25,0)];
 s.clean = [datenum(2018,10,4,9,33,3) datenum(2018,10,4,9,44,45)];

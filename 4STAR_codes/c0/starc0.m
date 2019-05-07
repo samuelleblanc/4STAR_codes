@@ -30,10 +30,11 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v2.1, 2018-09-14, updated c0 from MLO 20180812 (tentative) for ORCLES 3 
 % MS, v2.1, 2018-09-14, updated mean c0 from MLO Aug-2018 for ORACLES 3
 % MS, v2.1, 2018-09-20, updated suffix of starc0 for 4STAR for ORACLES 3
+% SL, v2.2, 2019-04-30, Updated c0s for the Final ORACLES 2018 data. Multiple c0s used for changing behavior at 420nm, wavelenghts longer than 454 nm unchanged.
 
 % defined via instrumentname variable, defaults to 4STAR
 
-version_set('2.1');
+version_set('2.2');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -53,15 +54,55 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
-                if t>=datenum([2018 9 21 0 0 0])
-                    daystr = '20181005';
-                    filesuffix = 'refined_averaged_4STAR_MLO_inflight';
-                elseif t>=datenum([2018 9 20 0 0 0]) %From transit
+                if t>=datenum([2018 9 19 0 0 0]) & t<datenum(2018,9,21,0,0,0) %From transit
                      daystr = '20180922';
                      filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                elseif t>=datenum([2018 9 21 0 0 0]) & t < datenum(2018,10,2,24,0,0) 
+                    % for the first part of ORACLES 2018. Very similar to
+                    % in-field, with added high alt, and short airmass Feb
+                    % MLO. Change of low wvls to take care of 420 nm 'feature'
+                    daystr = '20180921'; %20180921_VIS_C0_refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short.dat
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short';
+                    %previous in field archival (R0)
+                    %mostly good, too low in NIR, and too high in mid AOD,
+                    %not high enough in short wvl
+                    %daystr = '20181005'; 
+                    %filesuffix = 'refined_averaged_4STAR_MLO_inflight';
+                elseif t>=datenum(2018,10,3,0,0,0) & t<datenum(2018,10,4,0,0,0) 
+                    % Same as previous at longer wavl than 454 nm
+                    % Change special for this flight for 420 nm feature,
+                    % using high alt AERONET comparison to Misamfu
+                    daystr = '20181003';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withshort_highalt_only';
+                elseif t>datenum(2018,10,5,0,0,0) & t< datenum(2018,10,6,0,0,0)
+                    % Special case in between 
+                    daystr = '20181005';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial';
+                elseif t>=datenum(2018,10,19,0,0,0) & t<datenum(2018,10,20,0,0,0)
+                    % special case with same longer wavelengths, but
+                    % variation on 1015 day for higher c0 at 400-450 nm. 
+                    daystr = '20181005';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial';
+                elseif t>=datenum(2018,10,12,0,0,0) & t<datenum(2018,10,13,0,0,0)
+                    % special case with same longer wavelengths, but
+                    % variation on 1015 day for higher c0 at 400-450 nm. closer to values seen on 1003 
+                    daystr = '20181007'; %20181007_VIS_C0_refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial';
+                elseif t>=datenum(2018,10,17,0,0,0) & t<datenum(2018,10,18,0,0,0)
+                    % special case with same longer wavelengths, but
+                    % variation on 1015 day for higher c0 at 400-450 nm. closer to values seen on 1003 
+                    daystr = '20181007'; %20181007_VIS_C0_refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_with_shortspecial';
+                elseif t>=datenum(2018,10,4,0,0,0) % Default for any future times.
+                    % Same as 1005, but with averaging of high altitude
+                    % AERONET spectra for shrot wavelengths and short airmass range MLO
+                    daystr = '20181015';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short';
                 else
-                     daystr = '20180811';
-                     filesuffix = 'refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12';
+                    daystr = '20180921';
+                    filesuffix = 'refined_averaged_4STAR_MLO_inflight_highalt_withFebMLO_short';
+                     %daystr = '20180811';
+                     %filesuffix = 'refined_Langley_4STAR_averaged_with_MLO_2018_Aug_11_12';
                 end
             elseif t>=datenum([2018 1 1 0 0 0]); %for COSR 2018 and on
                  %daystr = '20180209';
