@@ -81,7 +81,7 @@ rate_dir_mean = mean(rate_dir);
 % get the solar angles during reflector panel measurements. 
 disp('Assuming Panel is placed vertically')
 incident_angle = mean(90.0-s.sza(ii));
-viewing_angle = incident_angle.*-1.0;
+viewing_angle = incident_angle;
 R = spectralon_brdf(incident_angle,viewing_angle);
 phi_spectralon = 0.9949; % reflectivity of spectralon should be slightly spectrally dependent
 
@@ -94,6 +94,8 @@ view_solid_angle = 0.001378; %For a conic FOv of the sky-barrel of 2.4 deg wide.
 view_solid_angle = 0.001589; % Update of the FOV for sky-barrel at 2.8 deg wide.
 
 Irr_to_rad_conversion_factor = R.*phi_spectralon.*view_solid_angle./pi./2.0; % for converting the direct sun irradiance on panel to radiance 
+Irr_to_rad_conversion_factor = R.*phi_spectralon./pi;
+
 
 %% plot out the values
 figure;
@@ -232,7 +234,7 @@ sun_irr = rate_dir_mean .* sunresp; % W/m^2/nm
 
 %% Calculate the absolute radiance measured
 sun_rad = sun_irr.*Irr_to_rad_conversion_factor; % W/m^2/nm/sr
-resp = rate_directrefl./sun_rad./1000000.0; %counts/ms / (W/m^2/nm/sr)
+resp = rate_directrefl./sun_rad./1000.0 ;%000.0; %counts/ms / (W/m^2/nm/sr)
 
 %% Plot out and print the responses and calibrated values
 figure; 
