@@ -15,6 +15,11 @@ end
 %s.langley1 = [datenum(2018,9,22,17,01,00) datenum(2018,9,22,19,10,00)]; %put in if condition below if different for different 4STARs
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
+s.dirty = [datenum(2018,10,02,16,8,29) datenum(2018,10,02,16,14,27)];
+s.clean = [datenum(2018,10,02,16,16,43) datenum(2018,10,02,16,21,18)];
+
+%Dirty window correction
+s.AODuncert_mergemark_file = '20181002_AOD_merge_marks.mat';
              
 % Ozone and other gases 
 s.O3h=21; %  

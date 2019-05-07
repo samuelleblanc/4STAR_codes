@@ -21,6 +21,10 @@ s.O3h=21; %
 s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
 s.NO2col=2.0e15; %  
 
+%Dirty window correction
+s.AODuncert_mergemark_file = '20180927_AOD_merge_marks.mat';
+
+
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
                  s.flight=[datenum(2018,9,27,7,18,28) datenum(2018,9,27,14,59,58)];

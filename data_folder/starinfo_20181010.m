@@ -21,6 +21,8 @@ s.O3h=21; %
 s.O3col=0.275; %
 s.NO2col=2.0e15; %  
 
+%Dirty window correction
+s.AODuncert_mergemark_file = '20181010_AOD_merge_marks.mat';
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 

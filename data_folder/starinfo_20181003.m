@@ -19,6 +19,9 @@ s.high_alt_c0 = [datenum(2018,10,3,9,20,0) datenum(2018,10,3,9,25,0)];
 
 s.dirty = [datenum(2018,10,4,9,7,0) datenum(2018,10,4,9,25,0)];
 s.clean = [datenum(2018,10,4,9,33,3) datenum(2018,10,4,9,44,45)];
+
+%Dirty window correction
+s.AODuncert_mergemark_file = '20181003_AOD_merge_marks.mat';
              
 % Ozone and other gases 
 s.O3h=21; %  

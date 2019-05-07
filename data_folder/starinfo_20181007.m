@@ -22,6 +22,8 @@ s.O3h=21; %
 s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
 s.NO2col=2.0e15; %  
 
+%Dirty window correction
+s.AODuncert_mergemark_file = '20181007_AOD_merge_marks.mat';
 s.dirty = [datenum(2018,10,07,15,40,0) datenum(2018,10,07,15,47,0)];
 s.clean = [datenum(2018,10,07,15,48,00) datenum(2018,10,07,15,51,0)];
 
