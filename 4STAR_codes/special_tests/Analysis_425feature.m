@@ -104,8 +104,8 @@ ylabel('delta move')
 xlabel('UTC Time')
 linkaxes([ax1,ax2,ax3],'x')
 
-fig_paths = [getnamedpath('starfig') s.instrumentname '_' s.daystr '_425feature.png'];
-save_fig(figt,fig_paths,1)
+fig_paths = [getnamedpath('starfig') s.instrumentname '_' s.daystr '_425feature'];
+save_fig(figt,fig_paths,false)
 
 s.dtau425 = dtau425;
 s.dtau400 = dtau400;
