@@ -54,17 +54,18 @@
 % 2018-04-18, SL,v5.0, Added new values to archive, 
 %                      with acaod flags, polynomials, and angstrom exponent
 % 2018-09-28, SL,v6.0, Ported to 2018
+% 2019-05-07, SL,v6.1, Added the Apply_window_correction algorithm to the makearchive
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_2018_AOD
-version_set('v6.0')
+version_set('v6.1')
 %% set variables
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = getnamedpath('ORACLES2018_starsun')
 ICTdir = getnamedpath('ORACLES2018_aod_ict')
 
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='1'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
 gas_subtract = false;
 avg_wvl = true;
@@ -96,14 +97,14 @@ NormalComments = {...
     'LLOD_VALUE: N/A';...
     'DM_CONTACT_INFO: Samuel LeBlanc, samuel.leblanc@nasa.gov';...
     'PROJECT_INFO: ORACLES 2018 deployment; September-October 2018; Based out of Sao Tome';...
-    'STIPULATIONS_ON_USE: This is in-field archival. Must consult PI before using';...
+    'STIPULATIONS_ON_USE: This is the initial public release of the 4STAR-AOD ORACLES-2018 data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
     'OTHER_COMMENTS: N/A';...
     };
 
 revComments = {...
     %'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
     %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
-    %'R1: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new Angstrom exponent calculations, polynomial fit, and the flag for measurements of Above cloud AOD.';...
+    'R1: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added flag for measurements of Above cloud AOD.';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
@@ -129,20 +130,20 @@ save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,66
 iwvls_angs = [4,16];
 [v,n] = starwavelengths; wvl = [v,n].*1000.0;
 
-for i=1:length(save_wvls);
+for i=1:length(save_wvls)
     namestr = sprintf('AOD%04.0f',save_wvls(i));
-    if avg_wvl;
+    if avg_wvl
         [nul,iw] = min(abs(wvl-save_wvls(i)));
         info.(namestr) = sprintf(['unitless, Aerosol optical depth averaged over 3 wavelength pixels from %4.1f nm to %4.1f nm centered at %4.1f nm'],wvl(iw-1),wvl(iw+1),save_wvls(i));
-    else;
+    else
         info.(namestr) = sprintf(['unitless, Aerosol optical depth at %4.1f nm'],save_wvls(i));
-    end;
-end;
+    end
+end
 
-for i=1:length(save_wvls);
+for i=1:length(save_wvls)
     uncnamestr = sprintf('UNCAOD%04.0f',save_wvls(i));
     info.(uncnamestr) = sprintf('unitless, Uncertainty in aerosol optical depth at %4.1f nm',save_wvls(i));
-end;
+end
 
 %set the format of each field
 form = info;
@@ -160,7 +161,7 @@ originfo = info; origform = form; orignames = names;
 dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007' '20181010' '20181012' '20181015' '20181017' '20181019' '20181021' '20181023' '20181025' '20181026' '20181027'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-jproc=[         1          1          0          0          0           0         0          0          0          0          0          0          0          0          0          0          0          0          0] ;
+jproc=[         0          0          1          1          1           1         1          1          1          1          1          1          1          1          1          1          1          1          1] ;
 %jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
 %jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
@@ -207,30 +208,30 @@ for i=idx_file_proc
     starfile = fullfile(starsun_path, ['4STAR_' daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     load(starfile, 't','tau_aero_noscreening','w','Lat','Lon','Alt','m_aero','note');
-    try;
+    try
         load(starfile,'tau_aero_subtract_all');
         tau = tau_aero_subtract_all;
-    catch;
+    catch
         disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
         tau = tau_aero_noscreening;
-    end;
-    if gas_subtract;
-        try;
+    end
+    if gas_subtract
+        try
             load(starfile,'tau_aero_subtract_all');
             tau = tau_aero_subtract_all;
-        catch;
+        catch
             disp('*** tau_aero_subtract_all not available, reverting to tau_aero_noscreening ***')
             tau = tau_aero_noscreening;
-        end;
-    else;
+        end
+    else
         tau = tau_aero_noscreening;
-    end;
+    end
     
-    try;
+    try
         load(starfile, 't','tau_aero_err');
-    catch;
+    catch
         error(['Problem loading the uncertainties in file:' starfile])
-    end;
+    end
     
     %% Special case processing for removing NIR aod values
      switch daystr
@@ -241,19 +242,28 @@ for i=idx_file_proc
     end
     
     %% Update the uncertainties with merge marks file saved in the starinfo
-    add_uncert = false;
-    correct_aod = false;
-    if isfield(s,'AODuncert_mergemark_file');
-        disp(['Loading the AOD uncertainty correction file: ' s.AODuncert_mergemark_file])
-        d = load(s.AODuncert_mergemark_file);
+    try 
+        load(starfile, 'is_tau_aero_window_dep_corrected');
+    catch
+        is_tau_aero_window_dep_corrected = false;
+    end
+    if ~isavar('is_tau_aero_window_dep_corrected'), is_tau_aero_window_dep_corrected = false; end
+    
+    %run the correction
+    s.deltatime_dAOD = deltatime_dAOD; 
+    s.dAOD_uncert_frac = dAOD_uncert_frac;
+    s.daystr = daystr;
+    s.instrumentname = '4STAR';
+    s.t = t;
+    s.w = w;
+    s.tau_aero = tau; s.tau_aero_noscreening = tau;
+    s.tau_aero_err = tau_aero_err;
+    s.is_tau_aero_window_dep_corrected = is_tau_aero_window_dep_corrected;
+    s = Apply_window_correction(s);
+    if s.is_tau_aero_window_dep_corrected
         specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true; correct_aod = true;
-    elseif isfield(s,'AODuncert_constant_extra');
-        disp(['Applying constant AOD factor to existing AOD'])
-        d.dAODs = repmat(s.AODuncert_constant_extra,[length(t),length(save_wvls)]);
-        specComments{end+1} = specComments_extra_uncertainty;
-        add_uncert = true; correct_aod = false;
-        d.time = t;
+        tau = s.tau_aero; 
+        tau_aero_err = s.tau_aero_err;
     end
     
     %% extract special comments about response functions from note
@@ -359,18 +369,6 @@ for i=idx_file_proc
         else;
             data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
         end;
-        if correct_aod;
-            d.dAODs(isnan(d.dAODs)) = 0.0;
-            if ~strcmp(datestr(d.time(1),'YYYYmmDD'),daystr); error('Time array in delta AOD merge mark file not the same as starsun file'), end;
-            [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-            try;
-                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-            catch;
-                [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-            end;
-        end;
         if ii ==1; aod_saved=data.(names{nn}); else aod_saved(ii,:)=data.(names{nn});end;
     end;
     
@@ -387,41 +385,6 @@ for i=idx_file_proc
         ii = nn-iradstart-length(save_wvls)+1;
         [tutc_unique,itutc_unique] = unique(tutc);
         data.(names{nn}) = interp1(tutc_unique,tau_aero_err(itutc_unique,save_iwvls(ii)),UTC,'nearest');
-        if add_uncert;  % if the add uncertainty exists then run that also.
-            if correct_aod;
-                it = find(diff(d.dCo(:,5))<-0.0001);
-                dAODs = d.dAODs.*0.0;
-                for itt=1:length(it); % add uncertainty equivalent to the daod change for a period of +/- deltatime_dAOD seconds around the effect
-                    [nul,itm] = min(abs(d.time-(d.time(it(itt))-deltatime_dAOD/86400)));
-                    [nul,itp] = min(abs(d.time-(d.time(it(itt))+deltatime_dAOD/86400)));
-                    dAODs(itm:itp,:) = repmat(d.dAODs(it(itt)+1,:)-d.dAODs(it(itt),:),itp-itm+1,1);
-                end;
-                try;
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                catch;
-                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                end;
-                try;  % add uncertainty equivalent to 20% of the correction
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*dAOD_uncert_frac,UTC,'nearest');
-                catch;
-                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii).*dAOD_uncert_frac,UTC,'nearest');
-                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                end;
-            else;
-                try;
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                catch;
-                    [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
-                    data.(names{nn}) = data.(names{nn}) + interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-                    disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
-                end;
-            end;
-        end;
-        
-        %end
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
