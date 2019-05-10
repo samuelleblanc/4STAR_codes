@@ -38,89 +38,107 @@ merge_read = true;
 close all;
 
 %% set variables and prepare for loading
-if merge_read;
+if merge_read
     [fa pa] = uigetfile2(['*.nc;*.NC;*.ncf;*.ncdf'],['Please select the merged 1 second netcdf file for loading']);
     tt = split(fa,'_'); daystr = tt{3};
 
     t_n = ncread([pa fa],'time');
     t = datenum(t_n/3600.0/24.0+datenum(1970,1,1,0,0,0));
-    try;
+    try
         alt = ncread([pa fa],'HAE_GPS_Altitude');
-    catch;
-        try;
-        alt = ncread([pa fa],'Sys_GPSAlt');
-        catch;
+    catch
+        try
+            alt = ncread([pa fa],'Sys_GPSAlt');
+        catch
             alt = ncread([pa fa],'MSL_GPS_Altitude');
-        end;
-    end;
+        end
+    end
     
-    try;
+    try
         flag_mod = ncread([pa fa],'P3_module_flags');
         flag_belowcld = flag_mod==0;
         flag_incld = flag_mod==1;
         flag_abovecld = flag_mod==2;
-    catch;
-        try;
+    catch
+        try
         cdp_conc = ncread([pa fa],'CDP_Conc');
         rh = ncread([pa fa],'RH');
         flag_belowcld = (cdp_conc<50.0) & (rh > 30.0) & (alt<1500.0);
         flag_incld = cdp_conc>50.0;
         flag_abovecld = (alt>600.0) & (alt <1600.0) & (cdp_conc<50.0);
-        catch;
+        catch
             rh = ncread([pa fa],'Relative_Humidity');
             flag_belowcld = (rh > 30.0) & (alt<1500.0);
             flag_incld = rh>75.0;
             flag_abovecld = (alt>600.0) & (alt <1600.0) & (rh<50.0);
-        end;
-    end;
-
-    aod = ncread([pa fa],'AOD');
-    aod_wl = ncread([pa fa],'AODwavelength');
-    [nul,ia] = min(abs(aod_wl-500));
-    aod500 = aod(ia,:); 
-    aod500(aod500==-9999.0) = NaN;
-    [nul,ia] = min(abs(aod_wl-1040));
-    aod1040 = aod(ia,:); 
-    aod1040(aod1040==-9999.0) = NaN;
-    qual_flag = ncread([pa fa],'qual_flag');
+        end
+    end
     
-    try;
-        try;
+    try
+        aod = ncread([pa fa],'AOD');
+        aod_wl = ncread([pa fa],'AODwavelength');
+        [nul,ia] = min(abs(aod_wl-500));
+        aod500 = aod(ia,:);
+        aod500(aod500==-9999.0) = NaN;
+        [nul,ia] = min(abs(aod_wl-1040));
+        aod1040 = aod(ia,:);
+        aod1040(aod1040==-9999.0) = NaN;
+        qual_flag = ncread([pa fa],'qual_flag');
+    catch
+        disp(['** Issue with netcdf file missing the 4STAR AODs' pa fa])
+        dd = ictread;
+        aod500a = dd.AOD0501;
+        aod1040a = dd.AOD1040;
+        qual_flaga = dd.qual_flag;
+        ta = datenum(dd.t+datenum(dd.year,1,0,0,0,0));
+        aod500 = interp1(ta,aod500a,t,'nearest');
+        aod1040 = interp1(ta,aod1040a,t,'nearest');
+        qual_flag = interp1(ta,qual_flaga,t,'nearest');
+        
+    end
+    
+    try
+        try
             cdnc = ncread([pa fa],'CDNC');
-        catch;
+        catch
             cdnc = ncread([pa fa],'PDI-CDNC_dNdlogd');
-        end;
+        end
         cdnc(cdnc==-9999)=NaN;
         cdn = sum(cdnc);
-    catch;
+    catch
         disp('No PDI for this day')
-        try; 
+        try 
             cdp_conc = ncread([pa fa],'CDP_Conc');
             cdn = cdp_conc;
             cdn(cdn==-10000)=NaN;
-        catch;
+        catch
             cdn = rh; %t.*0.0;
-        end;
-    end;
+            disp('No CDP for this day')
+        end
+    end
     
-    try;
-        try;
+    try
+        try
             scat = ncread([pa fa],'ScatTSI1_ATP');
-        catch;
-            try;
+        catch
+            try
                 scat = ncread([pa fa],'Scat550TSI1');
-            catch;
-                scat = ncread([pa fa],'Scattotal_Tot');
-            end;
-        end;
+            catch
+                try
+                    scat = ncread([pa fa],'TSI1_Scat_Tot_ATP');
+                catch
+                    scat = ncread([pa fa],'Scattotal_Tot');
+                end
+            end
+        end
         scat(scat>100000)=NaN; scat(scat<-100)=NaN;
         sca = scat(2,:);
         fl.low_scat = sca < 25.0;
-    catch;
+    catch
         disp('No scattering data')
         sca = t.*0.0;
         fl.low_scat = [];
-    end;
+    end
 
     fl.qual_flag = qual_flag>0;
     fl.acaod = flag_abovecld;

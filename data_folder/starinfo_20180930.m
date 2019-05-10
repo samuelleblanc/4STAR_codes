@@ -29,7 +29,8 @@ if isfield(s,'instrumentname')
                  
                  s.AODuncert_constant_extra = 0.01;
     %             flags
-%                   s.flagfilename     = '20180930_starflag_man_created20181002_2322by_SL.mat'; 
+                   s.flagfilename     = '20180930_starflag_man_created20181002_2322by_SL.mat'; 
+                   s.flagacaod = '20180930_flag_acaod_sleblanc_20190509_114511.mat';
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';

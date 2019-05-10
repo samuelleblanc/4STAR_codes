@@ -33,6 +33,7 @@ if isfield(s,'instrumentname')
                  s.AODuncert_constant_extra = 0.02;
     %             flags
                  s.flagfilename     = '20181019_starflag_man_created20181021_1532by_SL.mat'; 
+                 s.flagacaod = '20181019_flag_acaod_sleblanc_20190509_161534.mat';
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
