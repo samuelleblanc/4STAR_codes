@@ -330,7 +330,7 @@ mrg_out.wl_nm = wls;
 [p_out, fname] = fileparts(in_star_file);p_out = [p_out, filesep];
 ffname = extract_date_from_starname(fname);
 save([p_out,ffname,'_AOD_marks.mat'],'-struct','mark');
-save([p_out,ffname,'_AOD_merge_marks.mat'],'-struct','mrg_out');
+save([p_out,ffname,'_AOD_merge_marks_' datestr(now,'yyyymmdd_HHMMSS') '.mat'],'-struct','mrg_out');
 fig_out = strrep(p_out,'mat','fig');
 if ~exist(fig_out,'dir')
     mkdir(fig_out);
