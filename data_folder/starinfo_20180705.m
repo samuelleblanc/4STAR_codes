@@ -11,20 +11,16 @@ else
     s.toggle = update_toggle;
 end
 
-s.flight=[datenum(2018,06,18,14,54,00) datenum(2018,6,18,18,42,00)]; 
+s.flight=[datenum(2018,07,05,14,43,08) datenum(2018,7,05,19,43,22)]; 
 %s.langley1 = [datenum(2018,02,15,17,11,00) datenum(2018,02,15,20,15,00)];
 s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 %s.xtra_langleyfilesuffix = '_MLOFeb2018_day11';
 %s.calreflector_time = [datenum(2018,2,10,20,37,0),datenum(2018,2,10,21,30,0)];
-s.dirty = [datenum(2018,06,18,20,15,00) datenum(2018,6,18,20,19,00)];
-s.clean = [datenum(2018,06,18,20,55,00) datenum(2018,6,18,20,59,00)];
+s.dirty = [datenum(2018,06,24,20,32,00) datenum(2018,6,24,20,35,00)];
+s.clean = [datenum(2018,06,24,20,55,00) datenum(2018,6,24,20,58,00)];
+s.flagfilename = '20180705_starflag_man_created20190304_1221by_SL.mat';
+s.flagfilenameNO2  = '20180705_starflag_NO2_man_created20190719_1329by_SL.mat';
 
-<<<<<<< Updated upstream
-=======
-s.flagfilename = '20180618_starflag_man_created20190303_1608by_SL.mat';
-s.flagfilenameNO2 = '20180618_starflag_NO2_man_created20190719_1312by_SL.mat';
-
->>>>>>> Stashed changes
 % Ozone and other gases 
 s.O3h=21; %  
 s.O3col=0.261; % MLO obs from dobson brewer
