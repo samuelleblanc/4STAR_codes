@@ -19,6 +19,8 @@ s.sd_aero_crit=0.01;  %Connor asked to add this line on 8/2/2017
 %s.dirty = [datenum(2018,06,18,20,15,00) datenum(2018,6,18,20,19,00)];
 %s.clean = [datenum(2018,06,18,20,55,00) datenum(2018,6,18,20,59,00)];
 s.flagfilename = '20180620_starflag_man_created20190303_1855by_SL.mat';
+s.flagfilenameNO2 = '20180620_starflag_NO2_man_created20190719_1300by_SL.mat';
+
 
 % Ozone and other gases 
 s.O3h=21; %  
