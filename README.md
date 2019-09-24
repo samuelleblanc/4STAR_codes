@@ -1,5 +1,7 @@
 # 4STAR_codes
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1492912.svg)](https://doi.org/10.5281/zenodo.1492912)
+
 
 Collection of Matlab codes used for routine and special analysis of measurements from the 4STAR instrument.
 - Includes codes for combining raw 4STAR files (allstarmat)

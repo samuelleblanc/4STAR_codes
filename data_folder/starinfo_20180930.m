@@ -15,6 +15,8 @@ end
 %s.langley1 = [datenum(2018,9,22,17,01,00) datenum(2018,9,22,19,10,00)]; %put in if condition below if different for different 4STARs
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
+s.dirty = [datenum(2018,9,30,15,38,32) datenum(2018,9,30,15,52,22)];
+s.clean = [datenum(2018,9,30,15,56,05) datenum(2018,9,30,16,3,8)]
              
 % Ozone and other gases 
 s.O3h=21; %  
@@ -27,7 +29,8 @@ if isfield(s,'instrumentname')
                  
                  s.AODuncert_constant_extra = 0.01;
     %             flags
-%                   s.flagfilename     = '20180930_starflag_man_created20181002_2322by_SL.mat'; 
+                   s.flagfilename     = '20180930_starflag_man_created20181002_2322by_SL.mat'; 
+                   s.flagacaod = '20180930_flag_acaod_sleblanc_20190509_114511.mat';
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';

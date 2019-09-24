@@ -22,6 +22,8 @@ s.O3h=21; %
 s.O3col=0.275; %I think 270 DU was what  the dobson ozone was this morning?   
 s.NO2col=2.0e15; %  
 
+%Dirty window correction
+s.AODuncert_mergemark_file = '20181007_AOD_merge_marks.mat';
 s.dirty = [datenum(2018,10,07,15,40,0) datenum(2018,10,07,15,47,0)];
 s.clean = [datenum(2018,10,07,15,48,00) datenum(2018,10,07,15,51,0)];
 
@@ -32,6 +34,7 @@ if isfield(s,'instrumentname')
                  s.AODuncert_constant_extra = 0.03;
     %             flags
                  s.flagfilename     = '20181007_starflag_man_created20181009_1147by_SB.mat'; 
+                 s.flagacaod = '20181007_flag_acaod_sleblanc_20190509_152425.mat';
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
