@@ -70,6 +70,9 @@ gas_subtract = false;
 avg_wvl = true;
 deltatime_dAOD = 900.0; %time in seconds around the shift in AOD due to the window deposition
 dAOD_uncert_frac = 0.25; %fraction of the change in dAOD due to window deposition to be kept as extra uncertainty (default 20%, 0.2)
+eps_380 = 0.05 ; %acceptable difference between AOD 380 and the polyfit aod 380, for when the spectra is off
+remove_aod380 = true;
+
 
 %% Prepare General header for each file
 HeaderInfo = {...
@@ -104,6 +107,7 @@ revComments = {...
     %'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
     %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
     %'R1: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new Angstrom exponent calculations, polynomial fit, and the flag for measurements of Above cloud AOD.';...
+    'R1: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added flag for measurements of Above cloud AOD. Removed AOD at 380nm when stray light from instrument was problematic';...
     'R0: First in-field data archival. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows, and possible tracking instablity.';...
     };
 
@@ -423,6 +427,13 @@ for i=idx_file_proc
         
         %end
     end;
+    
+    %% remove the bad 380 nm data, using polyfit differences
+    if remove_aod380
+        flag_bad_380 = polyfit_diff_380(save_wvls,aod_saved',eps_380);
+        data.AOD0380(flag_bad_380) = NaN;
+        data.UNCAOD0380(flag_bad_380) = NaN;
+    end
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
     inans = find(isnan(data.(names{iradstart+2})));
