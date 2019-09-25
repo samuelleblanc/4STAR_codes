@@ -19,6 +19,8 @@
 %  - t2utch.m
 %  - ICARTTwriter.m
 %  - evalstarinfo.m
+%  - polyfit_diff_380.m
+%  - polyfitaod
 %  - ...
 %
 % NEEDED FILES:
@@ -26,6 +28,7 @@
 %  processed with starsun
 %  - starinfo for the flight with the flagfile defined
 %  - flagfile
+%  - flag_acaod file
 %
 % EXAMPLE:
 %  none
@@ -55,10 +58,11 @@
 %                      with acaod flags, polynomials, and angstrom exponent
 % 2018-09-28, SL,v6.0, Ported to 2018
 % 2019-05-07, SL,v6.1, Added the Apply_window_correction algorithm to the makearchive
+% 2019-09-24, SL,v6.2, Added removal of bad AOD at 380 nm data using the polyfit differences
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_2018_AOD
-version_set('v6.1')
+version_set('v6.2')
 %% set variables
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = getnamedpath('ORACLES2018_starsun')
@@ -165,10 +169,10 @@ originfo = info; origform = form; orignames = names;
 dslist={'20180921' '20180922' '20180924' '20180927' '20180930' '20181002' '20181003' '20181005' '20181007' '20181010' '20181012' '20181015' '20181017' '20181019' '20181021' '20181023' '20181025' '20181026' '20181027'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
 
-jproc=[         0          0          1          1          1           1         1          1          1          1          1          1          1          1          1          1          1          1          1] ;
+%jproc=[         0          0          0          0          0           0         1          1          1          1          1          1          1          1          1          1          1          1          1] ;
 %jproc=[         1          1          1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          1          1          0] ;
 %jproc=[         0          0          0          0          0          0          0          1          0          0          0          1          0          0          0          0          0          0          0          0] ; %set=1 to proces s
-%jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          0] ;
+jproc=[         1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1          1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -396,6 +400,7 @@ for i=idx_file_proc
         flag_bad_380 = polyfit_diff_380(save_wvls,aod_saved',eps_380);
         data.AOD0380(flag_bad_380) = NaN;
         data.UNCAOD0380(flag_bad_380) = NaN;
+        title(daystr);
     end
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
