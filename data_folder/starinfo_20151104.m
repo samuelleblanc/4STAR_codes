@@ -39,7 +39,14 @@ circles=[horilegs(4,:) ; % one big counterclockwise circle (seen from above); ma
     horilegs(5,:); % 3100 m GPS alt 
     horilegs(6,1) datenum('16:53:12')-datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)])]; % two small counterclockwise circle (seen from above); max 6700 m GPS altitude 
 % Circles were also made during the vertical profiles between the horizontal legs listed here: vertprofs(5,:); % spiral descent     vertprofs(6,:) ; % spiral ascent, two circles  
- 
+
+s.flight = flight;
+s.horilegs= horilegs;
+s.vertprofs = vertprofs;
+s.circles = circles;
+s.cleaning = cleaning;
+s.langley = langley;
+s.groundcomparison = groundcomparison;
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
  
