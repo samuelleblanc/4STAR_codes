@@ -31,10 +31,11 @@ function [visc0, nirc0, visnote, nirnote, vislstr, nirlstr, visaerosolcols, nira
 % MS, v2.1, 2018-09-14, updated mean c0 from MLO Aug-2018 for ORACLES 3
 % MS, v2.1, 2018-09-20, updated suffix of starc0 for 4STAR for ORACLES 3
 % SL, v2.2, 2019-04-30, Updated c0s for the Final ORACLES 2018 data. Multiple c0s used for changing behavior at 420nm, wavelenghts longer than 454 nm unchanged.
+% SL, v2.3, 2019-09-26, Updated 4STARB c0s to include TMF. 
 
 % defined via instrumentname variable, defaults to 4STAR
 
-version_set('2.2');
+version_set('2.3');
 if ~exist('verbose','var')
     verbose=true;
 end;
@@ -395,7 +396,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>=datenum([2018 2 11 0 0 0]); %for COSR 2018 and on
+        if t>=datenum([2019 5 1  0 0 0]); % for FIREX-AQ 2019 and on, from Table Mountain, single day
+                 daystr = '20190925';
+                 filesuffix = '4STARB_refined_ground_langley_am';
+        elseif t>=datenum([2018 2 11 0 0 0]); %for COSR 2018 and on
                  daystr = '20180212';
                  %filesuffix = 'refined_averaged_MLO_inflight_polyfit_v2';
                  filesuffix = '4STARB_refined_averaged_good_MLO_Feb2018';

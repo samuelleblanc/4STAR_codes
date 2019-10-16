@@ -38,6 +38,7 @@ datenum('16:20:00') datenum('16:26:00') 10 % the flight notes are mixed: "some t
 datenum('16:33:00') datenum('16:36:00') 10]; 
 s.ng(:,1:2) = s.ng(:,1:2) - datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
  
+try
 % or load flags from file as follows:
 % 1. Call the function by name as in:
 s.ng_new = starflags_20151117_CF_marks_ALL_20160217_0302;
@@ -46,7 +47,9 @@ marks_fnt  = str2func('starflags_20151117_CF_marks_ALL_20160217_0302');
 s.ng_newer = marks_fnt();
 % 3. Load the mat file and convert to 'ng'
 % s.ng_mat = cnvt_flags2ng(load(['E:\data\4STAR\yohei\mat\20151117_starflag_man_created20160212_1438by_CF.mat']));
-
+catch
+   disp('*** marks flags file not loaded') 
+end
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
  

@@ -211,7 +211,7 @@ labels = strread(num2str(w(cols)*1000.0,'%5.0f'),'%s');
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels);
+legend(labels,'location','best');
 end;
 
 tl = title([instrumentname ' multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
@@ -246,7 +246,7 @@ for ij=11:length(cols), labels{ij} = '.'; end;
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels);
+legend(labels,'location','best');
 end;
 
 tl = title([instrumentname ' VIS ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
@@ -281,7 +281,7 @@ for ij=1:10, labels{ij} = '.'; end;
 try;
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 catch;
-legend(labels)
+legend(labels,'location','best')
 end;
 tl = title([instrumentname ' NIR multi-wavelength ' daystr xtra ' :'  starttstr ' - ' stoptstr]);
 set(tl,'interp','none');
