@@ -13,7 +13,7 @@ if ~isavar('skyrad_fname')
 end
 
 if iscell(skyrad_fname)&&isafile(skyrad_fname{1})&&length(skyrad_fname)>1
-   define_skyrad_nc(skyrad_fname(2:end)); 
+   define_skyrad_nc_ORACLES2017(skyrad_fname(2:end)); 
 end
 if ~isadir(getnamedpath('skyrad_nc'))
    anc_nc = setnamedpath('skyrad_nc','','Select directory for skyscan netcdf');
@@ -272,14 +272,17 @@ for sky_str = {'good_almA','good_almB','good_ppl'}
 %       end      
    end      
 end
-
-anc_rad = anc_timesync(anc_rad);
-fname = ['4STAR-skyrad_P3_',datestr(anc_rad.time(1),'yyyymmdd.HHMMSS'),'_R0.nc'];
-anc_rad.fname = [getnamedpath('skyrad_nc'),fname];
-anc_rad.clobber = true;anc_rad.verbose = false; anc_rad.quiet = true;quiet = anc_rad.quiet;
-anc_rad = anc_check(anc_rad); anc_rad = rmfield(anc_rad,'quiet');
-anc_save(anc_rad,[],quiet);
-
+try
+    anc_rad = anc_timesync(anc_rad);
+    fname = ['4STAR-skyrad_P3_',datestr(anc_rad.time(1),'yyyymmdd.HHMMSS'),'_R0.nc'];
+    anc_rad.fname = [getnamedpath('skyrad_nc'),fname];
+    anc_rad.clobber = true;anc_rad.verbose = false; anc_rad.quiet = true;quiet = anc_rad.quiet;
+    anc_rad = anc_check(anc_rad); anc_rad = rmfield(anc_rad,'quiet');
+    anc_save(anc_rad,[],quiet);
+catch 
+    disp(['Problem with data from file: ' skyrad_fname ' *** skipping ***'])
+    anc_rad = [];
+end
 % anc_rad = anc_bundle_files(['4STAR-skyrad_P3_*_R0.nc'],'skyrad_nc');
 % anc_save(anc_rad)
 
