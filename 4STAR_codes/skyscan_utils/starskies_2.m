@@ -96,7 +96,11 @@ for in = 1:length(infiles)
 %                warning(['Crashed while running ',fstem]);
 %                pause(4);
 %             end
+try
                 [xls_fname] = print_skyscan_details_to_xls(s,xls_fname);
+catch
+   disp(['Problem with excel details savings for number: ' num2str(si) ]) 
+end
             toggle = s.toggle; close('all');
             end
          end
