@@ -112,7 +112,7 @@ else
             if ~isadir(pname)
                 pname = pwd;
             end
-            pname = [pname, '..',filesep];
+            pname = [pname, filesep,'..',filesep];
             if pickdir
                 [pname] = uigetdir([pname,fstem],dialog);
             else
