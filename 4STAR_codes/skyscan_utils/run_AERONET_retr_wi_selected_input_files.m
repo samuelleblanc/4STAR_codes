@@ -1,4 +1,10 @@
 function [outname,ss,ww] = run_AERONET_retr_wi_selected_input_files(skyinput);
+%% Modification notes
+% SL, 2020-03-30, Added tracking of file daystr and merging of ppt files at the end.
+
+
+
+%% Codes
 % run_4STAR_AERONET_retrieval(skytag, line_num,)
 % No customization, just pick files and run retrieval for all selected
 % if ~exist('skyinput','var')
@@ -19,6 +25,7 @@ end
 if ischar(skyinput)&&~iscell(skyinput)&&exist(skyinput,'file')
    skyinput ={skyinput};
 end
+jf = 1;
 for F = length(skyinput):-1:1
    infile = skyinput{F};
    disp(['Running ',num2str(F)])
@@ -28,6 +35,13 @@ for F = length(skyinput):-1:1
       %         if ~exist(skip_dir,'dir')
       %             mkdir(skip_dir);
       %         end
+      
+      % build a list of good daystr and instrumentname for merging the ppts
+      [daystr, filen, datatype,instrumentname]=starfilenames2daystr({infile}, 1);
+      days{jf} = daystr;
+      instnames{jf} = instrumentname;
+      jf = jf+1;
+      
       bad_dir = [pname_tagged, 'bad',filesep];
       if ~exist(bad_dir,'dir')
          mkdir(bad_dir);
@@ -82,6 +96,7 @@ for F = length(skyinput):-1:1
             %         fid3 = fopen(outname, 'r');
             %         outfile = char(fread(fid3,'uchar'))';
             %         fclose(fid3);
+            
             try
                anetaip = parse_anet_aip_output(outname);
             
@@ -113,5 +128,11 @@ end
 %%
 if length(skyinput)==0
    outname = [];
+end
+
+%Merge the resulting ppts into a single per day
+udays = unique(days)
+for i=1:length(udays)
+    ppt_out = merge_ppts_for_day(getnamedpath('starimg'),udays{i},instrumentname,'_allSKY');
 end
 return

@@ -4,7 +4,7 @@ if ~exist('anetaip','var')
 end
 [~, fname, ~] = fileparts(anetaip.output_fname);
 fstem = anetaip.fstem; 
-imgdir = getnamedpath('star_images');
+imgdir = getnamedpath('starimg');
 skyimgdir = [imgdir,fstem,filesep]; 
 if isdir(imgdir)&&~isdir(skyimgdir)
    mkdir(skyimgdir);
