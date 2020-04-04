@@ -58,7 +58,7 @@ for f = length(files):-1:1
          if over==0            
             N = 1;
             [there_path,~,~] = fileparts(there); there_path = [there_path filesep];
-            dstr = datestr(now,'yyyymmdd_');
+            dstr = datestr(now,'.yyyymmdd_');
             while ~isempty(dir([there_path,fun,dstr,num2str(N),ext]))
                N = N+1;
             end
