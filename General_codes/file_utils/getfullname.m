@@ -8,7 +8,16 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 % 2009-01-08, CJF: Uploading to 4STAR matlab_files repository
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
-usrpath = userpath;
+% 2019-08-15, CJF: fixing empty userpath issue and also force disp(dialog)
+% when not running on a PC to handle Mac OSX suppression of dialog titles
+
+% Sometimes the userpath content becomes empty and needs to be reset to
+% yield a valid path
+if isempty(userpath)
+    userpath('reset');
+end
+usrpath = userpath; 
+    
 usrpath = strrep(usrpath,';','');
 if ~ispc
    usrpath = strrep(usrpath,':','');
@@ -79,6 +88,7 @@ if (exist(fspec,'file')||exist([pname,filesep,fname,ext],'file'))&&~exist(fspec,
 else
     [pth,fstem,ext] = fileparts(fspec);
     fspec = [fstem,ext];
+    if ~ispc; disp(dialog); end
     if exist(pth,'dir')
         [fname,pname] = uigetfile([pth,filesep,fspec],dialog,'multiselect','on');
     elseif exist(pname,'dir')

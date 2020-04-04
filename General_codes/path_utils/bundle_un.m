@@ -4,6 +4,8 @@ function [ output_args ] = bundle_un(inzip, outpath, over)
 % outpath is an optional string indicating the path to put new files
 % over, if over==0, backup don't overwrite.  over==1 overwrite, over==2 overwrite if newer
 % The default is 0, to overwrite if newer and backup existing function
+
+% 2019-08-15, CJF: fixing filename construction problem with leftovers line 103
 tmpdir = ['unzip_tmpdir_',datestr(now,'yyyy-mm-dd_HHMMSS')];
 [status, msg] = mkdir(tmpdir);
 if isempty(who('inzip')) || isempty(dir(inzip)) 
@@ -97,7 +99,9 @@ else    % else warning that some files couldn't be moved.
    warning(['Some files could not be moved out of ',tmpdir, ' in place of existing files.']);
    warning(['Moving to ',outpath, ' instead...'])
    for L = length(leftover):-1:1
-      status = movefile(leftover{L},[outpath,fun, ext]);
+       [~,fun,ext] = fileparts(leftover(L).name);
+      status = movefile([leftover(L).folder,filesep,leftover(L).name],[outpath,fun, ext]);
+%       status = movefile(leftover{L},[outpath,fun, ext]);
    end
 end
 % add outpath to end of matlab path
