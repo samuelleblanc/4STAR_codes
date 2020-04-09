@@ -81,6 +81,9 @@ elseif star.isALM
 end
 imgdir = getnamedpath('starimg');
 skyimgdir = [imgdir,star.fstem,filesep];
+    if ~isadir(skyimgdir)
+           mkdir(skyimgdir);
+    end
    fig_out = [skyimgdir, star.fstem,star.created_str,sky];
    saveas(gcf,[fig_out,'.fig']);
    saveas(gcf,[fig_out,'.png']);
