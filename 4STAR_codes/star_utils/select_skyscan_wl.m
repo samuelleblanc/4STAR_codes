@@ -60,7 +60,6 @@ elseif man==2 % Select an existing file as source of (additional?) wavelengths
       star.wl_ = false(size(star.w)); star.wl_(star.wl_ii) = true;
    end
 end
-
 % in_mat = load([last_wl_path, 'last_wl.mat']);
 % Now we have to make sure that skymask captures the new selected WLs
 % This may be mostly legacy code since now we require identical WLs at all
@@ -68,6 +67,7 @@ end
 % and not require sky radiances from NIR
 skyrad = star.skyrad(:,star.wl_);
 skymask = ones(size(skyrad));
+if size(star.wl_ii,1)>size(star.wl_ii,2); star.wl_ii = star.wl_ii';end
 wl_ii = star.wl_ii;
 % sky_wl returns the actual WL as opposed to the pixel indices.
 if ~isfield(star,'sky_wl')
