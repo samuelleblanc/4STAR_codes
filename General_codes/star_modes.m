@@ -1,4 +1,4 @@
-function out = star_modes(s,spc)
+function out = star_modes(spc,s)
 
 % OK, I'll split out the spc type and wls from the spc struct, call
 % star_mode once for each one, and merge the results
@@ -18,15 +18,17 @@ if ischar(s)
    end
    s_ = s; s = load(s); pname = [fileparts(s_),filesep];
 end
-if ~exist('spc','var')||~isstruct(spc)||...
+while ~isavar('spc')||~isstruct(spc)||...
       (~any(strcmp(fieldnames(spc),'vis'))&&~any(strcmp(fieldnames(spc),'nir')))
-   error('spc is a required input')
+  spc_str = {'vis','nir'};
+   spc_i = (menu('Select spectrometer:','VIS','NIR')); 
+   spc = spc_str{spc_i};
 end
 sfields = fieldnames(s);
 filename = [];
 sf = 1;
 while isempty(filename)&& sf<=length(sfields)
-   if ~isempty(s.(sfields{sf}))
+   if ~isempty(s.(sfields{sf}))&&length(s.(sfields{sf}))==1
       filename = s.(sfields{sf}).filename(1);
       in_time = s.(sfields{sf}).t(1);
    else
@@ -298,9 +300,6 @@ fclose(fid)
 % corresponding to Parked. Perhaps look at a flight when I know I parked to
 % avoid clouds and see what Az and El were reported.  If spectra are
 % collected, how different are they than Str==0 darks. 
-
-
-
 % {'nir_sun','nir_zen','nir_park','nir_forj','nir_cldp','nir_skyp','nir_skya'});
 % out.state = strcmp(out.part,'sun')&out.Str==1 + 2.*strcmp(out.part,'zen') -1.*strcmp(out.part,'park') + 4.*strcmp(out.part,'forj')+...
 %    8.*strcmp(out.part,'cldp') + 16.*strcmp(out.part,'skyp')+32.*strcmp(out.part,'skya');
