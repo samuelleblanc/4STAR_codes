@@ -112,7 +112,7 @@ version_set('3.3');
 %********************
 
 %% set default toggle switches
-if exist('toggle','var')&&~isempty(toggle)&&isstruct(toggle)
+if isavar('toggle')&&~isempty(toggle)&&isstruct(toggle)
    toggle = update_toggle(toggle);
 else
    toggle = update_toggle;
@@ -241,7 +241,7 @@ infofile = fullfile(getnamedpath('starinfo'), ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
-if exist(infofile_)==2;
+if isafile(infofile_);
    if toggle.editstarinfo
       try
          edit(infofile_) ; % open infofile in case user wants to edit it.
@@ -267,7 +267,7 @@ if exist(infofile_)==2;
          %     s = eval([infofile2,'(s)']);
       end
    end;
-elseif exist(infofile2)==2;
+elseif isafile(infofile2)
    try
       edit(infofile2) ; % open infofile in case user wants to edit it.
    catch me
@@ -283,7 +283,7 @@ elseif exist(infofile2)==2;
       s = infofnt(s);
    end
    %     s = eval([infofile2,'(s)']);
-elseif exist(infofile)==2;
+elseif isafile(infofile)
    open(infofile);
    run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
    %         eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
@@ -291,7 +291,7 @@ else; % copy an existing old starinfo file and run it
    while dayspast<maxdayspast;
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
-      if exist(infofile_previous);
+      if isafile(infofile_previous);
          copyfile(infofile_previous, infofile_);
          open(infofile_);
          eval([infofile_(1:end-2),'(s)']);
@@ -362,7 +362,7 @@ if toggle.verbose; disp('...calculating saturated points'); end
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
-if exist('s2','var')
+if isavar('s2')
    if strmatch('vis', lower(datatype2));
       s2.w=visw;
       s2.c0=visc0;
@@ -430,7 +430,7 @@ end;
 % combine two structures
 if toggle.verbose; disp('out of starrate, combining two structures'), end;
 drawnow;
-if exist('s','var')&&exist('s2','var');
+if isavar('s')&&isavar('s2');
    s = combine_star_s_s2(s,s2,toggle);
 end
 pp=numel(s.t);
@@ -496,7 +496,7 @@ course_changed = false(size(s.t));
 course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
 if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
    s.airborne = true;
-%    warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
    [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
 else
    s.airborne = false;
@@ -823,7 +823,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag && (length(s.flags.bad_aod)==length(s.t))&&(toggle.starflag_mode==1||toggle.starflag_mode==3);
+   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3) && size(s.tau_aero,1)==length(s.flags.bad_aod);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
    end;
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
@@ -943,7 +943,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
       ylim(ax(ii),yylim(ii,:));
       ylabel(yystr{ii});
       set(gca,'xtick',[],'xticklabel','');
-      if numel(kk)==1 && exist('lstr');
+      if numel(kk)==1 && isavar('lstr');
          lh=legend(ph0, lstr);
          set(lh,'fontsize',6,'location','best');
       else
@@ -1179,3 +1179,4 @@ clear qq2 s2;
 % end
 
 return
+tau_
