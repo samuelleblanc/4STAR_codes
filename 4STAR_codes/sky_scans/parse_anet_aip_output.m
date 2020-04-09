@@ -1,18 +1,18 @@
 function anetaip = parse_anet_aip_output(outname)
 % Search for "Wavelength Dependence" and read the block of
-if ~exist('outname','var')
+if ~isavar('outname')
     outname = getfullname('4STAR_*.output','anet_results');
 end
-[pname, fname, ext] = fileparts(outname); ii = findstr(fname, '.created');
-fstem = fname(1:ii-1);
-if exist('outname','var')&&exist(outname, 'file')
+[pname, fname, ext] = fileparts(outname); ii = findstr(fname, '_SKY');
+fstem = fname(1:ii+4);
+if isavar('outname')&&isafile(outname)
     cnvt_txt_file_to_pc(outname);
     fid = fopen(outname); 
     outfile = char(fread(fid,'uchar'))';
     fclose(fid);
     anetaip.output_fname = outname; anetaip.fstem = fstem;
     inputname = strrep(outname, '.output','.input');
-    if exist(inputname, 'file') % Read a bunch of supporting data from the input file
+    if isafile(inputname) % Read a bunch of supporting data from the input file
         anetaip.input_fname = inputname;
     fid = fopen(anetaip.input_fname);
     done = false;
@@ -157,7 +157,7 @@ block_start = find(linestart(blocks)>ii,1,'first')-1; % negative needed due to m
 block_str = outfile(linestart(blocks(block_start)):linestart(blocks(block_start+1)));
 
 tmp = textscan(block_str,'%f %f %f %f %f %f');
-while ~isempty(strfind(block_str,'-th'))||isempty(tmp{1})
+while (~isempty(strfind(block_str,'-th'))||isempty(tmp{1})) && ~isempty(block_str)
     [~,block_str] = getl(block_str);
     tmp = textscan(block_str,'%f %f %f %f %f %f');
 end
@@ -171,7 +171,7 @@ ii = strfind(outfile,instr );
 block_start = find(linestart(blocks)>ii,1,'first')-1; % negative needed due to missing blank line in output file
 block_str = outfile(linestart(blocks(block_start)):linestart(blocks(block_start+1)));
 tmp = textscan(block_str,'%f %f %f %f %f %f');
-while ~isempty(strfind(block_str,'-th'))||isempty(tmp{1})
+while (~isempty(strfind(block_str,'-th'))||isempty(tmp{1})) && ~isempty(block_str)
     [~,block_str] = getl(block_str);
     tmp = textscan(block_str,'%f %f %f %f %f %f');
 end
@@ -193,7 +193,7 @@ ii = strfind(outfile,instr );
 block_start = find(linestart(blocks)>ii,1,'first'); %
 block_str = outfile(linestart(blocks(block_start)):linestart(blocks(block_start+1)));
 tmp = textscan(block_str,'%f %f %f %f %f %f');
-while ~isempty(strfind(block_str,'-th'))||isempty(tmp{1})
+while (~isempty(strfind(block_str,'-th'))||isempty(tmp{1})) && ~isempty(block_str)
     [~,block_str] = getl(block_str);
     tmp = textscan(block_str,'%f %f %f %f %f %f');
 end
@@ -207,7 +207,7 @@ block_start = find(linestart(blocks)>ii,1,'first') +1; %
 block_str = outfile(linestart(blocks(block_start)):linestart(blocks(block_start+1)));
 %%
 tmp = textscan(block_str,'%f %f %f %*[^\n]');
-while ~isempty(strfind(block_str,'-th'))||isempty(tmp{1})
+while (~isempty(strfind(block_str,'-th'))||isempty(tmp{1})) && ~isempty(block_str)
     [~,block_str] = getl(block_str);
     tmp = textscan(block_str,'%f %f %f %*[^\n]');
 end
