@@ -30,15 +30,15 @@ end
 [pname,fstem,ext] = fileparts(strrep(star.filename{1},'\',filesep));
 pname = [pname, filesep];
 fstem = strrep(fstem, '_VIS',''); star.fstem = fstem;
-paths = set_starpaths; imgdir = paths.starppt;
+paths = set_starpaths; imgdir = paths.starimg; pptdir = paths.starppt;
 if ~isadir([imgdir,star.fstem]);
    mkdir(imgdir, star.fstem);
 end
-skyimgdir = [imgdir,star.fstem,filesep];
-star.pptname = [imgdir,star.fstem,'.ppt'];
-created_str = ['.created',datestr(now,'_yyyymmdd_HHMMSS.')];
+skyimgdir = [imgdir, star.fstem, filesep];
+star.pptname = [pptdir, star.fstem, '.ppt'];
+created_str = ['.created', datestr(now, '_yyyymmdd_HHMMSS.')];
 star.created_str = created_str;
-star.pptname = ppt_add_title(star.pptname, [star.fstem,': ',star.created_str]);
+star.pptname = ppt_add_title(star.pptname, [star.fstem, ': ', star.created_str]);
 
 % fstem = strrep(star.out,'_STARSKY','_SKY')
 if ~isempty(findstr(upper(fstem),'SKYP'))
@@ -300,15 +300,21 @@ if star.isPPL
       title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',miss)]);
       ylabel('radiance');legend('Below sun','Above sun')
       xlabel('El shifted - sun El');
-      
+
+      fig_out = [skyimgdir, star.fstem, star.created_str, 'el_shift'];
+      saveas(gcf, [fig_out, '.fig']);
+      saveas(gcf, [fig_out, '.png']);
+      ppt_add_slide(star.pptname, fig_out);
       pause(3)
+      
+      figure_(3004);
       plot(star.SA(zone&below_orb),star.skyrad(zone&below_orb,star.aeronetcols(vis_pix(end))),'o',...
          star.SA(zone&above_orb), star.skyrad(zone&above_orb,star.aeronetcols(vis_pix(end))),'x');
       title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',mean(dSA))]);
       ylabel('radiance');legend('Below sun','Above sun')
       xlabel('SA shifted');
       
-      fig_out = [skyimgdir, star.fstem,star.created_str,'ppl'];
+      fig_out = [skyimgdir, star.fstem,star.created_str,'sa_shift'];
       saveas(gcf,[fig_out,'.fig']);
       saveas(gcf,[fig_out,'.png']);
       ppt_add_slide(star.pptname, fig_out);
