@@ -842,6 +842,15 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
    
    % fit a polynomial curve to the non-strongly-absorbing wavelengths
+%    issun_ii = find(s.Str==1&s.Zn==0&s.QdVtot>1&abs(s.QdVlr)<.05&abs(s.QdVtb)<.05);
+%    figure_(1999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:);  s.gas.no2.no2OD(issun_ii,:);...
+%        s.gas.o3.o3OD(issun_ii,:);s.gas.o3.o4OD(issun_ii,:);s.gas.co2.co2OD(issun_ii,:);...
+%        s.cwv.wvOD(issun_ii,:)],'-'); legend('tot OD','NO2','O3','O4','CO2','H2O');logy
+%    
+%      gas_od = s.tau_NO2(issun_ii,:) + s.gas.o3.o3OD(issun_ii,:) + s.tau_O4(issun_ii,:) + s.cwv.wvOD(issun_ii,:)+s.gas.co2.co2OD(issun_ii,:), s.gas.co2.ch4OD(issun_ii,:); 
+%      w_gas = gas_od>
+%      figure_(2999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:); gas_od; s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:)- gas_od],'-'); legend('tot','gas','aero?');logy;
+%  
    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
    s.tau_aero_polynomial=[a2 a1 a0];
