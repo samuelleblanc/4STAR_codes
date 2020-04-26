@@ -146,7 +146,7 @@ end
 %     for k=1:length(s.t);
 ccoef_d = NaN([size(basis,2),length(s.t)]);
 RR_d = NaN([length(wln),length(s.t)]);
-suns = find(s.Str==1&s.Zn==0)';
+
 for k=suns
    coef=real(basis\eta(k,:)');
    % coef=real(Abasis\spectrum_sub(k,:)');
@@ -168,7 +168,7 @@ end
    if mode==0
         % covert from atm x cm to molec/cm^2
        hcoh_amount =  ccoef_d(1,:);% + ccoef_d(2,:);
-       hcohVCD = real((((Loschmidt*hcoh_amount))./(s.m_aero)')');
+       hcohVCD = real((((Loschmidt*hcoh_amount))./(s.m_NO2)')');
        tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohVCDsmooth, sn] = boxxfilt(tplot, hcohVCD, xts);
        hcohvcd_smooth = real(hcohVCDsmooth);
@@ -180,7 +180,7 @@ end
        tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;
        [hcohSCDsmooth, sn] = boxxfilt(tplot, hcohSCD, xts);
        %[hcohvcd_smooth, sn] = (boxxfilt(tplot, hcohVCD, xts));
-       hcohvcd_smooth = real(hcohSCDsmooth)./s.m_aero;
+       hcohvcd_smooth = real(hcohSCDsmooth)./s.m_NO2;
    end
    
    
@@ -243,7 +243,8 @@ end
    % hcohOD is the spectrum portion to subtract
     hcoh.hcoh_DU          = hcohvcd_smooth/(Loschmidt/1000);
     hcoh.hcohresi         = RMSres;
-    hcoh.hcohOD           = (real((((ccoef_d(1,:))))')*hcohcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+%     hcoh.hcohOD           = (real((((ccoef_d(1,:))))')*hcohcoef')./repmat(s.m_NO2,1,length(s.w));%(no2VCD/Loschmidt)*no2_298Kcoef';% this is optical depth
+    hcoh.hcohOD           = hcohvcd_smooth*hcohcoef';
     hcoh.hcohSCD           = hcohSCDsmooth/(Loschmidt/1000);%real((((Loschmidt*ccoef_d(1,:))))');%no2SCDsmooth;%real((((Loschmidt*ccoef_d(1,:))))');
 
 
