@@ -56,11 +56,12 @@ gxs = get_GlobalCrossSections;
 
 if s.toggle.verbose; disp('Starting NO2 gas retrieval'), end
  [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
-
+% gas.no2.no2OD is column OD
 %% retrieve O3
 if s.toggle.verbose; disp('Starting O3 gas retrieval'), end
- [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
-
+[gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
+%  
+% [gas.o3]  = retrieveO3(s,0.550,0.640,1,gxs);
 %----------------------------------------------------------------------
 %% retrieve CO2
 if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
