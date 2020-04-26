@@ -87,7 +87,12 @@ if mode==0
    c0 = tmp(wln)';
 elseif mode==1
    c0 = tmp.o3refspec;
+   tmp.w = s.w(395:636);
+   tmp_wln = find(tmp.w<=s.w(iend)&tmp.w>=s.w(istart));
+   c0 = c0(tmp_wln);
 end
+
+
 
 %  c0_wstart=0.490;
 %  c0_wend  =0.682;
@@ -178,41 +183,40 @@ end
 
 %rate = rate(:,wln);
 %tau_OD = log(repmat(c0,length(s.t),1)./rate);
-ccoef=[];
-RR=[];
-% o3 inversion is being done on total slant path (not Rayleigh
-% subtracted)
-%         if     s.t(1) <= datenum([2016 8 25 0 0 0]);
-%                % pre-ORACLES
-%                  rate = s.rateslant;
-%
-%         elseif s.t(1) > datenum([2016 8 25 0 0 0]);
-%                % ORACLES
-%                  rate = s.ratetot;
-%         end
 
-for k=1:length(s.t);
-   %meas = log(c0'./rate(k,:)');
-   meas = rate(k,:)';
-   %         if     s.t(1) <= datenum([2016 8 25 0 0 0]);
-   %                % pre-ORACLES
-   %                  meas = log(s.c0(wln)'./rate(k,(wln))');
-   %
-   %         elseif s.t(1) > datenum([2016 8 25 0 0 0]);
-   %                % ORACLES
-   %                  meas = log(c0'./rate(k,(wln))');
-   %         end
-   
-   % invert
-   coef=basis\meas;
-   %coefo3=basiso3\tau_OD(k,(wln))';
-   recon=basis*coef;
-   RR=[RR recon];
-   ccoef=[ccoef coef];
+ccoef=NaN(size(basis,2),length(s.t));
+RR=NaN(length(wln),length(s.t));
+suns = find(s.Str==1 & s.Zn==0)';
+for k= suns;
+     meas = rate(k,:)';
+    coefk=real(basis\meas);    
+    % reconstruct spectrum
+    recon=basis*coefk;
+    RR(:,k)=recon;
+    ccoef(:,k)=coefk;
 end
 
-% calculate vcd
+% for k=1:length(s.t);
+%    %meas = log(c0'./rate(k,:)');
+%    meas = rate(k,:)';
+%    %         if     s.t(1) <= datenum([2016 8 25 0 0 0]);
+%    %                % pre-ORACLES
+%    %                  meas = log(s.c0(wln)'./rate(k,(wln))');
+%    %
+%    %         elseif s.t(1) > datenum([2016 8 25 0 0 0]);
+%    %                % ORACLES
+%    %                  meas = log(c0'./rate(k,(wln))');
+%    %         end
+%    
+%    % invert
+%    coef=basis\meas;
+%    %coefo3=basiso3\tau_OD(k,(wln))';
+%    recon=basis*coef;
+%    RR=[RR recon];
+%    ccoef=[ccoef coef];
+% end
 
+% calculate vcd
 % create smooth o3 time-series
 xts = 60/3600;   %60 sec in decimal time
 
@@ -278,7 +282,7 @@ if plotting
       
       legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured O_{3} spectrum','fitted O_{3} spectrum','residual');
       set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
-      pause;
+      pause(5);
    end
 end
 
@@ -318,16 +322,16 @@ end
 if plotting
    
    % save data for further plotting (heatmap)
-   %            t   = serial2Hh(s.t);
-   %            alt = s.Alt;
-   %            lat = s.Lat;
-   %            lon = s.Lon;
-   %            res = real(o3residual./repmat(s.m_O3,1,length(wln)));
-   %            % normalize residual -1 to 1
-   %            [res_norm, mu, range] = featureNormalizeRange(res);
-   %
-   %
-   %            dat = [t alt lat lon res_norm];
+              t   = serial2Hh(s.t);
+              alt = s.Alt;
+              lat = s.Lat;
+              lon = s.Lon;
+              res = real(o3residual./repmat(s.m_O3,1,length(wln)));
+              % normalize residual -1 to 1
+              [res_norm, mu, range] = featureNormalizeRange(res);
+   
+   
+              dat = [t alt lat lon res_norm];
    %            fi = strcat(datestr(s.t(1),'yyyy-mm-dd'), '-O3residual_20160825c0_norm','.txt');
    %            save([starpaths,fi],'-ASCII','dat');
    
@@ -342,7 +346,8 @@ if plotting
       plot(s.w((wln)),o3spectrum(i,:),'-k','linewidth',2);hold on;
       plot(s.w((wln)),o3fit(i,:),'-r','linewidth',2);hold on;
       plot(s.w((wln)),o3residual(i,:),':k','linewidth',2);hold off;
-      xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' o3VCD= ',num2str(o3vcd_smooth(i)),' RMSE = ',num2str(RMSEo3(i)./s.m_O3(i))),...
+      xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');
+      title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' o3VCD= ',num2str(o3vcd_smooth(i)),' RMSE = ',num2str(RMSres(i)./s.m_O3(i))),...
          'fontsize',14,'fontweight','bold');
       ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted O_{3} spectrum','residual');
       set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
@@ -426,7 +431,7 @@ if linear==0
    end
    
    
-   [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts);
+   [O3conc_s, sn] = boxxfilt(tplot, O3conc, xts); % Looks like an error here. This is a slant density, not vertical.
    O3conc_smooth = real(O3conc_s);
    % save smooth values
    %gas.o3 = O3conc_smooth;
@@ -458,7 +463,7 @@ elseif linear==1
    o4amount  = (-log(exp(-(real(ccoef(2,:)')*o4coef'))))./repmat(s.m_ray,1,length(s.w));%O4conc*o4coef';
    h2ocoefVIS= zeros(length(s.w),1); h2ocoefVIS(wln) = h2ocoef(wln);
    h2oamount = (-log(exp(-(real(ccoef(4,:)')*h2ocoefVIS'))))./repmat(s.m_H2O,1,length(s.w));%H2Oconc*h2ocoefVIS';
-   
+   no2amount = (-log(exp(-(real(ccoef(3,:)')*no2coef'))))./repmat(s.m_NO2,1,length(s.w));%
    % save parameters
    o3.o3DU    = o3vcd_smooth;
    o3.o3resiDU= RMSres;
@@ -472,7 +477,8 @@ end
 
 
 % save OD amount
-
+% Maybe an error with o3amount slant for linear=0 but vertical for
+% linear=1;
 o3.o3OD    = o3amount;%(O3conc/1000)*o3coef';
 o3.o4OD    = o4amount;
 o3.h2oOD   = h2oamount;
@@ -485,7 +491,7 @@ sd_o3_crit = 5e-3;
 % 0 is good data, 1 is bad data
 
 ti=60/86400;
-for i=1:length(t);
+for i=suns;
    rows=find(t>=t(i)-ti/2&t<=t(i)+ti/2);
    if numel(rows)>0;
       o3std(i) =nanstd(o3vcd_smooth(rows),0,1);
