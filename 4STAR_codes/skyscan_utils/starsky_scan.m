@@ -86,7 +86,7 @@ tau_abs_gas = star.tau_tot_vert -star.tau_ray - star.tau_aero_subtract_all;
 % This is similar to aodpolyfit except uses a reduced wavelength range
 % tailored to the expected wavelengths for the sky retrieval and will thus
 % generally better represent the wavelength dependence in this region
-w_ii = star.w_isubset_for_polyfit;
+w_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
 % SEAC4RS and ORACLES seem to require different WL ranges % SL (2019-03-21) implemented this time dependent change into get_wvl_subset for where the w_isubset_for_polyfit is determined.
 % w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
 w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
@@ -101,7 +101,8 @@ star.AGOD = star.tau_abs_gas_fit(sun_ii,:);
 figure_(3001);
 sx(1) = subplot(2,1,1);
 plot(star.w(200:1044), tau_noray_vert(sun_ii,200:1044),'.m-', ...
-   star.w(200:1044), star.tau_aero_subtract_all(sun_ii,(200:1044)),'-',...  
+   star.w(200:1044), star.tau_aero_subtract_all(sun_ii,(200:1044)),'k-',...  
+   star.w(w_ii), star.tau_aero_subtract_all(sun_ii,w_ii),'ko',... 
 star.w(200:1044), exp(polyval(PP_,log(star.w(200:1044)))), '-',...   
    star.w(star.aeronetcols), exp(polyval(PP_,log(star.w(star.aeronetcols)))), 'o'); logx; logy;
 ylabel('optical depth');
