@@ -83,40 +83,8 @@ loadCrossSections_global;
    co2.co2 = CO2conc./s.m_ray;       % this is vertical column amount
    co2.ch4 = CH4conc./s.m_ray;       % this is vertical column amount
    co2.co2resi= CO2resi;
-   co2amount = real((CO2conc./s.m_ray)*co2coef');    % this is wavelength dependent slant OD
-   ch4amount = real((CH4conc./s.m_ray)*ch4coef');    % this is wavelength dependent slant OD
+   co2.co2OD = real( co2.co2 *co2coef');    % this is wavelength dependent slant OD %cjf: I think vertical, not slant
+   co2.ch4OD = real(co2.ch4*ch4coef');    % this is wavelength dependent slant OD %cjf: I think vertical, not slant
    %tau_OD_fitsubtract2 = tau_OD_fitsubtract1 - real(co2amount) - real(ch4amount);   % this is wv, co2 and ch4 subtraction
-   
-   
-   
-          
-   % prepare to plot spectrum OD and cross section
-   
-%    tau_OD = log(repmat(s.c0(wln),length(s.t),1)./s.rateslant(:,(wln)));
-%    spectrum     = tau_OD-RR' + ccoef(2,:)'*basis(:,1)';
-%    fit          = ccoef(1,:)'*basis(:,2)';
-%    residual     = tau_OD-RR';
-% 
-%    if plotting
-% %      plot fitted and "measured" spectrum
-%          for i=1:1000:length(s.t)
-%              figure(111);
-%              plot(s.w((wln)),spectrum(i,:),'-k','linewidth',2);hold on;
-%              plot(s.w((wln)),fit(i,:),'-r','linewidth',2);hold on;
-%              plot(s.w((wln)),residual(i,:),':k','linewidth',2);hold off;
-%              xlabel('wavelength [\mum]','fontsize',14,'fontweight','bold');title(strcat(datestr(s.t(i),'yyyy-mm-dd HH:MM:SS'),' co2= ',num2str(co2.co2(i)),' RMSE = ',num2str(CO2resi(i))),...
-%                     'fontsize',14,'fontweight','bold');
-%              ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted CO_{2} spectrum','residual');
-%              set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
-%              pause(1);
-%          end
-%    end
 
-   % save parameters
-  
-    co2.co2OD    = co2amount;
-    co2.ch4OD    = ch4amount;
-    
-  
- 
  return;
