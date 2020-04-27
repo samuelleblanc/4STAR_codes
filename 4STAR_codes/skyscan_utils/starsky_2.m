@@ -22,7 +22,7 @@ end
 % regulate input and read source
 %********************
 if ~isavar('mat_file');
-   mat_file = getfullname([getnamedpath('stardat'),'4STAR_*.dat']);% Default to last_path
+   mat_file = getfullname([getnamedpath('stardat'),'4STAR_*sky*.dat']);% Default to last_path
    if iscell(mat_file)
       if length(mat_file)>1
          warning('Starsky is intended to process only a single sky scan.  Processing first file...');
