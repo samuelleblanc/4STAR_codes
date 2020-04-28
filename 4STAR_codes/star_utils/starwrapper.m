@@ -793,7 +793,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
    %s.flagallcols
    %************************************************************
-   if toggle.dostarflag;
+   % Only generate these flags if in SUN mode.  
+   if toggle.dostarflag && strcmpi(s.datatype, 'SUN')
       if toggle.verbose; disp('Starting the starflag'), end;
       if isfield(s,'flagfilename')
          if toggle.verbose; disp(['** Found starflag file :' s.flagfilename ', Loading that instead']), end;
