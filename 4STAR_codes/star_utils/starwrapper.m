@@ -824,9 +824,10 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3) && size(s.tau_aero,1)==length(s.flags.bad_aod);
+   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3)...
+           &&isfield(s,'flags')&&isfield(s.flags, 'bad_aod')&& size(s.tau_aero,1)==length(s.flags.bad_aod);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
-   end;
+   end
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
    % 2014/07/18.
    % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
