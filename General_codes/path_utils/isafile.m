@@ -5,6 +5,7 @@ function TF = isafile(in)
 TF = false;
 if isavar('in')
     if length(in)==1 && iscell(in) && ischar(in{1}); in = in{1};end
+    in_ = which(in); if ~isempty(in_); in = in_; end
     out = dir(in);
     if ~isempty(out)
         if ~isfield(out,'folder')
@@ -15,10 +16,8 @@ if isavar('in')
     end
 end
     %nested function isavar
+    % This fast version of isavar benefit from knowing the input is a char
     function TF = isavar(var)
-        TF = false;
-        if ~isempty(who('var'))
             TF = ~isempty(who(var));
-        end
     end
 end

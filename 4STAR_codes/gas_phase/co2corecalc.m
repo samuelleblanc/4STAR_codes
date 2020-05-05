@@ -1,32 +1,35 @@
-function [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc(starsun,ch4coef,co2coef,wln,tau_OD)
+function [CH4conc CO2conc CO2resi co2OD,tau_co2ch4_subtract] = co2corecalc(s,ch4coef,co2coef,wln,tau_OD)
 % retrieve using 1.555-1.630 region (CH4 and CO2)
 %------------------------------------------------
 % MS, Mar 11, 2014
 % MS, July 25, 2014
 % MS, 2014-11-17, refined struct names, added output variable
 %------------------------------------------------
-ODfit = zeros(length(starsun.t),length(starsun.w));
+ODfit = zeros(length(s.t),length(s.w));
 tau_co2ch4_subtract = tau_OD;
 %------------------------------------------------
 
 sc=[];
 sc_residual = [];
-%if starsun.toggle.verbose
+%if s.toggle.verbose
 %   options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','notify-detailed','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
 %else
    options = optimset('Algorithm','sqp','LargeScale','off','TolFun',1e-6,'Display','off','TolX',1e-6,'MaxFunEvals',1000);%optimset('Algorithm','interior-point','TolFun',1e-12);%optimset('MaxIter', 400);
 %end
 
-if starsun.toggle.verbose
+if s.toggle.verbose
     disp('Starting CO2 retrieval loop...')
-    upd = textprogressbar(length(starsun.t),'updatestep',50);
+    upd = textprogressbar(length(s.t),'updatestep',50);
 end
 
-for i = 1:length(starsun.t)
+sc = NaN([length(s.t),5]);
+sc_residual = NaN(size(s.t));
+suns = find(s.Str==1&s.Zn==0)';
+for i = suns
            
     x0 = [500 500 0.75 0.8 -2]; 
     y = (tau_OD(i,wln));
-    meas = [starsun.w(wln)' y'];
+    meas = [s.w(wln)' y'];
     PAR  = [ch4coef(wln) co2coef(wln)];
        % Set Options
        
@@ -44,16 +47,16 @@ for i = 1:length(starsun.t)
           
             [U_,fval,exitflag,output]  = fmincon('CH4CO2resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             
-                if isNaN(U_(1)) || ~isreal(U_(1)) || U_(1)<0
-
-                        U_ = [NaN NaN NaN NaN NaN];
-                        sc = [sc; U_];
-                        sc_residual = [sc_residual;NaN];
-                end
+%                 if isNaN(U_(1)) || ~isreal(U_(1)) || U_(1)<0
+% 
+%                         U_ = [NaN NaN NaN NaN NaN];
+%                         sc = [sc; U_];
+%                         sc_residual = [sc_residual;NaN];
+%                 end
   
-                sc = [sc; real(U_)];
-                sc_residual = [sc_residual;real(fval)];
-                co2_conc_ = (real(U_(2)));%/starsun.m_H2O(i); 
+                sc(i,:) = real(U_);
+                sc_residual(i) = real(fval);
+                co2_conc_ = (real(U_(2)));%/s.m_H2O(i); 
                 co2_round = round(co2_conc_*100)/100;
                %[x,fval,exitflag,output,lambda,grad] =  fmincon(fun,x0,A,b,Aeq,beq,lb,ub,nonlcon,options);
                % plot fitted figure
@@ -69,49 +72,49 @@ for i = 1:length(starsun.t)
                 % save spectrum to subtract
                 tau_co2ch4_subtract(i,wln) = -log(exp(-(ch4coef(wln).*real(U_(1)))).*exp(-(co2coef(wln).*real(U_(2)))));
 %                       figure(444);
-%                       plot(starsun.w(wln),y,'-b');hold on;
-%                       plot(starsun.w(wln),yopt,'--r');hold on;
-%                       plot(starsun.w(wln),tau_aero_subtract(i,wln),'-c');hold on;
-%                       plot(starsun.w(wln),y-tau_aero_subtract(i,wln),'-k');hold off;
+%                       plot(s.w(wln),y,'-b');hold on;
+%                       plot(s.w(wln),yopt,'--r');hold on;
+%                       plot(s.w(wln),tau_aero_subtract(i,wln),'-c');hold on;
+%                       plot(s.w(wln),y-tau_aero_subtract(i,wln),'-k');hold off;
 %                       xlabel('wavelength','fontsize',12);ylabel('total OD','fontsize',12);
 %                       legend('measured','calculated (fit)','spectrum to subtract','subtracted spectrum');
-%                       title([datestr(starsun.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(starsun.Altavg(i)) 'm' ' CO2= ' num2str(co2_round) '[atm x cm]']);
+%                       title([datestr(s.t(i),'yyyy-mm-dd HH:MM:SS') ' Alt= ' num2str(s.Altavg(i)) 'm' ' CO2= ' num2str(co2_round) '[atm x cm]']);
 %                       ymax = yopt + 0.2;
-%                       axis([min(starsun.w(wln)) max(starsun.w(wln)) 0 max(ymax)]);
+%                       axis([min(s.w(wln)) max(s.w(wln)) 0 max(ymax)]);
 %                       pause(0.0001);
                 % subtract fitted spectrum from slant
                 % tau_aero_subtract(i,wln) = tau_ODslant(i,wln) - ODfit(i,wln) + baseline(i,:);
-       else
-          
-               U_ = [NaN NaN NaN NaN NaN];
-               sc = [sc; U_];
-               sc_residual = [sc_residual;NaN];
+%        else
+%           
+%                U_ = [NaN NaN NaN NaN NaN];
+%                sc = [sc; U_];
+%                sc_residual = [sc_residual;NaN];
            
        end
-       if starsun.toggle.verbose; upd(i); end;   
+       if s.toggle.verbose; upd(i); end;   
 end
 
 %% correct spectrum to subtract
 % order2=1;  % order of baseline polynomial fit
-%  poly3=zeros(length(starsun.w(wln)),length(starsun.UTavg));  % calculated polynomial
-%  poly3_c=zeros(length(starsun.UTavg),(order2)+1);            % polynomial coefficients
+%  poly3=zeros(length(s.w(wln)),length(s.UTavg));  % calculated polynomial
+%  poly3_c=zeros(length(s.UTavg),(order2)+1);            % polynomial coefficients
 %  order_in2=1;
 %  thresh_in2=0.01;
 %  % deduce baseline
-%  for i=1:length(starsun.UTavg)
+%  for i=1:length(s.UTavg)
 %  % function (fn) can be: 'sh','ah','stq','atq'
 %  % for gui use (visualization) write:
-%  % [poly2_,poly2_c_,iter,order,thresh,fn]=backcor(wvis(wln_ind),starsun.tau_aero(goodTime(i),wln_ind));
+%  % [poly2_,poly2_c_,iter,order,thresh,fn]=backcor(wvis(wln_ind),s.tau_aero(goodTime(i),wln_ind));
 %          % perform baseline on vertical total OD (rayleigh excluded)
-%          [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(starsun.w(wln),tau_aero_subtract(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
+%          [poly3_,poly3_c_,iter,order_lin,thresh,fn] = backcor(s.w(wln),tau_aero_subtract(i,wln),order_in2,thresh_in2,'atq');% backcor(wavelength,signal,order,threshold,function);
 %          poly3(:,i)=poly3_;        % calculated polynomials
 %          poly3_c(i,:)=poly3_c_';   % polynomial coefficients
 %  
 %          % plot AOD baseline interpolation and real AOD values
 %  %                   figure(1111)
-%  %                   plot(starsun.w(wln),tau_OD(i,wln),'.b','markersize',8);hold on;
-%  %                   plot(starsun.w(wln),poly3_,'-r','linewidth',2);hold off;
-%  %                   legend('AOD','AOD baseline');title(num2str(starsun.UTavg(i)));
+%  %                   plot(s.w(wln),tau_OD(i,wln),'.b','markersize',8);hold on;
+%  %                   plot(s.w(wln),poly3_,'-r','linewidth',2);hold off;
+%  %                   legend('AOD','AOD baseline');title(num2str(s.UTavg(i)));
 %  %                   pause(0.01);  
 %  
 %  end
@@ -121,7 +124,7 @@ end
 %   
 %       baseline = (tau_aero)';%this is slant
 %       spectrum = tau_aero_subtract(:,wln);
-%       spectrum_sub = (spectrum-baseline);%./repmat(starsun.m_aero,1,qqvis);
+%       spectrum_sub = (spectrum-baseline);%./repmat(s.m_aero,1,qqvis);
 %   %s
 
 

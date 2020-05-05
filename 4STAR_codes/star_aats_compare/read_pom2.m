@@ -1,4 +1,4 @@
-function prede = read_prede(filename,prede);
+function prede = read_pom2(filename,prede);
 % prede = read_prede(filename,prede)
 %This should read Prede sun/sky files of all types except disk scan.
 if ~exist('filename', 'var')
@@ -108,7 +108,12 @@ if fid>0
             else
                rec = 1;
             end
-            format_str = ['%s %*s',repmat(' %f',[1,prede.header.numFilters])];
+%13:46:00,08:46:00,
+%-088.59,000.49,
+%1.1829E-09,9.6214E-10,2.5734E-10,9.0446E-09,2.3933E-06,3.8399E-05,6.7001E-05,4.2656E-07,2.6497E-05,7.7698E-05,2.4658E-05,
+%21.4,-20.6,-999,00982
+
+            format_str = ['%s %*s %f %f ',repmat('%f ',[1,prede.header.numFilters]),'%f %f %f %f'];
             C = textscan(tmp,format_str, 'delimiter',',');
             UTC = C{1}{:};
             %          {sky_mode, num2str(rec)}
@@ -129,7 +134,10 @@ if fid>0
 %                disp(ii)
                prede.(['filter_' num2str(f)])(rec) = C{4+f-1};
             end
-
+            prede.T_Si_Det(rec) = C{15};
+            prede.T_InGaAs_Det(rec) = C{16};
+            prede.unknown(rec) = C{17};
+            prede.flags(rec) = C{18};
          end
       end
    end

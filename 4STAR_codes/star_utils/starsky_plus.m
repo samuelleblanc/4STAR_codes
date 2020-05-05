@@ -10,7 +10,7 @@ function s = starsky_plus(s)
 % anet_dl, CWV, O3_DU, TOD, AOD, AGOD, flt_lev_alb, land_fraction, rad_scale,
 % flight_level...
 
-if ~exist('s','var')
+if ~isavar('s')
    sfile = getfullname('*STARSKY*.mat','starsky','Select star sky mat file.');
    s = load(sfile);
    if isfield(s,'s_out')
@@ -37,10 +37,8 @@ if in_air && ~s.toggle.no_SSFR
    [flight_alb, out_time] = get_ssfr_flight_albedo(s.t,s.w);
    imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,s.fstem,filesep];
+   if ~isadir(skyimgdir) ; mkdir(imgdir,s.fstem); end
    fig_out = [skyimgdir, s.fstem,s.created_str,'SSFR_albedo'];
-   if ~isadir([imgdir,s.fstem]);
-       mkdir(imgdir, s.fstem);
-   end
    saveas(gcf,[fig_out,'.fig']);
    saveas(gcf,[fig_out,'.png']);
    ppt_add_slide(s.pptname, fig_out);
@@ -114,7 +112,7 @@ if contains(skytag,'_STARSKY')
    skytag = strrep(skytag,'_STARSKY','_aSTARSKY');
 end
 
-if ~exist([pname_mat, skytag,'.mat'],'file')
+if ~isafile([pname_mat, skytag,'.mat'])
    save([pname_mat, skytag,'.mat'], '-struct','s');
 end
 

@@ -48,7 +48,7 @@ version_set('2.1');
 vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
-if exist('reset','var')&&reset
+if isavar('reset')&&reset
    setnamedpath('stardat','Select the location for raw *.dat files...');
    matfolder = setnamedpath('starmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]']);
    setnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]');
@@ -84,6 +84,8 @@ elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on plei
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'kpistone'))
     author='Kristina';
+elseif ~isempty(strfind(lower(userpath), 'loganm818'))
+    author='Logan';
 else
     warning('Update starpaths.m');
     author='anon_star_user';
