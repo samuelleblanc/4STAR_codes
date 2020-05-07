@@ -119,7 +119,7 @@ else
 end
 
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = merge_toggle(s.toggle, toggle);
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -191,7 +191,7 @@ end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle,toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = merge_toggle(s.toggle, toggle);
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -472,7 +472,8 @@ end;
 v=datevec(s.t);
 [s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
 s.sza=90-s.sunel;
-s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
+s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code, "f" is actually 1/solar_distance^2
+s.soldst_au = sqrt(1./s.f);
 clear v;
 [s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
 
@@ -854,6 +855,13 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
 %      figure_(2999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:); gas_od; s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:)- gas_od],'-'); legend('tot','gas','aero?');logy;
 %  
    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
+   
+   if isfield(s.toggle,'use_last_wl')&& s.toggle.use_last_wl
+       [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(s);
+       s.wl_ = last_wl.wl_; s.wl_ii = last_wl.wl_ii; s.w_isubset_for_polyfit= last_wl.w_fit_ii;
+       s.aeronetcols = s.wl_ii;
+   end
+   
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
    s.tau_aero_polynomial=[a2 a1 a0];
    
