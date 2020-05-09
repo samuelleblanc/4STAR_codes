@@ -49,7 +49,7 @@ toggle_out.debug = true; % Steps into debug execution after untrapped errors
 load('RadUncAt4STARwl.mat','RadUncAt4STARwl');
 toggle_out.sky_rad_scale = 1-0*RadUncAt4STARwl;
 if isavar('toggle_in')
-    s.toggle = merge_toggle(toggle_out, toggle_in);
+    toggle_out = merge_toggle(toggle_out, toggle_in);
 end
 
 return
