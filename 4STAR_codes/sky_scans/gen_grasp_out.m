@@ -64,6 +64,16 @@ inp.header(end+1,1) = {sprintf('%% Solar geometry: SZA=%2.1f, SAZ=%2.1f, SEL=%2.
 N_wl = sum(s.wl_);N_obs = sum(good_); N_sun_obs = sum(sun_); N_sky_obs = sum(sky_); alb_src = 'SSFR'; 
 inp.header(end+1,1) = {sprintf('%% Config details: N_wavelengths=%d,N_obs=%d, N_sun_obs=%d, N_sky_obs=%d, albedo_source=%s',[N_wl, N_obs, N_sun_obs, N_sky_obs,alb_src])};
 
+inp.header(end+1,1) = {sprintf('%% rec_type: meaning for "rec_type" tag, type of spectra reported')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=1: Tr_LOS, atmospheric transmittance, line of sight to sun')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=2: TOD_LOS, total observed OD, line of sight to sun = -ln(Tr_LOS)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=3: ROD, Rayleigh molecular OD, vertical above Alt')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=4: AOD, aerosol OD subtract all gasses, vertical above Alt (=TOD-ROD-GOD_retrieved)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=5: AOD_fit, 3rd order polynomial fit of AOD subtract-all over gas-free wavelengths')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=6: GOD_obs, gaseous OD inferred as TOD - ROD - AOD_fit ')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=-1: RAD, sky radiance [W/m2/nm/sr] (= s.skyrad./1000)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=-2: NRAD, normalized sky radiance [1/sr] (=pi*RAD/TOA)')};
+  
 inp.static_data(1,1) = {['wavelength(N_wavelengths)[nm]=[',sprintf('%3.1f',1000.*s.w(s.wl_ii(1))),sprintf(', %3.1f',1000.*s.w(s.wl_ii(2:end))),']']};
 % Add spectrometer FWHM
 % Add uncertainty estimate for AOD, for skyrad
