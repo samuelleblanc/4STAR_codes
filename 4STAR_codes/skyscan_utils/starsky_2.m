@@ -20,6 +20,7 @@ version_set('1.2');
 if ~isavar('toggle')||isempty(toggle)
     toggle = update_toggle;
 end
+toggle = flip_toggle(toggle);
 %********************
 % regulate input and read source
 %********************
