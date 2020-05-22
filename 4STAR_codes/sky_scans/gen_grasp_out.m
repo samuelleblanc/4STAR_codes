@@ -101,7 +101,7 @@ inp.static_data(end+1,1) = {['TOA_irradiance_Gueymard(N_wavelengths)[W/m2/nm]=['
 nrad = pi.*skyrad./(ones(size(sky_ii))*g_ESR);
 
 Tr_LOS = s.rate(sun_,s.wl_).*(soldst_au.^2)./s.c0(s.wl_);
-TOD_LOS =real(log(Tr_LOS));
+TOD_LOS =real(-log(Tr_LOS));
 ROD = s.tau_ray(sun_,s.wl_);
 AOD = s.tau_aero_subtract_all(sun_,s.wl_);
 for ss = length(sun_ii):-1:1
@@ -120,7 +120,7 @@ for ss = 1:length(good_ii)
     ti = good_ii(ss);
     stub = sprintf('%s, %d, %d, %d, %d, %d , %2.3f, %2.4f, %3.4f, %2.1f, %2.1f, %2.1f, %2.1f, %2.1f, %2.1f, %2.1f, %2.1f, ',...
         datestr(s.t(ti),'yyyy-mm-dd HH:MM:SS.fff UT'),V(ss,:), s.Lat(ti), s.Lon(ti), s.Alt(ti),...
-        s.sza(ti), s.sunel(ti), s.sunaz(ti),s.sza(ti), s.sunel(ti), s.sunaz(ti),s.SA(ti));
+        s.sza(ti), s.sunel(ti), s.sunaz(ti),90-s.El_gnd(ti), s.El_gnd(ti), s.Az_gnd(ti),s.SA(ti));
     if any(sun_ii==ti) % Then it is a sun spectra, so report various direct beam products
         for rec_type = 1:6
             in = find(sun_ii==ti);
