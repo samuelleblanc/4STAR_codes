@@ -9,6 +9,8 @@ function TF = isafile(in)
 % Connor, v1.2, 2020/05/03, Removed nexted function "isavar".  Caused
 % problems with version_set to add a static field to function with a nexted
 % function.  
+% Connor, v1.3, 2020/06/03, Modified test of whether supplied name is found
+% in reconstructed name to only test filename+ext.
 version_set('1.2');
 
 TF = false;
@@ -21,7 +23,8 @@ if isavar('in')
             out.folder = [fileparts(in),filesep];
         end
         out = fullfile(out.folder, out.name);
-        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in));
+        [~,in_,ex] = fileparts(in);in_ex = [in_ ex];
+        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in_ex));
     end
 end
 end

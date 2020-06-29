@@ -1,4 +1,4 @@
-function s=starsky(mat_file,toggle)
+function s=starsky_2(mat_file,toggle)
 % savematfile=starsky(mat_file,toggle)
 % Process a single 4STAR sky scan from raw or starsky.mat
 %
