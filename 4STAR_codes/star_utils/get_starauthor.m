@@ -34,6 +34,8 @@ elseif ~isempty(strfind(usr,'sleblan2'))
     author='Samuel';
 elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
     author='Samuel';
+elseif ~isempty(strfind(usr,'lebla')) % for running on pleiades
+    author='Samuel';
 elseif ~isempty(strfind(usr,'kpistone'))
     author='Kristina';
 else
