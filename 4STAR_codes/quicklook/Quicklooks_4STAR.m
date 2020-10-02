@@ -1192,9 +1192,36 @@ if isavar('tau_aero')
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
 
 end
-
-
-
+% ******************
+%% Plot Angstrom exponent for a quick view of the behavior
+% ******************
+if isavar('tau_aero_noscreening')
+    [visc,nirc]=starchannelsatAATS(s.t);
+    colsang=visc([3 7]);
+    ang=sca2angstrom(s.tau_aero_noscreening(:,colsang), s.w(colsang));
+    
+    fsang = figure;
+    pla = plot(s.t,ang,'.');
+    lstr = {'All data'};
+    if isavar('tau_aero')
+        angg = sca2angstrom(s.tau_aero(:,colsang), s.w(colsang));
+        hold on; p2 = plot(s.t,angg,'.'); 
+        pla = [pla p2];
+        lh = legend('No screening','Screened');
+    else
+        lh=legend('No screeneing');
+    end
+    set(lh,'fontsize',12,'location','best');
+    dynamicDateTicks;
+    xlabel('UTC time');
+    ylabel('Angstrom Exponent');
+    grid;
+    title([instrumentname ' - ' daystr ' - Angstrom' ]);
+    fname = fullfile(p1,[instrumentname daystr '_angstrom']);
+    fig_names = [fig_names,{[fname '.png']}];
+    save_fig(fsang,fname,0);
+    pptcontents0=[pptcontents0; {fig_names{end} 1}];
+end
 
 %********************
 %% plot gas retrievals results
