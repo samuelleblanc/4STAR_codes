@@ -1,4 +1,4 @@
-function compare_star_2_aeronet();
+function fig_paths = compare_star_2_aeronet();
 %% PURPOSE:
 %   Compare the 4STAR aod values to a cimel aeronet v1.5 ground site. 
 %
@@ -21,17 +21,21 @@ function compare_star_2_aeronet();
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Samuel LeBlanc, Santa Cruz, CA, 2017-10-20
-% Modified (v1.0): 
+% Modified (v1.1): Samuel LeBlanc, Santa Cruz, CA, 2020-09-21
+%                  Changed pathing to use the getnamedpath starsun and
+%                  starfig
+%                  Added return of figure path files
 % -------------------------------------------------------------------------
 
 %% start of function
-version_set('1.0')
+version_set('1.1')
 
-%% load the files
-if getUserName == 'sleblan2'; fp = 'C:\Users\sleblan2\Research\ORACLES\data_2017'; else; fp = ''; end;
+%% load the file
+fp = getnamedpath('starsun');
 [file pname fi]=uigetfile2('*starsun*.mat','Find starsun file for comparison .mat',fp);
 
 disp(['Loading the matlab file: ' pname file])
+[daystr, filen, datatype, instrumentname]=starfilenames2daystr({[pname file]});
 max_alt_diff = 200.0
 max_seconds_diff = 360.0
 
@@ -41,7 +45,7 @@ catch;
     load([pname file]);
 end;
 
-if getUserName == 'sleblan2'; fp = 'C:\Users\sleblan2\Research\ORACLES\data_other_2017'; else; fp = ''; end;
+fp = getnamedpath('starsun');
 [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
 a = aeronet_read_lev([apname afile]);
 
@@ -79,8 +83,8 @@ hold on; dynamicDateTicks;
 for n=2:length(wvls);
     plot(t(i),tau_aero_noscreening(i,iw(n)),'o','Color',cm(n,:));
 end;
-title('4STAR ground time trace')
-ylabel('4STAR AOD'); grid; xlabel('Time')
+title([instrumentname ' ground time trace'])
+ylabel([instrumentname ' AOD']); grid; xlabel('Time')
 
 ax2 = subplot(3,1,2);
 plot(a.jd,a.aot(:,a.iw(1)),'x','Color',cm(1,:));
@@ -106,19 +110,22 @@ for n=2:length(wvls);
     lns = {lns{:},ln};
 end;
 
+fig_paths = {};
+
 linkaxes([ax1,ax2,ax3],'x');
 dynamicDateTicks;
-title(['Time trace 4STAR vs. AERONET for ' a.location ' within ' num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds'],'Interpreter','none')
+title(['Time trace ' instrumentname ' vs. AERONET for ' a.location ' within ' num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds'],'Interpreter','none')
 ylabel('AOD');grid;
-legend('4STAR','AERONET')
+legend(instrumentname,'AERONET')
 colormap(cm)
 nms = strtrim(cellstr(num2str(wvls'))');
 labels = strread(num2str(wvls,'%5.0f'),'%s');
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 hold off;
-fname = fullfile([apname '4STAR_AERONET_timetrace_' a.location]);
+apname = getnamedpath('starfig');
+fname = fullfile([apname instrumentname '_AERONET_timetrace_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
-
+fig_paths = [fig_paths; [fname '.png']];
 
 % plot the scatter plot of AOD 4STAR vs AOD AERONET, with linear fits and
 % differences
@@ -138,16 +145,16 @@ for n=2:length(wvls);
 end;
 yu = max(a.aot(iidat,a.iw(end)));
 plot([0,yu],[0,yu],':k')
-xlabel('4STAR AOD');
+xlabel([instrumentname ' AOD']);
 ylabel(['AERONET AOD at: ' a.location ', ' a.level],'Interpreter','none');
-title(['4STAR vs. AERONET for ' a.location],'Interpreter','none');
+title([instrumentname ' vs. AERONET for ' a.location],'Interpreter','none');
 ylim([0,yu]);xlim([0,yu]);
 legend(pln,lbls,'location','southeast','FontSize',8)
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-fname = fullfile([apname '4STAR_AERONET_scatter_' a.location]);
+fname = fullfile([apname instrumentname '_AERONET_scatter_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
-
+fig_paths = [fig_paths; [fname '.png']];
 
 % Plot the difference between 4STAR AOD and AERONET AOD as a function of
 % airmass
@@ -159,7 +166,7 @@ for n=2:length(wvls);
     plot(mod(t2utch(t(ii)),24),tau_aero_noscreening(ii,iw(n))-a.aot(iidat,a.iw(n)),'+','Color',cm(n,:));
 end;
 
-ylabel('AOD difference (4STAR-AERONET)');
+ylabel(['AOD difference (' instrumentname '-AERONET)']);
 xlabel('UTC from start of day [hours]'); xlim([0,24])
 grid on;
 dtv = datevec(t(ii(1)));
@@ -167,7 +174,7 @@ dtv = datevec(t(ii(1)));
 [ax,h1,h2] = plotyy([0],[0.001],[0:0.1:24.0],sza); 
 ylabel(ax(2), 'SZA [^{\circ}]')
 hold off;
-title(['Difference between 4STAR and AERONET at: ' a.location],'Interpreter','none')
+title(['Difference between ' instrumentname ' and AERONET at: ' a.location],'Interpreter','none')
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 
@@ -179,14 +186,14 @@ for n=2:length(wvls);
     plot(m_aero(ii),tau_aero_noscreening(ii,iw(n))-a.aot(iidat,a.iw(n)),'+','Color',cm(n,:));
     get_linfit(m_aero(ii),tau_aero_noscreening(ii,iw(n))-a.aot(iidat,a.iw(n)),cm(n,:));
 end;
-ylabel('AOD difference (4STAR-AERONET)');
-xlabel('airmass'); xlim([1,7]);
+ylabel(['AOD difference (' instrumentname '-AERONET)']);
+xlabel('airmass'); xlim([1,3]);
 grid on; hold off;
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
-fname = fullfile([apname '4STAR_AERONET_difference_' a.location]);
+fname = fullfile([apname instrumentname '_AERONET_difference_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
-
+fig_paths = [fig_paths; [fname '.png']];
 return
 
 function [line,label] = get_linfit(x,y,color)
