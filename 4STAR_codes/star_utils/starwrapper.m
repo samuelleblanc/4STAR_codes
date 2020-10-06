@@ -105,8 +105,9 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % toggle was being set, and added logic to set toggle.applyforjcorr to
 % false if 2STAR, 4STARB, or forj measurement
 % SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
+% SL: v3.4, 2020-10-05, Added check if 4STARB to disable water vapor and trace gas retrieval
 
-version_set('3.3');
+version_set('3.4');
 %********************
 %% prepare for processing
 %********************
@@ -292,7 +293,8 @@ else; % copy an existing old starinfo file and run it
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if isafile(infofile_previous);
-         copyfile(infofile_previous, infofile_);
+          change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
+         %copyfile(infofile_previous, infofile_);
          open(infofile_);
          eval([infofile_(1:end-2),'(s)']);
          %run(infofile_);
@@ -726,10 +728,14 @@ s.tau_tot_vertical(~sun_,:) = NaN;
 
 % water vapor retrieval (940fit+c0 method)
 %-----------------------------------------
-if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
+if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox exists
    toggle.runwatervapor = false;
    warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
-end;
+end
+if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
+    toggle.runwatervapor = false;
+    if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
+end
 if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'))||~isempty(strfind(lower(datatype),'sky'));
    if toggle.runwatervapor;
       disp('water vapor retrieval start')
