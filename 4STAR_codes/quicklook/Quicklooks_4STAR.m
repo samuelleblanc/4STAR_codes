@@ -984,7 +984,7 @@ if isavar('tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');
     ylabel('tau_aero');
-    if max(s.tau_aero(:,iwvlv))<1.2; tma = max(max(s.tau_aero(:,iwvlv)))*1.05; else tma=1.2; end;
+    if max(s.tau_aero(:,iwvlv(1)))<2.5; tma = max(max(s.tau_aero(:,iwvlv(1))))*1.05; else tma=2.5; end;
     ylim([0.0,tma]);
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
@@ -1157,16 +1157,22 @@ if isavar('tau_aero')
     loglog(s.w.*1000.0,s.tau_aero(1,:),'.'); hold on;
     labels = {}; labels{1} = datestr(s.t(1),'HH:MM');
     ji = find(isfinite(s.tau_aero(:,400)));
+    min_aod = 0.0001;
+    max_aod = 1.0;
+    decimal = 4;
     if length(ji)>0
         for i=2:nl
             ik = ji(floor(length(ji)./nl.*i));
             loglog(s.w.*1000.0,s.tau_aero(ik,:),'.');
             labels{i} = datestr(s.t(ik),'HH:MM');
+            if max_aod<s.tau_aero(ik,250), max_aod = ceil(s.tau_aero(ik,250)); end;
+            if min_aod<s.tau_aero(ik,1510), min_aod = floor(10^decimal*s.tau_aero(ik,1510))/(10^decimal); end;
         end;
-        ylim([0.0001,1.0]);
-        xlabel('Wavelength [nm]'); xlim([350,1700]);
+        ylim([min_aod,max_aod]);
+        xlabel('Wavelength [nm]'); xlim([330,1710]);
         ylabel('tau_aero','Interpreter','None');
         title([daystr ' - Spectra of AOD'])
+        grid;
         colormap(cm)
         lcolorbar(labels,'TitleString','UTC [H]')
         fname = fullfile(p1,[instrumentname daystr '_spectra_aod']);
@@ -1177,7 +1183,7 @@ if isavar('tau_aero')
 
     fspcar = figure('pos',[100,100,1000,800]);
     colormap(parula);
-    s.tau_aero(find(s.tau_aero<-0.1)) = NaN;s.tau_aero(find(s.tau_aero>1.5)) = NaN;
+    s.tau_aero(find(s.tau_aero<-0.1)) = NaN;s.tau_aero(find(s.tau_aero>2.5)) = NaN;
     imagesc(s.t,s.w.*1000.0,s.tau_aero');
     dynamicDateTicks;
     xlabel('UTC time');xlim([s.t(1)-ddt s.t(end)+ddt]);
@@ -1788,6 +1794,17 @@ if isfield(s,'langley')||isfield(s,'langley1')
     pptcontents0=[pptcontents0; {langley_figs{end} 1}];
 end
 end
+
+%% Compare to AERONET
+aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
+if length(aeronet_fig_paths)>0
+    pptcontents0=[pptcontents0; {aeronet_fig_paths{1} 1}];
+    pptcontents0=[pptcontents0; {aeronet_fig_paths{2} 4}];
+    pptcontents0=[pptcontents0; {aeronet_fig_paths{3} 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+end
+
 
 %% Print out the toggle states
 

@@ -1,4 +1,4 @@
-function fig_paths = compare_star_2_aeronet();
+function fig_paths = compare_star_2_aeronet(fname_starsun);
 %% PURPOSE:
 %   Compare the 4STAR aod values to a cimel aeronet v1.5 ground site. 
 %
@@ -32,25 +32,37 @@ version_set('1.1')
 
 %% load the file
 fp = getnamedpath('starsun');
-[file pname fi]=uigetfile2('*starsun*.mat','Find starsun file for comparison .mat',fp);
-
-disp(['Loading the matlab file: ' pname file])
-[daystr, filen, datatype, instrumentname]=starfilenames2daystr({[pname file]});
+if nargin<1;
+    [file pname fi]=uigetfile2('*starsun*.mat','Find starsun file for comparison .mat',fp);
+    fname_starsun = [pname file];
+end
+disp(['Loading the matlab file: ' fname_starsun])
+[daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_starsun});
 max_alt_diff = 200.0
 max_seconds_diff = 360.0
 
 try; 
-    load([pname file],'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt');
+    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt');
 catch;
-    load([pname file]);
+    load(fname_starsun);
 end;
 
 fp = getnamedpath('starsun');
-[afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
+dis = dir([daystr(3:end) '*.lev??']);
+if length(dis) ~= 1
+    [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
+    if afile==0
+        fig_paths = {};
+        return 
+    end
+else
+    apname = [dis.folder filesep];
+    afile = dis.name;
+end
 a = aeronet_read_lev([apname afile]);
 
 %% filter out the bad aod 4STAR
-i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<1.5)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
+i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
 
 %% knnsearch to find the closest times to compare aeronet and 4STAR data
 % make sure to only have unique valuesSL331125766198
@@ -63,6 +75,9 @@ it = find(i);
 ii = it(it_un(idat(iidat)));
 ia = iidat;
 
+if length(it)<1;
+    warning('No good 4STAR data found to compare, please reevaluate the filtering in compare_star_2_aeronet.m')
+end
 %% match aeronet wvls to 4STAR's
 wvls = a.wlen(a.anywlen==1);
 a.iw = find(a.anywlen==1);
@@ -166,12 +181,15 @@ for n=2:length(wvls);
     plot(mod(t2utch(t(ii)),24),tau_aero_noscreening(ii,iw(n))-a.aot(iidat,a.iw(n)),'+','Color',cm(n,:));
 end;
 
+new_time = mod(t2utch(t(ii)),24);
+
 ylabel(['AOD difference (' instrumentname '-AERONET)']);
-xlabel('UTC from start of day [hours]'); xlim([0,24])
+xlabel('UTC from start of day [hours]'); xlim([new_time(1)*0.95,new_time(end)*1.02]);
 grid on;
 dtv = datevec(t(ii(1)));
 [azi,sza,r] = sun(a.long, a.lat,dtv(3), dtv(2), dtv(1), [0:0.1:24.0],[0:0.1:24.0].*0+288.15,[0:0.1:24.0].*0+950.0);
 [ax,h1,h2] = plotyy([0],[0.001],[0:0.1:24.0],sza); 
+xlim([new_time(1)*0.95,new_time(end)*1.02]);
 ylabel(ax(2), 'SZA [^{\circ}]')
 hold off;
 title(['Difference between ' instrumentname ' and AERONET at: ' a.location],'Interpreter','none')

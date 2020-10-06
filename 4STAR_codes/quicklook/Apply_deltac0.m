@@ -48,6 +48,7 @@ end;
 
 load_sp = true;
 load([fp file]);
+fp_img = getnamedpath('starimg');
 
 if nargin<3;
     isflight = false;
@@ -108,6 +109,9 @@ set(gca,'XTickLabel','');
 ax3 = subplot(7,1,3);
 plot(ax3,t(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
 hold on;grid on; ylabel(['AOD ' leg{3} ' nm']);ylim([-0.02,0.08]);
+if length(find(aod_500nm(i)<0.08))==0
+    text(ax3,min(t(i))+0.2*(max(t(i))-min(t(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+end
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(3/7-0.01) .92 1/7-0.03]);
 title(['delta c0 + ' num2str(deltac0_percent,'%3.1f') '%'],'Interpreter','none')
@@ -152,7 +156,7 @@ catch;
     disp(['No points for day:' days(i,:)])
 end;
 %set(gcf,'pos',[10 10 600 1500])
-fname = fullfile(fp,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_time']);
+fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_time']);
 save_fig(figaas,fname,0);
 saved_fig_path = [fname '.png'];
 
@@ -177,6 +181,9 @@ set(gca,'XTickLabel','');
 ax3 = subplot(7,1,3);
 plot(ax3,m_aero(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
 hold on;grid on; ylim([-0.02,0.04]);ylabel(['AOD ' leg{3} ' nm']);
+if length(find(aod_500nm(i)<0.04))==0
+    text(ax3,min(m_aero(i))+0.2*(max(m_aero(i))-min(m_aero(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+end
 set(gca,'Position',[0.07 1-(3/7-0.01) .92 1/7-0.03]);
 title(['delta c0 + ' num2str(deltac0_percent,'%3.1f') '%'],'Interpreter','none')
 
@@ -215,7 +222,7 @@ try;
 catch;
     disp(['No points for day:' days(i,:)])
 end;
-fname = fullfile(fp,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_airmass']);
+fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_airmass']);
 save_fig(figm,fname,0);
 saved_fig_path =[{saved_fig_path}; {[fname '.png']}];
 
@@ -269,7 +276,7 @@ if load_sp;
     end;
     hold off;
     
-    fname = fullfile(fp,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_spectra']);
+    fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_spectra']);
     save_fig(figs,fname,0);
     saved_fig_path =[saved_fig_path; {[fname '.png']}];
 end;
