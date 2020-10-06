@@ -33,7 +33,10 @@ version_set('v1.0');
 
 %% start of function
 fidi=fopen(starinfo_in,'r');
-if exist(starinfo_out) & nargin<5
+if nargin <5
+   force_overwrite = false; 
+end
+if exist(starinfo_out) & ~force_overwrite
     error(['File : ' starinfo_out ' Already exists'])
 end
 fido=fopen(starinfo_out,'w');
