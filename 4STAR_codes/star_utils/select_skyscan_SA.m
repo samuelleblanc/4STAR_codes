@@ -6,14 +6,13 @@ function star = select_skyscan_SA(star)
 
 % Check for existence of sky_wl and that it matches the wl in star.wl_.
 skyrad = star.skyrad(:,star.wl_);
-skymask = ones(size(skyrad));
-wl_ii = star.wl_ii;
+skymask = star.skymask(:,star.wl_);
+wl_ii = star.wl_ii; rain = length(wl_ii)>7;
 if ~isfield(star,'sky_wl')
    star.sky_wl = star.w(star.wl_);
    good_sky = false(size(star.good_sky*star.wl_ii));
    good_sky(star.good_sky,:) = true;
-   skymask(~good_sky) = NaN;
-   
+   skymask(~good_sky) = NaN;   
 else
    if length(star.sky_wl)~=sum(star.wl_) || ~all(star.sky_wl==star.w(star.wl_))
       sky_wl_ii = interp1(star.w, [1:length(star.w)],star.sky_wl,'nearest');
@@ -25,9 +24,9 @@ else
       good_sky(:,ii_new) = any(star.good_sky,2)*ones([1,length(ii_new)]);
       
       star.sky_wl = star.w(star.wl_);
-   else
-      skymask = star.skymask;
-      good_sky = star.good_sky;
+%    else
+%       skymask = star.skymask;
+%       good_sky = star.good_sky;
    end
 end
 figure_(1000);
@@ -66,11 +65,13 @@ while ~done % with SA selection
       ylabel('mW/(m^2 sr nm)');
       title('Select or reject points for retrieval','interp','none')
       grid('on'); set(gca,'Yminorgrid','off');
-      leg_str{1} = sprintf('%2.0f nm',star.w(wl_ii(1))*1000);
-      for ss = 2:length(wl_ii)
-         leg_str{ss} = sprintf('%2.0f nm',star.w(wl_ii(ss))*1000);
+      if ~rain;
+          leg_str{1} = sprintf('%2.0f nm',star.w(wl_ii(1))*1000);
+          for ss = 2:length(wl_ii)
+              leg_str{ss} = sprintf('%2.0f nm',star.w(wl_ii(ss))*1000);
+          end
+          legend(leg_str,'location','northeast');
       end
-      legend(leg_str,'location','northeast');
       hold('on');
       ax = gca;
       ax.ColorOrderIndex = 1;
@@ -85,16 +86,19 @@ while ~done % with SA selection
       hold('off')
       %         xlim([0,85+star.sza(1)-max(abs(star.pitch))-max(abs(star.roll))]);
    end
+   if rain
+       recolor(linesA,1000.*star.w(wl_ii)); cb = colorbar;cbt=get(cb,'title'); set(cbt,'string','nm')
+       if isavar('linesB') recolor(linesB,1000.*star.w(wl_ii));
+       end
+   end
    zoom('on');
    
-   act = menu('Now zoom in to specific regions and select the desired action, or exit','Include','Exclude','Toggle','ONLY these', 'No change', 'Done/Exit');
-   if act==6
+   act = menu('Now zoom in to specific regions and select the desired action, or exit','Include','Exclude','Toggle','ONLY these','Done/Exit');
+   if act==5
       done = true;
    else
       % Now zoom in and include, toggle, or exclude
-      
-      %         skyrad = star.skyrad(:,wl_);
-      %         skymask = zeros(size(skyrad));
+
       v = axis;
       for wi = 1:length(wl_ii)
          in_bounds =  ang>=v(1)&ang<=v(2)&skyrad(:,wi)>=v(3)&skyrad(:,wi)<=v(4)&star.Str==2;
@@ -128,7 +132,7 @@ while ~done % with SA selection
       end
    end
 end
-star.good_sky = good_sky;
-star.skymask = skymask;
+
+star.skymask(:,star.wl_) = skymask ;
 
 return

@@ -112,15 +112,20 @@ elseif isfield(ssfr,'DN415') % maybe ICT?
     ssfr_up(miss) = NaN; ssfr_down(miss) = NaN;
     ssfr_alb = ssfr_up./ssfr_down;
     ssfr_alb(ssfr_alb<0|ssfr_alb>1) = NaN; ssfr_alb(miss) = NaN;
-    flight_alb = interp1(wl', ssfr_alb(:,ainb), in_lambda,'linear');    
-    figure_(442); xx(2) = subplot(2,1,2);
-    plot(ssfr.time, ssfr_alb(3,:),'k.',ssfr.time(ainb), ssfr_alb(3,ainb),'ro'); dynamicDateTicks
-    legend('flight albedo')
-    xx(1) = subplot(2,1,1);
-    plot(ssfr.time, ssfr_down(3,:),'-',ssfr.time, ssfr_up(3,:),'-'); dynamicDateTicks
-    legend('down','up');
+    flight_alb = interp1(wl', ssfr_alb(:,ainb), in_lambda,'linear'); 
+    xl_time = mean(ssfr.time(ainb));
+    figure_(442); 
+    xx(1) = subplot(3,1,1);
+    plot(ssfr.time, ssfr_down(3,:),'-',ssfr.time, ssfr_up(3,:),'-',...
+        ssfr.time, ssfr_alb(3,:),'k.',ssfr.time(ainb), ssfr_alb(3,ainb),'r.'); dynamicDateTicks
+    legend('downwelling','upwelling', 'albedo');
     title(['SSFR irradiances: ',datestr(ssfr.time(1),'yyyymmdd HH:MM'), '-',...
-    datestr(ssfr.time(end),'HH:MM')]);    
+    datestr(ssfr.time(end),'HH:MM')]);  
+xlim([xl_time - .25./24, xl_time + .25./24]);dynamicDateTicks
+xx(2) = subplot(3,1,2);
+    plot(ssfr.time(ainb), ssfr_alb([3,5,10],ainb),'*', ssfr.time, ssfr_alb([3,5,10],:),'k-'); 
+    xlim([xl_time - 2./(24*60), xl_time + 2./(24*60)]);dynamicDateTicks; ylim([-0.05, 1.05]);
+    legend('albedo 500nm', 'albedo 870nm', 'albedo 1650nm')
 %     linkaxes(xx,'x');
 elseif isfield(ssfr, 'TMHRS') % IDL .out file
    good_ii= good_ii(ssfr.SHUTTER(good_ii)==0);
@@ -144,8 +149,18 @@ for ww = length(in_lambda):-1:1
    flight_albedo(ww) = meannonan(flight_alb(ww,:));
 end
 flight_alb = flight_albedo;
-figure_(442); if isavar('xx'); subplot(2,1,1); gca; end
-plot(in_lambda, flight_alb,'-'); title(['SSFR flight-level albedo: ',datestr(double(out_time(1)),'yyyy-mm-dd HH:MM:SS')]);
+figure_(442); 
+if isavar('xx'); 
+    subplot(3,1,1); gca; xlim([min(out_time)-30/(24*60), max(out_time)+30/(24*60)]);dynamicDateTicks;
+    subplot(3,1,2); gca; xlim([min(out_time)-2/(24*60), max(out_time)+2/(24*60)]);dynamicDateTicks;
+    subplot(3,1,3); gca;
+end
+nms = interp1(in_lambda, [1:length(in_lambda)],[500,870,1650],'nearest');
+plot(in_lambda, flight_alb,'m-', in_lambda(nms(1)), flight_alb(nms(1)),'bo',...
+    in_lambda(nms(2)), flight_alb(nms(2)),'go', in_lambda(nms(3)), flight_alb(nms(3)),'ro'); 
+tl = title([datestr(double(out_time(1)),'yyyy-mm-dd HH:MM:SS')],'color','r');
+set(tl,'units','normalized'); tlp = get(tl,'position'); set(tl,'position',[.5,.85]); ylim([0,1.2])
+legend('flight level albedo');
 xlabel('wavelength [nm]'); ylabel('albedo');ylim([-0.05, 1.05]);
 good = ~isnan(flight_alb)&(flight_alb>.1)&(flight_alb<1);
 if ~any(good)
