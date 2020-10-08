@@ -22,6 +22,7 @@ toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = true; % for newer style flagging
 toggle_out.lampcalib  = false; 
 toggle_out.runwatervapor = true;
+toggle_out.check4STARB_nogasretrieval = true;
 toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
