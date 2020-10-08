@@ -76,11 +76,8 @@ elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpat
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
     author='Yohei';
-elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')); % Sam's laptop
-    author='Samuel';
-elseif ~isempty(strfind(lower(userpath),'sleblan2'))
-    author='Samuel';
-elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
+elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')) || ...
+        ~isempty(strfind(lower(userpath),'sleblan2')) || ~isempty(strfind(lower(getenv('USER')),'sleblan2')) ||  ~isempty(strfind(lower(userpath),'lebla')) % Sam's laptop
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'kpistone'))
     author='Kristina';
