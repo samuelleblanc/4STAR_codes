@@ -110,7 +110,7 @@ ax3 = subplot(7,1,3);
 plot(ax3,t(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
 hold on;grid on; ylabel(['AOD ' leg{3} ' nm']);ylim([-0.02,0.08]);
 if length(find(aod_500nm(i)<0.08))==0
-    text(ax3,min(t(i))+0.2*(max(t(i))-min(t(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+    text(ax3,nanmin(t(i))+0.2*(nanmax(t(i))-nanmin(t(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
 end
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(3/7-0.01) .92 1/7-0.03]);
@@ -182,7 +182,11 @@ ax3 = subplot(7,1,3);
 plot(ax3,m_aero(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
 hold on;grid on; ylim([-0.02,0.04]);ylabel(['AOD ' leg{3} ' nm']);
 if length(find(aod_500nm(i)<0.04))==0
-    text(ax3,min(m_aero(i))+0.2*(max(m_aero(i))-min(m_aero(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+    try
+        text(ax3,nanmin(m_aero(i))+0.2*(nanmax(m_aero(i))-nanmin(m_aero(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+    catch
+        legend('No Low AOD data for testing cal.')
+    end
 end
 set(gca,'Position',[0.07 1-(3/7-0.01) .92 1/7-0.03]);
 title(['delta c0 + ' num2str(deltac0_percent,'%3.1f') '%'],'Interpreter','none')
