@@ -127,6 +127,7 @@ while ~all_done
       end;
    end;
    plot([350,1000,1700],[0,0,0],'--k'); zoom('on');
+   ylim([-20,ceil(visc0(1,450)./vis_ref(450)./10.0.*1.1).*10.0]);
    tl = title([inst,' Normalized c0s versus ',title_tag]); set(tl,'interp','none');
    lg = legend(leg{:});set(lg,'interp','none');
    co_ax(2) = gca;
@@ -180,6 +181,7 @@ while ~all_done
          end;
       end
       plot([350,1000,1700],[0,0,0],'--k');logy; hold('on');
+      ylim([-20,ceil(visc0(1,450)./vis_ref(450)./10.0.*1.1).*10.0]);
       lg = legend(leg{:}); set(lg,'interp','none');
       fig2 = figure_(101);hold('off'); zoom('on'); 
       tl = title([inst,' Normalized c0s versus ',title_tag]); set(tl,'interp','none')
@@ -208,6 +210,7 @@ while ~all_done
       end;
    end;
    plot([350,1000,1700],[0,0,0],'--k');
+   ylim([-20,ceil(visc0(1,450)./vis_ref(450)./10.0.*1.1).*10.0]);
    lg = legend(leg{:});set(lg,'interp','none');
       tl = title([inst,' Normalized c0s versus ',title_tag]); set(tl,'interp','none')
    end
@@ -218,7 +221,7 @@ while ~all_done
       plot(w_nir, nirc0_avg.*10,'k:','linewidth',4);
       if avg_or_ref==2
          figure_(fig2);
-         plot(w_vis,(visc0_avg./nir_ref-1).*100.0,'k--','linewidth',4);
+         plot(w_vis,(visc0_avg./vis_ref-1).*100.0,'k--','linewidth',4);
          plot(w_nir,(nirc0_avg./nir_ref-1).*100.0,'k--','linewidth',4);
       end
    end
@@ -235,6 +238,11 @@ end
  
 i_avg = find(use_avg);
 [~,gdaystr] = fileparts(vis_names{i_avg(end)}(1:end));
+for iia=1:length(i_avg)
+    [~,tmp_daystr] = fileparts(vis_names{i_avg(iia)}(1:end));
+   daystrs(iia) =  {tmp_daystr(1:8)};
+end
+daystrs = sort(daystrs);
 
 ymax = ceil(max(visc0_avg(w_vis>400&w_vis<700))./1000).*1000;
    figure_(fig);
@@ -250,10 +258,10 @@ ymax = ceil(max(visc0_avg(w_vis>400&w_vis<700))./1000).*1000;
    ylim([-10,10]);
 
 
-fp_out = getdir('C0_out','Select a location to save C0 plots.');
+fp_out = uigetdir('C0_out','Select a location to save C0 plots.');
 asktosave = 1; %set if ask to save the figures
 
-fignames = [inst,'_MLO_2018_Aug'];
+fignames = [inst,'_for_c0s_from_' daystrs{1} '_to_' daystrs{end}];
 % Save the figures
 
 fig3 = figure_(103);
@@ -298,18 +306,17 @@ for i=2:length(i_avg);
       leg_cell = [leg_cell, fn];
    days_cell = [days_cell ', ' leg_cell];
 end
-
-additionalnotes={'Langley at MLO outside of 1.8x the STD of 501 nm Langley residuals were screened out. ';...
-   'c0 from best days at MLO';...
+[nul,nul0,nul1,usr] = starpaths;
+additionalnotes={['Interactive averages of c0 built for ' inst ' by user: ' usr];...
    ['Averages of c0 from multiple days including: ' days_cell '.']};
-filesuffix=['refined_Langley_averaged_with_MLO_2018_Aug_11_12'];
+filesuffix=[fignames '_average'];
 
 disp({'Edit additionalnotes and filesuffix, then "Evaluate".';'Type "dbcont" to continue.'})
 keyboard
 
 daystr=label_daystr; %leg{i_avg(end)}(end-7:end);
-visfilename=fullfile(pn, [daystr '_' inst '_VIS_C0_' filesuffix '.dat']);
-nirfilename=fullfile(pn, [daystr '_' inst '_NIR_C0_' filesuffix '.dat']);
+visfilename=fullfile(pn, [daystr '_VIS_C0_' filesuffix '.dat']);
+nirfilename=fullfile(pn, [daystr '_NIR_C0_' filesuffix '.dat']);
 
 vissource_alt=cellstr(char(vis_names{i_avg}));
 nirsource_alt=cellstr(char(nir_names{i_avg}));
@@ -324,12 +331,12 @@ starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc
 
 %Save the figures
 
-save_fig(fig,[fp_out fignames '_cal_c0_' gdaystr],asktosave);
-save_fig(fig2,[fp_out fignames '_cal_c0_relative_' gdaystr],asktosave);
+save_fig(fig,[fp_out filesep fignames '_cal_c0_' gdaystr],asktosave);
+save_fig(fig2,[fp_out filesep fignames '_cal_c0_relative_' gdaystr],asktosave);
 figure_(fig2);
 ylim([-4 4]);
-save_fig(fig2,[fp_out fignames '_cal_c0_relative_zoom'],asktosave);
-save_fig(fig3,[fp_out fignames '_cal_c0_avg_' gdaystr],asktosave);
+save_fig(fig2,[fp_out filesep fignames '_cal_c0_relative_zoom'],asktosave);
+save_fig(fig3,[fp_out filesep fignames '_cal_c0_avg_' gdaystr],asktosave);
 end
 
 return
@@ -345,12 +352,22 @@ catch
    vis = []; nir = [];
    return
 end
-vis.c0=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+try
+   vis.c0=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+catch
+    a = importdata(vis_,' ',3);
+    vis.c0=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
+end
 vis.c0err=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
 vis.w = a.data(:,strcmp(lower(a.colheaders),'wavelength'));
 
 b=importdata(nir_);
+try
 nir.c0=b.data(:,strcmp(lower(b.colheaders), 'c0'))';
-nir.c0err=b.data(:,strcmp(lower(b.colheaders), 'c0err'))';
+catch
+    b=importdata(nir_,' ',3);
+    nir.c0=b.data(:,strcmp(lower(b.colheaders), 'c0'))';
+end
+    nir.c0err=b.data(:,strcmp(lower(b.colheaders), 'c0err'))';
 nir.w = b.data(:,strcmp(lower(b.colheaders),'wavelength'));
 return
