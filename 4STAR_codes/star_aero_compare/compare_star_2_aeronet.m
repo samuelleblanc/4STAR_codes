@@ -34,6 +34,10 @@ version_set('1.1')
 fp = getnamedpath('starsun');
 if nargin<1;
     [file pname fi]=uigetfile2('*starsun*.mat','Find starsun file for comparison .mat',fp);
+    if file==0
+        fig_paths = {};
+        return
+    end
     fname_starsun = [pname file];
 end
 disp(['Loading the matlab file: ' fname_starsun])
@@ -42,13 +46,13 @@ max_alt_diff = 200.0
 max_seconds_diff = 360.0
 
 try; 
-    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt');
+    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0');
 catch;
     load(fname_starsun);
 end;
 
 fp = getnamedpath('starsun');
-dis = dir([daystr(3:end) '*.lev??']);
+dis = dir([fp daystr(3:end) '*.lev??']);
 if length(dis) ~= 1
     [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
     if afile==0
@@ -87,7 +91,8 @@ for n=1:length(wvls);
     iw(n) = in;
 end;
 
-%% plot the output and correlate
+%%%%%%%%%%%%%%
+%% plot the time trace output and correlate
 % plot of the time series of 4STAR, AERONET, and 4STAR+AERONET
 figure('pos',[30,60,1000,800]);
 cm = hsv(length(wvls)); cmj = cm.*0.3+0.7;
@@ -129,6 +134,7 @@ fig_paths = {};
 
 linkaxes([ax1,ax2,ax3],'x');
 dynamicDateTicks;
+xlim([t(ii(1))-0.0417,t(ii(end))+0.0417]); % limits for the plots plus and minus one hour each side of good 4STAR data
 title(['Time trace ' instrumentname ' vs. AERONET for ' a.location ' within ' num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds'],'Interpreter','none')
 ylabel('AOD');grid;
 legend(instrumentname,'AERONET')
@@ -142,8 +148,9 @@ fname = fullfile([apname instrumentname '_AERONET_timetrace_' a.location '_' day
 save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
 
-% plot the scatter plot of AOD 4STAR vs AOD AERONET, with linear fits and
-% differences
+
+%%%%%%%%%%%%%%%
+%% plot the scatter plot of AOD 4STAR vs AOD AERONET, with linear fits and differences
 figure('pos',[600,50,700,600]);
 plot(tau_aero_noscreening(ii,iw(1)),a.aot(iidat,a.iw(1)),'.','Color',cm(1,:));
 hold on;
@@ -171,8 +178,8 @@ fname = fullfile([apname instrumentname '_AERONET_scatter_' a.location '_' dayst
 save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
 
-% Plot the difference between 4STAR AOD and AERONET AOD as a function of
-% airmass
+%%%%%%%%%%%%%%
+%% Plot the difference between 4STAR AOD and AERONET AOD as a function of time and airmass
 figure('pos',[800,50,600,700]);
 ax1 = subplot(2,1,1);
 plot(mod(t2utch(t(ii)),24),tau_aero_noscreening(ii,iw(1))-a.aot(iidat,a.iw(1)),'+','Color',cm(1,:));
@@ -181,7 +188,7 @@ for n=2:length(wvls);
     plot(mod(t2utch(t(ii)),24),tau_aero_noscreening(ii,iw(n))-a.aot(iidat,a.iw(n)),'+','Color',cm(n,:));
 end;
 
-new_time = mod(t2utch(t(ii)),24);
+new_time = t2utch(t(ii));
 
 ylabel(['AOD difference (' instrumentname '-AERONET)']);
 xlabel('UTC from start of day [hours]'); xlim([new_time(1)*0.95,new_time(end)*1.02]);
@@ -212,6 +219,107 @@ lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile([apname instrumentname '_AERONET_difference_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
+
+%%%%%%%%%%%%%%%
+%% Quantify the C0 changes, and plot the time trace and spectra
+% run through the good aod coincidences and make new c0
+jidat = find(iidat);
+for j=1:length(ii)
+    a_aods = interp1(wvls,a.aot(jidat(j),a.iw),w.*1000.0,'pchip');
+    c0_A(j,:) = rateaero(ii(j),:) ./ exp(-1.0.*a_aods.*m_aero(ii(j)));
+    dc0(j,:) = (c0-c0_A(j,:))./c0.*100.0;
+end
+
+figure; 
+plot(t(ii),dc0(:,iw(1)),'o-','Color',cm(1,:));
+hold on;
+plot(t(ii),t(ii).*0.0,'--k');
+for n=2:length(wvls)
+    plot(t(ii),dc0(:,iw(n)),'o-','Color',cm(n,:));
+end
+dynamicDateTicks;
+xlabel('Time');
+ylabel('Diff (c0-c0_from_aeronet)/c0 [%]');
+title([instrumentname ' c0s to match AERONET AOD at:' a.location],'Interpreter','none')
+grid;
+colormap(cm);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile([apname instrumentname '_AERONET_delta_c0_' a.location '_' daystr]);
+save_fig(gcf(),fname,0);
+fig_paths = [fig_paths; [fname '.png']];
+
+%% plot figure of new c0 spectra
+figure; 
+ax(1) = subplot(3,1,1);
+cms = hsv(length(ii)); 
+plot(w(1:1044),c0_A(1,1:1044),'o-','Color',cms(1,:));
+hold on;
+plot(w(1045:end),c0_A(1,1045:end).*10.0,'o-','Color',cms(1,:));
+plot(w(1:1044),c0(1:1044),'.','Color','k');
+plot(w(1045:end),c0(1045:end).*10.0,'.','Color','k');
+labelsd = {datestr(t(ii(1)),'HH:MM:SS')};
+for n=2:length(ii)
+    plot(w(1:1044),c0_A(n,1:1044),'o','Color',cms(n,:));
+    plot(w(1045:end),c0_A(n,1045:end).*10.0,'o','Color',cms(n,:));
+    labelsd = {labelsd{:},datestr(t(ii(n)),'HH:MM:SS')};
+end
+ylabel({'c0 from AERONET';'(10x NIR) [rate/ms]'})
+ylim([0,ceil(c0(450).*1.1./100.0)*100.0]);
+grid;
+title([instrumentname ' new c0 from AERONET match: ' a.location ' - ' daystr],'Interpreter','none')
+originalSize1 = get(ax(1), 'Position');
+colormap(cms);
+cbh = lcolorbar(labelsd,'TitleString','Time','fontweight','bold');
+set(ax(1), 'Position', originalSize1);
+
+ax(2) = subplot(3,1,2);
+plot(w,dc0(1,:),'.-','Color',cms(1,:));
+hold on;
+plot(w,w.*0.0,'--k');
+for n=2:length(ii)
+    plot(w,dc0(n,:),'.-','Color',cms(n,:));
+end
+ylabel({'Diff';'(c0-c0_from_aeronet)/c0 [%]'});
+ylim([-10,10]); grid;
+
+ax(3) = subplot(3,1,3);
+plot(w,dc0(1,:),'.-','Color',cms(1,:));
+hold on;
+plot(w,w.*0.0,'--k');
+for n=2:length(ii)
+    plot(w,dc0(n,:),'.-','Color',cms(n,:));
+end
+ylabel('Zoomed c0 Diff [%]');
+ylim([-2,2]); grid;
+
+xlabel('Wavelength [{\mu}m]');
+linkaxes(ax,'x');
+xlim([0.320,1.710]);
+
+cbh.Position(1) = .89-cbh.Position(3);
+cbh.Position(4) = 0.8;
+cbh.Position(2) = 0.5-cbh.Position(4)/2;
+set(ax, {'Position'}, mat2cell(vertcat(ax.Position) .* [1 1 .88, 1], ones(size(ax(:))),4));
+fname = fullfile([apname instrumentname '_AERONET_c0_spectra_' a.location '_' daystr]);
+save_fig(gcf(),fname,0);
+fig_paths = [fig_paths; [fname '.png']];
+
+%% Save the c0s to new file.
+filesuffix=[instrumentname '_AODmatch_toAERONET' '_from' a.location]; %_loglogquad';
+additionalnotes={['C0 built to match AOD from ' instrumentname ' to AERONET spline fit for ' a.location ' within ' num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds, measured on ' daystr '.']};
+w_vis = w(1:1044);
+w_nir = w(1045:end);
+vis_c0 = nanmean(c0_A(:,1:1044));
+nir_c0 = nanmean(c0_A(:,1045:end));
+vis_c0_std = nanstd(c0_A(:,1:1044));
+nir_c0_std = nanstd(c0_A(:,1045:end));
+
+visfilename=[daystr '_VIS_C0_' filesuffix '.dat'];
+nirfilename=[daystr '_NIR_C0_' filesuffix '.dat'];
+disp(['printing to ' getnamedpath('starmat') visfilename])
+starsavec0([getnamedpath('starmat') visfilename], fname_starsun, additionalnotes, w_vis, vis_c0, vis_c0_std);
+disp(['printing to ' getnamedpath('starmat') nirfilename])
+starsavec0([getnamedpath('starmat') nirfilename], fname_starsun, additionalnotes, w_nir, nir_c0, nir_c0_std);
 return
 
 function [line,label] = get_linfit(x,y,color)
