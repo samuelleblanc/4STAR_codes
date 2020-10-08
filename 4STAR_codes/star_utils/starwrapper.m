@@ -296,10 +296,13 @@ else; % copy an existing old starinfo file and run it
           change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
          %copyfile(infofile_previous, infofile_);
          open(infofile_);
-         eval([infofile_(1:end-2),'(s)']);
-         %run(infofile_);
-         %             eval(['edit ' infofile ';']);
-         %             eval(['run ' infofile ';']);
+         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+        try
+             s = infofnt(s);
+        catch
+             eval([infofile_(1:end-2),'(s)']);
+         %     s = eval([infofile2,'(s)']);
+        end
          warning([infofile_ ' has been created from ' ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
          break;
       end;

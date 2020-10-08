@@ -54,7 +54,10 @@ switch instrumentname;
     case {'4STAR'}
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-            if t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
+            if t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
+                daystr = '20200701';
+                filesuffix = '4STAR_average_from_AERONET_NASA_AMES_SummerFall2020';
+            elseif t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
                 if t>=datenum([2018 9 19 0 0 0]) & t<datenum(2018,9,21,0,0,0) %From transit
                      daystr = '20180922';
                      filesuffix = 'refined_averaged_4STAR_MLO_inflight';
@@ -396,7 +399,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>=datenum([2019 5 1  0 0 0]); % for FIREX-AQ 2019 and on, from Table Mountain, single day
+        if t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
+                daystr = '20200701';
+                filesuffix = '4STARB_average_from_AERONET_NASA_AMES_SummerFall2020';
+        elseif t>=datenum([2019 5 1  0 0 0]); % for FIREX-AQ 2019 and on, from Table Mountain, single day
                  daystr = '20190925';
                  filesuffix = '4STARB_refined_ground_langley_am';
         elseif t>=datenum([2018 2 11 0 0 0]); %for COSR 2018 and on
