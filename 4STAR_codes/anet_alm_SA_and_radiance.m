@@ -1,11 +1,11 @@
-function alm = anet_alm_SA_and_radiance(alm)
-% alm = anet_alm_SA_and_radiance(alm)
+function alm = anet_alm_SA_and_radiance(infile)
+% alm = anet_alm_SA_and_radiance(infile)
 % Pack data from aeronet alm file into structure with radiance dimensioned
 % against time and azimuth angle, and compute scattering angles.
-if ~exist('alm','var')
-    alm = read_cimel_aip;
+if ~isavar('infile')||~isafile(infile)
+    infile = getfullname('*.alm','aeronet_sky','Select AERONET AIP ALM file.');
 end
-
+alm = rd_anetaip_v3(infile);
 fld = fieldnames(alm);
 fld(1:13) = [];
 for f = 1:length(fld)
@@ -18,7 +18,7 @@ dAz(n) = sscanf(flds{n},'%f');
 end
 alm.dAz = dAz;
 for n = length(dAz):-1:1
-alm.SA(:,n) = scat_ang_degs(alm.SolarZenithAngle_degrees_, 0.*ones([length(alm.time),1]), alm.SolarZenithAngle_degrees_, abs(ones(size(alm.time))*dAz(n)));
+alm.SA(:,n) = scat_ang_degs(alm.Solar_Zenith_Angle_Degrees_, 0.*ones([length(alm.time),1]), alm.Solar_Zenith_Angle_Degrees_, abs(ones(size(alm.time))*dAz(n)));
 end
 
 return

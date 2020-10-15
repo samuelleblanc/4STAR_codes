@@ -5,10 +5,10 @@ function ppl = anet_ppl_SA_and_radiance(ppl)
 if ~isavar('infile')||~isafile(infile)
     infile = getfullname('*.*','aeronet_ppl','Select AERONET AIP PPL file.');
 end
-ppl = read_cimel_aip_v3(infile);
+ppl = rd_anetaip_v3(infile);
 
 fld = fieldnames(ppl);
-fld(1:10) = [];
+fld(1:13) = [];
 for f = 1:length(fld)
     ppl.radiance(:,f) = ppl.(char(fld(f)));
     ppl = rmfield(ppl,fld{f});
