@@ -3,13 +3,15 @@ function [fullname] = getfullname(fspec,pathfile,dialog)
 % fspec is a string indicating the file mask to be used with uigetfile
 % pathfile is a string indicating the filename stem of the mat-file to use
 % containing the "filepath" desired.
-% Normally this is interactive but if a unique match is found to fspec it
+% Normally this is interactive but if a fspec specifies an exact file it
 % is returned without interaction.
 % 2009-01-08, CJF: Uploading to 4STAR matlab_files repository
 % 2011-04-07, CJF: modifying with userpath to hopefully get around needing
 % access to the protected matlabroot directory
 % 2019-08-15, CJF: fixing empty userpath issue and also force disp(dialog)
 % when not running on a PC to handle Mac OSX suppression of dialog titles
+% 2020-10-15, CJF: Modified to handle case when a wild-card matches one and
+% only one file, making it appear as a file
 
 % Sometimes the userpath content becomes empty and needs to be reset to
 % yield a valid path
@@ -77,8 +79,8 @@ end;
 if ~strcmp(pname(end),filesep)
     pname = [pname, filesep];
 end
-[~,fname,ext] = fileparts(fspec);
-if (isafile(fspec)||isafile([pname,filesep,fname,ext]))&&~isadir(fspec)
+[~,fname,ext] = fileparts(fspec); fid = fopen([pname,filesep,fname,ext],'r+'); if fid>0 fclose(fid); end
+if (isafile(fspec)||fid>0)&&~isadir(fspec)
     this = which(fspec,'-all');
     if isempty(this) % Then file exists, but not in path
         this = {fspec};

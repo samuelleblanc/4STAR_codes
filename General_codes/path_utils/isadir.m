@@ -7,8 +7,6 @@ function result = isadir(dirpath)
 %
 %ISADIR  True if argument is a directory.
 %   ISADIR(DIR) returns a 1 if DIR is a directory and 0 otherwise.
-%
-%   See also FINFO, MKDIR.
 %   C. Flynn 2018-11-26
 
 result = false;
