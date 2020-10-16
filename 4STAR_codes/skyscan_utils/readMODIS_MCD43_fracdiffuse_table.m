@@ -27,7 +27,7 @@ function [table_AOD,table_SZA,table_fracdiffuse]=readMODIS_MCD43_fracdiffuse_tab
 % -------------------------------------------------------------------------
 version_set('v1.0')
 
-fidrd = fopen(fullfile(getnamedpath('data_folder'),'skyl_lut_bbshortwave.dat'));
+fidrd = fopen(fullfile(getnamedpath('data_folder_github'),'skyl_lut_bbshortwave.dat'));
 for i=1:2,
     linetext=fgetl(fidrd);
 end
