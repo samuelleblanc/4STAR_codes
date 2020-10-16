@@ -17,8 +17,11 @@ function [inp,line_num] = gen_sky_inp_4STAR(star,good_sky_)
 % perhaps when relatively few other pixels were saturated.
 
 if isfield(star.toggle,'sky_rad_scale')
-    star.rad_scale = star.toggle.sky_rad_scale;
-    star.rad_scale=repmat(star.rad_scale,size(star.skyrad,1),1);
+    if numel(star.toggle.sky_rad_scale)==1
+        star.rad_scale = star.toggle.sky_rad_scale .* ones(size(star.skyrad));
+    elseif all(size(star.toggle.sky_rad_scale)==size(star.w))
+        star.rad_scale = ones(size(star.t))*star.toggle.sky_rad_scale;
+    end
 else
     star.rad_scale = 1;
 end
@@ -41,10 +44,10 @@ if isavar('good_sky_')
 else
     good_sky = star.good_sky;
 end
+star.good_almA = star.good_almA&good_sky;
+star.good_almB = star.good_almB&good_sky;
 % if ~isavar('good_sky_')
 %     good_sky = repmat(star.good_sky,size(star.wl_ii))&(~isnan(sat_rad));
-% else
-%     good_sky = good_sky_;
 % end
 if sum(good_sky)==0
     inp = []; line_num = [];
@@ -69,7 +72,11 @@ else
     
     % if sum(star.good_almA)>2 & sum(star.good_almB)>2
     [star.anet_level, star.anet_tests] = anet_preproc_dl(star);
-    title_str = sprintf(', lev=%1.1f',star.anet_level);
+    if isfield(star.anet_tests,'sky_test') && isfield(star.anet_tests,'tau_test')
+        inp.sky_test = star.anet_tests.sky_test;  inp.tau_test = star.anet_tests.tau_test;
+    else
+        inp.anet_level = star.anet_level;
+    end
     % else
     %     star.anet_level = 1;
     % end
@@ -544,7 +551,6 @@ else
     end
     inp.date_time_site_unit = [datestr(mean(star.t),'dd:mm:yyyy,HH:MM:SS,'),sky_str,',4STAR,01'];
     inp.geom = geom;
-    inp.anet_level = star.anet_level;
     % [inp.anet_level inp.anet_tests] = anet_preproc_dl(inp);
     line_num = gen_aip_cimel_strings(inp);
     %   [~,fstem,ext] = fileparts(star.filename{1});
@@ -565,12 +571,12 @@ else
     if size(good_sky_,2)>1; good_sky_ = all(good_sky_,2);end
     if size(star.good_sky,2)>1; star.good_sky = all(star.good_sky,2); end;
     if isavar('good_sky_')
-        if isfield(star,'good_almA') && all(good_sky_==star.good_almA)
+        if isfield(star,'good_almA')&& isfield(star,'good_almB')&& all(good_sky_==star.good_almB)&& all(star.good_almA==star.good_almB)
+            tag = strrep(tag,'..','.avg_');
+        elseif isfield(star,'good_almA') && all(good_sky_==star.good_almA)
             tag = strrep(tag,'..','.almA_');
         elseif isfield(star,'good_almB') && all(good_sky_==star.good_almB)
-            tag = strrep(tag,'..','.almB_');
-        elseif isfield(star,'good_almA') && all(good_sky_==star.good_sky)
-            tag = strrep(tag,'..','.avg_');
+            tag = strrep(tag,'..','.almB_');        
         elseif isfield(star,'good_ppl') && all(good_sky_==star.good_ppl)
             tag = strrep(tag,'..','.ppl_');
         end
