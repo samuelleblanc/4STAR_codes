@@ -78,6 +78,38 @@ if s.toggle.verbose; disp('Starting HCOH gas retrieval'), end
 %           s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
 %             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;
 gas.no2; gas.o3; gas.co2; gas.hcoh;
+
+god = gas.no2.no2OD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.no2.no2OD = s.tau_NO2;
+end
+
+god = gas.o3.o3OD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.o3.o3OD = s.tau_O3;
+end
+
+god = gas.o3.o4OD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.o3.o4OD = s.tau_O4;
+end
+
+god = gas.o3.h2oOD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.o3.h2oOD = zeros(size(gas.o3.h2oOD));
+end
+
+god = gas.co2.ch4OD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.co2.ch4OD = 0;
+    gas.co2.co2OD = ones(size(s.t))*s.tau_CO2_CH4_N2O;
+end
+
+god = gas.hcoh.hcohOD;
+if all(all(isnan(god)))||~any(any(god>0))
+    gas.hcoh.hcohOD = zeros(size(gas.hcoh.hcohOD));
+end
+
 % figure_(999); plot(gas.no2.visnm,gas.no2.visXs,'-',gas.o3.visnm, gas.o3.visXs, '-'); logy  
 % figure_(1999); plot(s.w, [max(gas.no2.no2OD); max(gas.o3.o3OD);max(gas.o3.o4OD);max(gas.co2.co2OD);max(s.cwv.wvOD)],'-'); legend('NO2','O3','O4','CO2','H2O');logy
 
