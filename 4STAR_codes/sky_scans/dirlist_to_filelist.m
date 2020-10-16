@@ -7,8 +7,12 @@ if ~isavar('pname')
    end
 end
 % flist = string;fulllist = {};
-if length(dlist)==1
-   flist(1) = {[pname, char(dlist.name)]};
+if isempty(dlist)
+    fulllist(1) = {[]};
+    flist = string([]);
+elseif length(dlist)==1
+    fulllist(1) = {[pname, char(dlist(1).name)]};
+    flist(1) = string(dlist(1).name);
 else
    for d = length(dlist):-1:1
       if strcmp(dlist(d).name,'.')||strcmp(dlist(d).name,'..')
