@@ -49,9 +49,10 @@ if isafile(pptname_out)
 else
    Presentation = h_ppt.Presentation.Add;
 end
-
 flist = dir(fullfile([path filesep '*' instrumentname '_' daystr '*.ppt']));
-
+if isempty(flist)
+    flist = dir(fullfile([path filesep '*' daystr '*.ppt']));
+end
 try
     Presentation.SaveAs(pptname_out);
 catch
