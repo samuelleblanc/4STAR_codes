@@ -25,7 +25,7 @@ toggle = flip_toggle(toggle);
 % regulate input and read source
 %********************
 if ~isavar('mat_file');
-    mat_file = getfullname([getnamedpath('stardat'),'4STAR_*sky*.dat']);% Default to last_path
+    mat_file = getfullname(['4STAR_*sky*.dat;*vis_sky*.dat'],'stardat');% Default to last_path
     if iscell(mat_file)
         if length(mat_file)>1
             warning('Starsky is intended to process only a single sky scan.  Processing first file...');
@@ -85,7 +85,7 @@ elseif isafile(mat_file)
             end
         end
         % force gas and cwv retrievals true for sky scans
-        toggle.gassubtract = true; toggle.runwatervapor = true
+        toggle.gassubtract = true; toggle.runwatervapor = true;
         s=starwrapper(vis_sky, nir_sky,toggle);
         s.toggle = toggle; %overwrite changes to toggle from within starwrapper
         % which come from a re-load of update_toggle in starinfo
@@ -201,12 +201,16 @@ if (sum(s.Str==0)>0)&&(sum(s.Str==1)>0)&&(sum(s.Str==2)>=5)
                 grasp_fname = gen_grasp_out(s);
             elseif part <=5
                 if isfield(s,'isPPL')&&s.isPPL
+                    % max sky_test=1.5 for non-symmetry test
                     gen_sky_inp_4STAR(s,s.good_ppl);
                 elseif isfield(s,'isALM')&&s.isALM
+                    % max sky_test=1.5 for non-symmetry test
                     gen_sky_inp_4STAR(s, s.good_almA);
+                    % max sky_test=1.5 for non-symmetry test
                     gen_sky_inp_4STAR(s, s.good_almB);
                     s_ =prep_ALM_avg(s);
                     if ~isempty(s_)&&length(s_.t)>10
+                        % max sky_test=2 if symmetry test passed
                         gen_sky_inp_4STAR(s_, s_.good_sky);
                     end
                 end

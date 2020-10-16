@@ -15,10 +15,10 @@ toggle_out.savefigure=false;
 toggle_out.computeerror=true;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
-toggle_out.applytempcorr=false;% true is for SEAC4RS data
+toggle_out.applytempcorr=true;% true is for SEAC4RS data
 toggle_out.gassubtract = true;
 toggle_out.booleanflagging = false; % for running any Yohei style flagging
-toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
+toggle_out.starflag_mode = 2; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = true; % for newer style flagging

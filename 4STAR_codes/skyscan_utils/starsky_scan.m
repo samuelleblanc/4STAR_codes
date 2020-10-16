@@ -100,7 +100,8 @@ if isfield(star.toggle,'use_last_wl')&&star.toggle.use_last_wl
     star.aeronetcols = star.wl_ii; 
     w_ii = star.w_isubset_for_polyfit;
 end
-    
+    log_tau = real(log(star.tau_aero_subtract_all(sun_ii,w_ii)));
+    w_ii(isNaN(log_tau)) = [];
 PP_ = polyfit(log(star.w(w_ii)), real(log(star.tau_aero_subtract_all(sun_ii,w_ii))),3);
 tau_aero_subtract_all_fit = exp(polyval(PP_,log(star.w)));
 star.tau_abs_gas_fit=  tau_noray_vert - ones(size(star.t))*exp(polyval(PP_,log(star.w)));
@@ -504,6 +505,7 @@ else
     
     if length(CW_Y)>1 && length(CW_neg_Y)>1  % then we have enough points to assess CW symmetry
         X_CW = interp1(CW_Y, CW_X, Ys,'pchip');
+        [CW_neg_Y,IA]= unique(CW_neg_Y); CW_neg_X = CW_neg_X(IA);
         X_CW_neg = interp1(CW_neg_Y, CW_neg_X, Ys,'pchip');
         dX_CW = (X_CW-X_CW_neg);
         star.SA_CW_offset = mean(dX_CW)./2;

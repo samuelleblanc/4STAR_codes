@@ -8,7 +8,7 @@ good_almB = star.good_almB & ~any(isNaN(star.skyrad(:,star.aeronetcols)),2);
 almA_ii = find(good_almA);
 almB_ii = find(good_almB);
 wl_test = [440,615,870]; 
-wl_test_ii = interp1(1000.*star.w(star.aeronetcols),1:length(star.aeronetcols),wl_test,'nearest');
+wl_test_ii = interp1(1000.*star.w(star.aeronetcols),1:length(star.aeronetcols),wl_test,'nearest','extrap');
 if star.isALM && ~isempty(almA_ii)&&~isempty(almB_ii)
     [inA, inB] = nearest(star.SA(almA_ii), star.SA(almB_ii));
     Az_A = mod(star.Az_sky(almA_ii(inA))-star.sunaz((almA_ii(inA))),180);

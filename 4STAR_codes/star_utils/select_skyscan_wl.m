@@ -3,6 +3,11 @@ function star = select_skyscan_wl(star)
 % or selected manually.
 % Returns logical field star.wl_, indices star.wl_ii = find(star.wl_), and
 % starmask (size of radsky with 1 and NaN)
+% Also selects order of polynomial used to fit AOD
+
+% Modifications:
+% CJF, v1.1, 2020-07-09, added ability to set polynomial 
+version_set('1.1');
 if ~isavar('star')||~isstruct(star)&&isafile(star)
     star = load(getfullname('*STAR*_SKY*.mat','star_skysky_mats','Select a 4STAR sky mat file.'));
     if isfield(star,'s'); star = star.s; end
@@ -23,10 +28,14 @@ else
 end
 
 man = menu({'Current wavelengths [nm]: ';WL_str ;'Select other wavelengths?'},'Manually','From file...','Done');
+ORD = 3;
 if man==1
-    while ~done
-        PP_ = polyfit(log(star.w(w_fit_ii)), real(log(star.tau_aero_subtract_all(suns,w_fit_ii))),3);
-        tau_line = exp(polyval(PP_,log(star.w)));
+    while ~done 
+        lte0 = star.tau_aero_subtract_all(suns,w_fit_ii)<=0;  w_fit_ii(lte0) = [];
+        PP_ = polyfit(log(star.w(w_fit_ii)), real(log(star.tau_aero_subtract_all(suns,w_fit_ii))),ORD);
+        [~,PP_] = rpoly_mad(log(star.w(w_fit_ii)), real(log(star.tau_aero_subtract_all(suns,w_fit_ii))),ORD);
+        tau_line = exp(polyval(PP_,log(star.w))); 
+        tau_line_fit = fit_aod_basis(star.w(w_fit_ii), star.tau_aero_subtract_all(suns,w_fit_ii),star.w);
         tau_aero = star.tau_tot_vertical(suns,:); tau_sub = star.tau_aero_subtract_all(suns,:);
         figure_(1111);
         sb(2) = subplot(2,1,2);
@@ -35,13 +44,14 @@ if man==1
         xlabel('wavelength');
         ylabel('responsivity');
         sb(1) = subplot(2,1,1);
-        ll = loglog([NaN,star.w(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,star.w(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', star.w, tau_aero,'-',star.w, tau_sub,'-', star.w, tau_line, 'm-');
+        ll = loglog([NaN,star.w(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,star.w(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', ...
+            star.w, tau_aero,'-',star.w, tau_sub,'-', star.w, tau_line, 'm-', star.w, tau_line_fit, 'g-');
         ylabel('OD');ylim([0.9.*min(tau_line),1.1.*max(tau_line)]);
         lg = legend('used in fit','selected for retrieval');zoom('on');
         linkaxes(sb,'x');xlim([.335,1.7]);
         
         opt = menu('Select pixels to be used for the fit line and pixels for the retrieval: ',...
-            'Include in fit','Exclude from fit', 'Use for retrieval','Do NOT use for retrieval','Done');
+            'Include in fit','Exclude from fit', 'Use for retrieval','Do NOT use for retrieval',['PolyOrder: [',num2str(ORD),']'],'Done');
         v1 = axis(sb(1)); v2 = axis(sb(2));
         v_ = star.w>=v1(1) & star.w<=v1(2) & tau_sub>=v1(3)&tau_sub<=v1(4)& star.skyresp >= v2(3) & star.skyresp<=v2(4) ;
         if opt==1
@@ -54,6 +64,9 @@ if man==1
         elseif opt==4
             star.wl_(v_) = false; 
             star.skymask(:,v_) = NaN;
+        elseif opt==5
+            ORD_ = menu('Select order for polyfit:','1: linear','2: quadradtic','3: cubic');
+            if ~isempty(ORD_)&&ORD_>0&&ORD_<4 ORD = ORD_; end
         else
             done = true;
         end
@@ -91,23 +104,35 @@ elseif man==2 % Select an existing file as source of (additional?) wavelengths
     while ~exist('in_mat','var')
         last_wl_path = getfullname('*.mat','last_wl','Select skyscan mat file (eg ANET AIP retrieval output) to load wavelengths from.');
         [last_wl_path, fname,ext] = fileparts(last_wl_path); last_wl_path = [last_wl_path,filesep];
-        in_mat = load([last_wl_path, fname,ext]); save([last_wl_path,'last_wl.mat'],'-struct','in_mat');
+        in_mat = load([last_wl_path, fname,ext]); 
+        if isstruct(in_mat)&&isfield(in_mat,'s') in_mat = in_mat.s; end        
     end
+%     good_last_wl = false;
     if isfield(in_mat,'Wavelength')
         star.wl_ii = interp1(star.w, [1:length(star.w)],in_mat.Wavelength,'nearest');
         star.wl_ = false(size(star.w)); star.wl_(star.wl_ii) = true;
+%         good_last_wl = true;
     elseif isfield(in_mat,'wl_ii')&&isfield(in_mat,'wl_')&&(length(in_mat.wl_)==length(star.w))
         star.wl_ii = in_mat.wl_ii;
         star.wl_ = false(size(star.w)); star.wl_(star.wl_ii) = true;
+%         good_last_wl = true;
     end
     star.skymask(:,~star.wl_) = NaN; 
     star.skymask(star.good_sky,star.wl_) = 1; 
     if isfield(in_mat,'w')&&isfield(in_mat,'w_fit_ii')
         star.w_isubset_for_polyfit = in_mat.w_fit_ii;
+%         good_last_wl = true;
+    elseif isfield(in_mat,'w')&&isfield(in_mat,'w_isubset_for_polyfit')
+        star.w_isubset_for_polyfit = in_mat.w_isubset_for_polyfit;
+%         good_last_wl = true;        
     end
 end
 star.sky_wl = star.w(star.wl_);
 star.aeronetcols = star.wl_ii;
+% if good_last_wl
+%     save([last_wl_path,'last_wl.mat'],'-struct','in_mat');
+%     save([last_wl_path,['last_wl.',datestr(now,'yyyymmdd_HHMM'),'.mat']],'-struct','in_mat');
+% end
 % in_mat = load([last_wl_path, 'last_wl.mat']);
 % Now we have to make sure that skymask captures the new selected WLs
 % This may be mostly legacy code since now we require identical WLs at all

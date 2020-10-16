@@ -29,6 +29,7 @@ for F = length(skyinput):-1:1
    disp(['Running ',num2str(F)])
    if isafile(infile)
       [pname_tagged, fname_tagged, ~] = fileparts(infile);pname_tagged = [pname_tagged, filesep];
+
       %         skip_dir = [pname_tagged, 'skip',filesep];
       %         if ~isadir(skip_dir)
       %             mkdir(skip_dir);
@@ -68,10 +69,25 @@ for F = length(skyinput):-1:1
          in_test = fopen(infile, 'r');
          first_line = fgetl(in_test);
          fclose(in_test);
-         enil = fliplr(first_line);
-         vel = strtok(enil,':');
-         lev = fliplr(vel);
-         in_lev = sscanf(lev, '%f');
+%          if contains(first_line,'ANET inp level:') %old-style ANET input level
+%              enil = fliplr(first_line);
+%              vel = strtok(enil,':');
+%              lev = fliplr(vel);
+%              in_lev = sscanf(lev, '%f');
+%          elseif contains(first_line,'_test=') % Contains tests for sky or tau or both...
+%              if contains(first_line,'sky_test=')
+%                  ii = findstr(first_line,'sky_test=')+9;
+%                  sky_test = sscanf(first_line(ii:end),'%f');
+%              else
+%                  sky_test = 1;
+%              end
+%              if contains(first_line,'tau_test')
+%                  ii = findstr(first_line,'tau_test=')+9;
+%                  tau_test = sscanf(first_line(ii:end),'%f');
+%              else
+%                  tau_test = 1;
+%              end             
+%          end
          % Haven't got around to re-tagging with post-processing data level
          
          [SUCCESS,MESSAGE,MESSAGEID] = copyfile(infile,'C:\z_4STAR\work_2aaa__\4STAR_.input');
@@ -98,9 +114,13 @@ for F = length(skyinput):-1:1
             try
                anetaip = parse_anet_aip_output(outname);
             
-               [lv, tests] = anet_postproc_dl(anetaip);
+               [anetaip.lv_out, anetaip.tests] = anet_postproc_dl(anetaip);
                
-               plot_anet_aip(anetaip);
+               plot_anet_aip(anetaip);               
+               lv_out = min([anetaip.lv_out.ssa,anetaip.lv_out.psd, anetaip.lv_out.pct_sphericity]);
+               lv_ii = findstr(fname_tagged,'_lv');fname_tagged(lv_ii+1:end) = [];
+               fname_tagged = [fname_tagged,num2str(10.*lv_out)];
+%                [xls_fname] = print_anetretr_details_to_xls(s,xls_fname);
                save([done_dir,'..',filesep, fname_tagged, '.mat'],'-struct','anetaip')
                movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir );
             catch ME
@@ -131,6 +151,6 @@ end
 %Merge the resulting ppts into a single per day
 udays = unique(days)
 for i=1:length(udays)
-    ppt_out = merge_ppts_for_day(getnamedpath('starimg'),udays{i},instrumentname,'_allSKY');
+    ppt_out = merge_ppts_for_day(getnamedpath('starppt'),udays{i},instrumentname,'_allSKY');
 end
 return

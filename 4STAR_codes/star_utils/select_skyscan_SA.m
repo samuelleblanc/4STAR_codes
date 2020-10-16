@@ -1,12 +1,13 @@
 function star = select_skyscan_SA(star)
 % star = select_skyscan_SA(star)
 % We need to be a bit careful now that we're trying to use this iteratively
-% with select_skyscan_wl because that changes the dimensionality of
-% good_sky
-
+% with select_skyscan_wl because that changes the dimensionality of good_sky
 % Check for existence of sky_wl and that it matches the wl in star.wl_.
-skyrad = star.skyrad(:,star.wl_);
-skymask = star.skymask(:,star.wl_);
+skyrad = star.skyrad(:,star.wl_); skymask = star.skymask(:,star.wl_); 
+if isfield(star,'good_sky')
+   good_sky = false(size(star.good_sky*star.wl_ii));
+   good_sky(star.good_sky,:) = true;
+end
 wl_ii = star.wl_ii; rain = length(wl_ii)>7;
 if ~isfield(star,'sky_wl')
    star.sky_wl = star.w(star.wl_);

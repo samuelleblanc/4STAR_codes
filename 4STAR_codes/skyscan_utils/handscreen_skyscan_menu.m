@@ -42,13 +42,27 @@ star.wl_ii = find(star.wl_);
 last_wl.w = star.w; last_wl.wl_ = star.wl_; last_wl.wl_ii = star.wl_ii;
 last_wl.w_fit_ii = star.w_isubset_for_polyfit;
 last_wl_path = getnamedpath('last_wl');
-save([last_wl_path, 'last_wl.mat'],'-struct','last_wl');
+
 if isfield(star.toggle,'sky_tag')&&~isempty(star.toggle.sky_tag)
     tag_str = star.toggle.sky_tag; tag_str = tag_str{:}; 
    if ~isempty(tag_str) tag_str = [tag_str, '.']; tag_str = strrep(tag_str,'..','.');end
 else tag_str = '';
 end
-save([last_wl_path,['last_wl.',tag_str,datestr(now,'yyyymmdd.HHMMSS.'),'mat']],'-struct','last_wl');
+new_file = [last_wl_path,['last_wl.',tag_str,datestr(now,'yyyymmdd_HHMMSS.'),'mat']];
+last_file = [last_wl_path,'last_wl.mat'];
+while ~isafile(last_file)
+    last_file = getfullname('last_wl*.mat','last_wl','Select last_wl.mat file');
+end
+
+save(new_file,'-struct','last_wl');
+% If the new last_wl is identical to last_wl.mat, then delete new one
+last_wls = load(last_file); new_wls = load(new_file);
+if isequal(last_wls,new_wls )
+        delete(new_file);       
+else
+    save([last_wl_path, 'last_wl.mat'],'-struct','last_wl');
+end
+clear last_wls new_wls
 star.toggle = flip_toggle(star.toggle);
 if star.isPPL
    sky = 'ppl_mod';
