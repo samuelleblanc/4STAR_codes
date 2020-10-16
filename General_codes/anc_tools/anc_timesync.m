@@ -141,7 +141,11 @@ else
           if isfield(nc.ncdef.vars.time_bounds.atts, 'bound_offsets')
              bin_center = mean(nc.vatts.time_bounds.bound_offsets);
           else
-             bin_center = nc.vdata.time_offset - mean(nc.vdata.time_bounds);
+              if nc.vdata.time_bounds(1,1)>1e9
+                  bin_center = 0;
+              else
+                  bin_center = nc.vdata.time_offset - mean(nc.vdata.time_bounds);
+              end
           end
        else
           bin_center = 0;
@@ -166,7 +170,11 @@ else
           if isfield(nc.ncdef.vars.time_bounds.atts, 'bound_offsets')
              bin_center = mean(nc.vatts.time_bounds.bound_offsets);
           else
-             bin_center = nc.vdata.time - mean(nc.vdata.time_bounds);
+              if nc.vdata.time_bounds(1,1)>1e9
+                  bin_center = 0;
+              else
+                  bin_center = nc.vdata.time_offset - mean(nc.vdata.time_bounds);
+              end
           end
        else
           bin_center = 0;
