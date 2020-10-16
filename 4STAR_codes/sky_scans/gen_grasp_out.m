@@ -16,7 +16,7 @@ if ~isavar('s')
     elseif isfield(s,'star'); s = s.star; 
     end
 end
-v_str = '0.1';
+v_str = '0.2';
 version_set(v_str);
 % Critical elements: time, lat, lon, alt, wavelength, dW, SFA,
 % TOD, ROD, AGOD, RAD, TOA
@@ -58,19 +58,19 @@ clear inp
 % Reproduce elements of gen_sky_inp_4STAR that may be of use for GRASP...
 inp.header(1,1) = {['% NSTAR GRASP Input File v',v_str, ' created ',datestr(now,'yyyy-mm-dd HH:MM:SS UT'), ' by ',get_starauthor]};
 inp.header(end+1,1) = {sprintf('%% Instrument="%s", Campaign="%s"',s.instrumentname, campaign)};
-inp.header(end+1,1) = {['% Date_Time="',d_str, '", ', sprintf('Lat_deg_N=%2.3f, Lon_deg_E=%2.3f, Flight_Alt_m_MSL=%d', meanLat, meanLon, meanAlt)]};
-inp.header(end+1,1) = {sprintf('%% Solar geometry: SZA=%2.1f, SAZ=%2.1f, SEL=%2.1f, airmass_Rayleigh=%1.2f, airmass_aerosol=%1.2f, sol_dist_AU=%1.3f',...
+inp.header(end+1,1) = {['% Date_Time="',d_str, '", ', sprintf('Lat_deg_N=%2.3f, Lon_deg_E=%2.3f, Flight_Alt_m_MSL=%2.1f', meanLat, meanLon, meanAlt)]};
+inp.header(end+1,1) = {sprintf('%% Solar geometry: SZA=%2.1f, SAZ=%2.1f, SEL=%2.1f, airmass_Rayleigh=%0.4g, airmass_aerosol=%0.4g, sol_dist_AU=%0.4g',...
     [meanSZA, meanSAZ, meanSEL, mean_am_ray, mean_am_aero, soldst_au])};
 N_wl = sum(s.wl_);N_obs = sum(good_); N_sun_obs = sum(sun_); N_sky_obs = sum(sky_); alb_src = 'SSFR'; 
 inp.header(end+1,1) = {sprintf('%% Config details: N_wavelengths=%d,N_obs=%d, N_sun_obs=%d, N_sky_obs=%d, albedo_source=%s',[N_wl, N_obs, N_sun_obs, N_sky_obs,alb_src])};
 
 inp.header(end+1,1) = {sprintf('%% rec_type: meaning for "rec_type" tag, type of spectra reported')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=1: Tr_LOS, atmospheric transmittance, line of sight to sun')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=2: TOD_LOS, total observed OD, line of sight to sun = -ln(Tr_LOS)')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=3: ROD, Rayleigh molecular OD, vertical above Alt')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=4: AOD, aerosol OD subtract all gasses, vertical above Alt (=TOD-ROD-GOD_retrieved)')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=5: AOD_fit, 3rd order polynomial fit of AOD subtract-all over gas-free wavelengths')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=6: GOD_obs, gaseous OD inferred as TOD - ROD - AOD_fit ')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=1: Tr_LOS, slant-path atmospheric transmittance, line of sight to sun')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=2: TOD_LOS, slant-path total observed OD, line of sight to sun = -ln(Tr_LOS)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=3: ROD_LOS, slant-path Rayleigh molecular OD, line of sight to sun, scaled to aircraft pressure')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=4: AOD_LOS, slant-path aerosol OD, subtracting Rayleigh and retrieved gases (= (TOD-ROD-GOD_retr) * airmass_aero)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=5: AOD_LOS_fit, 3rd order polynomial fit of AOD_LOS')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=6: GOD_LOS, slant-path gas OD = TOD_LOS - ROD_LOS - AOD_LOS_fit ')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-1: RAD, sky radiance [W/m2/nm/sr] (= s.skyrad./1000)')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-2: NRAD, normalized sky radiance [1/sr] (=pi*RAD/TOA)')};
   
@@ -78,38 +78,44 @@ inp.static_data(1,1) = {['wavelength(N_wavelengths)[nm]=[',sprintf('%3.1f',1000.
 % Add spectrometer FWHM
 % Add uncertainty estimate for AOD, for skyrad
 %
-inp.static_data(end+1,1) = {['flight_level_albedo(N_wavelengths)[unitless]=[',sprintf('%1.2f',sfc_alb(s.wl_ii(1))),sprintf(', %1.2f',sfc_alb(s.wl_ii(2:end))),']']};
+inp.static_data(end+1,1) = {['flight_level_albedo(N_wavelengths)[unitless]=[',sprintf('%0.3g',sfc_alb(s.wl_ii(1))),sprintf(', %0.3g',sfc_alb(s.wl_ii(2:end))),']']};
 % Add variability in SFFR albedo over sky scan
 % Add uncertainty in SSFR albedo over sky scan
 % Add support for MODIS sfc_alb or BDRF
     guey_ESR = gueymard_ESR;
     g_ESR = interp1(guey_ESR(:,1), guey_ESR(:,3), 1000.*s.w(s.wl_ii),'pchip','extrap');
    % Substitute alternative to Gueymard? E.g., Coddington ESR?
-inp.static_data(end+1,1) = {['TOA_irradiance_Gueymard(N_wavelengths)[W/m2/nm]=[',sprintf('%1.2f',g_ESR(1)),sprintf(', %1.2f',g_ESR(2:end)),']']};
+inp.static_data(end+1,1) = {['TOA_irradiance_Gueymard(N_wavelengths)[W/m2/nm]=[',sprintf('%0.4g',g_ESR(1)),sprintf(', %0.4g',g_ESR(2:end)),']']};
 
 % inp.static_data(end+1,1) = {'pitch, roll, heading, Quad, pitch_del, roll_del, head_del, quad_del, pitch_std, roll_std, head_std, QD_std'}
 % rec_type: type of spectra reported 
-% rec_type=1: Tr_LOS, atmospheric transmittance, line of sight to sun
-% rec_type=2: TOD_LOS, total observed OD, line of sight to sun = -ln(Tr_LOS)
-% rec_type=3: ROD, Rayleigh molecular OD, vertical above Alt
-% rec_type=4: AOD, aerosol OD subtract all gasses, vertical above Alt (=TOD-ROD-GOD_retrieved)
-% rec_type=5: AOD_fit, 3rd order polynomial fit of AOD subtract-all over gas-free wavelengths
-% rec_type=6: GOD_obs, gaseous OD inferred as TOD - ROD - AOD_fit 
+% rec_type=1: Tr_LOS, slant-path atmospheric transmittance, line of sight to sun's apparent position
+% rec_type=2: TOD_LOS, slant-path total observed OD, line of sight to sun = -ln(Tr_LOS)
+% rec_type=3: ROD_LOS, slant-path Rayleigh/molecular OD, OD_ray (Bucholtz) * m_ray(Kasten&Young)* 
+% rec_type=4: AOD_LOS, slant-path aerosol OD (TOD minus Rayleigh and all retrieved gasses (=TOD_LOS-ROD_LOS-GOD_retrieved)
+% rec_type=5: AOD_LOS_fit, 3rd order polynomial fit of AOD_LOS 
+% rec_type=6: GOD_LOS, slant-path gaseous OD inferred as TOD_LOS - ROD_LOS - AOD_LOS_fit 
 % rec_type>6: reserved for reporting specific gas ODs and cross-sections
 % rec_type=-1: RAD, sky radiance [W/m2/nm/sr] (= s.skyrad./1000)
 % rec_type=-2: NRAD, normalized sky radiance [1/sr] (=pi*RAD/TOA)
 nrad = pi.*skyrad./(ones(size(sky_ii))*g_ESR);
 
 Tr_LOS = s.rate(sun_,s.wl_).*(soldst_au.^2)./s.c0(s.wl_);
-TOD_LOS =real(-log(Tr_LOS));
-ROD = s.tau_ray(sun_,s.wl_);
-AOD = s.tau_aero_subtract_all(sun_,s.wl_);
+ROD = s.tau_ray(sun_,s.wl_); ROD_LOS_ = ROD.*(s.m_ray(sun_)*ones([1,size(ROD,2)]));
+Tr_ray = tr(s.m_ray(sun_),ROD); ROD_LOS = real(-log(Tr_ray)); %Just as a check, checks out fine
+AOD = s.tau_aero_subtract_all(sun_,s.wl_); AOD_LOS = AOD .*(s.m_aero(sun_)*ones([1,size(AOD,2)]));
 for ss = length(sun_ii):-1:1
-    PP_(ss,:) = polyfit(log(WL), real(log(AOD(ss,:))),3);
-    AOD_fit(ss,:) = exp(polyval(PP_(ss,:),log(WL)));
-end
-GOD_obs = s.tau_tot_vert(sun_ii,s.wl_) -ROD - AOD_fit;
+    PP_(ss,:) = polyfit(log(WL), real(log(AOD_LOS(ss,:))),3);
+    AOD_LOS_fit(ss,:) = real(exp(polyval(PP_(ss,:),log(WL))));
+end 
+Tr_AOD_fit = exp(-AOD_LOS_fit);
+% Tr_AOD_fit = tr(s.m_aero(sun_),AOD_fit); 
+% AOD_LOS = AOD_fit.*(s.m_aero(sun_)*ones([1,size(AOD,2)]));
+Tr_gas_LOS = Tr_LOS./(Tr_ray .*Tr_AOD_fit);
 
+GOD_LOS = real(-log(Tr_gas_LOS));
+TOD_LOS =real(-log(Tr_LOS));
+TOD_LOS - AOD_LOS_fit - ROD_LOS - GOD_LOS; % Should be zero, definitively
 
 V = datevec(s.t(good_));
 % YYYY, MM, DD, hh, mm, ss.mmm, d_str, lat, lon, alt, sza, sel, saz, oza, oel, oaz, SA
@@ -129,18 +135,18 @@ for ss = 1:length(good_ii)
             elseif rec_type==2
                 spec = TOD_LOS(in,:);
             elseif rec_type==3
-                spec = ROD(in,:);
+                spec = ROD_LOS(in,:);
             elseif rec_type==4
-                spec = AOD(in,:);
+                spec = AOD_LOS(in,:);
             elseif rec_type==5
-                spec = AOD_fit(in,:);
+                spec = AOD_LOS_fit(in,:);
             elseif rec_type==6
-                spec = GOD_obs(in,:);
+                spec = GOD_LOS(in,:);
             elseif rec_type>6
                 spec = NaN(size(WL));
                 warning('rec_type > 6 reserved for reporting gas species OD and cross sections.  Not yet supported.');
             end
-            inp.spectra(end+1,1) = {[stub, sprintf('%d',rec_type), sprintf(', %2.3g',spec)]};
+            inp.spectra(end+1,1) = {[stub, sprintf('%d',rec_type), sprintf(', %0.4g',spec)]};
         end
         
     elseif any(sky_ii==ti) %Then it is a sky scan so report
@@ -151,7 +157,7 @@ for ss = 1:length(good_ii)
             elseif rec_type == -2
                 spec = nrad(in,:);
             end
-            inp.spectra(end+1,1) = {[stub, sprintf('%d',rec_type), sprintf(', %2.3g',spec)]};
+            inp.spectra(end+1,1) = {[stub, sprintf('%d',rec_type), sprintf(', %0.4g',spec)]};
         end               
     end
 end
