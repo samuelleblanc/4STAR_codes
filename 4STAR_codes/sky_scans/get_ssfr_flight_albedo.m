@@ -10,7 +10,7 @@ if exist('in_time','var')
         'SSFR_*_',datestr(in_time(1),'yyyymmdd'), '_*.mat; ',...
         'SSFR_*_',datestr(in_time(1),'yyyymmdd'), '_*.cdf; ',...
         'SSFR_*_',datestr(in_time(1),'yyyymmdd'), '_*.ict; ' ,...
-        '*',datestr(in_time(1),'yyyymmdd'), '*.out',...
+        '*',datestr(in_time(1),'yyyymmdd'), '*.out; ',...
         '*SSFR*',datestr(in_time(1),'yyyymmdd'), '*.ict'];
 else
     file_str = ['_SSFR.mat; *_SSFR.cdf; *SSFR*.ict ; *.out'];
@@ -21,10 +21,14 @@ end
 if ~any(in_lambda>100)
     in_lambda = 1000.* in_lambda;
 end
-[list,pname] = dir_(file_str,'ssfr_alb');
+list = [];
+while isempty(list)
+    [list,pname] = dir_(file_str,'ssfr_alb');
+    if isempty(list) setnamedpath('ssfr_alb'); end
+end
 in_file = dirlist_to_filelist(list,pname);
 if length(in_file)~=1 || ~isafile(char(in_file))
-pause(0.1);in_file = getfullname(file_str,'ssfr_alb','Select SSFR mat or cdf file');
+    pause(0.1);in_file = getfullname(file_str,'ssfr_alb','Select SSFR mat or cdf file');
 else
    in_file = in_file{1};
 end
