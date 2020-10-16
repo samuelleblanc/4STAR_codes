@@ -29,9 +29,16 @@ ict_meta.missing = sscanf(fgetl(fid),fmt_str);
 for v = 1:ict_meta.N_vars
     line = fgetl(fid);
     v_str = textscan(line, '%s %s %s', 'delimiter',',');
-    ict_meta.vars.(legalize_fieldname(char(v_str{1}))).units = char(v_str{2});
-    if ~isempty(v_str{3})
-        ict_meta.vars.(legalize_fieldname(char(v_str{1}))).long_name = char(v_str{3});
+    if length(v_str{1})==1
+        ict_meta.vars.(legalize_fieldname(char(v_str{1}))).units = char(v_str{2});
+        if ~isempty(v_str{3})
+            ict_meta.vars.(legalize_fieldname(char(v_str{1}))).long_name = char(v_str{3});
+        end
+    else
+        ict_meta.vars.(legalize_fieldname(char(v_str{1}(1)))).units = char(v_str{2}(1));
+        if ~isempty(v_str{3}(1))
+            ict_meta.vars.(legalize_fieldname(char(v_str{1}(1)))).long_name = char(v_str{3}(1));
+        end
     end
 end
 ict_meta.special_comments = sscanf(fgetl(fid),'%d');
