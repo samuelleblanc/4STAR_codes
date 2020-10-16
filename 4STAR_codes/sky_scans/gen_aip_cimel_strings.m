@@ -7,9 +7,14 @@ function line_num = gen_aip_cimel_strings(inp)
 ln = 1; % Initialize line number to 1
 [KM, KN, KL, IT, ISZ, IMSC, IMSC1, ISTOP, IEL] = ...
     deal(inp.KM, inp.KN, inp.KL,inp.IT, inp.ISZ, inp.IMSC, inp.IMSC1, inp.ISTOP, inp.IEL);
-lev = inp.anet_level;
-line_num(ln) = {sprintf('%-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d  : KM KN KL IT ISZ IMSC IMSC1 ISTOP IEL; ANET inp level: %1.1f', ...
-    KM, KN, KL, IT, ISZ, IMSC, IMSC1, ISTOP, IEL, lev)};
+if isfield(inp,'sky_test')&&isfield(inp,'tau_test')
+    line_num(ln) = {sprintf('%-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d  : KM KN KL IT ISZ IMSC IMSC1 ISTOP IEL; sky_test=%1.1f , tau_test=%1.1f', ...
+        KM, KN, KL, IT, ISZ, IMSC, IMSC1, ISTOP, IEL, inp.sky_test, inp.tau_test)};
+else
+    lev = inp.anet_level;
+    line_num(ln) = {sprintf('%-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-4d  : KM KN KL IT ISZ IMSC IMSC1 ISTOP IEL; ANET inp level: %1.1f', ...
+        KM, KN, KL, IT, ISZ, IMSC, IMSC1, ISTOP, IEL, lev)};
+end
 ln = ln +1;
 % Second line: % 1 4 1 0 0 1 1 : NSD  NW  NLYR  NBRDF  NBRDF1
 % READ (*,*) NSD,NW,NLYR,NBRDF,NBRDF1,NSHAPE,IEND !! Read line 2
