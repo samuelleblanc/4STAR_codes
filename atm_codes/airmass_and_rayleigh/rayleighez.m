@@ -36,10 +36,10 @@ tau_r=repmat(NaN,pp,length(lambda));
 for idx_model_atm=1:6;
     ok=find(idx==idx_model_atm);
     if ~isempty(ok)
-        tau_r(ok,:)=rayleigh(lambda(:),press(ok),idx_model_atm)';
+        tau_r(ok,:)=(press(ok)/1013.25)*rayleigh(lambda,idx_model_atm);
+%         tau_r(ok,:)=rayleigh(lambda(:),press(ok),idx_model_atm)';
     end;
 end;
-
 % give uncertainties - inherited from the AATS code. From Schmid et al.
 % (1996)?
 tau_r_err=0.015;       % relative error that reflects the estimated accuracy of pressure measurements 

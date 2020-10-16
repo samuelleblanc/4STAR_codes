@@ -1,4 +1,4 @@
-function tau_r=rayleigh(lambda,press,idx_model_atm)
+function tau_r=rayleigh(lambda,idx_model_atm)
 
 %function tau_r=rayleigh(lambda,press,idx_model_atm)
 %Computes Rayleigh Scattering according to Bucholtz A., 1995: Appl. Optics., Vol. 34, No. 15 2765-2773
@@ -31,7 +31,8 @@ A=Coeff_model_atmo(idx_model_atm,1);
 B=3.55212;
 C=1.35579;
 D=0.11563;
-
+% Tests consistency with Hansen & Travis 1974.  Looks good, shows
+% discontinuity in Bucholtz at 500 nm.
 tau_r=A./lambda.^(B+C*lambda+D./lambda);
 
 i=find (lambda>0.500);
@@ -41,7 +42,7 @@ C=1.10298e-3;
 D=2.71393e-2;
 
 tau_r(i)=A./lambda(i).^(B+C*lambda(i)+D./lambda(i));
-
-tau_r=(press/1013.25*tau_r')';
+% tau_r = tau_r';
+% tau_r=(press./1013.25).*tau_r;
 
 
