@@ -11,7 +11,7 @@ end
 if exist(ssfr,'file')
     ssfr = anc_load(ssfr);
 end
-[pname, fname, ext] = fileparts(ssfr.fname)
+[pname, fname, ext] = fileparts(ssfr.fname);
 secs = round(ssfr.vdata.TMHRS.*60.*60);
 
 fix = false(size(secs));
@@ -24,7 +24,7 @@ secs(fix) = interp1(find(~fix), secs(~fix),find(fix),'linear','extrap');
 
 ssfr.vdata.TMHRS(fix) = secs(fix)./(60*60);
 ssfr.time = datenum(fname(1:8),'yyyymmdd')+ssfr.vdata.TMHRS./24;
-save([pname, filesep,fname, '.mat'],'-struct','ssfr');
+% save([pname, filesep,fname, '.mat'],'-struct','ssfr');
 
 return;
 
