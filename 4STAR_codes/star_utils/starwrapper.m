@@ -543,7 +543,7 @@ if toggle.applyforjcorr && isempty(strfind(lower(datatype),'forj'))...
    end;
 end;
 
-%% apply temp correction to rate structs
+%% apply temp correction to rate structs % For TCAP and SEAC4RS?
 if toggle.applytempcorr
    corr=startemperaturecorrection(daystr, s.t);
    s.rate  = s.rate.*repmat(corr,1,qq);
@@ -684,10 +684,10 @@ if toggle.hires_rayleigh;
    end;
 end;
 
-Tr = real(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1));
+Tr = real(s.rate./repmat(s.f,1,length(s.w))./repmat(s.c0,length(s.t),1));
 Tr_noray = Tr ./tr(s.m_ray, s.tau_ray);
 tau_noray_slant = -real(log(Tr_noray));
-tau_noray_vert = tau_noray_slant ./repmat(s.m_aero,1,qq);
+tau_noray_vert = tau_noray_slant ./repmat(s.m_aero,1,length(s.w));
 s.tau_tot_vert = tau_noray_vert + s.tau_ray; % This is really a "total" vertical optical depth
 
 sun_ = s.Zn==0&s.Str==1; 
