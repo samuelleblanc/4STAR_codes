@@ -79,8 +79,8 @@ end;
 if ~strcmp(pname(end),filesep)
     pname = [pname, filesep];
 end
-[~,fname,ext] = fileparts(fspec); fid = fopen([pname,filesep,fname,ext],'r+'); if fid>0 fclose(fid); end
-if (isafile(fspec)||fid>0)&&~isadir(fspec)
+[~,fname,ext] = fileparts(fspec); %fid = fopen([pname,filesep,fname,ext],'r+'); if fid>0 fclose(fid); end
+if isafile([pname,filesep,fname,ext])&&~isadir(fspec)
     this = which(fspec,'-all');
     if isempty(this) % Then file exists, but not in path
         this = {fspec};
