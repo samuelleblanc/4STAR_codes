@@ -10,7 +10,7 @@ function [list,pname] = dir_(masks,pathfile)
 %
 % getfile uses uigetfile to locate and open a file in read mode.
 % keyboard
-if ~exist('masks','var')
+if ~isavar('masks')
     masks = '*';
 end
 % upath = which ('userpath.m');
@@ -21,7 +21,7 @@ end
 %%%
 pname = strrep(userpath,';',filesep);
 pathdir = [pname,filesep, 'filepaths',filesep];
-if ~exist(pathdir,'dir')
+if ~isadir(pathdir)
     mkdir(pname, 'filepaths');
 end
 
@@ -55,23 +55,23 @@ end
 %       dialog = ['Select a directory.'];
 %    end
 
-if ~exist('pathfile','var')||isempty(pathfile)
+if ~isavar('pathfile')||isempty(pathfile)
     pathfile = 'lastpath.mat';
 end
 % This change is an attempt to let the user first load a specified path
 % file then replace it with an alternate starting directory if desired.
 
-if ~exist([pathdir,pathfile],'file')&&exist([pathdir,pathfile,'.mat'],'file')
+if ~isafile([pathdir,pathfile])&&isafile([pathdir,pathfile,'.mat'])
     pathfile = [pathfile,'.mat'];
-elseif ~exist([pathdir,pathfile],'file')&&~exist([pathdir,pathfile,'.mat'],'file')
+elseif ~isafile([pathdir,pathfile])&&~isafile([pathdir,pathfile,'.mat'])
     pathfile = 'lastpath.mat';
 end
-if exist([pathdir,pathfile],'file')
+if isafile([pathdir,pathfile])
     load([pathdir,pathfile]);
-    if ~exist('pname','var')
+    if ~isavar('pname')
         pname = pwd;
     end
-    if ~ischar(pname)||~exist(pname,'dir')
+    if ~ischar(pname)||~isadir(pname)
         %disp(['The path specified in the indicated pathfile ''',pathfile, [''' does not exist.'];
         disp('The pathfile will be deleted.');
         delete([pathdir,pathfile]);
@@ -82,7 +82,7 @@ else
     pname = [pwd,filesep];
 end;
 % The above should load an pre-saved path into pname.
-if exist('start','var')&&~isempty(start)&&exist(start,'dir')
+if isavar('start')&&~isempty(start)&&isadir(start)
     pname = start;
 end
 
@@ -97,7 +97,16 @@ for i = 1:length(mask)
       list = [list;dir([mask_i])];
    end
 end
-
+L = length(list);
+while L>1
+    top = list(L);
+    for LL = (L-1):-1:1
+        if strcmp(top.folder,list(LL).folder) && strcmp(top.name,list(LL).name)
+            list(LL) = [];
+        end
+    end
+    L = L-1;
+end
 if isempty(pname) || isempty(list)
     pname = [];
 else
