@@ -1,10 +1,14 @@
-function star = handscreen_skyscan_menu(star)
-% s = handscreen_skyscan_menu(s)
+function [star,changed] = handscreen_skyscan_menu(star)
+% [s,changed] = handscreen_skyscan_menu(s)
 % Adjust selected WL, SA
+% changed.wl and changed.SA are booleans indicating whether either were
+% changed
 
 % Parameters to adjust:
 % wavelengths
 % scattering angles
+changed.wl = false; changed.SA = false;
+
 if ~isfield(star,'wl_')
     star.wl_ = false(size(star.w));
     star.wl_(star.aeronetcols) = true;
@@ -22,8 +26,17 @@ while ~fini
    plot_skyscan(star);
    mn = menu('MODIFY: ', WL_str,'Screen Angles','DONE');
 if mn==1 %select wavelengths
-   star = select_skyscan_wl(star);
-   star = select_skyscan_SA(star);
+   star_ = select_skyscan_wl(star);
+   if length(star_.wl_ii)~=length(star.wl_ii)||any(star_.wl_ii~=star.wl_ii)
+       changed.wl = true;
+       star = select_skyscan_SA(star_); 
+       if any(star.good_sky~=star_.good_sky)
+           changed.SA = true;
+       end
+   else
+       star = star_;
+   end
+  clear star_;
 %    star.wl_ii = find(star.wl_);
 %    WL_str = ['Wavelengths [nm]: ',sprintf('%4.f ',1000.*star.w(star.wl_ii))];
    %       good_sky = false(size(star.good_sky*star.wl_ii));
@@ -31,7 +44,12 @@ if mn==1 %select wavelengths
    %       skymask = ones(size(star.skyrad(:,star.wl_)));
    %       skymask(~good_sky) = NaN;
 elseif mn==2  %select scattering angles
-   star = select_skyscan_SA(star);
+   star_ = star;
+   star = select_skyscan_SA(star_);
+   if any(star.good_sky~=star_.good_sky)
+       changed.SA = true;
+   end
+   clear star_
    %       good_sky = star.good_sky;
    %       skymask = star.skymask;
 elseif mn==3 % must be done!
