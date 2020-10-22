@@ -59,13 +59,13 @@ else
         skyrad(star.good_almA,:).*skymask(star.good_almA,:),'.-');
     if ~rain
         for la = 1:length(linesA)
-       leg_str(la) =  {['w(',num2str(star.wl_ii(la)),') ',sprintf('[%4.1f nm]',1000.*star.w(star.wl_ii(la)))]};
-        text(ang(star.good_almA), ...
-            skyrad(star.good_almA,la).*skymask(star.good_almA, la),'L','color',get(linesA(la),'color'),'fontname','tahoma','fontsize',7,'fontweight','demi');
+            leg_str(la) =  {['w(',num2str(star.wl_ii(la)),') ',sprintf('[%4.1f nm]',1000.*star.w(star.wl_ii(la)))]};
+            text(ang(star.good_almA), ...
+                skyrad(star.good_almA,la).*skymask(star.good_almA, la),'L','color',get(linesA(la),'color'),'fontname','tahoma','fontsize',7,'fontweight','demi');
         end
-            legend(leg_str,'location','northeast');
+        legend(leg_str,'location','northeast');
     else
-            recolor(linesA,1000.*star.w(wl_ii)); cb = colorbar; cbt=get(cb,'title'); set(cbt,'string','nm')
+        recolor(linesA,1000.*star.w(wl_ii)); cb = colorbar; cbt=get(cb,'title'); set(cbt,'string','nm')
     end
     xlabel('scattering angle [degrees]');
     ylabel('mW/(m^2 sr nm)');
