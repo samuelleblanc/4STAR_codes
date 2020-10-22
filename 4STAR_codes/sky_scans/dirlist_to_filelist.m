@@ -12,7 +12,7 @@ if isempty(dlist)
     flist = string([]);
 elseif length(dlist)==1
     fulllist(1) = {[pname, char(dlist(1).name)]};
-    flist(1) = string(dlist(1).name);
+    flist(1) = {string(dlist(1).name)};
 else
    for d = length(dlist):-1:1
       if strcmp(dlist(d).name,'.')||strcmp(dlist(d).name,'..')
@@ -21,7 +21,7 @@ else
    end
    for d = length(dlist):-1:1
       fulllist(d) = {[pname, char(dlist(d).name)]};
-      flist(d) = string(dlist(d).name);
+      flist(d) = {string(dlist(d).name)};
    end
 end
 return
