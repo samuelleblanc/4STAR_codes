@@ -100,8 +100,8 @@ if isfield(star.toggle,'use_last_wl')&&star.toggle.use_last_wl
     star.aeronetcols = star.wl_ii; 
     w_ii = star.w_isubset_for_polyfit;
 end
-    log_tau = real(log(star.tau_aero_subtract_all(sun_ii,w_ii)));
-    w_ii(isNaN(log_tau)) = [];
+log_tau = real(log(star.tau_aero_subtract_all(sun_ii,w_ii)));
+w_ii(isNaN(log_tau)) = []; % This eliminates bad but "unplottable" tau from the fit.
 PP_ = polyfit(log(star.w(w_ii)), real(log(star.tau_aero_subtract_all(sun_ii,w_ii))),3);
 tau_aero_subtract_all_fit = exp(polyval(PP_,log(star.w)));
 star.tau_abs_gas_fit=  tau_noray_vert - ones(size(star.t))*exp(polyval(PP_,log(star.w)));
