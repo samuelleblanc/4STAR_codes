@@ -31,7 +31,7 @@ end
 if ~isavar('toggle')||isempty(toggle)
     toggle = update_toggle;
 end
-if isfield(toggle,'flip_toggle')&&toggle.flip_toggle
+if ~isfield(toggle,'flip_toggle')||toggle.flip_toggle
     toggle = flip_toggle(toggle);
 end
 if isstruct(mat_file)
