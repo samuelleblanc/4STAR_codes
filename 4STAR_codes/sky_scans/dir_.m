@@ -97,15 +97,15 @@ for i = 1:length(mask)
       list = [list;dir([mask_i])];
    end
 end
-L = length(list);
-while L>1
+L = 1
+while L<(length(list)-1)
     top = list(L);
-    for LL = (L-1):-1:1
+    for LL = length(list):-1:2
         if strcmp(top.folder,list(LL).folder) && strcmp(top.name,list(LL).name)
             list(LL) = [];
         end
     end
-    L = L-1;
+    L = L+1;
 end
 if isempty(pname) || isempty(list)
     pname = [];
