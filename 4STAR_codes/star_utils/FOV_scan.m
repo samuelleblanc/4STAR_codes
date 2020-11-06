@@ -61,6 +61,13 @@ end;
 if strcmp(instrumentname,'2STAR');
     error('Not yet implemented for 2STAR')
 end;
+
+if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
+    mkdir([apname instrumentname '_' daystr]);
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
+else
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
+end
 %% legacy code
 % 
 % if ~exist('infile','var')
@@ -305,10 +312,10 @@ ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
-save_fig(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV']);
+save_fig(fig2,[apname, ins.fname(1:end-4),'.line_FOV']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
-ins.fig_name = {[ins.pname, ins.fname(1:end-4),'.line_FOV.png']};
+ins.fig_name = {[apname, ins.fname(1:end-4),'.line_FOV.png']};
 %%
 % ./(ones(size(ins.time))*ins.rangeCCD);
 % fig7 = figure; 
@@ -338,14 +345,14 @@ ylabel('Quad V_x/V_t_o_t');
 figure(fig2);
 ylim([.98,1.02]);
 xlim([-1.5,1.5]);
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.fig']);
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.selected_lines.png']}];
+saveas(fig2,[apname, ins.fname(1:end-4),'.selected_lines.fig']);
+saveas(fig2,[apname, ins.fname(1:end-4),'.selected_lines.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.selected_lines.png']}];
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
-saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.fig']);
-saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']}];
+saveas(fig3,[apname, ins.fname(1:end-4),'.quad_sigs.fig']);
+saveas(fig3,[apname, ins.fname(1:end-4),'.quad_sigs.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.quad_sigs.png']}];
 
 %%
 %ins.SA(3:end-2), ins.CCD_norm(3:end-2,good_pix)
@@ -374,9 +381,9 @@ ax(4) = gca;
 linkaxes(ax,'x');
 axis(ax(2),v);
 
-saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
-saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']}];
+saveas(fig4,[apname, ins.fname(1:end-4),'.spectral_FOV.fig']);
+saveas(fig4,[apname, ins.fname(1:end-4),'.spectral_FOV.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.spectral_FOV.png']}];
 %%
 return
 %

@@ -110,6 +110,15 @@ if nargin <3;
     ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks.ppt']);
 end;
 
+%% Check if figures subfolder exist for day and instrument, if not then create it
+if isfolder([p1 instrumentname '_' daystr])
+    mkdir([p1 instrumentname '_' daystr]);
+    p1 = [getnamedpath('starimg') instrumentname '_' daystr filesep];
+else
+    p1 = [getnamedpath('starimg') instrumentname '_' daystr filesep];    
+end
+
+
 %% Set up the load path of the files
 st = load(fname_4star);
 s = load(fname_4starsun);
@@ -332,7 +341,7 @@ grid on;
 ylabel('Altitude [m]'); xlabel('Time'); title([tit ' - Altitude vs. time']);
 dynamicDateTicks;
 legend(plo,leg,'Interpreter', 'none','Location', 'Best');
-fname = fullfile(p1,[instrumentname daystr '_alt']);
+fname = fullfile(p1,[instrumentname '_' daystr '_alt']);
 fig_names = {[fname '.png']};
 save_fig(falt,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -384,7 +393,7 @@ ylabel(ax2,'T [^\circC]');
 [lg,ic] = legend(['raw ' starfieldname2label('Tbox')],['smoothed over 60s ' starfieldname2label('Tbox')],'Location', 'Best');
 for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
 title(ax(1),[instrumentname ' - ' daystr ' - Temperature and Pressure (precon) in spectrometer box']);
-fname = fullfile(p1,[instrumentname daystr '_TnP']);
+fname = fullfile(p1,[instrumentname '_' daystr '_TnP']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(ftnp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -401,7 +410,7 @@ for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
 grid on;
 ylabel([ii{:} ', smoothed over ' num2str(bl*86400) ' s']);
 title([tit ' - Temperature (head)'])
-fname = fullfile(p1,[instrumentname daystr '_track_' ii{:}]);
+fname = fullfile(p1,[instrumentname '_' daystr '_track_' ii{:}]);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figtp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -425,7 +434,7 @@ pos1 = get(ax(1), 'Position');pos2 = get(ax(2), 'Position');
 set(ax(1), 'Position', [pos1(1) pos1(2) pos1(3)-0.08 pos1(4)]);
 set(ax(2), 'Position', [pos2(1) pos2(2) pos2(3)-0.08 pos2(4)]);
 title([instrumentname ' - ' daystr ' - Pressures and RH (head)']);
-fname = fullfile(p1,[instrumentname daystr '_track_P']);
+fname = fullfile(p1,[instrumentname '_' daystr '_track_P']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figtpp,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -523,7 +532,7 @@ title([instrumentname ' - ' daystr ' - Temperature and Pressure St']);
 pos1 = get(ax(1), 'Position');pos2 = get(ax(2), 'Position');
 set(ax(1), 'Position', [pos1(1) pos1(2) pos1(3)-0.08 pos1(4)]);
 set(ax(2), 'Position', [pos2(1) pos2(2) pos2(3)-0.08 pos2(4)]);
-fname = fullfile(p1,[instrumentname daystr '_Tst_Pst']);
+fname = fullfile(p1,[instrumentname '_' daystr '_Tst_Pst']);
 fig_names = [fig_names,{[fname '.png']}];
 save_fig(figts,fname,0);
 pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -1175,7 +1184,7 @@ if isavar('tau_aero')
         grid;
         colormap(cm)
         lcolorbar(labels,'TitleString','UTC [H]')
-        fname = fullfile(p1,[instrumentname daystr '_spectra_aod']);
+        fname = fullfile(p1,[instrumentname '_' daystr '_spectra_aod']);
         fig_names = [fig_names,{[fname '.png']}];
         save_fig(fspaod,fname,0);
         pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1192,7 +1201,7 @@ if isavar('tau_aero')
     set(gca,'ytick',str2num(labls));%yticklabels(labls);
     title([instrumentname ' - ' daystr ' - tau_aero spectra' ]);
     cb = colorbarlabeled('tau_aero');
-    fname = fullfile(p1,[instrumentname daystr '_spectra_aod_carpet']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_spectra_aod_carpet']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fspcar,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1223,7 +1232,7 @@ if isavar('tau_aero_noscreening')
     ylabel('Angstrom Exponent');
     grid;
     title([instrumentname ' - ' daystr ' - Angstrom' ]);
-    fname = fullfile(p1,[instrumentname daystr '_angstrom']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_angstrom']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fsang,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 1}];
@@ -1258,7 +1267,7 @@ if isavar('cwv2plot')
     title([tit ' - CWV [g/cm^{2}]' ]);
     grid on;
    
-    fname = fullfile(p1,[instrumentname daystr '_cwv']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_cwv']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fcwv_fl,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -1314,7 +1323,7 @@ if isavar('o32plot');
     title([tit ' - O_{3} [DU]' ]);
     grid on;
    
-    fname = fullfile(p1,[instrumentname daystr '_o3']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_o3']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fo3_fl,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -1369,7 +1378,7 @@ if isavar('no22plot');
     title([tit ' - NO_{2} [DU]' ]);
     grid on;
    
-    fname = fullfile(p1,[instrumentname daystr '_no2']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_no2']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fno2_fl,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -1414,7 +1423,7 @@ if isavar('hcoh2plot');
     title([tit ' - HCOH [DU]' ]);
     grid on;
    
-    fname = fullfile(p1,[instrumentname daystr '_hcoh']);
+    fname = fullfile(p1,[instrumentname '_' daystr '_hcoh']);
     fig_names = [fig_names,{[fname '.png']}];
     save_fig(fhcoh_fl,fname,0);
     pptcontents0=[pptcontents0; {fig_names{end} 4}];
@@ -1453,8 +1462,8 @@ if isavar('tau_aero_scaled')&&isavar('vars');
         figure;
         [h,filename]=spsun(daystr, 't', tau_aero_scaled, '.', vars.Alt1e5{:}, mods{:}, ...
             'cols', colslist{k,2}, 'ylabel', 'tau_aero_scaled', ...
-            'filename', ['star' daystr platform 'tau_aero_scaledtseries' colslist{k,1}]);
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+            'filename', [p1 instrumentname '_' daystr '_' platform 'tau_aero_scaledtseries' colslist{k,1}]);
+        pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
     end;
 end;
 
@@ -1465,8 +1474,8 @@ if isafile(starzenfile)
     figure;
     [h,filename]=spzen(daystr, 't', 'rad', '.', 't', Alt/100, mods{:}, ...
         'cols', c, ...
-        'filename', ['star' daystr platform 'zenradtseries']);
-    pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        'filename', [p1 instrumentname '_' daystr '_' platform 'zenradtseries']);
+    pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
 else
     warning([starzenfile ' does not exist. No zenith radiance plot is created.']);
 end
@@ -1527,11 +1536,11 @@ if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat'
         ylabel(ystr);
         title(daystr);
         set(lh,'fontsize',12,'location','best');
-        filename=['star' daystr 'AATS' ystr(regexp(ystr,'\w')) '_' num2str(aats.w(ii)*1000, '%0.0f') 'nm'];
+        filename=[p1 instrumentname '_' daystr '_'  'AATS' ystr(regexp(ystr,'\w')) '_' num2str(aats.w(ii)*1000, '%0.0f') 'nm'];
         if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
         end
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 4}];
+        pptcontents0=[pptcontents0; {fullfile([filename '.png']) 4}];
     end
     
     % time series of the delta tau_aero at all overlapping wavelengths
@@ -1558,11 +1567,11 @@ if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat'
             lstr=setspectrumcolor(ph, aats.w(cols));
             lh=legend(ph,lstr);
             set(lh,'fontsize',12,'location','best');
-            filename=['star' daystr 'AATS' ystr(regexp(ystr,'\w')) colslist{k,1}];
+            filename=[p1 instrumentname '_' daystr '_' 'AATS' ystr(regexp(ystr,'\w')) colslist{k,1}];
             if savefigure
                 starsas([filename '.fig, ' mfilename '.m'])
             end
-            pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+            pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
         end
     end
     
@@ -1605,11 +1614,11 @@ if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat'
         xlabel('Wavelength (nm)');
         ylabel('Tr. Ratio, 4STAR/AATS');
         title([daystr ' ' datestr(groundcomparison(1), 13) ' - ' datestr(groundcomparison(end), 13)]);
-        filename=['star' daystr datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'AATStrratio'];
+        filename=[p1 instrumentname '_' daystr '_'  datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'AATStrratio'];
         if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
         end
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
         % plot spectra
         figure;
         h=starplotspectrum(w, nanmean(tau_aero(rows,:),1), aerosolcols, viscols, nircols);
@@ -1623,11 +1632,11 @@ if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat'
         xlabel('Wavelength (nm)');
         ylabel('Optical Depth');
         title([daystr ' ' datestr(groundcomparison(1), 13) ' - ' datestr(groundcomparison(end), 13)]);
-        filename=['star' daystr datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'tau_aero_scaledspectra'];
+        filename=[p1 instrumentname '_' daystr '_'  datestr(groundcomparison(1), 'HHMMSS') datestr(groundcomparison(end), 'HHMMSS') 'tau_aero_scaledspectra'];
         if savefigure
             starsas([filename '.fig, ' mfilename '.m'])
         end
-        pptcontents0=[pptcontents0; {fullfile(figurefolder, [filename '.png']) 1}];
+        pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
     end
     
     % % %     % spectra, average

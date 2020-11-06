@@ -143,7 +143,12 @@ nms = strtrim(cellstr(num2str(wvls'))');
 labels = strread(num2str(wvls,'%5.0f'),'%s');
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 hold off;
-apname = getnamedpath('starfig');
+if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
+    mkdir([apname instrumentname '_' daystr]);
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
+else
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
+end
 fname = fullfile([apname instrumentname '_AERONET_timetrace_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];

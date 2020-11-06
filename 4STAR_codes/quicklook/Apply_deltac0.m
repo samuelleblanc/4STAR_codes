@@ -48,7 +48,12 @@ end;
 
 load_sp = true;
 load([fp file]);
-fp_img = getnamedpath('starimg');
+if isfolder([getnamedpath('starimg') instrumentname '_' daystr])
+    mkdir([apname instrumentname '_' daystr]);
+    fp_img = [getnamedpath('starimg') instrumentname '_' daystr filesep];
+else
+    fp_img = [getnamedpath('starimg') instrumentname '_' daystr filesep];    
+end
 
 if nargin<3;
     isflight = false;
@@ -156,7 +161,7 @@ catch;
     disp(['No points for day:' days(i,:)])
 end;
 %set(gcf,'pos',[10 10 600 1500])
-fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_time']);
+fname = fullfile(fp_img,[instrumentname '_' daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_time']);
 save_fig(figaas,fname,0);
 saved_fig_path = [fname '.png'];
 
@@ -226,7 +231,7 @@ try;
 catch;
     disp(['No points for day:' days(i,:)])
 end;
-fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_airmass']);
+fname = fullfile(fp_img,[instrumentname '_' daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_airmass']);
 save_fig(figm,fname,0);
 saved_fig_path =[{saved_fig_path}; {[fname '.png']}];
 
@@ -280,7 +285,7 @@ if load_sp;
     end;
     hold off;
     
-    fname = fullfile(fp_img,[instrumentname daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_spectra']);
+    fname = fullfile(fp_img,[instrumentname '_' daystr '_AODwith_deltac0_' num2str(deltac0_percent,'%03.1f') '_spectra']);
     save_fig(figs,fname,0);
     saved_fig_path =[saved_fig_path; {[fname '.png']}];
 end;
