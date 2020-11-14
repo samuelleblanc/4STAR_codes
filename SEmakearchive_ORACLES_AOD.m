@@ -50,6 +50,9 @@
 %                      Added new wavelengths and uncertainty comments
 % 2018-06-20, SL,v3.1, Added saving of FLAG_ACAOD, angstrom exponent, and
 %                      polynomial coefficients
+% 2020-10-23, SL, v3.2, Updated for R4, renewed FLAG_ACAOD, and saved the
+%                       flag with 0s when no flag_acaod file is identified 
+%                       in the starinfo
 % -------------------------------------------------------------------------
 
 function SEmakearchive_ORACLES_AOD
@@ -62,7 +65,7 @@ starsun_path = getnamedpath('ORACLES2016_starsun')
 ICTdir = getnamedpath('ORACLES2016_aod_ict')
 
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='3'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='4'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
 gas_subtract = false;
 avg_wvl = true;
@@ -100,7 +103,8 @@ NormalComments = {...
     };
 
 revComments = {...
-    'R3: Added new Angstrom exponent calculations, polynomial fit, and the flag for measurements of Above cloud AOD.'
+    'R4: Removed some low altitude erroneous flag_acaod.';...
+    'R3: Added new Angstrom exponent calculations, polynomial fit, and the flag for measurements of Above cloud AOD.';...
     'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
     'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Column trace gas impact to AOD has been removed for O3, O4, H2O, NO2, CO2, and CH4. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission.';...
     %'R1: Fix on field archived data for erroneus altitude, position, and some AOD data interpolation. Updated calibration from Mauna Loa, November 2016 has been applied. There is still uncertainty in the impact of window deposition affection light transmission and minimal column trace gas impacts on certain wavelengths.';...
@@ -129,7 +133,7 @@ save_wvls  = [354.9,380.0,451.7,470.2,500.7,520,530.3,532.0,550.3,605.5,619.7,66
 iwvls_angs = [4,16];
 [v,n] = starwavelengths; wvl = [v,n].*1000.0;
 
-for i=1:length(save_wvls);
+for i=1:length(save_wvls)
     namestr = sprintf('AOD%04.0f',save_wvls(i));
     if avg_wvl;
         [nul,iw] = min(abs(wvl-save_wvls(i)));
@@ -163,7 +167,7 @@ dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160
 %Values of jproc: 1=archive 0=do not archive
 jproc=[         1          1          1          1          1          1          1          1           1           1          1          1          1          1          1          1          1          1          1] ; %set=1 to process
 %jproc=[         1          0          0          0          1          1          1          1           1           1          1          0          1          1          1          1          1          1          1] ;
-jproc=[         0          0          0          0          0          0          0          0           0           0          1          0          0          0          0          0          0          0          0];
+%jproc=[         0          0          0          0          0          0          0          0           0           0          1          0          0          0          0          0          0          0          0];
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
 for i=idx_file_proc
@@ -322,22 +326,23 @@ for i=idx_file_proc
             data.flag_acaod = acaod_flag.flag_acaod;
         end;
     else
-        disp(['ACAOD flag file not found for daystr: ' daystr])
-        info = rmfield(info,'flag_acaod');
-        form = rmfield(form,'flag_acaod');
-        data = rmfield(data,'flag_acaod');
-        nms = {}; iir = 0; aod_start=true;
-        for jj=1:length(names);
-            if ~strcmp(names{jj},'flag_acaod'); nms{end+1} = names{jj}; end;
-            if strcmp(nms{end}(1:4),'AOD0') && aod_start; aod_start=false; end;
-            if ~strcmp(nms{end}(1:4),'AOD0') && aod_start; iir = iir+1; end;
-        end;
-        names = nms; iradstart = iir
+        disp(['ACAOD flag file not found for daystr: ' daystr '. Filling up with empty (0) values.'])
+        data.flag_acaod = data.qual_flag*0;
+        %info = rmfield(info,'flag_acaod');
+        %form = rmfield(form,'flag_acaod');
+        %data = rmfield(data,'flag_acaod');
+        %nms = {}; iir = 0; aod_start=true;
+        %for jj=1:length(names);
+        %    if ~strcmp(names{jj},'flag_acaod'); nms{end+1} = names{jj}; end;
+        %    if strcmp(nms{end}(1:4),'AOD0') && aod_start; aod_start=false; end;
+        %    if ~strcmp(nms{end}(1:4),'AOD0') && aod_start; iir = iir+1; end;
+        %end;
+        %names = nms; iradstart = iir
     end
     
-    %% Now go through the times of radiances, and fill up the related variables
+    %% Now go through the times of measurements, and fill up the related variables
     disp('filing up the data')
-    for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end;
+    for n=1:length(save_wvls); [uu,i] = min(abs(w-save_wvls(n)/1000.0)); save_iwvls(n)=i; end
     % make sure to only have unique values
     [tutc_unique,itutc_unique] = unique(tutc);
     [idat,datdt] = knnsearch(tutc_unique,UTC');
@@ -353,13 +358,13 @@ for i=idx_file_proc
         else;
             data.(names{nn})(iidat) = tau(itutc_unique(idat(iidat)),save_iwvls(ii));
         end;
-        if correct_aod;
+        if correct_aod
             d.dAODs(isnan(d.dAODs)) = 0.0;
             if ~strcmp(datestr(d.time(1),'YYYYmmDD'),daystr); error('Time array in delta AOD merge mark file not the same as starsun file'), end;
             [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
             try;
                 data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
-            catch;
+            catch
                 [tutc_unique_daod,itutc_unique_daod] = unique(t2utch(d.time));
                 data.(names{nn}) = data.(names{nn}) - interp1(tutc_unique_daod,d.dAODs(itutc_unique_daod,ii),UTC,'nearest');
                 disp('dAOD merge marks file does not have the same time array size, interpolating to nearest values and trying again.')
