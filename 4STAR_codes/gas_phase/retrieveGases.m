@@ -106,7 +106,7 @@ gas.no2; gas.o3; gas.co2; gas.hcoh;
    
   
    fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary.mat');
-   save([starpaths fi],'-struct','d');
+   save([getnamedpath('gas_summary') fi],'-struct','d');
    
   
 %---------------------------------------------------------------------
