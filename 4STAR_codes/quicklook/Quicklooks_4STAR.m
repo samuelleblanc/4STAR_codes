@@ -1843,5 +1843,5 @@ if savefigure
             error('Paste either 1 or 4 figures per slide.');
         end
     end
-    makeppt(ppt_fname, [instrumentname ' - '  daystr ' ' platform], pptcontents{:});
+    makepptx(ppt_fname, [instrumentname ' - '  daystr ' ' platform], pptcontents{:});
 end
