@@ -295,7 +295,11 @@ else; % copy an existing old starinfo file and run it
       if isafile(infofile_previous);
           change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
          %copyfile(infofile_previous, infofile_);
-         open(infofile_);
+         try
+             open(infofile_);
+         catch
+             disp(['Unable to open starinfo file for editing, please open and check file: ' infofile_])
+         end
          infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
         try
              s = infofnt(s);
