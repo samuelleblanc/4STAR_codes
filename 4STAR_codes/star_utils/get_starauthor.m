@@ -30,7 +30,7 @@ elseif ~isempty(strfind(usr,'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
     author='Yohei';
 elseif ~isempty(strfind(usr,'yohei')); % Yohei's laptop
     author='Yohei';
-elseif ~isempty(strfind(usr,'samuel'))
+elseif ~isempty(strfind(usr,'samuel')) || ~isempty(strfind(usr,'sam'))
     author='Samuel';
 elseif ~isempty(strfind(usr,'sleblan2'))
     author='Samuel';
