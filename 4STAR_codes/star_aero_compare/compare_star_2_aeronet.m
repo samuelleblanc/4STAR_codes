@@ -51,10 +51,15 @@ catch;
     load(fname_starsun);
 end;
 
-fp = getnamedpath('starsun');
-dis = dir([fp daystr(3:end) '*.lev??']);
+fp = getnamedpath('aeronet');
+dis = dir([fp daystr(3:end) '*.lev*']);
 if length(dis) ~= 1
-    [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
+    try
+        [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
+    catch
+        fig_paths = {};
+        return
+    end
     if afile==0
         fig_paths = {};
         return 
@@ -143,11 +148,11 @@ nms = strtrim(cellstr(num2str(wvls'))');
 labels = strread(num2str(wvls,'%5.0f'),'%s');
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 hold off;
-if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
-    mkdir([apname instrumentname '_' daystr]);
-    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
+if isfolder([getnamedpath('starimg') instrumentname '_' daystr])
+    apname = [getnamedpath('starimg') instrumentname '_' daystr filesep];
 else
-    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
+    apname = [getnamedpath('starimg') instrumentname '_' daystr filesep];
+    mkdir([getnamedpath('starimg') instrumentname '_' daystr]);
 end
 fname = fullfile([apname instrumentname '_AERONET_timetrace_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);

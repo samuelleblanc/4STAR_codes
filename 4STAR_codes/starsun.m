@@ -85,6 +85,13 @@ end;
 tic; make_small(s, savematfile);toc
 tic; make_for_starflag(s, savematfile);toc
 disp(['Saving: ',savematfile])
-tic; save([getnamedpath('starsun'),savematfile], '-struct', 's', '-mat');toc
+tic; 
+pathparts = strsplit(savematfile,filesep);
+if length(pathparts)>1
+    save(savematfile,'-struct','s','-mat');
+else
+    save(fullfile(getnamedpath('starsun'),savematfile),'-struct','s','-mat');
+end
+toc
 
 contents=[contents; fieldnames(s)];

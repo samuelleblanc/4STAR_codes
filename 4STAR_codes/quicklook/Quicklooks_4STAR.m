@@ -112,9 +112,9 @@ end;
 
 %% Check if figures subfolder exist for day and instrument, if not then create it
 if isfolder([p1 instrumentname '_' daystr])
-    mkdir([p1 instrumentname '_' daystr]);
     p1 = [getnamedpath('starimg') instrumentname '_' daystr filesep];
 else
+    mkdir([p1 instrumentname '_' daystr]);
     p1 = [getnamedpath('starimg') instrumentname '_' daystr filesep];    
 end
 

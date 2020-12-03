@@ -49,9 +49,9 @@ end;
 load_sp = true;
 load([fp file]);
 if isfolder([getnamedpath('starimg') instrumentname '_' daystr])
-    mkdir([apname instrumentname '_' daystr]);
     fp_img = [getnamedpath('starimg') instrumentname '_' daystr filesep];
 else
+    mkdir([getnamedpath('starimg') instrumentname '_' daystr]);
     fp_img = [getnamedpath('starimg') instrumentname '_' daystr filesep];    
 end
 
