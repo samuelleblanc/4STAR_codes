@@ -20,7 +20,7 @@ if ~exist('matname','var')
 end
 matname = strrep(matname,'_small.mat', '.mat');
 f_out = strrep(matname,'.mat', '_small.mat');
-pathparts = strsplit(f_out,filesepsave_fig);
+pathparts = strsplit(f_out,filesep);
 if length(pathparts)>1
     save(f_out,'-struct','s','-mat','-v7.3');
 else
