@@ -42,11 +42,11 @@ if nargin<1;
 end
 disp(['Loading the matlab file: ' fname_starsun])
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_starsun});
-max_alt_diff = 200.0
-max_seconds_diff = 360.0
+max_alt_diff = 200.0;
+max_seconds_diff = 360.0;
 
 try; 
-    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0');
+    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0','note');
 catch;
     load(fname_starsun);
 end;
@@ -249,7 +249,7 @@ for n=2:length(wvls)
 end
 dynamicDateTicks;
 xlabel('Time');
-ylabel('Diff (c0-c0_from_aeronet)/c0 [%]');
+ylabel('Diff (c0-c0_from_aeronet)/c0 [%]','Interpreter','none');
 title([instrumentname ' c0s to match AERONET AOD at:' a.location],'Interpreter','none')
 grid;
 colormap(cm);
@@ -259,7 +259,7 @@ save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
 
 %% plot figure of new c0 spectra
-figure; 
+figure('pos',[80,50,1000,1000]); 
 ax(1) = subplot(3,1,1);
 cms = hsv(length(ii)); 
 plot(w(1:1044),c0_A(1,1:1044),'o-','Color',cms(1,:));
@@ -276,7 +276,7 @@ end
 ylabel({'c0 from AERONET';'(10x NIR) [rate/ms]'})
 ylim([0,ceil(c0(450).*1.1./100.0)*100.0]);
 grid;
-title([instrumentname ' new c0 from AERONET match: ' a.location ' - ' daystr],'Interpreter','none')
+title([instrumentname ' new c0 to match AERONET: ' a.location ' - ' daystr],'Interpreter','none')
 originalSize1 = get(ax(1), 'Position');
 colormap(cms);
 cbh = lcolorbar(labelsd,'TitleString','Time','fontweight','bold');
@@ -289,7 +289,7 @@ plot(w,w.*0.0,'--k');
 for n=2:length(ii)
     plot(w,dc0(n,:),'.-','Color',cms(n,:));
 end
-ylabel({'Diff';'(c0-c0_from_aeronet)/c0 [%]'});
+ylabel({'Diff';'(c0-c0_from_aeronet)/c0 [%]'},'Interpreter','none');
 ylim([-10,10]); grid;
 
 ax(3) = subplot(3,1,3);
@@ -330,6 +330,19 @@ disp(['printing to ' getnamedpath('starmat') visfilename])
 starsavec0([getnamedpath('starmat') visfilename], fname_starsun, additionalnotes, w_vis, vis_c0, vis_c0_std);
 disp(['printing to ' getnamedpath('starmat') nirfilename])
 starsavec0([getnamedpath('starmat') nirfilename], fname_starsun, additionalnotes, w_nir, nir_c0, nir_c0_std);
+
+%% Compare the resulting c0s
+
+%try
+   % get used c0 filename
+   for i=1:length(note); if contains(note{i},'VIS_C0'); cofiles = strsplit(note{i}); end; end;
+   fig_names = compare_Co_fx({which(cofiles{end}(1:end-1));[getnamedpath('starmat') visfilename]},1);
+   for n=1:length(fig_names)
+       fig_paths = [fig_paths; fig_names{n}];
+   end
+%catch
+    disp('Problem comparing the new C0s')
+%end
 return
 
 function [line,label] = get_linfit(x,y,color)

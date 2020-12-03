@@ -1,4 +1,4 @@
-function compare_Co_fx(c0vis_fname);
+function fig_names = compare_Co_fx(c0vis_fname,auto);
 %% Details of the program:
 % NAME:
 %   compare_Co_fx
@@ -20,10 +20,11 @@ function compare_Co_fx(c0vis_fname);
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): Connor, MLO 2018 Aug and following, based on Compare_Co_* 
+% Modified (v1.1): Sam, Santa Cruz, 2020-12-03, to make it useable in automated methods.
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.0');
+version_set('1.1');
 
 % Cheking some c0, and calculating the averages
 % Select a bunch of Co files
@@ -32,8 +33,14 @@ version_set('1.0');
 % Display normalized Cos in fig2.
 % Iteratively select Cos for avg.
 % When done select output location, name/describe Co, and produce output.
-
-vis_names = getfullname('*_VIS_C0_*.dat', 'C0s','Select VIS C0 files for comparison');
+if nargin<2
+    auto = 0;
+end
+if nargin <1
+    vis_names = getfullname('*_VIS_C0_*.dat', 'C0s','Select VIS C0 files for comparison');
+else
+    vis_names = c0vis_fname;
+end
 [pn,fn,~] = fileparts(vis_names{1}); pn = [pn,filesep];
 if ~isempty(strfind(upper(fn),'_4STARB_'));
    inst = '4STARB';
@@ -88,9 +95,17 @@ nirc0_avg = mean(nirc0(use_avg,:));
 nirc0_std = std(nirc0(use_avg,:));
 co_ax(1) = gca;
 while ~all_done
-   avg_or_ref = menu('Compare C0s against AVERAGE or REFERENCE?', 'Compare to AVERAGE','Compare to REFERENCE');
+    if auto
+        avg_or_ref = 2; %ref
+    else
+        avg_or_ref = menu('Compare C0s against AVERAGE or REFERENCE?', 'Compare to AVERAGE','Compare to REFERENCE');
+    end
    if avg_or_ref==2
-      visref = getfullname(['*VIS_C0_*.dat'],'C0_ref','Select a VIS C0 file to use a reference.');
+       if auto
+           visref = vis_names{1}; %use the first as default reference
+       else
+            visref = getfullname(['*VIS_C0_*.dat'],'C0_ref','Select a VIS C0 file to use a reference.');
+       end
       nirref = strrep(visref,'_VIS_C0_','_NIR_C0_');
       [vis_ref, nir_ref] = get_C0s(visref, nirref);vis_ref = vis_ref.c0; nir_ref = nir_ref.c0;
       [~, title_tag] = fileparts(nirref);title_tag = strrep(title_tag,'_NIR_C0_','_*_');
@@ -134,7 +149,11 @@ while ~all_done
    linkaxes(co_ax,'x');
    done_averaging = false;
    while ~done_averaging
-      avg = menu('Toggle Cos for use in average',Co_names{:},'DONE');
+       if auto
+           avg = length(use_avg)+1;
+       else
+            avg = menu('Toggle Cos for use in average',Co_names{:},'DONE');
+       end
       if avg>length(use_avg)
          done_averaging = true;
       else
@@ -227,7 +246,11 @@ while ~all_done
    end
    
    %%
-   ref_done = menu('Select a different Co as reference, or all done?','Different Co','all done');
+   if auto
+       ref_done = 2;
+   else
+    ref_done = menu('Select a different Co as reference, or all done?','Different Co','all done');
+   end
    if ref_done>1
       all_done = true;
    else
@@ -257,9 +280,19 @@ ymax = ceil(max(visc0_avg(w_vis>400&w_vis<700))./1000).*1000;
    ylabel('%diff');
    ylim([-10,10]);
 
-
-fp_out = uigetdir('C0_out','Select a location to save C0 plots.');
-asktosave = 1; %set if ask to save the figures
+if auto
+    [daystr, filen, datatype, instrumentname]=starfilenames2daystr(vis_names(2));
+    if isfolder([getnamedpath('starimg') instrumentname '_' daystr])
+        fp_out = [getnamedpath('starimg') instrumentname '_' daystr filesep];
+    else
+        fp_out = [getnamedpath('starimg') instrumentname '_' daystr filesep];
+        mkdir([getnamedpath('starimg') instrumentname '_' daystr]);
+    end
+    asktosave = 0;
+else
+    fp_out = uigetdir('C0_out','Select a location to save C0 plots.');
+    asktosave = 1; %set if ask to save the figures
+end
 
 fignames = [inst,'_for_c0s_from_' daystrs{1} '_to_' daystrs{end}];
 % Save the figures
@@ -306,29 +339,34 @@ for i=2:length(i_avg);
       leg_cell = [leg_cell, fn];
    days_cell = [days_cell ', ' leg_cell];
 end
-[nul,nul0,nul1,usr] = starpaths;
-additionalnotes={['Interactive averages of c0 built for ' inst ' by user: ' usr];...
-   ['Averages of c0 from multiple days including: ' days_cell '.']};
-filesuffix=[fignames '_average'];
+if auto
+    sav = 2;
+else
+    [nul,nul0,nul1,usr] = starpaths;
+    additionalnotes={['Interactive averages of c0 built for ' inst ' by user: ' usr];...
+       ['Averages of c0 from multiple days including: ' days_cell '.']};
+    filesuffix=[fignames '_average'];
 
-disp({'Edit additionalnotes and filesuffix, then "Evaluate".';'Type "dbcont" to continue.'})
-keyboard
+    disp({'Edit additionalnotes and filesuffix, then "Evaluate".';'Type "dbcont" to continue.'})
+    keyboard
 
-daystr=label_daystr; %leg{i_avg(end)}(end-7:end);
-visfilename=fullfile(pn, [daystr '_VIS_C0_' filesuffix '.dat']);
-nirfilename=fullfile(pn, [daystr '_NIR_C0_' filesuffix '.dat']);
+    daystr=label_daystr; %leg{i_avg(end)}(end-7:end);
+    visfilename=fullfile(pn, [daystr '_VIS_C0_' filesuffix '.dat']);
+    nirfilename=fullfile(pn, [daystr '_NIR_C0_' filesuffix '.dat']);
 
-vissource_alt=cellstr(char(vis_names{i_avg}));
-nirsource_alt=cellstr(char(nir_names{i_avg}));
-vissource = '(SEE Original files for sources)';
-nirsource = '(SEE Original files for sources)';
+    vissource_alt=cellstr(char(vis_names{i_avg}));
+    nirsource_alt=cellstr(char(nir_names{i_avg}));
+    vissource = '(SEE Original files for sources)';
+    nirsource = '(SEE Original files for sources)';
 
-sav = menu('Save the resulting Co values to file?','Yes', 'No');
+
+    sav = menu('Save the resulting Co values to file?','Yes', 'No');
+end
 if sav ==1
-disp(['Printing c0 file to :' visfilename])
-starsavec0(visfilename, vissource, [additionalnotes; vissource_alt], w_vis, visc0_avg, visc0_std);
-starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc0_avg, nirc0_std);
-
+    disp(['Printing c0 file to :' visfilename])
+    starsavec0(visfilename, vissource, [additionalnotes; vissource_alt], w_vis, visc0_avg, visc0_std);
+    starsavec0(nirfilename, nirsource, [additionalnotes; nirsource_alt], w_nir, nirc0_avg, nirc0_std);
+end 
 %Save the figures
 
 save_fig(fig,[fp_out filesep fignames '_cal_c0_' gdaystr],asktosave);
@@ -337,7 +375,12 @@ figure_(fig2);
 ylim([-4 4]);
 save_fig(fig2,[fp_out filesep fignames '_cal_c0_relative_zoom'],asktosave);
 save_fig(fig3,[fp_out filesep fignames '_cal_c0_avg_' gdaystr],asktosave);
-end
+
+fig_names = {};
+fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_' gdaystr '.png']];
+fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_relative_' gdaystr '.png']];
+fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_relative_zoom' gdaystr '.png']];
+fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_avg_' gdaystr '.png']]
 
 return
 

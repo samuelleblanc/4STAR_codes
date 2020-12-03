@@ -1812,6 +1812,16 @@ if length(aeronet_fig_paths)>0
     pptcontents0=[pptcontents0; {aeronet_fig_paths{3} 4}];
     pptcontents0=[pptcontents0; {' ' 4}];
     pptcontents0=[pptcontents0; {' ' 4}];
+    if length(aeronet_fig_paths)>3
+        pptcontents0=[pptcontents0; {aeronet_fig_paths{4} 1}];
+        pptcontents0=[pptcontents0; {aeronet_fig_paths{5} 1}];
+        if length(aeronet_fig_paths)>5
+            pptcontents0=[pptcontents0; {aeronet_fig_paths{6} 4}];
+            pptcontents0=[pptcontents0; {aeronet_fig_paths{7} 4}];
+            pptcontents0=[pptcontents0; {aeronet_fig_paths{8} 4}];
+            pptcontents0=[pptcontents0; {aeronet_fig_paths{9} 4}];
+        end
+    end
 end
 
 

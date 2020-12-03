@@ -58,6 +58,9 @@ exportToPPTX('new','Dimensions',[9 6], ...
 
 %SlideNum = exportToPPTX('addslide');
 
+% flip varargin, since generating slides from the bottom
+vargin = flip(varargin);
+varargin = vargin;
 % generate slides
 pixtoin = 0.01;
 for i=nargin:-1:3;
