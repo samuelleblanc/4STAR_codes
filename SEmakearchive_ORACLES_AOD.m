@@ -75,7 +75,7 @@ dAOD_uncert_frac = 0.25; %fraction of the change in dAOD due to window depositio
 
 %% Prepare General header for each file
 HeaderInfo = {...
-    'Jens Redemann';...                           % PI name
+    'Samuel LeBlanc (previously Jens Redemann)';...                           % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
     'ORACLES 2016';...                                  % Mission name
@@ -85,7 +85,7 @@ HeaderInfo = {...
     };
 
 NormalComments = {...
-    'PI_CONTACT_INFO: Jens.Redemann-1@nasa.gov';...
+    'PI_CONTACT_INFO: samuel.leblanc@nasa.gov / jredemann@ou.edu';...
     'PLATFORM: NASA P3';...
     'LOCATION: Based at Walvis Bay, Namibia, Exact aircraft latitude, longitude, altitude are included in the data records';...
     'ASSOCIATED_DATA: N/A';...
@@ -423,21 +423,27 @@ for i=idx_file_proc
         %end
     end;
     
-    %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement
+    %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement, or bad polycoeff values
     if strcmp(daystr,'20160912');
         data.(names{iradstart+2})(ilat) = NaN;
         data.AOD_polycoef_a2(ilat) = NaN; data.AOD_polycoef_a1(ilat) = NaN; data.AOD_polycoef_a0(ilat) = NaN;
         data.AOD_angstrom_470_865(ilat) = NaN;
     end;
-    inans = find(isnan(data.(names{iradstart+2})));
+    ibads = (data.AOD_polycoef_a2 > 20.0) | (data.AOD_polycoef_a2 < -20.0);
+    inans = find(isnan(data.(names{iradstart+2})) | transpose(ibads));
     %data.UTC(inans) = NaN;
     data.GPS_Alt(inans) = NaN;
     data.Latitude(inans) = NaN;
     data.Longitude(inans) = NaN;
     data.amass_aer(inans) = NaN;
+    data.AOD_polycoef_a2(inans) = NaN;
+    data.AOD_polycoef_a1(inans) = NaN;
+    data.AOD_polycoef_a0(inans) = NaN;
+    data.AOD_angstrom_470_865(inans) = NaN;
     for i=iradstart:length(names)
         data.(names{i})(inans) = NaN;
     end
+    data.qual_flag(inans) = 1;
     
     %% Now print the data to ICT file
     disp('Printing to file')
