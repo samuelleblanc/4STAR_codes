@@ -65,16 +65,16 @@ starsun_path = getnamedpath('ORACLES2016_starsun')
 ICTdir = getnamedpath('ORACLES2016_aod_ict')
 
 prefix='4STAR-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='4'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+rev='5'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'P3';
-gas_subtract = false;
+gas_subtract = true;
 avg_wvl = true;
 deltatime_dAOD = 900.0; %time in seconds around the shift in AOD due to the window deposition
 dAOD_uncert_frac = 0.25; %fraction of the change in dAOD due to window deposition to be kept as extra uncertainty (default 20%, 0.2)
 
 
 %% Prepare General header for each file
-HeaderInfo = {...
+HeaderInfoMain = {...
     'Samuel LeBlanc (previously Jens Redemann)';...                           % PI name
     'NASA Ames Research Center';...              % Organization
     'Spectrometers for Sky-Scanning, Sun-Tracking Atmospheric Research (4STAR)';...     % Data Source
@@ -103,6 +103,7 @@ NormalComments = {...
     };
 
 revComments = {...
+    'R5: Fixed error in header info for Start_UTC indicating wrong day of time start and fixed flight day 2016-09-14 for erroneous AOD values';...
     'R4: Removed some low altitude erroneous flag_acaod.';...
     'R3: Added new Angstrom exponent calculations, polynomial fit, and the flag for measurements of Above cloud AOD.';...
     'R2: Final calibrations, with new error calculations, and correction of window deposition for some selected flights. Added new wavelengths to archive.';...
@@ -165,9 +166,9 @@ originfo = info; origform = form; orignames = names;
 %% prepare list of details for each flight
 dslist={'20160824' '20160825' '20160827' '20160830' '20160831' '20160902' '20160904' '20160906', '20160908', '20160910','20160912','20160914','20160918','20160920','20160924','20160925','20160927','20160929','20160930'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          1          1          1          1          1          1          1           1           1          1          1          1          1          1          1          1          1          1] ; %set=1 to process
-%jproc=[         1          0          0          0          1          1          1          1           1           1          1          0          1          1          1          1          1          1          1] ;
-%jproc=[         0          0          0          0          0          0          0          0           0           0          1          0          0          0          0          0          0          0          0];
+%jproc=[         1          1          1          1          1          1          1          1           1           1          1          1          1          1          1          1          1          1          1] ; %set=1 to process
+%jproc=[         0          0          0          0          0          0          0          0           0           0          0          0          1          1          1          1          1          1          1] ;
+jproc=[         0          0          0          0          1          1          1          1           1           1          1          0          0          0          0          0          0          0          0];
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
 for i=idx_file_proc
@@ -188,6 +189,7 @@ for i=idx_file_proc
         eval([infofile_(1:end-2),'(s)']);
     end
     UTCflight=t2utch(s.flight);
+    HeaderInfo = HeaderInfoMain;
     HeaderInfo{7} = strrep(HeaderInfo{7},'DATE',daystr);
     
     %% build the Start_UTC time array, spaced at one second each
@@ -281,7 +283,22 @@ for i=idx_file_proc
         data.Latitude(ilat) = NaN;
         data.Longitude(ilat) = NaN;
         data.amass_aer(ilat) = NaN;
-    end;
+        data.(names{iradstart+2})(ilat) = NaN;
+    elseif strcmp(daystr,'20160831')
+        ilat = find(data.Latitude>0.0);
+        data.Latitude(ilat) = NaN;
+        data.Longitude(ilat) = NaN;
+        data.amass_aer(ilat) = NaN;
+        data.(names{iradstart+2})(ilat) = NaN;
+    elseif strcmp(daystr,'20160908')
+        ilat = find(data.Latitude>0.0 | data.Longitude>15.5);
+        data.Latitude(ilat) = NaN;
+        data.Longitude(ilat) = NaN;
+        data.amass_aer(ilat) = NaN;
+        data.(names{iradstart+2})(ilat) = NaN;
+    end
+    
+    
     
     %% Load the flag file
     if isfield(s, 'flagfilename');
@@ -424,7 +441,7 @@ for i=idx_file_proc
     end;
     
     %% make sure that no UTC, Alt, Lat, and Lon is displayed when no measurement, or bad polycoeff values
-    if strcmp(daystr,'20160912');
+    if strcmp(daystr,'20160912') | strcmp(daystr,'20160908') | strcmp(daystr,'20160831');
         data.(names{iradstart+2})(ilat) = NaN;
         data.AOD_polycoef_a2(ilat) = NaN; data.AOD_polycoef_a1(ilat) = NaN; data.AOD_polycoef_a0(ilat) = NaN;
         data.AOD_angstrom_470_865(ilat) = NaN;
@@ -448,6 +465,9 @@ for i=idx_file_proc
     %% Now print the data to ICT file
     disp('Printing to file')
     ICARTTwriter(prefix, platform, HeaderInfo, specComments, NormalComments, revComments, daystr,Start_UTCs,data,info,form,rev,ICTdir)
+    
+    %% Clear the variables for next run
+    clear tau_aero_subtract_all tau tau_aero_noscreening;
 end;
 
 function name = getUserName ()
