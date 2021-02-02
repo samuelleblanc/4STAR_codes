@@ -71,10 +71,13 @@ catch
 end
 j=0;
 for i=1:length(flist)
-    if strcmp(pptname_out,[flist(i).folder filesep flist(i).name]); continue; end;
+%     if strcmp(pptname_out,[flist(i).folder filesep flist(i).name]); continue; end; %%% .folder doesn't exist in this structure...
+    if strcmp(pptname_out,[path filesep flist(i).name]); continue; end;
     if flist(i).name(1)=='~'; continue; end;
-    disp(['Merging file: ' flist(i).folder filesep flist(i).name])
-    jj = Presentation.Slides.InsertFromFile([flist(i).folder filesep flist(i).name],j);
+%     disp(['Merging file: ' flist(i).folder filesep flist(i).name])
+    disp(['Merging file: ' path filesep flist(i).name])
+%     jj = Presentation.Slides.InsertFromFile([flist(i).folder filesep flist(i).name],j);
+    jj = Presentation.Slides.InsertFromFile([path filesep flist(i).name],j);
     j = j + jj;
 end
 Presentation.SaveAs(pptname_out);
