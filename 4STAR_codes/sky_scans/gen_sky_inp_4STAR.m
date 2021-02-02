@@ -44,8 +44,12 @@ if isavar('good_sky_')
 else
     good_sky = star.good_sky;
 end
-star.good_almA = star.good_almA&good_sky;
-star.good_almB = star.good_almB&good_sky;
+if star.isALM==1
+    star.good_almA = star.good_almA&good_sky;
+    star.good_almB = star.good_almB&good_sky;
+elseif star.isPPL==1
+    star.good_ppl = star.good_ppl&good_sky;
+end
 % if ~isavar('good_sky_')
 %     good_sky = repmat(star.good_sky,size(star.wl_ii))&(~isnan(sat_rad));
 % end
