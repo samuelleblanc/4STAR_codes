@@ -58,14 +58,14 @@ if changed & sum(wl_)>2
 end
 [aod_fit, Ks] = fit_aod_basis(wl(wl_ii), aod(wl_ii),wl);
 res = aod-aod_fit;
-fit_rms = rms(res(wl_ii));
+fit_rms = sqrt(nanmean((res(wl_ii)).^2));%rms(res(wl_ii));
 fit_bias = mean(-res(wl_ii));
 % Now, compute the RMSE at each block, interpolate over wavelength, and
 % identify new block 
 for B = size(block,1):-1:1
     aa = [block(B,1):block(B,2)];% indices in wl_ii and aod_fit
     bb =[block(B,3):block(B,4)]; % indices in wl and aod
-    RR = rms(res(bb));
+    RR = sqrt(nanmean((res(bb)).^2)); %rms(res(bb));
     block(B,8) = RR;
 end
 RR = interp1(block(:,7), block(:,8), wl,'linear');
@@ -79,7 +79,7 @@ wl_x_ = (res < 0.5.*RR)&(abs(res)<RR); %this is an extended set of pixels includ
 
  [aod_fit_x, Ks_x] = fit_aod_basis(wl(wl_x), aod(wl_x),wl);
 res_x = aod-aod_fit_x;
-fit_rms_x = rms(res_x(wl_x));
+fit_rms_x = sqrt(nanmean((res_x(wl_x)).^2)); %rms(res_x(wl_x));
 fit_bias_x = mean(-res_x(wl_x));
 
 % figure; plot(wl, aod, '-', wl(wl_ii), aod_fit(wl_ii),'-o',wl(wl_x), aod_fit_x(wl_x),'-x',wl, aod-aod_fit, 'r-', wl, aod-aod_fit_x,'k-')
