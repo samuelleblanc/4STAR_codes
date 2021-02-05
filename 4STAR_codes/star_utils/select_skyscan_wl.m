@@ -7,7 +7,9 @@ function star = select_skyscan_wl(star)
 
 % Modifications:
 % CJF, v1.1, 2020-07-09, added ability to set polynomial 
-version_set('1.1');
+% CJF, v1.2, 2020-11-23, adding rfit_aod_basis, not checked yet
+% CJF, v1.2, 2021-02-04, adding xfit_aod deprecating rfit_aod_basis
+version_set('1.3');
 if ~isavar('star')||~isstruct(star)&&isafile(star)
     star = load(getfullname('*STAR*_SKY*.mat','star_skysky_mats','Select a 4STAR sky mat file.'));
     if isfield(star,'s'); star = star.s; end
@@ -30,13 +32,24 @@ end
 man = menu({'Current wavelengths [nm]: ';WL_str ;'Select other wavelengths?'},'Manually','From file...','Done');
 ORD = 3;
 if man==1
+    block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
+    if isfield(block,'block') block = block.block; end;
+    wl_ = false(size(star.w));
+    for b = 1:size(block,1)
+        wl_(block(b,3):block(b,4)) = true;
+    end
+    w_fit_ii = find(wl_);
     while ~done 
+        
         lte0 = star.tau_aero_subtract_all(suns,w_fit_ii)<=0;  w_fit_ii(lte0) = [];
-        PP_ = polyfit(log(star.w(w_fit_ii)), real(log(star.tau_aero_subtract_all(suns,w_fit_ii))),ORD);
-        [~,PP_] = rpoly_mad(log(star.w(w_fit_ii)), real(log(star.tau_aero_subtract_all(suns,w_fit_ii))),ORD);
-        tau_line = exp(polyval(PP_,log(star.w))); 
-        tau_line_fit = fit_aod_basis(star.w(w_fit_ii), star.tau_aero_subtract_all(suns,w_fit_ii),star.w);
-        tau_aero = star.tau_tot_vertical(suns,:); tau_sub = star.tau_aero_subtract_all(suns,:);
+        [aod_fit] = tau_xfit(star.w,star.tau_aero_subtract_all(suns,:),block);  
+        
+        w_fit_ii(star.w(w_fit_ii)>.950 &star.w(w_fit_ii)<1.100) = [];
+        tau_tot = star.tau_tot_vertical(suns,:); 
+        tau_sub = star.tau_aero_subtract_all(suns,:);
+        tau_noray_vert = star.tau_tot_vert -star.tau_ray;
+
+        
         figure_(1111);
         sb(2) = subplot(2,1,2);
         loglog(star.w, star.skyresp,'.',star.w(star.wl_), star.skyresp(star.wl_),'ro');
@@ -45,31 +58,31 @@ if man==1
         ylabel('responsivity');
         sb(1) = subplot(2,1,1);
         ll = loglog([NaN,star.w(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,star.w(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', ...
-            star.w, tau_aero,'-',star.w, tau_sub,'-', star.w, tau_line, 'm-', star.w, tau_line_fit, 'g-');
-        ylabel('OD');ylim([0.9.*min(tau_line),1.1.*max(tau_line)]);
+            star.w, tau_tot,'-',star.w, tau_sub,'-', star.w, aod_fit, 'm-');
+        ylabel('OD');ylim([0.5.*min(aod_fit),2]);
         lg = legend('used in fit','selected for retrieval');zoom('on');
         linkaxes(sb,'x');xlim([.335,1.7]);
         
         opt = menu('Select pixels to be used for the fit line and pixels for the retrieval: ',...
-            'Include in fit','Exclude from fit', 'Use for retrieval','Do NOT use for retrieval',['PolyOrder: [',num2str(ORD),']'],'Done');
+            'Include in fit','Exclude from fit', 'Use for retrieval','Do NOT use for retrieval','Done');
         v1 = axis(sb(1)); v2 = axis(sb(2));
         v_ = star.w>=v1(1) & star.w<=v1(2) & tau_sub>=v1(3)&tau_sub<=v1(4)& star.skyresp >= v2(3) & star.skyresp<=v2(4) ;
         if opt==1
             w_fit_ii  = unique([w_fit_ii ,find(v_)]);
+            block = return_wl_block(w_fit_ii,star.w);
         elseif opt==2
             w_fit_ii = setdiff(w_fit_ii,find(v_));% removes find(v_) from w_fit_ii
+            block = return_wl_block(w_fit_ii,star.w);
         elseif opt==3
             star.wl_(v_) = true;             
             star.skymask(star.good_sky,v_)= 1; 
         elseif opt==4
             star.wl_(v_) = false; 
             star.skymask(:,v_) = NaN;
-        elseif opt==5
-            ORD_ = menu('Select order for polyfit:','1: linear','2: quadradtic','3: cubic');
-            if ~isempty(ORD_)&&ORD_>0&&ORD_<4 ORD = ORD_; end
         else
             done = true;
         end
+        
     end % with wavelength selection
     star.w_isubset_for_polyfit = w_fit_ii; star.wl_ii = find(star.wl_); star.sky_wl = star.w(star.wl_);
     close(1111)
@@ -81,9 +94,9 @@ if man==1
         figure_(1111);
         ll = loglog(star.w(star.wl_),tau_sub(star.wl_), 'k.',star.w(w_in(N_out)),tau_sub(w_in(N_out)), 'ro');
         ylabel('tau'); xlabel('wavelength'); title(['Pixel spacing = ',num2str(N), ' Number of pixels = ',num2str(length(N_out))]);
-        lg = legend('used in fit');zoom('on');
-        hold('on');loglog(star.w, tau_sub,'-',star.w(w_in(N_out)),tau_sub(w_in(N_out)), 'ro');hold('off')
-        xlim([.335,1.7]);ylim([0.9.*min(tau_line),1.1.*max(tau_line)]);
+        lg = legend('Retrieval pixels');zoom('on');
+        hold('on');loglog(star.w, tau_sub,'-',star.w(w_in(N_out)),tau_sub(w_in(N_out)), 'o');hold('off')
+        xlim([.335,1.7]);ylim([0.5.*min(aod_fit),2]);
          mn = menu('Adjust pixel spacing of retrieval wavelengths?','+','-','Done');
         if mn==1
             N = min([N+1,floor(length(w_in)./2)]);
@@ -129,44 +142,6 @@ elseif man==2 % Select an existing file as source of (additional?) wavelengths
 end
 star.sky_wl = star.w(star.wl_);
 star.aeronetcols = star.wl_ii;
-% if good_last_wl
-%     save([last_wl_path,'last_wl.mat'],'-struct','in_mat');
-%     save([last_wl_path,['last_wl.',datestr(now,'yyyymmdd_HHMM'),'.mat']],'-struct','in_mat');
-% end
-% in_mat = load([last_wl_path, 'last_wl.mat']);
-% Now we have to make sure that skymask captures the new selected WLs
-% This may be mostly legacy code since now we require identical WLs at all
-% SA.  Would be good to be able to relax this constraint to use NIR for AOD
-% and not require sky radiances from NIR
 
-% skymask = star.skymask(:,star.wl_);
-% if size(star.wl_ii,1)>size(star.wl_ii,2); star.wl_ii = star.wl_ii';end
-% 
-% % sky_wl returns the actual WL as opposed to the pixel indices.
-% if ~isfield(star,'sky_wl')
-%     star.sky_wl = star.w(star.wl_);
-%     good_sky = false(size(star.good_sky*star.wl_ii));
-%     good_sky(star.good_sky,:) = true;
-%     skymask(~good_sky) = NaN;    
-% else
-%     if length(star.sky_wl)~=sum(star.wl_) || ~all(star.sky_wl==star.w(star.wl_))
-%         sky_wl_ii = interp1(star.w, [1:length(star.w)],star.sky_wl,'nearest');% old
-%         [~, sky_ii,sky_ij] = intersect(sky_wl_ii,star.wl_ii);
-%         [~,ii_new] = setxor(star.wl_ii,sky_wl_ii);
-%         skymask(:,sky_ij) = star.skymask(:,sky_ii);
-%         skymask(:,ii_new) = any(star.skymask,2)*ones([1,length(ii_new)]);
-%         
-%         if size(star.good_sky,2)==1
-%             good_sky = star.good_sky*ones([1,length(sky_ii)]);
-%         else
-%             good_sky(:,sky_ij) = star.good_sky(:,sky_ii);
-%             good_sky(:,ii_new) = any(star.good_sky,2)*ones([1,length(ii_new)]);
-%         end
-%         star.sky_wl = star.w(star.wl_);
-%         star.wl_ii = find(star.wl_);
-%     end
-% end
-% star.good_sky = good_sky;
-% star.skymask = skymask;
 
 return
