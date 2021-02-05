@@ -10,6 +10,10 @@ function [aod, min_rms, fit_rms, aod_pfit, aod_afit] = tau_afit(ws,tau, block);
 % aod_rms(:,2) as the RMS from aod_fit_basis
 % aod_pfit is the evaluated polyfit
 % aod_afit is the evaluated aod_fit_basis
+
+% 2021-02-04: v1.0 Connor introducing tau_afit that combines polyfit, afit,
+
+version_set('1.0');
 if ~isavar('ws')||isempty(ws)
     s = load(getfullname('*starsun*.mat','starsun'));
     wl = 1000.*s.w; tau = s.tau_aero;
