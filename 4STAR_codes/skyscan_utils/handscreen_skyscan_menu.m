@@ -7,6 +7,10 @@ function [star,changed] = handscreen_skyscan_menu(star)
 % Parameters to adjust:
 % wavelengths
 % scattering angles
+
+% 2020/11/26, Connor, v1.0, added version control of this m-script via version_set
+version_set('1.0');
+
 changed.wl = false; changed.SA = false;
 
 if ~isfield(star,'wl_')
