@@ -33,7 +33,7 @@ end
 figure_(1000);
 done = false;
 while ~done % with SA selection
-   ang = star.SA;
+   ang = double(star.SA);
    x_type = 2;
    %         x_type = menu('Choose x-axis style:','Scattering angle (positive only)','Difference angle (pos and neg)');
    
