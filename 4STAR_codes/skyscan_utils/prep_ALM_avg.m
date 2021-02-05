@@ -45,7 +45,7 @@ for f = 1:length(flds)
    else
       ss = [ss,sprintf('%s',': not handled')];
    end
-   if s.toggle.verbose; disp(ss); end
+%    if s.toggle.verbose; disp(ss); end
 end
 s_.filename = s.filename;
 s_.instrumentname = s.instrumentname;
