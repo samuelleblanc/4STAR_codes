@@ -203,7 +203,8 @@ else
                     s = starsky_plus(s);
                 end
                 if isfield(s.toggle, 'skyscan_manual')&&s.toggle.skyscan_manual && part <= 3
-                    s = handscreen_skyscan_menu(s);                [s,changed] = handscreen_skyscan_menu(s);
+%                     s = handscreen_skyscan_menu(s);                
+                    [s,changed] = handscreen_skyscan_menu(s);
                     close('all');
                     if changed.wl||changed.SA
                         s= starsky_scan(s); s = starsky_plus(s);
