@@ -483,8 +483,8 @@ clear v;
 % angle rotations and/or offsets to yield Az_gnd and El_gnd;
 s.sun_sky_El_offset = 3.5; %This represents the known mechanical offset between the sun and sky FOV in elevation.
 s.sun_sky_Az_offset = 0;
-s.Az_deg = s.AZstep/(-50);
-s.Az_sky = s.Az_deg;
+s.Az_deg = single(s.AZstep/(-50));
+s.Az_sky = single(s.Az_deg);
 s.El_sky = s.El_deg; s.El_sky(s.Str==2) = s.El_sky(s.Str==2) - s.sun_sky_El_offset;
 
 % Now we'll determind if we're on the ground or in the air, and if we trust
@@ -684,25 +684,26 @@ if toggle.hires_rayleigh;
    end;
 end;
 
-Tr = real(s.rate./repmat(s.f,1,length(s.w))./repmat(s.c0,length(s.t),1));
-Tr_noray = Tr ./tr(s.m_ray, s.tau_ray);
-tau_noray_slant = -real(log(Tr_noray));
-tau_noray_vert = tau_noray_slant ./repmat(s.m_aero,1,length(s.w));
-s.tau_tot_vert = tau_noray_vert + s.tau_ray; % This is really a "total" vertical optical depth
-
-sun_ = s.Zn==0&s.Str==1; 
-s.tau_tot_vert(~sun_,:) = NaN;
 
 [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
 
 s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
 s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-s.tau_aero=s.tau_aero_noscreening;
 % aerosol optical depth before flags are applied
-
+sun_ = s.Zn==0&s.Str==1; suns_ii = find(sun_);
 s.rateaero(~sun_,:) = NaN;
 s.tau_aero_noscreening(~sun_,:) = NaN;
 s.tau_aero=s.tau_aero_noscreening;
+% fit_aod_basis stuff
+Tr = real(s.rate./repmat(s.f,1,length(s.w))./repmat(s.c0,length(s.t),1));
+Tr_noray = Tr ./tr(s.m_ray, s.tau_ray);
+tau_noray_slant = -real(log(Tr_noray));
+tau_noray_vert = tau_noray_slant ./repmat(s.m_aero,1,length(s.w));
+s.tau_tot_vert = tau_noray_vert + s.tau_ray; % This is really a "total" vertical optical depth
+s.tau_noray = s.tau_tot_vert - s.tau_ray -s.tau_O3;
+
+s.tau_tot_vert(~sun_,:) = NaN; s.tau_tot_vert(~isfinite(s.tau_tot_vert)) = NaN;
+s.tau_noray(~sun_,:) = NaN; s.tau_noray(~isfinite(s.tau_noray)) = NaN;
 % total optical depth (Rayleigh subtracted) needed for gas processing
 %     if toggle.gassubtract
 tau_O4nir          = s.tau_O4;
@@ -711,7 +712,6 @@ if ~strcmp(instrumentname,'2STAR');
 else;
    tau_O4nir(:,1:256)=0;
 end;
-
 
 s.rateslant        = real(s.rate./repmat(s.f,1,qq));
 % Comment from Connor: the fields in following 3 lines aren't really "total" since Rayleigh and O4 are removed
@@ -855,14 +855,14 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
 %      figure_(2999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:); gas_od; s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:)- gas_od],'-'); legend('tot','gas','aero?');logy;
 %  
    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
-   
+
    if isfield(s.toggle,'use_last_wl')&& s.toggle.use_last_wl
        [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(s);
        s.wl_ = last_wl.wl_; s.wl_ii = last_wl.wl_ii; s.w_isubset_for_polyfit= last_wl.w_fit_ii;
        s.aeronetcols = s.wl_ii;
    end
-   
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
+
    s.tau_aero_polynomial=[a2 a1 a0];
    
 end; % End of sun-specific processing
