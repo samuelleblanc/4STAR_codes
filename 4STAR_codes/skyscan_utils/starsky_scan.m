@@ -13,8 +13,15 @@ function star = starsky_scan(star)
 % For PPL, star.El_gnd is also corrected but star.Az_gnd is not similarly
 % shifted for ALM scans
 
-% 2018-06-02: Added test to require SA > SA_min = 3.5 and El_gnd > El_min = 6, airmass < ~10
+% 2018-06-02: v0.1 Connor Added test to require SA > SA_min = 3.5 and El_gnd > El_min = 6, airmass < ~10
+% 2020-11-23: v1.1 Connor added rfit_aod_basis to be evaluated are replacement for polyfit to tau_aero_subtract_all lines 110-
+% This is looking pretty acceptable but still requires testing with data
+% from each field campaign
+% 2021-02-04: v1.2 Connor introducing tau_xfit that combines polyfit, afit,
+% and xfit to provide the best-fit that minimizes RMS. Fully supplants
+% rfit_aod_basis which is deprecated.
 
+version_set('1.2');
 % minimum acceptable scattering angle. Aeronet 3.5, airborne maybe 4?
 if isfield(star.toggle,'sky_SA_min')
     SA_min = star.toggle.sky_SA_min;
@@ -81,71 +88,75 @@ if star.O3col>8
 end
 % end
 %% This section to test impact of different selection of wavelengths to compute
+% Check this logic carefully in light of afit and xfit implementations and
+% implications regarding tau_aero and tau_aero_subtract_all.  
+% Not sure whether w_ii and last_wl have any utility anymore
+% w_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
+% w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
+% if isfield(star.toggle,'use_last_wl')&&star.toggle.use_last_wl
+%     [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(star);
+%     star.wl_ = last_wl.wl_; star.wl_ii = last_wl.wl_ii; star.w_isubset_for_polyfit= last_wl.w_fit_ii;
+%     star.aeronetcols = star.wl_ii; 
+%     w_ii = star.w_isubset_for_polyfit;
+% end
 
+block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
+if isfield(block,'block') block = block.block; end;
+wl_ = false(size(star.w));
+for b = 1:size(block,1)
+    wl_(block(b,3):block(b,4)) = true;
+end
+w_ii = find(wl_);
+
+lte0 = star.tau_aero_subtract_all(sun_ii,w_ii)<=0;  w_ii(lte0) = [];
 % This reproduces some of starwrapper ~717 in order to reduce file size by
 % not retaining an alternate version tau_noray_vert
 tau_noray_vert = star.tau_tot_vert -star.tau_ray;
-tau_abs_gas = star.tau_tot_vert -star.tau_ray - star.tau_aero_subtract_all;
-% This is similar to aodpolyfit except uses a reduced wavelength range
-% tailored to the expected wavelengths for the sky retrieval and will thus
-% generally better represent the wavelength dependence in this region
-w_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
-% SEAC4RS and ORACLES seem to require different WL ranges 
-% SL (2019-03-21) implemented this time dependent change into get_wvl_subset for where the w_isubset_for_polyfit is determined.
-% w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
-w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
-if isfield(star.toggle,'use_last_wl')&&star.toggle.use_last_wl
-    [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(star);
-    star.wl_ = last_wl.wl_; star.wl_ii = last_wl.wl_ii; star.w_isubset_for_polyfit= last_wl.w_fit_ii;
-    star.aeronetcols = star.wl_ii; 
-    w_ii = star.w_isubset_for_polyfit;
-end
-log_tau = real(log(star.tau_aero_subtract_all(sun_ii,w_ii)));
-w_ii(isNaN(log_tau)) = []; % This eliminates bad but "unplottable" tau from the fit.
-PP_ = polyfit(log(star.w(w_ii)), real(log(star.tau_aero_subtract_all(sun_ii,w_ii))),3);
-tau_aero_subtract_all_fit = exp(polyval(PP_,log(star.w)));
-star.tau_abs_gas_fit=  tau_noray_vert - ones(size(star.t))*exp(polyval(PP_,log(star.w)));
-star.tau_abs_gas_fit(star.tau_abs_gas_fit<0) = 0;
-star.AOD = exp(polyval(PP_,log(star.w)));
-star.TOD = star.tau_tot_vert(sun_ii,:);
-star.AGOD = star.tau_abs_gas_fit(sun_ii,:);
-ii = [250:1044 1070:1550];
+% star.tau_tot_vert(sun_ii,lte0) = tau_noray_vert(sun_ii,lte0) + star.tau_ray(sun_ii,lte0);
+[aod_fit, min_rms, fit_rms, aod_pfit, aod_afit, aod_xfit] = tau_xfit(star.w,star.tau_aero_subtract_all(sun_ii,:));
+tau_abs_gas = tau_noray_vert(sun_ii,:) - star.tau_aero_subtract_all(sun_ii,:);
+tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - aod_fit;
+star.AOD = aod_fit;
+star.AGOD = tau_abs_gas_fit;
+% If inferred absorbing gas is negative, instead define it as zero, and
+% compute new tau_vert_tot as the tau_ray + fitted tau_aero_subtract
+lte0 = star.AGOD<=0;
+star.AGOD(lte0) = 0;
+star.TOD = star.AGOD + aod_fit + star.tau_ray;
+% 2021-02-04 I think figured out to here...
+
+ii = [200:1044 1070:1550];
 figure_(3001);
 sx(1) = subplot(2,1,1);
-tau_line = real(exp(polyval(PP_,log(star.w(star.aeronetcols)))));
-plot(star.w(ii), tau_noray_vert(sun_ii,ii),'.m-', ...
-    star.w(ii), exp(polyval(PP_,log(star.w(ii)))), 'c-',...
-    star.w(w_ii), star.tau_aero_subtract_all(sun_ii,w_ii),'xk',...    
-    star.w(star.aeronetcols),tau_line, 'ro'); logx; logy;
+% I think this is just for visualization purposes
+tau_line = aod_fit(star.aeronetcols);
+plot(star.w(ii), tau_noray_vert(sun_ii,ii),'-', ...    
+    star.w(ii), star.tau_aero_subtract_all(sun_ii,ii),'-', ...
+        star.w(ii), aod_fit(ii), 'r-',star.w(w_ii), aod_fit(w_ii), 'o',......
+    star.w(star.aeronetcols),tau_line, 'o'); logx; logy;
 ylabel('optical depth');
 yl = ylim;
-ylim([min(tau_line).*.5,...
-    max([yl(2),max(star.tau_aero_subtract_all(sun_ii,w_ii))]).*1.1]);
+ylim([min(tau_line).*.25, 2]);
 lg = legend('tau noray vert', ...
-    'tau aero sub all fit','tau aero fit pixels',...
-    'retrieval pixels');
+    'tau aero subtract all','aod fit','fit pixels', 'retrieval pixels');
 set(lg,'interp','none','location','southwest')
 tl = title({star.fstem;star.created_str}, 'interp','none');
 % This is getting pretty dicey in that it looks like the fitted line to
 % tau_aero_subtract_all is higher than tau_tot_vert which is impossible.
 % This may indicate stray light problems.  But what to do?
 sx(2) = subplot(2,1,2);
-plot(star.w(ii), tau_abs_gas(sun_ii,ii),'-',...
-    star.w(ii), star.tau_abs_gas_fit(sun_ii,ii),'-',...
-    star.w(star.aeronetcols), star.tau_abs_gas_fit(sun_ii,star.aeronetcols),'ro',...
-    star.w(star.aeronetcols), tau_abs_gas(sun_ii,star.aeronetcols),'k*'); logx;
+plot(star.w(ii), star.AGOD(ii),'-',star.w(ii), tau_abs_gas(ii),'c-',...    
+    star.w(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'k*',...
+    star.w(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
+    ); logx;
 xlabel('wavelength [um]');
 ylabel('Gas OD'); ylim([-.02,.28])
-lg = legend('tot - tau_aero_subtract_all','tot - aero_fit'); set(lg,'interp','none', 'location','northwest')
+lg = legend('AGOD (tot-aod_fit)','tot - tau_aero_subtract_all'); set(lg,'interp','none', 'location','northwest')
 linkaxes(sx,'x');
-xlim([star.w(250), star.w(1550)]);
-
+xlim([star.w(225), star.w(1550)]);
 %%
-
-if all(isNaN(tau_abs_gas(sun_ii,200:1044)))||...
-        all(isNaN(star.tau_abs_gas_fit(sun_ii,200:1044)))||...
-        all(isNaN(star.tau_abs_gas_fit(sun_ii,star.aeronetcols)))||...
-        all(isNaN( tau_abs_gas(sun_ii,star.aeronetcols)))
+if all(isNaN(star.AGOD(200:1044)))||...
+        all(isNaN(star.AGOD(star.aeronetcols)))
     disp('Problem with gas absorption?')
     warning('Problem with gas absorption?');
     pause(2)
@@ -156,12 +167,7 @@ saveas(gcf,[fig_out,'.fig']);
 saveas(gcf,[fig_out,'.png']);
 ppt_add_slide(star.pptname, fig_out);
 
-% If inferred absorbing gas is negative, instead define it as zero, and
-% compute new tau_vert_tot as the tau_ray + fitted tau_aero_subtract
-lte0 = star.tau_abs_gas_fit(sun_ii,:)<=0;
-tau_noray_vert(sun_ii,lte0) = tau_aero_subtract_all_fit(lte0);
-star.tau_tot_vert(sun_ii,lte0) = tau_noray_vert(sun_ii,lte0) + star.tau_ray(sun_ii,lte0);
-%So, if fitted residual (absorbing gas) < 0, then let it be 0 but recompute total OD
+
 
 % Now, check agreement between any sun meausurements and Az_gnd and El_gnd
 % Apply offsets, then compute initial SA.
@@ -180,7 +186,7 @@ star.Az_gnd = star.Az_gnd+Az_offset;
 El_offset = star.sunel(suns_ii(min_i))-star.El_gnd(suns_ii(min_i));
 star.El_gnd = star.El_gnd+El_offset;
 
-SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
+SA = double(scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd));
 rec = [1:length(star.t)];
 
 
@@ -239,21 +245,21 @@ end
 modes = unique(star.Md);
 zones = unique(star.Zn);
 %%
-figure;
-z= 0;
-%%
-z = z+1;
-tints_vis = unique(star.visTint(star.Zn==zones(z)));
-tints_nir = unique(star.nirTint(star.Zn==zones(z)));
-
-plot([star.w], [star.skyrad(star.Zn==zones(z),:)],'.-');
-title({fstem; [' Zone = ',num2str(zones(z)), sprintf(',  vis tints=%3.0d, ',tints_vis), ...
-    sprintf('  nir tints=%3.0d ',tints_nir)]},'interp','none')
-if z > length(zones)
-    z = 0;
-end
-
-%
+% figure;
+% z= 0;
+% %%
+% z = z+1;
+% tints_vis = unique(star.visTint(star.Zn==zones(z)));
+% tints_nir = unique(star.nirTint(star.Zn==zones(z)));
+% 
+% plot([star.w], [star.skyrad(star.Zn==zones(z),:)],'.-');
+% title({fstem; [' Zone = ',num2str(zones(z)), sprintf(',  vis tints=%3.0d, ',tints_vis), ...
+%     sprintf('  nir tints=%3.0d ',tints_nir)]},'interp','none')
+% if z > length(zones)
+%     z = 0;
+% end
+% 
+% %
 
 %% PPL Section
 if star.isPPL
@@ -304,7 +310,7 @@ if star.isPPL
         star.El_miss = miss;
         star.El_gnd(star.Str==2) = star.El_gnd(star.Str==2) - star.El_miss;
         %The fixes star.SA for ppl scans
-        star.SA = scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd);
+        star.SA = double(scat_ang_degs(star.sza, star.sunaz, 90-abs(star.El_gnd), star.Az_gnd));
         star.above_orb = above_orb;
         star.below_orb = below_orb;
         
