@@ -73,7 +73,7 @@ if size(wl,2)==1 && all(size(wl)==size(aod))
     slog_modes = interp1(aod_mode.log_wl, sub_modes(:,good_ii),log(wl_out),'linear','extrap');
     log_modes = interp1(aod_mode.log_wl, sub_modes(:,good_ii),log(wl),'linear','extrap');
     log_aod_fit = slog_modes*Ks(good)'; log_aod = log_modes*Ks(good)';
-    aod_fit = exp(log_aod_fit); aod_fit_ = exp(log_aod); fit_rms = rms(aod-aod_fit_);
+    aod_fit = exp(log_aod_fit); aod_fit_ = exp(log_aod); fit_rms = sqrt(nanmean((aod-aod_fit_)/^2));
 %         figure_(2020); plot(wl, aod, 'r*',wl_out, aod_fit,'-kx'); logx; logy
     if any(wl_out_size ~= size(wl_out))
         aod_fit = aod_fit';
