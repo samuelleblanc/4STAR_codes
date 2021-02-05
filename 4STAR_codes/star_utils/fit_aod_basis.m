@@ -57,7 +57,7 @@ if size(wl,2)==1 && all(size(wl)==size(aod))
     % alternate approach below avoids this by sorting in log-space and only
     % assessing the smallest value against the threshold
     while ~done && sum(good)>1
-        Ks(good) = log(aod)'/log_modes(:,good)';
+        Ks(good) = real(log(aod))'/real(log_modes(:,good))';
 %         Ks = fit_it_2(log(aod), log_modes(:,good_ii));
          nKs(good) = Ks(good)-max(Ks(good));      
         [minKs,min_ii] = min(nKs(good_ii));
