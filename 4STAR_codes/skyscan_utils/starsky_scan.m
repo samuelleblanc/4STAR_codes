@@ -122,7 +122,7 @@ star.AGOD = tau_abs_gas_fit;
 % compute new tau_vert_tot as the tau_ray + fitted tau_aero_subtract
 lte0 = star.AGOD<=0;
 star.AGOD(lte0) = 0;
-star.TOD = star.AGOD + aod_fit + star.tau_ray;
+star.TOD = star.AGOD + aod_fit + star.tau_ray(sun_ii,:);
 % 2021-02-04 I think figured out to here...
 
 ii = [200:1044 1070:1550];
