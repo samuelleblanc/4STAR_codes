@@ -32,7 +32,7 @@ end
 wl_ii = find(wl_);
 [aod_fit, Ks] = fit_aod_basis(wl(wl_ii), aod(wl_ii));
 res_ = aod(wl_ii)-aod_fit;
-fit_rms_ = rms(res_);
+fit_rms_ = sqrt(nanmean((res_).^2)); %rms(res_);
 fit_bias_ = mean(-res_);
 % Note aod_fit is same size as wl_ii
 % Identify and exclude statistical outliers from contiguous blocks
