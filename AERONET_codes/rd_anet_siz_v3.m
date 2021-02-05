@@ -82,7 +82,7 @@ for f = length(bins):-1:1
     SD(:,f) = cimel.(bins{f});    
 end
 cimel = rmfield(cimel,bins);
-[radius,ij] = sort(radius); SD = SD(ij,:);
+[radius,ij] = sort(radius); SD = SD(:,ij);
 cimel.bin_radius = radius; 
 cimel.bin_diam = radius./2;
 cimel.dV_dlnr = SD;

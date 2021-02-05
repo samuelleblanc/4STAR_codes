@@ -506,7 +506,7 @@ for wrange=[1];
             %        else
             %             y = (spectrum(i,:));%waterOD(i,:);
             %        end
-            meas = [s.w(wln)' y'];
+            meas = double([s.w(wln)' y']);
             Xdat = meas(:,1);
             if model_atmosphere==1
                 ac = real(afit_H2O(wln)); ac(isNaN(ac)) = 0; ac(ac<0) = 0; ac(isinf(ac)) = 0;

@@ -535,8 +535,13 @@ if ~isempty(fields)
                   %                   elseif qc_mode == 3
                   %                      [status,ax{axi},time_,qc_impact] = anc_plot_good_qcd(anc, field);                  
                end                              
-            else
-               disp([field, ' is a multi-dimensioned time series.'])
+            elseif length(anc.ncdef.vars.(field).dims)==2 && length(anc.ncdef.vars.(['qc_',field]))==1                
+               disp([field, ' is a multi-dimensioned time series with single-dimensioned qc field'])
+               % So, we'll plot plot either the ndim fields in panel A
+               % using opaque, transparent, and black for good, indet, and
+               % bad plus detailed QC in panel B
+               % or a time-series Y-slice analagous to anc_plot_vap_qcd
+               
                % Cases: 2D data, 1D QC
                set(gca,'NextPlot',nextplot);
                if isfield(anc.vdata,fields{f})&&isfield(anc.vdata,['qc_',fields{f}])
@@ -560,6 +565,11 @@ if ~isempty(fields)
                   %This is not a qc field
 %                   [status,ax{axi},time_] = plot_no_qc(anc, field,plt);
                end
+            elseif length(anc.ncdef.vars.(field).dims)==2 && length(anc.ncdef.vars.(['qc_',field]))==2
+                disp([field, ' is a multi-dimensioned time series with multi-dimensioned qc field']); 
+                % So we either plot an image with transparency set by QC,
+                % or we plot a Y-slice time series 
+                
             end
          end
          

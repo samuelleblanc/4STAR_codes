@@ -85,6 +85,6 @@ end;
 tic; make_small(s, savematfile);toc
 tic; make_for_starflag(s, savematfile);toc
 disp(['Saving: ',savematfile])
-tic; save([getnamedpath('starsun'),savematfile], '-struct', 's', '-mat');toc
+tic; save([getnamedpath('starsun'),savematfile],'-v7.3', '-struct', 's', '-mat');toc
 
 contents=[contents; fieldnames(s)];
