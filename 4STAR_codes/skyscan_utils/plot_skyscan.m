@@ -25,7 +25,7 @@ else
 end
 figure_(1000);
 
-ang = star.SA;
+ang = double(star.SA);
 x_type = 1; % All angles positive, so both branches of ALM appear on top of each other
 x_type = 2; % Branches of ALM appear symmetrically
 %         x_type = menu('Choose x-axis style:','Scattering angle (positive only)','Difference angle (pos and neg)');
