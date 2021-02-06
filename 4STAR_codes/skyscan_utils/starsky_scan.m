@@ -89,15 +89,15 @@ end
 % end
 %% This section to test impact of different selection of wavelengths to compute
 % Check this logic carefully in light of afit and xfit implementations and
-% implications regarding tau_aero and tau_aero_subtract_all.  
+% implications regarding tau_aero and tau_aero_subtract_all.
 % Not sure whether w_ii and last_wl have any utility anymore
-% w_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
-% w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
+% w_ii = wl_isubset_for_polyfit; % w_ii = [225,wl_isubset_for_polyfit];
+% w_ii(wl(w_ii)>1.1) = [];w_ii(wl(w_ii)>.9) = [];
 % if isfield(star.toggle,'use_last_wl')&&star.toggle.use_last_wl
 %     [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(star);
-%     star.wl_ = last_wl.wl_; star.wl_ii = last_wl.wl_ii; star.w_isubset_for_polyfit= last_wl.w_fit_ii;
-%     star.aeronetcols = star.wl_ii; 
-%     w_ii = star.w_isubset_for_polyfit;
+%     wll_ = last_wl.wl_; wll_ii = last_wl.wl_ii; wl_isubset_for_polyfit= last_wl.w_fit_ii;
+%     star.aeronetcols = wll_ii;
+%     w_ii = wl_isubset_for_polyfit;
 % end
 
 block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
@@ -107,13 +107,13 @@ for b = 1:size(block,1)
     wl_(block(b,3):block(b,4)) = true;
 end
 w_ii = find(wl_);
-
+wl = 1000.*star.w;
 lte0 = star.tau_aero_subtract_all(sun_ii,w_ii)<=0;  w_ii(lte0) = [];
 % This reproduces some of starwrapper ~717 in order to reduce file size by
 % not retaining an alternate version tau_noray_vert
 tau_noray_vert = star.tau_tot_vert -star.tau_ray;
 % star.tau_tot_vert(sun_ii,lte0) = tau_noray_vert(sun_ii,lte0) + star.tau_ray(sun_ii,lte0);
-[aod_fit, min_rms, fit_rms, aod_pfit, aod_afit, aod_xfit] = tau_xfit(star.w,star.tau_aero_subtract_all(sun_ii,:));
+[aod_fit, min_rms, fit_rms, aod_pfit, aod_afit, aod_xfit] = tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:));
 tau_abs_gas = tau_noray_vert(sun_ii,:) - star.tau_aero_subtract_all(sun_ii,:);
 tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - aod_fit;
 star.AOD = aod_fit;
@@ -130,10 +130,10 @@ figure_(3001);
 sx(1) = subplot(2,1,1);
 % I think this is just for visualization purposes
 tau_line = aod_fit(star.aeronetcols);
-plot(star.w(ii), tau_noray_vert(sun_ii,ii),'-', ...    
-    star.w(ii), star.tau_aero_subtract_all(sun_ii,ii),'-', ...
-        star.w(ii), aod_fit(ii), 'r-',star.w(w_ii), aod_fit(w_ii), 'o',......
-    star.w(star.aeronetcols),tau_line, 'o'); logx; logy;
+plot(wl(ii), tau_noray_vert(sun_ii,ii),'-', ...
+    wl(ii), star.tau_aero_subtract_all(sun_ii,ii),'-', ...
+    wl(ii), aod_fit(ii), 'r-',wl(w_ii), aod_fit(w_ii), 'o',......
+    wl(star.aeronetcols),tau_line, 'o'); logx; logy;
 ylabel('optical depth');
 yl = ylim;
 ylim([min(tau_line).*.25, 2]);
@@ -145,15 +145,15 @@ tl = title({star.fstem;star.created_str}, 'interp','none');
 % tau_aero_subtract_all is higher than tau_tot_vert which is impossible.
 % This may indicate stray light problems.  But what to do?
 sx(2) = subplot(2,1,2);
-plot(star.w(ii), star.AGOD(ii),'-',star.w(ii), tau_abs_gas(ii),'c-',...    
-    star.w(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'k*',...
-    star.w(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
+plot(wl(ii), star.AGOD(ii),'-',wl(ii), tau_abs_gas(ii),'c-',...
+    wl(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'k*',...
+    wl(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
     ); logx;
 xlabel('wavelength [um]');
 ylabel('Gas OD'); ylim([-.02,.28])
 lg = legend('AGOD (tot-aod_fit)','tot - tau_aero_subtract_all'); set(lg,'interp','none', 'location','northwest')
 linkaxes(sx,'x');
-xlim([star.w(225), star.w(1550)]);
+xlim([wl(225), wl(1550)]);
 %%
 if all(isNaN(star.AGOD(200:1044)))||...
         all(isNaN(star.AGOD(star.aeronetcols)))
@@ -198,11 +198,11 @@ sx(2) = subplot(3,1,2);
 plot(rec, SA, 'o', rec, mod(star.Az_gnd-star.Az_gnd(1)+90,180)-90, 'x',rec, star.El_gnd-star.El_gnd(1),'*');
 legend('SA','Az','El')
 sx(3) = subplot(3,1,3);
-if ~rain 
+if ~rain
     plot(rec, star.skyrad(:,star.aeronetcols),'x-');ylabel('sky rad');
 else
     pl = plot(rec, star.skyrad(:,star.aeronetcols),'-');ylabel('sky rad')
-    recolor(pl,1000.*star.w(wl_ii)); colorbar('east');
+    recolor(pl,1000.*wl(wl_ii)); colorbar('east');
 end
 xlabel('record number')
 linkaxes(sx, 'x');
@@ -251,14 +251,14 @@ zones = unique(star.Zn);
 % z = z+1;
 % tints_vis = unique(star.visTint(star.Zn==zones(z)));
 % tints_nir = unique(star.nirTint(star.Zn==zones(z)));
-% 
-% plot([star.w], [star.skyrad(star.Zn==zones(z),:)],'.-');
+%
+% plot([wl], [star.skyrad(star.Zn==zones(z),:)],'.-');
 % title({fstem; [' Zone = ',num2str(zones(z)), sprintf(',  vis tints=%3.0d, ',tints_vis), ...
 %     sprintf('  nir tints=%3.0d ',tints_nir)]},'interp','none')
 % if z > length(zones)
 %     z = 0;
 % end
-% 
+%
 % %
 
 %% PPL Section
@@ -344,7 +344,7 @@ if star.isPPL
         ppt_add_slide(star.pptname, fig_out);
         
         good_ppl =  star.Str==2&star.El_gnd>El_min &star.SA>SA_min;
-        %         sky_angstrom_screen(star.w(star.aeronetcols(vis_pix)), ...
+        %         sky_angstrom_screen(wl(star.aeronetcols(vis_pix)), ...
         %             star.SA(good_ppl),...
         %             star.skyrad(good_ppl,star.aeronetcols(vis_pix)));        star.good_ppl = good_ppl;
     else
@@ -406,7 +406,7 @@ else
     figure_(3004);
     if rain
         pl =  plot(sa(CW&NEG), star.skyrad(CW&NEG,wl_ii),'-x');
-        recolor(pl,1000.*star.w(wl_ii));colorbar
+        recolor(pl,1000.*wl(wl_ii));colorbar
         hold('on'); plot(sa(CCW&POS), star.skyrad(CCW&POS,star.aeronetcols),'k-o');
         hold('off');
     else
@@ -421,7 +421,7 @@ else
             sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');
     else
         pl = plot(sa(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols),'-x');
-        recolor(pl,star.w(wl_ii)); colorbar; hold('on');
+        recolor(pl,wl(wl_ii)); colorbar; hold('on');
         plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');
         hold('off');
     end
@@ -456,17 +456,17 @@ else
             star.Az_gnd(SA_&CCW)=star.Az_gnd(SA_&CCW);
             star.QA_CCW = 0; % 0 is good
             sa = SA; sa(NEG) = -SA(NEG);
-
+            
             plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o');hold('on');
             pl = plot(SA(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols(1)),'-x');hold('off')
-%             if rain
-%                 plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o');hold('on');                                
-%                 pl = plot(SA(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols(1)),'-x');
-%                 recolor(pl,1000.*star.w(wl_ii)); colorbar;hold('off')
-%             else
-%                 plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o',...
-%                     SA(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols(1)),'-x');
-%             end
+            %             if rain
+            %                 plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o');hold('on');
+            %                 pl = plot(SA(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols(1)),'-x');
+            %                 recolor(pl,1000.*wl(wl_ii)); colorbar;hold('off')
+            %             else
+            %                 plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o',...
+            %                     SA(SA_&CCW&NEG), star.skyrad(SA_&CCW&NEG,star.aeronetcols(1)),'-x');
+            %             end
             title(['CCW leg, shifted by ',sprintf('%2.1f deg',mean(dX_CCW)./2)])
         else
             warning('Offset for CCW branch > 2')
@@ -488,15 +488,15 @@ else
     plot(sa(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols(1)),'k-o',...
         sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
     
-%     if ~rain
-%         plot(sa(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols(1)),'k-o',...
-%             sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
-%     else
-%         plot(sa(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o');hold('on');
-%         pl = plot(sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%         recolor(pl,1000.*star.w(wl_ii));colorbar;
-%         hold('off')
-%     end
+    %     if ~rain
+    %         plot(sa(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols(1)),'k-o',...
+    %             sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
+    %     else
+    %         plot(sa(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o');hold('on');
+    %         pl = plot(sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+    %         recolor(pl,1000.*wl(wl_ii));colorbar;
+    %         hold('off')
+    %     end
     title('CW leg, original')
     CW_X = SA(SA_&CW&POS); CW_Y = star.skyrad(SA_&CW&POS,star.aeronetcols(1));
     CW_X(isnan(CW_Y)) = []; CW_Y(isnan(CW_Y)) = [];
@@ -516,7 +516,7 @@ else
         dX_CW = (X_CW-X_CW_neg);
         star.SA_CW_offset = mean(dX_CW)./2;
         dAz = star.SA_CW_offset./cosd(star.sunel(sun_ii));  %(SA_&CCW&NEG)
-        if mean(abs(dX_CW))<2                       
+        if mean(abs(dX_CW))<2
             SA(CW&POS) = SA(CW&POS)-star.SA_CW_offset;
             SA(CW&NEG) = SA(CW&NEG) + star.SA_CW_offset;
             
@@ -525,15 +525,15 @@ else
             sa = SA; sa(NEG) = -SA(NEG);
             plot(SA(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols(1)),'k-o',...
                 SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
-% 
-%             if ~rain
-%                 plot(SA(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o',...
-%                     SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%             else
-%                 plot(SA(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o');hold('on');
-%                 pl = plot(SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%                 recolor(pl,1000.*star.w(wl_ii));colorbar; hold('off')
-%             end
+            %
+            %             if ~rain
+            %                 plot(SA(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o',...
+            %                     SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+            %             else
+            %                 plot(SA(SA_&CW&POS), star.skyrad(SA_&CW&POS,star.aeronetcols),'k-o');hold('on');
+            %                 pl = plot(SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+            %                 recolor(pl,1000.*wl(wl_ii));colorbar; hold('off')
+            %             end
             
             title(['CW leg, shifted by ',sprintf('%2.1f deg',mean(dX_CW)./2)])
         else
@@ -561,14 +561,14 @@ else
         SA_ = (SA<7)&((CW&NEG)|(CCW&POS))&~star.sat_ij(:,star.aeronetcols(1));
         plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o',...
             sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
-%         if ~rain
-%             plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o',...
-%                 sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%         else
-%             plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');hold('on');
-%             pl = plot(sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x')
-%             recolor(pl,1000.*star.w(wl_ii));colorbar; hold('off')
-%         end
+        %         if ~rain
+        %             plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o',...
+        %                 sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+        %         else
+        %             plot(sa(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');hold('on');
+        %             pl = plot(sa(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x')
+        %             recolor(pl,1000.*wl(wl_ii));colorbar; hold('off')
+        %         end
         title('CW and CCW main branches, before final adjustment')
         CCW_X = SA(SA_&CCW&POS); CCW_Y = star.skyrad(SA_&CCW&POS,star.aeronetcols(1));
         CCW_X(isnan(CCW_Y)) = []; CCW_Y(isnan(CCW_Y)) = [];
@@ -609,17 +609,17 @@ else
                     star.skyrad(CW&POS,:) = NaN; %POS is short branch of CW leg, mask it out
                 end
                 plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols(1)),'k-o',...
-                    SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');               
-%                 if ~rain
-%                     plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o',...
-%                         SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%                 else
-%                     plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');hold('on');
-%                     pl = plot(SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
-%                     recolor(pl,1000.*star.w(wl_ii)); colorbar; hold('off');
-%                     
-%                     hold('off')
-%                 end
+                    SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols(1)),'-x');
+                %                 if ~rain
+                %                     plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o',...
+                %                         SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+                %                 else
+                %                     plot(SA(SA_&CCW&POS), star.skyrad(SA_&CCW&POS,star.aeronetcols),'k-o');hold('on');
+                %                     pl = plot(SA(SA_&CW&NEG), star.skyrad(SA_&CW&NEG,star.aeronetcols),'-x');
+                %                     recolor(pl,1000.*wl(wl_ii)); colorbar; hold('off');
+                %
+                %                     hold('off')
+                %                 end
                 title(['CW and CCW main branches, with final shift of ',sprintf('%2.1f',mean(dX_CCW_CW))])
             else
                 warning('Offset of CW relative to CCW  > 5 or too variable')
@@ -656,14 +656,14 @@ else
         recolor(thats,[length(star.aeronetcols):-1:1, length(star.aeronetcols):-1:1]);
     else
         subplot(2,1,1);
-        these = plot(sa(CW), star.skyrad(CW,star.aeronetcols),'-'); recolor(these,1000.*star.w(wl_ii));
+        these = plot(sa(CW), star.skyrad(CW,star.aeronetcols),'-'); recolor(these,1000.*wl(wl_ii));
         for th=1:length(these)
             text(sa(CW), star.skyrad(CW,star.aeronetcols(th)),...
                 repmat({'L'},size(star.skyrad(CW,star.aeronetcols(th)))),...
                 'color',get(these(th),'color'));
         end
         hold('on');
-        those= plot( sa(CCW), star.skyrad(CCW,star.aeronetcols),'-');recolor(those,1000.*star.w(wl_ii));
+        those= plot( sa(CCW), star.skyrad(CCW,star.aeronetcols),'-');recolor(those,1000.*wl(wl_ii));
         for toe=1:length(those)
             text(sa(CCW), star.skyrad(CCW,star.aeronetcols(toe)),...
                 repmat({'R'},size(star.skyrad(CCW,star.aeronetcols(toe)))),...
@@ -673,7 +673,7 @@ else
         subplot(2,1,2);
         thats = plot(SA(CW), star.skyrad(CW,star.aeronetcols),'-kx',...
             SA(CCW), star.skyrad(CCW,star.aeronetcols),'-ko');
-        recolor(thats,[star.w(wl_ii),star.w(wl_ii)]);
+        recolor(thats,[wl(wl_ii),wl(wl_ii)]);
     end
     % At this point adjustments to SA based an symmetry of CW, CCW legs is
     % incorporeated into star.SA
@@ -683,10 +683,10 @@ else
     star.good_almB = CW&(POS|NEG)&SA>=SA_min&star.El_gnd>El_min;
     % Now apply ALM symmetry test and flag failing values.
     [good_almA, good_almB] = alm_sym_test(star);
-    %      sky_angstrom_screen(star.w(star.aeronetcols(vis_pix)), ...
+    %      sky_angstrom_screen(wl(star.aeronetcols(vis_pix)), ...
     %        star.SA(good_almA),star.skyrad(good_almA,star.aeronetcols(vis_pix)));
     star.good_almA = good_almA;
-    %     sky_angstrom_screen(star.w(star.aeronetcols(vis_pix)), ...
+    %     sky_angstrom_screen(wl(star.aeronetcols(vis_pix)), ...
     %        star.SA(good_almB),star.skyrad(good_almB,star.aeronetcols(vis_pix)));
     star.good_almB = good_almB;
     good_alm = good_almA|good_almB;
@@ -723,9 +723,9 @@ star.skymask = NaN(size(star.skyrad));
 star.skymask(star.good_sky,:) = 1;
 %       good_sky =  star.good_alm;
 %
-% %       good_sky = sky_angstrom_screen(star.w(star.wl_ii), ...
+% %       good_sky = sky_angstrom_screen(wl(wll_ii), ...
 % %          star.SA(good_sky),...
-% %          star.skyrad(good_sky,star.wl_ii));
+% %          star.skyrad(good_sky,wll_ii));
 % %       star.good_sky = good_sky;
 
 % [star.anet_level, star.anet_tests] = anet_preproc_dl(star);
@@ -744,7 +744,7 @@ if star.isPPL
     else
         pl = semilogy(star.SA(star.Str==2&star.El_gnd>0&good_ppl), ...
             star.skyrad(star.Str==2&star.El_gnd>0&good_ppl,star.aeronetcols(vis_pix)),'-o');
-        recolor(pl,1000.*star.w(wl_ii));
+        recolor(pl,1000.*wl(wl_ii));
     end
     xlabel('scattering angle [degrees]');
     ylabel('mW/(m^2 sr nm)');
@@ -752,11 +752,11 @@ if star.isPPL
     grid('on');
     set(gca,'Yminorgrid','off');
     if ~rain
-    leg_str{1} = sprintf('%2.0f nm AOD (%2.2f)',star.w(star.aeronetcols(vis_pix(1)))*1000, star.tau_aero_skyscan(1));
-    for ss = 2:length(star.aeronetcols(vis_pix))
-        leg_str{ss} = sprintf('%2.0f nm AOD (%2.2f)',star.w(star.aeronetcols(vis_pix(ss)))*1000,star.tau_aero_skyscan(ss));
-    end
-    legend(leg_str, 'location','northeast');
+        leg_str{1} = sprintf('%2.0f nm AOD (%2.2f)',wl(star.aeronetcols(vis_pix(1)))*1000, star.tau_aero_skyscan(1));
+        for ss = 2:length(star.aeronetcols(vis_pix))
+            leg_str{ss} = sprintf('%2.0f nm AOD (%2.2f)',wl(star.aeronetcols(vis_pix(ss)))*1000,star.tau_aero_skyscan(ss));
+        end
+        legend(leg_str, 'location','northeast');
     else
         cb=colorbar; cbt=get(cb,'title'); set(cbt,'string','nm');
     end
@@ -783,7 +783,7 @@ elseif star.isALM
     else
         figure_(fog);
     end
-         semilogy(abs(star.SA(good_almB)), ...
+    semilogy(abs(star.SA(good_almB)), ...
         star.skyrad(good_almB,star.aeronetcols(vis_pix)),'k-'); hold('on')
     if ~rain
         semilogy(star.SA(good_almA), ...
@@ -791,21 +791,21 @@ elseif star.isALM
     else
         pl=  semilogy(star.SA(good_almA), ...
             star.skyrad(good_almA,star.aeronetcols(vis_pix)),'-o');
-        recolor(pl,1000.*star.w(wl_ii)); cb =colorbar; cbt = get(cb,'title'); set(cbt,'string','nm');
+        recolor(pl,1000.*wl(wl_ii)); cb =colorbar; cbt = get(cb,'title'); set(cbt,'string','nm');
     end
     xlabel('scattering angle [degrees]');
     ylabel('mW/(m^2 sr nm)');
     title(title_str,'interp','none')
     grid('on'); set(gca,'Yminorgrid','off');
-
+    
     if ~rain
-        leg_str{1} = sprintf('%2.0f nm, AOD(%2.2f)',star.w(star.aeronetcols(1))*1000, star.tau_aero_skyscan(1));
+        leg_str{1} = sprintf('%2.0f nm, AOD(%2.2f)',wl(star.aeronetcols(1))*1000, star.tau_aero_skyscan(1));
         for ss = 2:length(star.aeronetcols(vis_pix))
-            leg_str{ss} = sprintf('%2.0f nm, AOD(%2.2f)',star.w(star.aeronetcols(ss))*1000, star.tau_aero_skyscan(ss));
+            leg_str{ss} = sprintf('%2.0f nm, AOD(%2.2f)',wl(star.aeronetcols(ss))*1000, star.tau_aero_skyscan(ss));
         end
         legend(leg_str,'location','northeast');
     end
-
+    
     hold('off')
     xlim([0,ceil(max(star.SA(good_almB|good_almA)).*.1).*10]);
     %%
