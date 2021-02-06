@@ -105,8 +105,11 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % toggle was being set, and added logic to set toggle.applyforjcorr to
 % false if 2STAR, 4STARB, or forj measurement
 % SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
+% CF: v3.4, 2021-02-06, Replaced s.Alt NaNs from telemtry glitches with
+% altitude derived from pressure scaled to agree with non-glitched s.Alt
+% on lines 515ff
 
-version_set('3.3');
+version_set('3.4');
 %********************
 %% prepare for processing
 %********************
@@ -509,11 +512,14 @@ s.Az_gnd = mod(s.Az_gnd,360);
 % offset between where we thought we were pointing and the ephemeris.  And
 % correct our Az_true and El_true to agree with the ephemeris
 %********************
-%% If Alt is 0 from telemetry, attempt to replace by pressure altitude
+%% If Alt is 0 from telemetry, attempt to replace by an interpolated scaled value from pressure altitude
 if s.airborne
-   [~, test_Alt] = Alt_from_P(s.Pst); s.Alt_pressure = test_Alt;
-   bad_Alt = (s.Alt==0)&(s.Pst>0);
-   s.Alt(bad_Alt) = test_Alt(bad_Alt);
+   [~, test_Alt] = Alt_from_P(s.Pst); s.Alt_pressure = test_Alt; good_test = (test_Alt>0)&isfinite(test_Alt);
+   bad_Alt = ((s.Alt==0)|isnan(s.Alt))&((s.Pst>0)&~isnan(s.Pst)&(good_test));
+   rat = s.Alt./test_Alt; 
+   rat(bad_Alt) = interp1(s.t(~bad_Alt), rat(~bad_Alt), s.t(bad_Alt),'linear');
+   rat(isNaN(rat)) = interp1(s.t(~isnan(rat)), rat(~isNaN(rat)), s.t(isNaN(rat)), 'nearest','extrap');
+   s.Alt(bad_Alt) = rat(bad_Alt).*test_Alt(bad_Alt);
 end
 
 %********************
