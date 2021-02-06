@@ -18,15 +18,16 @@ end
 %skymask = star.skymask (:,star.wl_);
 done = false;
 suns = find(star.Str==1&star.Zn==0);
+wl = 1000.*star.w;
 if ~isempty(suns); suns = suns(1);end
 w_fit_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
 % w_fit_ii(star.w(w_fit_ii)>1.1) = [];w_fit_ii(star.w(w_fit_ii)>.9) = [];
 
 if length(star.wl_ii)<8
-    WL_str = ['Wavelengths [nm]: ',sprintf('%4.1f,',1000.*star.w(star.wl_ii))];
+    WL_str = ['Wavelengths [nm]: ',sprintf('%4.1f,',wl(star.wl_ii))];
 else
-    WL_str = ['Wavelengths [nm]: ',sprintf('%3.0f,',1000.*star.w(star.wl_ii(1:2))),...
-        '...',sprintf('%3.0f,',1000.*star.w(star.wl_ii(end-1:end)))];WL_str(end) = [];
+    WL_str = ['Wavelengths [nm]: ',sprintf('%3.0f,',wl(star.wl_ii(1:2))),...
+        '...',sprintf('%3.0f,',wl(star.wl_ii(end-1:end)))];WL_str(end) = [];
 end
 
 man = menu({'Current wavelengths [nm]: ';WL_str ;'Select other wavelengths?'},'Manually','From file...','Done');
@@ -52,21 +53,21 @@ if man==1
         
         figure_(1111);
         sb(2) = subplot(2,1,2);
-        loglog(star.w, star.skyresp,'.',star.w(star.wl_), star.skyresp(star.wl_),'ro');
+        semilogy(wl, star.skyresp,'.',wl(star.wl_), star.skyresp(star.wl_),'ro');
         legend('all 4STAR','selected for retrieval');zoom('on')
         xlabel('wavelength');
         ylabel('responsivity');
         sb(1) = subplot(2,1,1);
-        ll = loglog([NaN,star.w(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,star.w(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', ...
-            star.w, tau_tot,'-',star.w, tau_sub,'-', star.w, aod_fit, 'm-');
+        ll = semilogy([NaN,wl(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,wl(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', ...
+            wl, tau_tot,'-',wl, tau_sub,'-', wl, aod_fit, 'm-');
         ylabel('OD');ylim([0.5.*min(aod_fit),2]);
         lg = legend('used in fit','selected for retrieval');zoom('on');
-        linkaxes(sb,'x');xlim([.335,1.7]);
+        linkaxes(sb,'x');xlim([335,1700]);
         
         opt = menu('Select pixels to be used for the fit line and pixels for the retrieval: ',...
             'Include in fit','Exclude from fit', 'Use for retrieval','Do NOT use for retrieval','Done');
         v1 = axis(sb(1)); v2 = axis(sb(2));
-        v_ = star.w>=v1(1) & star.w<=v1(2) & tau_sub>=v1(3)&tau_sub<=v1(4)& star.skyresp >= v2(3) & star.skyresp<=v2(4) ;
+        v_ = wl>=v1(1) & wl<=v1(2) & tau_sub>=v1(3)&tau_sub<=v1(4)& star.skyresp >= v2(3) & star.skyresp<=v2(4) ;
         if opt==1
             w_fit_ii  = unique([w_fit_ii ,find(v_)]);
             block = return_wl_block(w_fit_ii,star.w);
@@ -92,11 +93,11 @@ if man==1
     while ~done
         N_out = [N:N:length(w_in)];
         figure_(1111);
-        ll = loglog(star.w(star.wl_),tau_sub(star.wl_), 'k.',star.w(w_in(N_out)),tau_sub(w_in(N_out)), 'ro');
+        ll = semilogy(wl(star.wl_),tau_sub(star.wl_), 'k.',wl(w_in(N_out)),tau_sub(w_in(N_out)), 'ro');
         ylabel('tau'); xlabel('wavelength'); title(['Pixel spacing = ',num2str(N), ' Number of pixels = ',num2str(length(N_out))]);
         lg = legend('Retrieval pixels');zoom('on');
-        hold('on');loglog(star.w, tau_sub,'-',star.w(w_in(N_out)),tau_sub(w_in(N_out)), 'o');hold('off')
-        xlim([.335,1.7]);ylim([0.5.*min(aod_fit),2]);
+        hold('on');semilogy(wl, tau_sub,'-',wl(w_in(N_out)),tau_sub(w_in(N_out)), 'o');hold('off')
+        xlim([335,1700]);ylim([0.5.*min(aod_fit),2]);
          mn = menu('Adjust pixel spacing of retrieval wavelengths?','+','-','Done');
         if mn==1
             N = min([N+1,floor(length(w_in)./2)]);
