@@ -97,7 +97,7 @@ for i = 1:length(mask)
       list = [list;dir([mask_i])];
    end
 end
-L = 1
+L = 1;
 while L<(length(list)-1)
     top = list(L);
     for LL = length(list):-1:2
