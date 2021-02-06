@@ -60,6 +60,7 @@ function [cwv] = cwvcorecalc(s,modc0,model_atmosphere)
 %                 also corrected bug to save tau_aero_cwvsub into cwv struct instead of s
 % MS: 2018-04-16: changed calculation for tau_aero_cwvsub (line 408)
 % CJF: 2020-04-24: Added comments, and forced run only for suns=find(s.Str==1 & s.Zn==0)
+% CJF: 2021-02-06: Run only for suns=find(s.Str==1 & s.Zn==0 & ~isnan(s.Alt))
 % -----------------------------------------------------------------------------------------
 showfigure = 0;
 Loschmidt=2.686763e19;                   % molec/cm3*atm
@@ -178,7 +179,7 @@ for wrange=[1];
     % deduce baseline
     
     % for i=1:length(s.t)
-    suns = find(s.Str==1&s.Zn==0)';
+    suns = find(s.Str==1&s.Zn==0&~isnan(s.Alt))';
     for i=suns
         % function (fn) can be: 'sh','ah','stq','atq'
         % for gui use (visualization) write:
