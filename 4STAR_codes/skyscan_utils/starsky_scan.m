@@ -65,7 +65,10 @@ star.time = star.t;
 % picking very low "ground level" sufficient for sea level or AMF ground level.
 
 star.flight_level = mean(star.Alt);
-warning('decide between Alt and Alt_pressure')
+% warning('decide between Alt and Alt_pressure')
+%  Attempted resolution of Alt and Alt_pressure by Connor in starwrapper on
+%  Feb 6, 2021 using an interpolated scaled value from Alt_pressure to fill
+%  telemetry glitches in Alt
 vis_pix = find(star.aeronetcols);
 recs = (1:length(star.time))';
 [pp,qq] = size(star.rate);
@@ -130,10 +133,14 @@ figure_(3001);
 sx(1) = subplot(2,1,1);
 % I think this is just for visualization purposes
 tau_line = aod_fit(star.aeronetcols);
-plot(wl(ii), tau_noray_vert(sun_ii,ii),'-', ...
-    wl(ii), star.tau_aero_subtract_all(sun_ii,ii),'-', ...
+nix = single(tau_noray_vert(sun_ii,ii)<=0); nix(nix==1)= NaN;
+nox = single(star.tau_aero_subtract_all(sun_ii,ii)<=0); nox(nox==1)= NaN;
+plot(wl(ii), nix+tau_noray_vert(sun_ii,ii),'-', ...
+    wl(ii), nox+star.tau_aero_subtract_all(sun_ii,ii),'-', ...
     wl(ii), aod_fit(ii), 'r-',wl(w_ii), aod_fit(w_ii), 'o',......
-    wl(star.aeronetcols),tau_line, 'o'); logx; logy;
+    wl(star.aeronetcols),tau_line, 'o'); 
+logx; 
+logy;clear nix nox
 ylabel('optical depth');
 yl = ylim;
 ylim([min(tau_line).*.25, 2]);
@@ -771,7 +778,7 @@ if star.isPPL
             QA_str(end+1) = {'PPL portion above sun is suspect'};
         end
         warning(QA_str{:})
-        txt = text(.1, .95,QA_str, 'units','norm', 'color','red','linestyle','-','fontsize',14)
+        txt = text(.1, .95,QA_str, 'units','norm', 'color','red','linestyle','-','fontsize',14);
     end
     %    fig_out = [skyimgdir, star.fstem,star.created_str,'ppl'];
     % saveas(gcf,[fig_out,'.fig']);
