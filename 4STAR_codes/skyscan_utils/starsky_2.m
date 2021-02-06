@@ -194,7 +194,7 @@ else
             end
         catch ME
             if isfield(s,'toggle')&&isfield(s.toggle,'debug')&&s.toggle.debug
-                dbstop starsky_2
+                dbstop starsky_2 at 198
                 if run_skyscan && part == 1
                     s= starsky_scan(s);      % vis_pix restrictions in here
                 end
