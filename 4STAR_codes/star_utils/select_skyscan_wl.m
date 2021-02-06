@@ -44,12 +44,15 @@ if man==1
         
         lte0 = star.tau_aero_subtract_all(suns,w_fit_ii)<=0;  w_fit_ii(lte0) = [];
         [aod_fit] = tau_xfit(star.w,star.tau_aero_subtract_all(suns,:),block);  
-        
         w_fit_ii(star.w(w_fit_ii)>.950 &star.w(w_fit_ii)<1.100) = [];
-        tau_tot = star.tau_tot_vertical(suns,:); 
-        tau_sub = star.tau_aero_subtract_all(suns,:);
-        tau_noray_vert = star.tau_tot_vert -star.tau_ray;
 
+        tau_tot = star.tau_tot_vertical(suns,:); 
+        nix = single((tau_tot<=0)|~isfinite(tau_tot)); nix(nix>0) = NaN;
+        tau_tot_nix = tau_tot + nix; clear nix
+        tau_sub = star.tau_aero_subtract_all(suns,:);
+        nix = single((tau_sub<=0)|~isfinite(tau_sub)); nix(nix>0) = NaN; 
+        tau_sub_nix = tau_sub + nix; clear nix
+        tau_noray_vert = star.tau_tot_vert -star.tau_ray;
         
         figure_(1111);
         sb(2) = subplot(2,1,2);
@@ -57,9 +60,9 @@ if man==1
         legend('all 4STAR','selected for retrieval');zoom('on')
         xlabel('wavelength');
         ylabel('responsivity');
-        sb(1) = subplot(2,1,1);
-        ll = semilogy([NaN,wl(w_fit_ii)],[NaN,tau_sub(w_fit_ii)], 'kx',[NaN,wl(star.wl_)],[NaN,tau_sub(star.wl_)], 'ro', ...
-            wl, tau_tot,'-',wl, tau_sub,'-', wl, aod_fit, 'm-');
+        sb(1) = subplot(2,1,1);        
+        ll = semilogy([NaN,wl(w_fit_ii)],[NaN,tau_sub_nix(w_fit_ii)], 'kx',[NaN,wl(star.wl_)],[NaN,tau_sub_nix(star.wl_)], 'ro', ...
+            wl, tau_tot_nix,'-',wl, tau_sub_nix,'-', wl, aod_fit, 'm-');
         ylabel('OD');ylim([0.5.*min(aod_fit),2]);
         lg = legend('used in fit','selected for retrieval');zoom('on');
         linkaxes(sb,'x');xlim([335,1700]);
@@ -93,10 +96,10 @@ if man==1
     while ~done
         N_out = [N:N:length(w_in)];
         figure_(1111);
-        ll = semilogy(wl(star.wl_),tau_sub(star.wl_), 'k.',wl(w_in(N_out)),tau_sub(w_in(N_out)), 'ro');
+        ll = semilogy(wl(star.wl_),tau_sub_nix(star.wl_), 'k.',wl(w_in(N_out)),tau_sub_nix(w_in(N_out)), 'ro');
         ylabel('tau'); xlabel('wavelength'); title(['Pixel spacing = ',num2str(N), ' Number of pixels = ',num2str(length(N_out))]);
         lg = legend('Retrieval pixels');zoom('on');
-        hold('on');semilogy(wl, tau_sub,'-',wl(w_in(N_out)),tau_sub(w_in(N_out)), 'o');hold('off')
+        hold('on');semilogy(wl, tau_sub_nix,'-',wl(w_in(N_out)),tau_sub_nix(w_in(N_out)), 'o');hold('off')
         xlim([335,1700]);ylim([0.5.*min(aod_fit),2]);
          mn = menu('Adjust pixel spacing of retrieval wavelengths?','+','-','Done');
         if mn==1
