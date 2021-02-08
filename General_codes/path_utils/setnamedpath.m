@@ -116,7 +116,7 @@ else
                 pname = pwd; pname = [pname, filesep]; pname = strrep(pname, [filesep filesep], filesep);
 >>>>>>> Stashed changes
             end
-            pname = [pname, '..',filesep];
+            pname = [pname, filesep,'..',filesep];
             if pickdir
                 [pname] = uigetdir([pname,fstem],dialog);
             else

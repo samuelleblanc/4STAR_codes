@@ -117,7 +117,7 @@ s = load(fname_4starsun);
 %********************
 %% set parameters and default titles
 %********************
-if length(unique(s.Lat))<=3;
+if length(unique(s.Lat))<=5;
     platform = 'ground';
 else;
     platform = 'flight';
@@ -1157,22 +1157,23 @@ if isavar('tau_aero')
     loglog(s.w.*1000.0,s.tau_aero(1,:),'.'); hold on;
     labels = {}; labels{1} = datestr(s.t(1),'HH:MM');
     ji = find(isfinite(s.tau_aero(:,400)));
-    for i=2:nl
-        ik = ji(floor(length(ji)./nl.*i));
-        loglog(s.w.*1000.0,s.tau_aero(ik,:),'.');
-        labels{i} = datestr(s.t(ik),'HH:MM');
-    end;
-    ylim([0.0001,1.0]);
-    xlabel('Wavelength [nm]'); xlim([350,1700]);
-    ylabel('tau_aero','Interpreter','None');
-    title([daystr ' - Spectra of AOD'])
-    colormap(cm)
-    lcolorbar(labels,'TitleString','UTC [H]')
-    fname = fullfile(p1,[instrumentname daystr '_spectra_aod']);
-    fig_names = [fig_names,{[fname '.png']}];
-    save_fig(fspaod,fname,0);
-    pptcontents0=[pptcontents0; {fig_names{end} 1}];
-
+    if length(ji)>0
+        for i=2:nl
+            ik = ji(floor(length(ji)./nl.*i));
+            loglog(s.w.*1000.0,s.tau_aero(ik,:),'.');
+            labels{i} = datestr(s.t(ik),'HH:MM');
+        end;
+        ylim([0.0001,1.0]);
+        xlabel('Wavelength [nm]'); xlim([350,1700]);
+        ylabel('tau_aero','Interpreter','None');
+        title([daystr ' - Spectra of AOD'])
+        colormap(cm)
+        lcolorbar(labels,'TitleString','UTC [H]')
+        fname = fullfile(p1,[instrumentname daystr '_spectra_aod']);
+        fig_names = [fig_names,{[fname '.png']}];
+        save_fig(fspaod,fname,0);
+        pptcontents0=[pptcontents0; {fig_names{end} 1}];
+    end
 
     fspcar = figure('pos',[100,100,1000,800]);
     colormap(parula);

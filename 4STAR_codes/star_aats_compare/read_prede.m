@@ -41,7 +41,7 @@ if fid>0
    done = false; header_rows = 0;
    % Read line 1
    tmp = fgetl(fid);
-   C = textscan(tmp,'%s %*d %*d %f %f %s %s %s %s', 'delimiter',',');
+   C = textscan(tmp,'%s %*s %*s %f %f %s %s %s %s', 'delimiter',',');
    prede.header(hed).model = C{1};
    prede.header(hed).lon = C{2};
    prede.header(hed).lat = C{3};
@@ -108,7 +108,7 @@ if fid>0
             else
                rec = 1;
             end
-            format_str = '%s %*s %f %f %f %f %f %f %f %f %f';
+            format_str = ['%s %*s',repmat(' %f',[1,prede.header.numFilters])];
             C = textscan(tmp,format_str, 'delimiter',',');
             UTC = C{1}{:};
             %          {sky_mode, num2str(rec)}

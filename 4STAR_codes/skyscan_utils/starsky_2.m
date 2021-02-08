@@ -22,7 +22,7 @@ end
 % regulate input and read source
 %********************
 if ~isavar('mat_file');
-   mat_file = getfullname('*.*');% Default to last_path
+   mat_file = getfullname([getnamedpath('stardat'),'4STAR_*sky*.dat']);% Default to last_path
    if iscell(mat_file)
       if length(mat_file)>1
          warning('Starsky is intended to process only a single sky scan.  Processing first file...');
@@ -32,10 +32,11 @@ if ~isavar('mat_file');
 end
 if isstruct(mat_file)
    % rename mat_file to s
-   s = mat_file; clear mat_file;
+   s = mat_file; clear mat_file; 
+%    previous = true;
 elseif isafile(mat_file)
    if ~isempty(strfind(mat_file,'.mat'))&&strcmp('.mat',mat_file(end-3:end))
-      s = load(mat_file); if isfield(s,'s') s = s.s; end
+      s = load(mat_file); if isfield(s,'s') s = s.s; end;  
    else
       [sourcefile, contents0, savematfile, instr_name]=startupbusiness('sky',mat_file);
       disp(sourcefile)
@@ -94,6 +95,27 @@ if ~isfield(s,'toggle')
 else
     s.toggle = catstruct(s.toggle, toggle);
 end
+
+if isfield(s.toggle,'rerun_skyscan')
+    run_skyscan = s.toggle.rerun_skyscan;
+else
+    run_skyscan = false;
+end
+% The "isPPL" field is added by star_skyscan. If this field doesn't exist,
+% need to run star_skyscan
+if ~isfield(s, 'isPPL')
+    run_skyscan = true;
+end
+if isfield(s.toggle,'rerun_starsky_plus')
+    run_starsky_plus = s.toggle.rerun_starsky_plus;
+else
+    run_starsky_plus = false;
+end
+% The sfc_albedo field is added by starsky_plus.  If it doesn't exist yet, 
+% then starsky_plus definitely needs to be run
+if ~isfield(s,'sfc_alb')
+    run_starsky_plus = true;
+end
 % And then propagage user-flipped values in s.toggle back to toggle.
 disp('Ready for sky scan stuff')
 [~,fname,~] = fileparts(strrep(s.filename{1},'\',filesep));
@@ -118,40 +140,47 @@ if isfield(s.toggle,'use_last_wl')&&s.toggle.use_last_wl && isafile([getnamedpat
    [wl_, wl_ii,sky_wl] = get_last_wl(s);
    s.aeronetcols = find(wl_); s.wl_ = wl_; s.wl_ii = find(wl_);
 end
+
+if (sum(s.Str==0)>0)&&(sum(s.Str==1)>0)&&(sum(s.Str==2)>=5)
 try
-s= starsky_scan(s);      % vis_pix restrictions in here
-filen = s.filen;
-if isfield(s.toggle, 'skyscan_manual')&&s.toggle.skyscan_manual
-  s = handscreen_skyscan_menu(s);
-end
-s = starsky_plus(s);
-if isfield(s,'isPPL')&&s.isPPL
-   gen_sky_inp_4STAR(s,s.good_ppl);
-elseif isfield(s,'isALM')&&s.isALM
-   gen_sky_inp_4STAR(s, s.good_almA);
-   gen_sky_inp_4STAR(s, s.good_almB);
-   s_ =prep_ALM_avg(s);
-   if ~isempty(s_) 
-       gen_sky_inp_4STAR(s_, s_.good_sky);
-   end
-end
-save([getnamedpath('starsky'),  s.fstem, '.mat'],'s','-mat', '-v7.3');
+    if run_skyscan
+        s= starsky_scan(s);      % vis_pix restrictions in here
+    end
+    filen = s.filen;
+    if isfield(s.toggle, 'skyscan_manual')&&s.toggle.skyscan_manual
+        s = handscreen_skyscan_menu(s);
+    end
+    if run_starsky_plus
+        s = starsky_plus(s);
+    end
+    if isfield(s,'isPPL')&&s.isPPL
+        gen_sky_inp_4STAR(s,s.good_ppl);
+    elseif isfield(s,'isALM')&&s.isALM
+        gen_sky_inp_4STAR(s, s.good_almA);
+        gen_sky_inp_4STAR(s, s.good_almB);
+        s_ =prep_ALM_avg(s);
+        if ~isempty(s_)&&length(s_.t)>10
+            gen_sky_inp_4STAR(s_, s_.good_sky);
+        end
+    end
+    save([getnamedpath('starsky'),  s.fstem, '.mat'],'s','-mat', '-v7.3');
+
 catch ME
-   [pname,fstem,ext] = fileparts(strrep(s.filename{1},'\',filesep));   
-   badtime_str = ['.bad_on',datestr(now,'_yyyymmdd_HHMMSS.')];
-   [~, skyscan, ~] = fileparts(s.out); skyscan = strrep(skyscan,'_STAR','_')
-   figure; plot(0:1,0:1,'o'); title(['Crashed during ',skyscan], 'interp','none');
-   text(0.1,0.8,ME.identifier,'color','red');
-   text(0.1,0.6,ME.message,'color','red','fontsize',8);
-   imgdir = getnamedpath('starimg');
-   skyimgdir = [imgdir,skyscan,filesep];
-   if ~isadir([skyimgdir,skyscan]); mkdir(skyimgdir, skyscan); end
-   saveas(gcf,[skyimgdir,skyscan,badtime_str, '.png']);
-   copyfile2([imgdir,skyscan,'.ppt'],[imgdir,'bad.',skyscan,'.ppt']);
-   ppt_add_title([imgdir,'bad.',skyscan,'.ppt'], [fstem,': ',badtime_str]);
-   ppt_add_slide([imgdir,'bad.',skyscan,'.ppt'], [skyimgdir,skyscan,badtime_str]);
-   
-   warning(['Crashed during ', s.out]);
+    [pname,fstem,ext] = fileparts(strrep(s.filename{1},'\',filesep));
+    badtime_str = ['.bad_on',datestr(now,'_yyyymmdd_HHMMSS.')];
+    [~, skyscan, ~] = fileparts(s.out); skyscan = strrep(skyscan,'_STAR','_')
+    figure; plot(0:1,0:1,'o'); title(['Crashed during ',skyscan], 'interp','none');
+    text(0.1,0.8,ME.identifier,'color','red');
+    text(0.1,0.6,ME.message,'color','red','fontsize',8);
+    imgdir = getnamedpath('starimg');
+    skyimgdir = [imgdir,skyscan,filesep];
+    saveas(gcf,[skyimgdir,skyscan,badtime_str, '.png']);
+    copyfile2([imgdir,skyscan,'.ppt'],[imgdir,'bad.',skyscan,'.ppt']);
+    ppt_add_title([imgdir,'bad.',skyscan,'.ppt'], [fstem,': ',badtime_str]);
+    ppt_add_slide([imgdir,'bad.',skyscan,'.ppt'], [skyimgdir,skyscan,badtime_str]);
+    
+    warning(['Crashed during ', s.out]);
 end
-% close('all')
+end
+close('all')
 end

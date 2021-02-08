@@ -30,30 +30,30 @@ usrpath = [usrpath,filesep];
 % end
 % pname = strrep(strrep(usrpath,';',filesep),':',filesep);
 pathdir = [usrpath,'filepaths',filesep];
-if ~exist(pathdir,'dir')
+if ~isadir(pathdir)
     mkdir(usrpath, 'filepaths');
 end
 
-if ~exist('dialog','var')||isempty(dialog)
-    if exist('pathfile','var')&&~isempty(pathfile)
+if ~isavar('dialog')||isempty(dialog)
+    if isavar('pathfile')&&~isempty(pathfile)
         dialog = ['Select a file for ',pathfile,'.'];
     else
         dialog = ['Select a file.'];
     end
 end
-if ~exist('pathfile','var')||isempty(pathfile)
+if ~isavar('pathfile')||isempty(pathfile)
     pathfile = 'lastpath.mat';
 end
-if ~exist('fspec','var')||isempty(fspec)
+if ~isavar('fspec')||isempty(fspec)
     fspec = '*.*';
 end
 if isempty(fspec)
     fspec = '*.*';
 end
 
-if ~exist([pathdir,pathfile],'file')&&exist([pathdir,pathfile,'.mat'],'file')
+if ~isafile([pathdir,pathfile])&&isafile([pathdir,pathfile,'.mat'])
     pathfile = [pathfile,'.mat'];
-elseif ~exist([pathdir,pathfile],'file')&&~exist([pathdir,pathfile,'.mat'],'file')
+elseif ~isafile([pathdir,pathfile])&&~isafile([pathdir,pathfile,'.mat'])
     if ~isempty(strfind(pathfile,'.mat'))
         newpathfile = pathfile;
     else
@@ -62,12 +62,12 @@ elseif ~exist([pathdir,pathfile],'file')&&~exist([pathdir,pathfile,'.mat'],'file
     pathfile = 'lastpath.mat';
 end
 
-if exist([pathdir,pathfile],'file')
+if isafile([pathdir,pathfile])
     load([pathdir,pathfile]);
-    if ~exist('pname','var')||isempty(pname)
+    if ~isavar('pname')||isempty(pname)
         pname = pwd;
     end
-    if ~ischar(pname)||~exist(pname,'dir')
+    if ~ischar(pname)||~isadir(pname)
         clear pname
         pname = [pwd,filesep];
     end
@@ -78,7 +78,7 @@ if ~strcmp(pname(end),filesep)
     pname = [pname, filesep];
 end
 [~,fname,ext] = fileparts(fspec);
-if (exist(fspec,'file')||exist([pname,filesep,fname,ext],'file'))&&~exist(fspec,'dir')
+if (isafile(fspec)||isafile([pname,filesep,fname,ext]))&&~isadir(fspec)
     this = which(fspec,'-all');
     if isempty(this) % Then file exists, but not in path
         this = {fspec};
@@ -89,9 +89,10 @@ else
     [pth,fstem,ext] = fileparts(fspec);
     fspec = [fstem,ext];
     if ~ispc; disp(dialog); end
-    if exist(pth,'dir')
+
+    if isadir(pth)
         [fname,pname] = uigetfile([pth,filesep,fspec],dialog,'multiselect','on');
-    elseif exist(pname,'dir')
+    elseif isadir(pname)
         [fname,pname] = uigetfile([pname,filesep,fspec],dialog,'multiselect','on');
     else
         [fname,pname] = uigetfile(fspec,dialog,'multiselect','on');
@@ -106,7 +107,7 @@ if ~isequal(pname,0)
             fullname(L) = {fullfile(pname, fname{L})};
         end
     end
-    if exist('newpathfile','var')
+    if isavar('newpathfile')
         save([pathdir,newpathfile], 'pname');
         pathfile = 'lastpath.mat';
         save([pathdir,pathfile],'pname');

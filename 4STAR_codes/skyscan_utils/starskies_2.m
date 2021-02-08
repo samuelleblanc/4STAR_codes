@@ -10,7 +10,8 @@ function [savematfile, contents]=starskies(toggle)
 %
 % Modifications:
 % SL, v1.1, 2019-03-20, added excel file writing 
-version_set('1.1');
+% SL, v1.2, 2020-03-30, added powerpoint combining
+version_set('1.2');
 %********************
 % regulate input and read source
 %********************
@@ -104,4 +105,6 @@ for in = 1:length(infiles)
    end
 end
 if toggle.verbose; disp(['Excel Summary file saved to: ' xls_fname]), end;
+ppt_out = merge_ppts_for_day(getnamedpath('starimg'),s.daystr,s.instrumentname,'_allSKY');
+if toggle.verbose; disp(['Powerpoint combined file saved to: ' ppt_out]), end;
 return

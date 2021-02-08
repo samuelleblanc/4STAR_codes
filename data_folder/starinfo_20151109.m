@@ -12,8 +12,9 @@ end
 s.toggle = toggle;
 
 flight=[datenum('20:23:09') datenum('24:48:00')] -datenum('00:00:00')+datenum([daystr(1:4) '-' daystr(5:6) '-' daystr(7:8)]); 
-!!! seconds of the landing time is to be updated 
- 
+%!!! seconds of the landing time is to be updated 
+s.flight = flight;
+
 % STD-based cloud screening for direct Sun measurements 
 s.sd_aero_crit=0.01; 
  

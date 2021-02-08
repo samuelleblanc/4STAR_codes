@@ -1,3 +1,5 @@
+function [gas] = retrieveGases(s)
+% Syntax: gas = retrieveGases(s)
 %% Details of the function:
 % NAME:
 %   retrieveGases
@@ -36,11 +38,9 @@
 % MS, 2016-05-20, adding retrieveHCOH routine
 % MS, 2016-10-12, changed default NO2 wavelength range to 460-490 nm
 % SL, v1.1, 2018-09-20, Added verbose and messaging to the gas retrievals
+% CF, v1.1, 2020-04-22, No functional changes. Added non-display lines to facilitate interrogation
 % -------------------------------------------------------------------------
-%% function routine
 
-function [gas] = retrieveGases(s)
-%----------------------------------------------------------------------
  version_set('1.1');
  showfigure = 0;
  
@@ -56,11 +56,12 @@ gxs = get_GlobalCrossSections;
 
 if s.toggle.verbose; disp('Starting NO2 gas retrieval'), end
  [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
-
+% gas.no2.no2OD is column OD
 %% retrieve O3
 if s.toggle.verbose; disp('Starting O3 gas retrieval'), end
- [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
-
+[gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
+%  
+% [gas.o3]  = retrieveO3(s,0.550,0.640,1,gxs);
 %----------------------------------------------------------------------
 %% retrieve CO2
 if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
@@ -72,7 +73,14 @@ if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
 %% retrieve HCOH
 if s.toggle.verbose; disp('Starting HCOH gas retrieval'), end
  [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1,gxs);
-             
+ 
+ %% Check gases
+%           s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
+%             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;
+gas.no2; gas.o3; gas.co2; gas.hcoh;
+% figure_(999); plot(gas.no2.visnm,gas.no2.visXs,'-',gas.o3.visnm, gas.o3.visXs, '-'); logy  
+% figure_(1999); plot(s.w, [max(gas.no2.no2OD); max(gas.o3.o3OD);max(gas.o3.o4OD);max(gas.co2.co2OD);max(s.cwv.wvOD)],'-'); legend('NO2','O3','O4','CO2','H2O');logy
+
 %% save gas data to .mat file
 
    Loschmidt          = 2.686763e19; %molecules/cm2

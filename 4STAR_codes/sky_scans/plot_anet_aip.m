@@ -1,15 +1,18 @@
 function plot_anet_aip(anetaip)
-if ~exist('anetaip','var')
+if ~isavar('anetaip')
     anetaip = parse_anet_aip_output;
 end
 [~, fname, ~] = fileparts(anetaip.output_fname);
 fstem = anetaip.fstem; 
-imgdir = getnamedpath('star_images');
-skyimgdir = [imgdir,fstem,filesep]; 
-if isdir(imgdir)&&~isdir(skyimgdir)
-   mkdir(skyimgdir);
+fstem = strrep(fstem, '_VIS', ''); anetaip.fstem = fstem;
+paths = set_starpaths; imgdir = paths.starimg; pptdir = paths.starppt;
+if ~isadir([imgdir, fstem]);
+   mkdir(imgdir, fstem);
 end
-pptname = [imgdir,fstem,'.ppt'];
+skyimgdir = [imgdir, fstem, filesep];
+pptname = [pptdir, fstem, '.ppt'];
+created_str = ['.created', datestr(now, '_yyyymmdd_HHMMSS.')];
+pptname = ppt_add_title(pptname, [fstem, ': ', created_str]);
 
 % h1 = figure('units','inches','position',[.1 4.2 4 3],'paperposition',[.1 .1 6.5 5]); 
 %    h1 = figure('units','inches','position',[.1 4.2 4 3],'paperposition',[.1 .1 10 7]);     
@@ -104,8 +107,8 @@ pptname = [imgdir,fstem,'.ppt'];
 % saveas(gcf, [pname, fname,'.phase_function.fig'], 'fig');
 
 % h2 = figure('units','inches','position',[.1 4.2 4 3],'paperposition',[.1 .1 8 5]); 
-h2 = figure('units','inches','position',[ 0.1 0.5 7 5],'paperposition',[.1 .1 10 7]); 
-
+% h2 = figure('units','inches','position',[ 0.1 0.5 7 5],'paperposition',[.1 .1 10 7]); 
+h2 = figure_(4001);
 ax = subplot(2,2,1);
 % Labels = {'Wavelength','Real','Imaginary'};
 %Range = [0.4,1.1; 1.55,1.65 ; 0.029,0.032];
@@ -149,6 +152,7 @@ xlim(hAxes(2),[0.8.*min(anetaip.Wavelength),1.1.*max(anetaip.Wavelength)]);
 % grid on
 
 hAxes(3) = subplot(2,2,2); % Angstrom and AAE
+hold off;
 P_AE = polyfit(log(anetaip.Wavelength), log(anetaip.aod),2);
 P_AAE = polyfit(log(anetaip.Wavelength), log(anetaip.aaod),2);
 anetaip.P_AE = P_AE;  
@@ -160,6 +164,7 @@ plot(anetaip.Wavelength, anetaip.AE_fit,'o-',...
   anetaip.Wavelength, anetaip.AAE_fit,'x-' )
 h = legend('AE fit','AAE fit'); set(h,'location','southeast')
 set(h,'FontSize', 10);
+
 
 %  plot(anetaip.Wavelength,anetaip.tod_meas,'-ko',anetaip.Wavelength,anetaip.tod_fit,'-rx');
 %  %
@@ -179,12 +184,13 @@ set(gca,'FontSize', 10);
 grid on
 
 hAxes(end+1) = subplot(2,2,3);
+hold off;
  plot(anetaip.Wavelength, [anetaip.ssa_fine;anetaip.ssa_coarse;anetaip.ssa_total]','-*',...
     anetaip.Wavelength, anetaip.sfc_alb, 'k-s');
 h = legend('fine','coarse','total', 'sfc alb');
 set(h,'FontSize', 8, 'location','southwest');
 xx_here=get(gca,'xlim');
-yy_here=get(gca,'ylim');
+yy_here=get(gca,'ylim');ylim([0,1.05]);
 xlabel('Wavelength','FontSize', 10);
 ylabel('SSA','FontSize', 10);
 % title('Single Scattering Albedo');
@@ -199,6 +205,7 @@ hold on;
 %% 
 
 hAxes(end+1) = subplot(2,2,4);
+hold off;
 if ~isempty(anetaip.input.aods)
 plot(anetaip.Wavelength, anetaip.input.aods,'-ko');
 hold on
@@ -224,7 +231,7 @@ ylabel('AOD and AAOD','FontSize', 10);
 xlim(gca,[0.8.*min(anetaip.Wavelength),1.1.*max(anetaip.Wavelength)]);
 % set(gca,'xlim',Range,'FontSize', 10);
 % set(gca,'XTick',anetaip.Wavelength);
-set(gca,'ylim',[0 0.6],'FontSize', 10);
+set(gca,'ylim',[-0.02 0.6],'FontSize', 10);
 grid on
 %% 
 
@@ -232,8 +239,8 @@ grid on
 % of aerosol layers), NLYRS, hlyr, rad transfer boundaries
 %
 [inp_pname,skytag,ext] = fileparts(anetaip.input_fname); 
-tmpA = textscan(skytag,'%s','delimiter','.'); tmpA = tmpA{:};
-skytag = char(tmpA(2));
+%tmpA = textscan(skytag,'%s','delimiter','.'); tmpA = tmpA{:};
+%skytag = char(tmpA(2));
 [inp_pname,skyscan,x] = fileparts(anetaip.input_fname);
 houtput = anetaip.input.houtput; H = anetaip.input.H; W = anetaip.input.W; 
 NLYRS = anetaip.input.NLYRS; hlyr = anetaip.input.hlyr;
@@ -258,16 +265,16 @@ set(bot_ax,'visi','off');set(bot_tl,'visi','off');
 %	set(p.th,'edgecolor',.5*[1 1 1]);
 linkaxes(hAxes,'x');
 % aos_ssa
-fig_out = [skyimgdir, fname,'_aod_ssa'];
-saveas(gcf,[fig_out,'.fig']);
-saveas(gcf,[fig_out,'.png']);
+fig_out = [skyimgdir, fname, '_aod_ssa'];
+saveas(gcf, [fig_out, '.fig']);
+saveas(gcf, [fig_out, '.png']);
 ppt_add_slide(pptname, fig_out);
 
 %%
-h3 = figure('units','inches','position',[7    0.5    7    5],'paperposition',[.1 .1 10 7]); 
-
+% h3 = figure('units','inches','position',[7    0.5    7    5],'paperposition',[.1 .1 10 7]); 
+h3 = figure_(4002);
 subplot(2,2,1);     
-semilogx(anetaip.radius, anetaip.psd,'-.b*');
+semilogx(anetaip.radius, anetaip.psd,'-r*');
 hold on
 
 xx_here=get(gca,'xlim');
@@ -294,10 +301,11 @@ else
    set(cb, 'Position', cb_pos); 
 end
 xlabel('scattering angle','fontsize',10); ylabel('(meas - fit)%','fontsize',10)
-set(gca,'xlim',[3 180],'FontSize', 10)
+set(gca,'xlim',[3 180],'FontSize', 10); set(gca,'ylim',[-25,25])
 % title('Sky Error (meas - fit) %');
 
 subplot(2,2,3);
+hold off;
  plot(anetaip.Wavelength,anetaip.sky_error,'-r*');
 hold on; xlim(gca,[0.8.*min(anetaip.Wavelength),1.1.*max(anetaip.Wavelength)]);
 % set(gca,'XTick',anetaip.Wavelength);
@@ -317,17 +325,19 @@ ylabel('(meas - fit)%','FontSize', 10);
 grid on
 
 hAxes3(end+1) = subplot(2,2,2);
-ll =loglog(anetaip.sky_radiances_angle, anetaip.sky_radiances_fit, 'k-');
-hold('on')
-mm = semilogy(anetaip.sky_radiances_angle,anetaip.sky_radiances_measured,'o');
+mm = loglog(anetaip.sky_radiances_angle,anetaip.sky_radiances_measured,'o');
 recolor(mm,1000.*anetaip.Wavelength,1000.*[min(anetaip.Wavelength),ceil(max(anetaip.Wavelength))]);
+hold('on');
+ll =loglog(anetaip.sky_radiances_angle, anetaip.sky_radiances_fit, 'k-');
 if length(anetaip.Wavelength)<7
 for wv = 1:length(anetaip.Wavelength);
     leg_str(wv) = {sprintf('%1.3f um',anetaip.Wavelength(wv))}; 
 end
 h = legend(leg_str{:});
 else
-   cb = colorbar('location','east');cb.Position(1) = .97; 
+   cb = colorbar('location','east');
+   cb_pos = get(cb,'position');cb_pos(1)= .97;
+   set(cb, 'Position', cb_pos); 
 end
 hold off
 
@@ -358,7 +368,7 @@ yy_here=get(gca,'ylim');
 xlabel('scattering angle','FontSize', 10);
 ylabel('sky radiances','FontSize', 10);
 set(gca,'xlim',[3 180],'FontSize', 10)
-set(gca,'ylim',[0 1],'FontSize', 10)
+set(gca,'ylim',[min(min(anetaip.sky_radiances_fit))./1.2, max(max(anetaip.sky_radiances_fit)).*1.2],'FontSize', 10)
 % title('Sky Radiances')
 grid on
 
@@ -410,7 +420,7 @@ ppt_add_slide(pptname, fig_out);
 % hold on
 % 
 % semilogy(anetaip.sky_radiances_angle(:,2),anetaip.sky_radiances_fit(:,2),'y');
-% hold on
+% ae on
 % semilogy(anetaip.sky_radiances_angle(:,2),anetaip.sky_radiances_measured(:,2),'yo');
 % hold on
 % 

@@ -138,7 +138,7 @@ if create_ppt
     daystr1 = datestr(forj_out.time(1),'yyyymmdd');
     daystr2 = datestr(forj_out.time(end),'yyyymmdd');
     disp(['Saving FORJ ppt to:' ppt_fname])
-    makeppt(ppt_fname, [FORJ ' - from '  daystr1 ' to ' daystr2], pptcontents{:});
+    makeppt(ppt_fname, ['FORJ  - from '  daystr1 ' to ' daystr2], pptcontents{:});
 end
 %%
 return

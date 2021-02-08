@@ -112,7 +112,7 @@ version_set('3.3');
 %********************
 
 %% set default toggle switches
-if exist('toggle','var')&&~isempty(toggle)&&isstruct(toggle)
+if isavar('toggle')&&~isempty(toggle)&&isstruct(toggle)
    toggle = update_toggle(toggle);
 else
    toggle = update_toggle;
@@ -241,7 +241,7 @@ infofile = fullfile(getnamedpath('starinfo'), ['starinfo' daystr '.m']);
 infofile2 = ['starinfo' daystr]; % 2015/02/05 for starinfo files that are functions, found when compiled with mcc for use on cluster
 dayspast=0;
 maxdayspast=365;
-if exist(infofile_)==2;
+if isafile(infofile_);
    if toggle.editstarinfo
       try
          edit(infofile_) ; % open infofile in case user wants to edit it.
@@ -267,7 +267,7 @@ if exist(infofile_)==2;
          %     s = eval([infofile2,'(s)']);
       end
    end;
-elseif exist(infofile2)==2;
+elseif isafile(infofile2)
    try
       edit(infofile2) ; % open infofile in case user wants to edit it.
    catch me
@@ -283,7 +283,7 @@ elseif exist(infofile2)==2;
       s = infofnt(s);
    end
    %     s = eval([infofile2,'(s)']);
-elseif exist(infofile)==2;
+elseif isafile(infofile)
    open(infofile);
    run(infofile); %Trying "run" instead of "eval" for better compiler compatibility
    %         eval(['run ' infofile ';']); % 2012/10/22 oddly, this line ignores the starinfo20120710.m after it was edited on a notepad (not on the Matlab editor).
@@ -291,13 +291,16 @@ else; % copy an existing old starinfo file and run it
    while dayspast<maxdayspast;
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
-      if exist(infofile_previous);
+      if isafile(infofile_previous);
          copyfile(infofile_previous, infofile_);
          open(infofile_);
-         eval([infofile_(1:end-2),'(s)']);
-         %run(infofile_);
-         %             eval(['edit ' infofile ';']);
-         %             eval(['run ' infofile ';']);
+         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+        try
+             s = infofnt(s);
+        catch
+             eval([infofile_(1:end-2),'(s)']);
+         %     s = eval([infofile2,'(s)']);
+        end
          warning([infofile_ ' has been created from ' ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
          break;
       end;
@@ -362,7 +365,7 @@ if toggle.verbose; disp('...calculating saturated points'); end
 s.sat_time = max(s.raw,[],2)==sat_val;
 s.sat_pixel = max(s.raw,[],1)==sat_val;
 s.sat_ij = (s.raw==sat_val);
-if exist('s2','var')
+if isavar('s2')
    if strmatch('vis', lower(datatype2));
       s2.w=visw;
       s2.c0=visc0;
@@ -430,7 +433,7 @@ end;
 % combine two structures
 if toggle.verbose; disp('out of starrate, combining two structures'), end;
 drawnow;
-if exist('s','var')&&exist('s2','var');
+if isavar('s')&&isavar('s2');
    s = combine_star_s_s2(s,s2,toggle);
 end
 pp=numel(s.t);
@@ -496,7 +499,7 @@ course_changed = false(size(s.t));
 course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
 if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
    s.airborne = true;
-%    warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
    [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
 else
    s.airborne = false;
@@ -793,7 +796,8 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    %produces YYYYMMDD_auto_starflag_created20131108_HHMM.mat and
    %s.flagallcols
    %************************************************************
-   if toggle.dostarflag;
+   % Only generate these flags if in SUN mode.  
+   if toggle.dostarflag && strcmpi(s.datatype, 'SUN')
       if toggle.verbose; disp('Starting the starflag'), end;
       if isfield(s,'flagfilename')
          if toggle.verbose; disp(['** Found starflag file :' s.flagfilename ', Loading that instead']), end;
@@ -823,9 +827,10 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    
    %% apply flags to the calculated tau_aero_noscreening
    s.tau_aero=s.tau_aero_noscreening;
-   if toggle.dostarflag && (length(s.flags.bad_aod)==length(s.t))&&(toggle.starflag_mode==1||toggle.starflag_mode==3);
+   if toggle.dostarflag && (toggle.starflag_mode==1||toggle.starflag_mode==3)...
+           &&isfield(s,'flags')&&isfield(s.flags, 'bad_aod')&& size(s.tau_aero,1)==length(s.flags.bad_aod);
       s.tau_aero(s.flags.bad_aod,:)=NaN;
-   end;
+   end
    % tau_aero on the ground is used for purposes such as comparisons with AATS; don't mask it except for clouds, etc. Yohei,
    % 2014/07/18.
    % The lines below used to be around here. But recent versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31.
@@ -842,6 +847,15 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    % versions of starwrapper.m. do not have them. Now revived. Yohei, 2014/10/31."
    
    % fit a polynomial curve to the non-strongly-absorbing wavelengths
+%    issun_ii = find(s.Str==1&s.Zn==0&s.QdVtot>1&abs(s.QdVlr)<.05&abs(s.QdVtb)<.05);
+%    figure_(1999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:);  s.gas.no2.no2OD(issun_ii,:);...
+%        s.gas.o3.o3OD(issun_ii,:);s.gas.o3.o4OD(issun_ii,:);s.gas.co2.co2OD(issun_ii,:);...
+%        s.cwv.wvOD(issun_ii,:)],'-'); legend('tot OD','NO2','O3','O4','CO2','H2O');logy
+%    
+%      gas_od = s.tau_NO2(issun_ii,:) + s.gas.o3.o3OD(issun_ii,:) + s.tau_O4(issun_ii,:) + s.cwv.wvOD(issun_ii,:)+s.gas.co2.co2OD(issun_ii,:), s.gas.co2.ch4OD(issun_ii,:); 
+%      w_gas = gas_od>
+%      figure_(2999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:); gas_od; s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:)- gas_od],'-'); legend('tot','gas','aero?');logy;
+%  
    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
    s.tau_aero_polynomial=[a2 a1 a0];
@@ -943,7 +957,7 @@ if toggle.inspectresults && ~isempty(strmatch('sun', lower(datatype(end-2:end)))
       ylim(ax(ii),yylim(ii,:));
       ylabel(yystr{ii});
       set(gca,'xtick',[],'xticklabel','');
-      if numel(kk)==1 && exist('lstr');
+      if numel(kk)==1 && isavar('lstr');
          lh=legend(ph0, lstr);
          set(lh,'fontsize',6,'location','best');
       else
@@ -1179,3 +1193,4 @@ clear qq2 s2;
 % end
 
 return
+tau_

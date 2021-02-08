@@ -48,7 +48,7 @@ version_set('2.1');
 vv = version('-release');
 
 askforsourcefolder=0; % in allstarmat.m, just ask for files.
-if exist('reset','var')&&reset
+if isavar('reset')&&reset
    setnamedpath('stardat','Select the location for raw *.dat files...');
    matfolder = setnamedpath('starmat',['Select the location for "allstarmat" files. [This should NOT be in the GitHub tree!]']);
    setnamedpath('starsun', 'Select the location for starsun mat-files. [This should NOT be in the GitHub tree!]');
@@ -76,14 +76,13 @@ elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpat
     author='Yohei';
 elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
     author='Yohei';
-elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')); % Sam's laptop
-    author='Samuel';
-elseif ~isempty(strfind(lower(userpath),'sleblan2'))
-    author='Samuel';
-elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
+elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')) || ...
+        ~isempty(strfind(lower(userpath),'sleblan2')) || ~isempty(strfind(lower(getenv('USER')),'sleblan2')) ||  ~isempty(strfind(lower(userpath),'lebla')) % Sam's laptop
     author='Samuel';
 elseif ~isempty(strfind(lower(userpath),'kpistone'))
     author='Kristina';
+elseif ~isempty(strfind(lower(userpath), 'loganm818'))
+    author='Logan';
 else
     warning('Update starpaths.m');
     author='anon_star_user';

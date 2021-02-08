@@ -26,7 +26,11 @@ end
 
 [short_in_long] = interp1(longer(end:-1:1), (length(longer):-1:1),shorter,'nearest','extrap');
 short_in_long = unique(short_in_long);
+if length(shorter)==1
+    [~,long_in_short] = min(abs(longer - shorter));
+else
 long_in_short = interp1(shorter(end:-1:1), (length(shorter):-1:1),longer(short_in_long),'nearest','extrap');
+end
 long_in_short = unique(long_in_short);
 while length(long_in_short)~=length(short_in_long)
    if length(long_in_short)~=length(short_in_long)

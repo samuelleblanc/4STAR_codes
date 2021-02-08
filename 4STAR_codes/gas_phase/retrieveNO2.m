@@ -20,7 +20,9 @@
 % OUTPUT:
 %   no2.no2vcdDU = no2 vertical column density [DU]
 %   no2.no2resiDU= no2 residual [DU];
-%   no2.no2OD    = no2 optical depth
+%   no2.no2OD    = no2 column optical depth
+%   no2.no2_molec_cm2 = molecules per cm^2, vertical column density
+%   no2.no2SCD   = no2 slant density    
 %
 % DEPENDENCIES:
 %  - starpaths.m: to find the correct path to the correction file.
@@ -89,8 +91,8 @@ loadCrossSections_global;
 % and any scattered contribution to the measurement
 % calculate linear fit and create residual spectrum
 
-% for i=1:length(s.t)
-for i=find(s.Str==1 & s.Zn==0)'   
+suns = find(s.Str==1 & s.Zn==0)'; 
+for i=suns   
     p = polyfit(s.w(wln),eta(i,:),1);
     %p1 = p(1);
     %p0 = p(2);
@@ -151,10 +153,9 @@ end
     % solve
     % x = real(Abasis\spectrum_sub');
     
-    ccoef_d=[];
-    RR_d=[];
-    
-    for k=1:length(s.t);
+    ccoef_d=NaN(size(basis,2),length(s.t));
+    RR_d=NaN(length(wln),length(s.t));
+    for k=suns
 
         coef=real(basis\eta(k,:)');
         % coef=real(Abasis\spectrum_sub(k,:)');
@@ -163,9 +164,10 @@ end
 
         % reconstruct spectrum
         recon=basis*scoef;
-        RR_d=[RR_d recon];
-        ccoef_d=[ccoef_d scoef];
-    end 
+        RR_d(:,k)=recon;
+        ccoef_d(:,k)=scoef;
+    end
+    
     
     % to get back to regular cross section:
     % test_spec=qno2*rno2;

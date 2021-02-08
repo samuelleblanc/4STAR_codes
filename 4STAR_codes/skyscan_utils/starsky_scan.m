@@ -30,15 +30,15 @@ end
 [pname,fstem,ext] = fileparts(strrep(star.filename{1},'\',filesep));
 pname = [pname, filesep];
 fstem = strrep(fstem, '_VIS',''); star.fstem = fstem;
-paths = set_starpaths; imgdir = paths.starppt;
+paths = set_starpaths; imgdir = paths.starimg; pptdir = paths.starppt;
 if ~isadir([imgdir,star.fstem]);
    mkdir(imgdir, star.fstem);
 end
-skyimgdir = [imgdir,star.fstem,filesep];
-star.pptname = [imgdir,star.fstem,'.ppt'];
-created_str = ['.created',datestr(now,'_yyyymmdd_HHMMSS.')];
+skyimgdir = [imgdir, star.fstem, filesep];
+star.pptname = [pptdir, star.fstem, '.ppt'];
+created_str = ['.created', datestr(now, '_yyyymmdd_HHMMSS.')];
 star.created_str = created_str;
-star.pptname = ppt_add_title(star.pptname, [star.fstem,': ',star.created_str]);
+star.pptname = ppt_add_title(star.pptname, [star.fstem, ': ', star.created_str]);
 
 % fstem = strrep(star.out,'_STARSKY','_SKY')
 if ~isempty(findstr(upper(fstem),'SKYP'))
@@ -86,7 +86,7 @@ tau_abs_gas = star.tau_tot_vert -star.tau_ray - star.tau_aero_subtract_all;
 % This is similar to aodpolyfit except uses a reduced wavelength range
 % tailored to the expected wavelengths for the sky retrieval and will thus
 % generally better represent the wavelength dependence in this region
-w_ii = star.w_isubset_for_polyfit;
+w_ii = star.w_isubset_for_polyfit; % w_ii = [225,star.w_isubset_for_polyfit];
 % SEAC4RS and ORACLES seem to require different WL ranges % SL (2019-03-21) implemented this time dependent change into get_wvl_subset for where the w_isubset_for_polyfit is determined.
 % w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
 w_ii(star.w(w_ii)>1.1) = [];w_ii(star.w(w_ii)>.9) = [];
@@ -101,9 +101,9 @@ star.AGOD = star.tau_abs_gas_fit(sun_ii,:);
 figure_(3001);
 sx(1) = subplot(2,1,1);
 plot(star.w(200:1044), tau_noray_vert(sun_ii,200:1044),'.m-', ...
-   star.w(200:1044), star.tau_aero_subtract_all(sun_ii,(200:1044)),'-',...  
-star.w(200:1044), exp(polyval(PP_,log(star.w(200:1044)))), '-',...   
-   star.w(star.aeronetcols), exp(polyval(PP_,log(star.w(star.aeronetcols)))), 'o'); logx; logy;
+   star.w([200 w_ii 1044]), star.tau_aero_subtract_all(sun_ii,[200 w_ii 1044]),'ok-',...  
+star.w(200:1044), exp(polyval(PP_,log(star.w(200:1044)))), 'c-',...   
+   star.w(star.aeronetcols), exp(polyval(PP_,log(star.w(star.aeronetcols)))), 'ro'); logx; logy;
 ylabel('optical depth');
 yl = ylim;
 ylim([min([yl(1),min(star.tau_aero_subtract_all(sun_ii,w_ii))]).*.75,...
@@ -300,15 +300,21 @@ if star.isPPL
       title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',miss)]);
       ylabel('radiance');legend('Below sun','Above sun')
       xlabel('El shifted - sun El');
-      
+
+      fig_out = [skyimgdir, star.fstem, star.created_str, 'el_shift'];
+      saveas(gcf, [fig_out, '.fig']);
+      saveas(gcf, [fig_out, '.png']);
+      ppt_add_slide(star.pptname, fig_out);
       pause(3)
+      
+      figure_(3004);
       plot(star.SA(zone&below_orb),star.skyrad(zone&below_orb,star.aeronetcols(vis_pix(end))),'o',...
          star.SA(zone&above_orb), star.skyrad(zone&above_orb,star.aeronetcols(vis_pix(end))),'x');
       title(['Near-sun sky zone shifted by ',sprintf('%2.2f deg',mean(dSA))]);
       ylabel('radiance');legend('Below sun','Above sun')
       xlabel('SA shifted');
       
-      fig_out = [skyimgdir, star.fstem,star.created_str,'ppl'];
+      fig_out = [skyimgdir, star.fstem,star.created_str,'sa_shift'];
       saveas(gcf,[fig_out,'.fig']);
       saveas(gcf,[fig_out,'.png']);
       ppt_add_slide(star.pptname, fig_out);

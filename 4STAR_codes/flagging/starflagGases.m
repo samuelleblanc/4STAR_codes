@@ -58,6 +58,9 @@ end % done loading starinfo file
 daystr = datestr(s.t(1),'yyyymmdd');
 
 % load gas_summary file, else use s structure
+if ~exist('Mode','var')||Mode==0
+    Mode = 2;
+end
 if Mode == 2
         
         % upload gas_summary

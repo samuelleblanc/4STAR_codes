@@ -24,6 +24,7 @@ newname = strrep(newname,'^','caret_');
 newname = strrep(newname,'%','pct_');
 newname = strrep(newname,'[','lbrak_');
 newname = strrep(newname,']','rbrak_');
+newname = strrep(newname, '°','deg_');
 
 if newname(1) == '_'
     newname = ['ubar_',newname(2:end)];
