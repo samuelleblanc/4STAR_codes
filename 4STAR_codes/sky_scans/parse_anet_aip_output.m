@@ -22,15 +22,15 @@ if isavar('outname')&&isafile(outname)
         
         while isempty(strfind(inline,'MEASUREMENT'))&&~feof(fid)
             inline = fgetl(fid);
-            if contains(inline,'sky_test=')
+            if ~isempty(strfind(inline,'sky_test='))
                 ii = findstr(inline,'sky_test=')+9;
                 anetaip.sky_test = sscanf(inline(ii:end),'%f');
             end
-            if contains(inline,'tau_test=')
+            if ~isempty(strfind(inline,'tau_test='))
                 ii = findstr(inline,'tau_test=')+9;
                 anetaip.tau_test = sscanf(inline(ii:end),'%f');
             end
-            if contains(inline,'ANET inp level:')
+            if ~isempty(strfind(inline,'ANET inp level:'))
                 ii = findstr(inline,'ANET inp level:')+15;
                 anetaip.sky_test = sscanf(inline(ii:end),'%f');
                 anetaip.tau_test = anetaip.sky_test;
