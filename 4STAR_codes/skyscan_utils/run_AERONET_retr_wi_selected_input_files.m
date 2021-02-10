@@ -118,11 +118,13 @@ for F = length(skyinput):-1:1
                
                plot_anet_aip(anetaip);               
                lv_out = min([anetaip.lv_out.ssa,anetaip.lv_out.psd, anetaip.lv_out.pct_sphericity]);
-               lv_ii = findstr(fname_tagged,'_lv');fname_tagged(lv_ii+1:end) = [];
-               fname_tagged = [fname_tagged,num2str(10.*lv_out)];
+               movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir ); %switched the order of when moving is done, so that the fname_tagged still applies to the first file string
+               lv_ii = findstr(fname_tagged,'_lv'); %fname_tagged(lv_ii+1:end) = []; %Why does it do this? This gets rid of the tags.
+               fname_tagged = [fname_tagged(1:(lv_ii+2)),num2str(10.*lv_out),fname_tagged((lv_ii+5):end)]; %[fname_tagged,num2str(10.*lv_out)];
+               %%^this now just pulls out the 2-digit number part that it found, and
+               %%replaces it with a separate number.
 %                [xls_fname] = print_anetretr_details_to_xls(s,xls_fname);
                save([done_dir,'..',filesep, fname_tagged, '.mat'],'-struct','anetaip')
-               movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir );
             catch ME
                disp(['Trouble displaying output from ',fname_tagged])
                copyfile(infile, bad_dir);
@@ -149,8 +151,8 @@ if length(skyinput)==0
 end
 
 %Merge the resulting ppts into a single per day
-udays = unique(days)
-for i=1:length(udays)
-    ppt_out = merge_ppts_for_day(getnamedpath('starppt'),udays{i},instrumentname,'_allSKY');
-end
+% udays = unique(days)
+% for i=1:length(udays)
+%     ppt_out = merge_ppts_for_day(getnamedpath('starppt'),udays{i},instrumentname,'_allSKY');
+% end
 return
