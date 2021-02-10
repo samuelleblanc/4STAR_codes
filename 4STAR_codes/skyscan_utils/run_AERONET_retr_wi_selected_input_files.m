@@ -125,6 +125,7 @@ for F = length(skyinput):-1:1
                %%replaces it with a separate number.
 %                [xls_fname] = print_anetretr_details_to_xls(s,xls_fname);
                save([done_dir,'..',filesep, fname_tagged, '.mat'],'-struct','anetaip')
+               movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir ); %the .mat is somehow not ending up in done_dir EVEN THOUGH THE PREVIOUS LINE SAYS IT SHOULD
             catch ME
                disp(['Trouble displaying output from ',fname_tagged])
                copyfile(infile, bad_dir);
