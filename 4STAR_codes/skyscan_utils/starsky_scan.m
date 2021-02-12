@@ -336,7 +336,7 @@ if star.isPPL
         saveas(gcf, [fig_out, '.fig']);
         saveas(gcf, [fig_out, '.png']);
         ppt_add_slide(star.pptname, fig_out);
-        pause(3)
+        pause(.1)
         
         figure_(3004);
         plot(star.SA(zone&below_orb),star.skyrad(zone&below_orb,star.aeronetcols(vis_pix(end))),'o',...
