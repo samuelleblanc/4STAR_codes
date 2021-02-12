@@ -282,7 +282,7 @@ if plotting
       
       legend('total spectrum baseline and rayliegh subtracted','tau-aero','reconstructed spectrum','measured O_{3} spectrum','fitted O_{3} spectrum','residual');
       set(gca,'fontsize',12,'fontweight','bold');%axis([wstart wend -5e-3 0.04]);%legend('boxoff');
-      pause(5);
+      pause(1);
    end
 end
 
@@ -351,7 +351,7 @@ if plotting
          'fontsize',14,'fontweight','bold');
       ylabel('OD','fontsize',14,'fontweight','bold');legend('measured spectrum (subtracted)','fitted O_{3} spectrum','residual');
       set(gca,'fontsize',12,'fontweight','bold');%axis([0.430 0.49 -0.015 0.01]);legend('boxoff');
-      pause(1);
+      pause(.1);
    end
    c_wln    = s.w(wln);
    wlnlabel = arrayfun(@(x){sprintf('%0.3f',x)}, c_wln);
