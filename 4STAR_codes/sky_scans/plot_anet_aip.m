@@ -108,7 +108,8 @@ pptname = ppt_add_title(pptname, [fstem, ': ', created_str]);
 
 % h2 = figure('units','inches','position',[.1 4.2 4 3],'paperposition',[.1 .1 8 5]); 
 % h2 = figure('units','inches','position',[ 0.1 0.5 7 5],'paperposition',[.1 .1 10 7]); 
-h2 = figure_(4001);
+h2 = figure_(4001); clf;
+% h2 = figure;
 ax = subplot(2,2,1);
 % Labels = {'Wavelength','Real','Imaginary'};
 %Range = [0.4,1.1; 1.55,1.65 ; 0.029,0.032];
@@ -272,7 +273,8 @@ ppt_add_slide(pptname, fig_out);
 
 %%
 % h3 = figure('units','inches','position',[7    0.5    7    5],'paperposition',[.1 .1 10 7]); 
-h3 = figure_(4002);
+h3 = figure_(4002); clf;
+% h3 = figure; 
 subplot(2,2,1);     
 semilogx(anetaip.radius, anetaip.psd,'-r*');
 hold on
