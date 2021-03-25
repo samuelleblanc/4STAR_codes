@@ -4,7 +4,6 @@ function test_fits_and_w_ii(s,in)
 % Written to identify good pixels for tau_fit and to also explore other
 % spectral issues
 % Several interesting take-aways:
-% 1. Possibly significant value down to 270 nm or even lower.
 % 2. Possible to improve oxygen A-band c0, but of uncertain benefit
 % 3. windows at 1240 nm and 1283 nm vary quasi-independently.  Possibly
 % depending on temperature and water vapor profile.  Usually 1283 is
@@ -12,8 +11,7 @@ function test_fits_and_w_ii(s,in)
 %4. Likely able to identify a minimum subset of robust pixels, identify
 %contiguous blocks with associated RME or MADS, and contextually extend
 %this minimal set with pixels meeting a bias threshold.  Then assess RME of
-%minimal and extended.
-% Explore what is going on with c0 below 270 nm where we see bat-ears.
+%minimal and extended
 % After accounting for O3 below 400 nm, review HCOH retrieval
 
 %2DU - 
@@ -37,11 +35,23 @@ if isavar('in')
     end
 end
 
-
+% Understand "wl_block"
+% Saved semi-permanently at end of test_fits_and_w_ii, menu driven
+% Seven columns described thusly:
+% col 1: start index in w_ii and aod_fit
+% col 2: end index in w_ii and aod_fit
+% col 3: start pixel index in wl and aod
+% col 4: star pixel index in wl and aod
+% col 5: start pixel in nm (or whatever units wl is provided in)
+% col 6: ending pixel in nm (or whatever units wl is provided in)
+% col 7: mean wl for block
 
 if ~isavar('block')
-    block = load(getfullname('*block*.mat','block','Select block file indicating contiguous pixels.')); 
-    if isfield(block,'block') block = block.block; end;
+    blocks = load(getfullname('*block*.mat','block','Select block file indicating contiguous pixels.')); 
+    if isfield(blocks,'blocks') block = blocks.blocks; 
+    else
+        block = blocks;
+    end
 end
 if ~isavar('s')
     s = load(getfullname('*starsun*.mat','starsun','Select starsun file.'));
@@ -95,10 +105,33 @@ for s_i = length(suns_i):-NN:1
     sum(least_good)
     least_good = least_good & good_wl(s_i,:);
 end
-
+inst_name = s.instrumentname;
 least_w_ii = find(least_good);
-
-block = return_wl_block(least_w_ii, cross_sections.wln);
-% block represents contiguous regions of good fit. 
-% save('xfit_wl_block.mat','block')
+% Uncomment to save block
+saveme = menu('Save the selected pixel set?', 'Yes','No');
+if saveme ==1
+    block_.header = {'w_ii(start)  w_ii(end)  wl_ii(start) wl_ii(end) nm(start) nm(end) nm_mean'};
+    block_.datestr = datestr(now,'yyyy-mm-dd HH:MM:SS');
+    block_.instrumentname = inst_name;
+    block_.description = string(input('Enter a description of this pixel set, if desired: ','s'));
+    block_.wl = 1000.*s.w;
+    block_.w_ii = w_ii;
+    block_.tau = s.tau_aero(suns_i(1),:);
+    block_.blocks = return_wl_block(least_w_ii, 1000.*s.w);
+%     block represents contiguous regions of good fit.
+    block_file = [getnamedpath('block'),inst_name,'_wl_block.',datestr(now,'yyyymmdd'),'*.mat'];
+    N = 1+ length(dir_(block_file)); N_str = sprintf('_%d',N);
+    if N == 1
+        block_file = [getnamedpath('block'),inst_name,'_wl_block.',datestr(now,'yyyymmdd'),'.mat'];
+    else
+        block_file = [getnamedpath('block'),inst_name,'_wl_block.',datestr(now,'yyyymmdd'),N_str,'.mat'];
+    end
+    [block_file_, pname] = uiputfile(block_file);
+    save([getnamedpath('block'),block_file_],'-struct','block_');
+end
+savedef = menu('Use as new default? ','Yes','No');
+if savedef==1
+    def_block = [getnamedpath('block'),inst_name,'_wl_block.mat'];
+    copyfile([getnamedpath('block'),block_file_], def_block,'f')
+end
 return
