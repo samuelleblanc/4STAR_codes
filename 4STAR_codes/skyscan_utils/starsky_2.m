@@ -144,7 +144,7 @@ if ~bad_sky_scan
         % an error in the try-catch loop
         s.out = [strrep(fname,'_VIS_','_STAR')];
         
-        ! Not 100% sure I should have commented this out on 2020-10-22
+%         ! Not 100% sure I should have commented this out on 2020-10-22
         %     if isfield(s.toggle,'flip_toggle')&&s.toggle.flip_toggle
         %         s.toggle = flip_toggle(s.toggle,s.out);
         %         toggle = s.toggle;
@@ -158,7 +158,7 @@ if ~bad_sky_scan
         s.wl_(s.aeronetcols) = true;
         s.wl_ii = find(s.wl_);
         
-        if isfield(s.toggle,'use_last_wl')&&s.toggle.use_last_wl && isafile([getnamedpath('last_wl') 'last_wl.mat'])
+        if isfield(s.toggle,'use_last_wl')&&s.toggle.use_last_wl && isafile([getnamedpath('wl_path') 'last_wl.mat'])
             [wl_, wl_ii,sky_wl,w_fit_ii] = get_last_wl(s);
             s.aeronetcols = find(wl_); s.wl_ = wl_; s.wl_ii = find(wl_);
             s.w_isubset_for_polyfit = w_fit_ii;
