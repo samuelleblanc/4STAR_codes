@@ -33,8 +33,9 @@ end
 man = menu({'Current wavelengths [nm]: ';WL_str ;'Select other wavelengths?'},'Manually','From file...','Done');
 ORD = 3;
 if man==1
-    block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
+    block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block','Select block file indicating contiguous pixels.'));
     if isfield(block,'block') block = block.block; end;
+    if isfield(block,'blocks') block = block.blocks; end;
     wl_ = false(size(star.w));
     for b = 1:size(block,1)
         wl_(block(b,3):block(b,4)) = true;
