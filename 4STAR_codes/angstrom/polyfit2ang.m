@@ -10,7 +10,11 @@ function [A,Ap,curvature,ext]=polyfit2ang(lambda,a2,a1,a0)
 
 A=(-2)*a2(:)*log(lambda(:)')-repmat(a1(:),1,length(lambda));
 curvature=2*a2;
-Ap=(-2)*repmat(a2(:),1,length(lambda)); % 20091010, this is correct, John has convinced me. 20091003, now I think this is wrong, as this is dA/dln(lambda). % Ap=(-2)*repmat(a2(:),1,length(lambda))./lambda; % 20091003, this is dA/d(lambda).
+Ap=(-2)*repmat(a2(:),1,length(lambda)); 
+% 20091010, this is correct, John has convinced me. 
+%20091003, now I think this is wrong, as this is dA/dln(lambda). 
+% Ap=(-2)*repmat(a2(:),1,length(lambda))./lambda; 
+% 20091003, this is dA/d(lambda).
 if nargout>=4
     if nargin<4;
         error('Extinction not calculated. Give a0.');
