@@ -1,4 +1,4 @@
-function [flight_alb, out_time] = get_ssfr_flight_albedo(in_time,in_lambda)
+function [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(in_time,in_lambda)
 % [flight_alb, out_time] = get_ssfr_flight_albedo(in_time,in_lambda)
 % in_time is required
 % in_lambda is optional. Will load txt file for lambda if not provided.
@@ -165,6 +165,13 @@ tl = title([datestr(double(out_time(1)),'yyyy-mm-dd HH:MM:SS')],'color','r');
 set(tl,'units','normalized'); tlp = get(tl,'position'); set(tl,'position',[.5,.85]); ylim([0,1.2])
 legend('flight level albedo');
 xlabel('wavelength [nm]'); ylabel('albedo');ylim([-0.05, 1.05]);
+hold('on'); 
+neg = min(ssfr_alb([3 5 10],ainb)')-nanmean(ssfr_alb([3 5 10],ainb)');
+pos = max(ssfr_alb([3 5 10],ainb)')-nanmean(ssfr_alb([3 5 10],ainb)');
+errorbar(in_lambda(nms), flight_alb(nms),neg, pos, 'color','k','linestyle','none');
+hold('off')
+min_alb = min(ssfr_alb([3 5 10],ainb)'); 
+max_alb = max(ssfr_alb([3 5 10],ainb)');
 good = ~isnan(flight_alb)&(flight_alb>.1)&(flight_alb<1);
 if ~any(good)
    warning('Did not find ANY good flight level albedo values...');
