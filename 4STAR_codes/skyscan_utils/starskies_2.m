@@ -23,7 +23,7 @@ end
 if isfield(toggle, 'flip_toggle')&&toggle.flip_toggle
    toggle = flip_toggle(toggle);
 end
-infiles = getfullname('*star.mat','starmats','Select one or more star.mat files');
+infiles = getfullname('*star.mat','starmat','Select one or more star.mat files');
 if ischar(infiles)
    infiles = {infiles};
 end
