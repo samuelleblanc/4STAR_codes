@@ -1,4 +1,4 @@
-function closereq
+function closereq(fig)
 %CLOSEREQ  Figure close request function.
 %   CLOSEREQ deletes the current figure window.  By default, CLOSEREQ is
 %   the CloseRequestFcn for new figures.
@@ -9,8 +9,10 @@ function closereq
 %   to show hidden handles.
 % 2017-04-27: CJF, modified to call savefigpos on close which in
 % conjunction with figure_ and loadfigpos remembers figures positions.
-
-if isempty(gcbf)
+if isavar('fig')&&isgraphics(fig)
+    savefigpos(fig);
+    delete(fig)
+elseif isempty(gcbf)
     if length(dbstack) == 1
         warning(message('MATLAB:closereq:ObsoleteUsage'));
     end
