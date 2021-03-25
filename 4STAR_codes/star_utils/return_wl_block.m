@@ -8,7 +8,7 @@ function [block, w_ii] = return_wl_block(w_ii, wl)
 % col 2: end index in w_ii
 % col 3: start pixel index in wl
 % col 4: star pixel index in wl
-% col 6: start pixel in nm (or whatever units wl is provided in)
+% col 5: start pixel in nm (or whatever units wl is provided in)
 % col 6: ending pixel in nm (or whatever units wl is provided in)
 % col 7: mean wl for block
 
@@ -47,5 +47,14 @@ block(:,4) = w_ii(block(:,2));
 block(:,5) = wl(block(:,3));
 block(:,6) = wl(block(:,4));
 block(:,7) = (block(:,5)+block(:,6))./2;
+% block.header = {'w_ii(start)  w_ii(end)  wl_ii(start) wl_ii(end) nm(start) nm(end) nm_mean'};
+% block.datestr = datestr(now,'yyyy-mm-dd HH:MM:SS');
+% col 1: start index in w_ii
+% col 2: end index in w_ii
+% col 3: start pixel index in wl
+% col 4: star pixel index in wl
+% col 5: start pixel in nm (or whatever units wl is provided in)
+% col 6: ending pixel in nm (or whatever units wl is provided in)
+% col 7: mean wl for block
 
 return
