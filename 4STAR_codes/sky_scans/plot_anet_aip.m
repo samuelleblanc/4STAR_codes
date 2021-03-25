@@ -129,8 +129,8 @@ set(hAxes(2),'ytickmode','auto');
 xlabel('Wavelength','FontSize', 10);
 ylabel('imag','FontSize', 10);
 
-set(hAxes(1),'xlim',Range,'FontSize', 10);
-set(hAxes(2),'xlim',Range,'FontSize', 10);
+set(hAxes(1),'xlim',Range,'FontSize', 10, 'Xscale','log');
+set(hAxes(2),'xlim',Range,'FontSize', 10, 'Xscale','log');
 % set(hAxes(1),'XTick',anetaip.Wavelength);
 % set(hAxes(2),'XTick',anetaip.Wavelength);
 yl1 = get(hAxes(1),'ylabel');
@@ -162,10 +162,10 @@ anetaip.AE_fit = -polyval(polyder(P_AE,1),log(anetaip.Wavelength));
 anetaip.AAE_fit = -polyval(polyder(P_AAE,1),log(anetaip.Wavelength));
 
 plot(anetaip.Wavelength, anetaip.AE_fit,'o-',...
-  anetaip.Wavelength, anetaip.AAE_fit,'x-' )
-h = legend('AE fit','AAE fit'); set(h,'location','southeast')
+  anetaip.Wavelength, anetaip.AAE_fit,'x-' ); logx
+h = legend('AE retr','AAE retr'); set(h,'location','southeast')
 set(h,'FontSize', 10);
-
+ylim([.5,2.5]);
 
 %  plot(anetaip.Wavelength,anetaip.tod_meas,'-ko',anetaip.Wavelength,anetaip.tod_fit,'-rx');
 %  %
@@ -187,7 +187,7 @@ grid on
 hAxes(end+1) = subplot(2,2,3);
 hold off;
  plot(anetaip.Wavelength, [anetaip.ssa_fine;anetaip.ssa_coarse;anetaip.ssa_total]','-*',...
-    anetaip.Wavelength, anetaip.sfc_alb, 'k-s');
+    anetaip.Wavelength, anetaip.sfc_alb, 'k-s'); logx;
 h = legend('fine','coarse','total', 'sfc alb');
 set(h,'FontSize', 8, 'location','southwest');
 xx_here=get(gca,'xlim');
@@ -207,18 +207,19 @@ hold on;
 
 hAxes(end+1) = subplot(2,2,4);
 hold off;
-if ~isempty(anetaip.input.aods)
-plot(anetaip.Wavelength, anetaip.input.aods,'-ko');
+plot(anetaip.Wavelength, anetaip.aod,'-+');logy;logx;
 hold on
+if ~isempty(anetaip.input.aods)
+plot(anetaip.Wavelength, anetaip.input.aods,'-o');
 end
-plot(anetaip.Wavelength, anetaip.aod,'-r');
-hold on
-plot(anetaip.Wavelength, anetaip.aaod,'-b*');
+
+plot(anetaip.Wavelength, anetaip.aaod,'-*');
+plot(anetaip.Wavelength, anetaip.aod,'b+');
 hold on
 if ~isempty(anetaip.input.aods)
-   h = legend('AOD meas','AOD fit','AAOD');
+   h = legend('AOD retr','AOD input','AAOD');
 else
-    h = legend('AOD fit','AAOD');
+    h = legend('AOD retr','AAOD');
 end
 
 set(h,'FontSize', 10);
