@@ -26,7 +26,7 @@ else
     if isgraphics(H)
         pos.position = get(H,'position');
         pos.units = get(H,'units');
-        pos.pos.windowstyle = get(H,'windowstyle');
+        pos.windowstyle = get(H,'windowstyle');
     end
     H = builtin('figure',H);
 end
