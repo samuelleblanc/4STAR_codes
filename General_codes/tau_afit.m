@@ -2,7 +2,7 @@ function [aod, min_rms, fit_rms, aod_pfit, aod_afit] = tau_afit(ws,tau, block);
 %[aod, min_rms, fit_rms, aod_pfit, aod_afit] = tau_afit(ws,tau, block);
 % "ws" can be either a vector or wavelengths or an "s" struct.
 % If ws is an "s" struct, then tau is ignored.
-% If block is not provided it will be loaded from xfit_wl_block.mat
+% If block is not provided it will be loaded from 4STAR*_wl_block.mat
 % Computes polyfit and aod_fit_basis on tau_aero.
 % Returns aod representing the best fit having the lowest RMS for each time
 % min_rms as the lowest RMS value
@@ -20,6 +20,7 @@ if ~isavar('ws')||isempty(ws)
     sun_ = s.Zn==0&s.Str==1; 
     suns_ii = find(sun_);
     tau = tau(sun_,:); 
+    inst = s.instrumentname;
     clear s
 end
 if isavar('ws')&&isstruct(ws)&&isfield(ws,'w')&&isfield(ws,'tau_aero')
@@ -37,9 +38,13 @@ if isavar('ws')&&~isstruct(ws)&&~isempty(ws)
     end
     clear ws
 end
+if ~isavar('inst')||isempty(inst)
+    inst = '*';
+end
 if ~isavar('block')
-    block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
+    block = load(getfullname([inst,'_wl_block.mat'],'block','Select block file indicating contiguous pixels.'));
     if isfield(block,'block') block = block.block; end;
+    if isfield(block,'blocks') block = block.blocks; end;    
 end
 wl_ = false(size(wl));
 for b = 1:size(block,1)
