@@ -146,9 +146,9 @@ tau_ODmodc0slant = -log(modc0Tw);
 % cwv.tau_aero_cwvsub = zeros(pp,qq);   % this is for cwv m1 retrieval
 cwv.tau_OD_wvsubtract   = zeros(pp,qq);   % this is for cwv fit retreival (m2)
 %
-
+suns = find(s.Str==1&s.Zn==0&~isnan(s.Alt))';
 %%
-
+if length(suns)>0
 %-------------------------------------
 % loop over retrieval regions (==1 at current version)
 for wrange=[1];
@@ -179,7 +179,7 @@ for wrange=[1];
     % deduce baseline
     
     % for i=1:length(s.t)
-    suns = find(s.Str==1&s.Zn==0&~isnan(s.Alt))';
+
     for i=suns
         % function (fn) can be: 'sh','ah','stq','atq'
         % for gui use (visualization) write:
@@ -401,8 +401,12 @@ for wrange=[1];
         
         %      Tslant
         % subtract cwv from tau_aero using m1
-        afit_H2Os1 = afit_H2O(:,kz); afit_H2Os1(isNaN(afit_H2Os1)) = 0; afit_H2Os1(afit_H2Os1<0) = 0; afit_H2Os1(isinf(afit_H2Os1)) = 0;
-        bfit_H2Os1 = bfit_H2O(:,kz); bfit_H2Os1(isNaN(bfit_H2Os1)) = 0; bfit_H2Os1(bfit_H2Os1<0) = 0; bfit_H2Os1(isinf(bfit_H2Os1)) = 0;
+        if isavar('kz')
+            afit_H2Os1 = afit_H2O(:,kz); afit_H2Os1(isNaN(afit_H2Os1)) = 0; afit_H2Os1(afit_H2Os1<0) = 0; afit_H2Os1(isinf(afit_H2Os1)) = 0;
+            bfit_H2Os1 = bfit_H2O(:,kz); bfit_H2Os1(isNaN(bfit_H2Os1)) = 0; bfit_H2Os1(bfit_H2Os1<0) = 0; bfit_H2Os1(isinf(bfit_H2Os1)) = 0;
+        else
+            disp('no kz')
+        end
         afit_H2Os1  = real(afit_H2Os1)'; bfit_H2Os1 = real(bfit_H2Os1)';
         
         
@@ -684,5 +688,6 @@ for wrange=[1];
     end% end of optfit procedure
 end % end for loop over all wavelength range cases
 %
+end
 %---------------------------------------------------------------------
 return;
