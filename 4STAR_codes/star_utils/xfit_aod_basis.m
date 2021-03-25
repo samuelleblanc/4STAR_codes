@@ -14,8 +14,9 @@ if nargin<2
     error(['wl, aod']);
 end
 if ~isavar('block')
-    block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.')); 
+    block = load(getfullname('4STAR*_wl_block.mat','block','Select block file indicating contiguous pixels.')); 
     if isfield(block,'block') block = block.block; end;
+    if isfield(block,'blocks') block = block.blocks; end;
 end
     
 if ~isavar('wl_out')
@@ -74,7 +75,7 @@ RR(isnan(RR)) = interp1(wl(~isnan(RR)),RR(~isnan(RR)),wl(isnan(RR)),'nearest','e
 end
 % figure; plot(block(:,7), block(:,8), 'o',wl, RR, '-',wl(wl_ii), res(wl_ii),'rs'); 
 
-wl_x_ = (res < 0.5.*RR)&(abs(res)<RR); %this is an extended set of pixels including other close values
+wl_x_ = (abs(res)<0.3.*RR); %this is an extended set of pixels including other close values
 [block_x, wl_x] = return_wl_block(unique([find(wl_x_),wl_ii]),wl);
 
  [aod_fit_x, Ks_x] = fit_aod_basis(wl(wl_x), aod(wl_x),wl);
