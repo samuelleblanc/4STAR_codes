@@ -20,8 +20,10 @@ function star = starsky_scan(star)
 % 2021-02-04: v1.2 Connor introducing tau_xfit that combines polyfit, afit,
 % and xfit to provide the best-fit that minimizes RMS. Fully supplants
 % rfit_aod_basis which is deprecated.
-
-version_set('1.2');
+% 2021-03-19: v1.3, Connor, testing polyfit as well as  a-fit (aod basis), 
+% and xfit (aod basis with outlier rejection and capture). Also provides RMS
+% for each fit type and independent results to facilitate residuals
+version_set('1.3');
 % minimum acceptable scattering angle. Aeronet 3.5, airborne maybe 4?
 if isfield(star.toggle,'sky_SA_min')
     SA_min = star.toggle.sky_SA_min;
@@ -102,9 +104,9 @@ end
 %     star.aeronetcols = wll_ii;
 %     w_ii = wl_isubset_for_polyfit;
 % end
-
-block = load(getfullname('xfit_wl_block.mat','block','Select block file indicating contiguous pixels.'));
+block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block','Select block file indicating contiguous pixels.'));
 if isfield(block,'block') block = block.block; end;
+if isfield(block,'blocks') block = block.blocks; end;
 wl_ = false(size(star.w));
 for b = 1:size(block,1)
     wl_(block(b,3):block(b,4)) = true;
@@ -116,19 +118,52 @@ lte0 = star.tau_aero_subtract_all(sun_ii,w_ii)<=0;  w_ii(lte0) = [];
 % not retaining an alternate version tau_noray_vert
 tau_noray_vert = star.tau_tot_vert -star.tau_ray;
 % star.tau_tot_vert(sun_ii,lte0) = tau_noray_vert(sun_ii,lte0) + star.tau_ray(sun_ii,lte0);
-[aod_fit, min_rms, fit_rms, aod_pfit, aod_afit, aod_xfit] = tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:));
+% [aod, min_rms, fit_rms, m_ij, aod_pfit, aod_afit, aod_xfit]
+wl_block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block'));
+    if isfield(block,'block') block = block.block; end;
+    if isfield(block,'blocks') block = block.blocks; end;    
+[aod_fit, min_rms, fit_rms, m_ij, aod_xfit, aod_afit, aod_pfit, w_ii_out] = ...
+    tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),wl_block);
+
+% Now evaluate projecting get_wvl_subset for polyfit into block
+% w_pii: "w" for wavelength, "p" for polyfit, "ii" for index
+w_pii = get_wvl_subset(star.t(1),star.instrumentname);
+% w_pii(wl(w_pii)<400) = [];
+% w_pii(wl(w_pii)>900) = [];
+w_pii(wl(w_pii)>1100) = []; 
+
+w_pii_ = false(size(wl)); w_pii_(w_pii) = true; 
+w_pii_(1:end-1) = w_pii_(1:end-1)| w_pii_(2:end);
+w_pii_(end) = w_pii_(end)|w_pii_(end-1); 
+w_pii = find(w_pii_); w_pii_block = return_wl_block(w_pii, wl);
+[star.aod_fit_pii, star.min_rms_pii, star.fit_rms_pii, m_ij_pii, star.aod_xfit_pii, aod_afit_pii, star.aod_pfit_pii, w_ii_out_pii] = ...
+    tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),w_pii_block);
+
+%% Interestingly, the fits using a truncated range from get_wvl_subset yields 
+% lower residuals than the fits using the wavelengths in wv_block.mat
+% Thus, we'll carry the _pii fields and residuals forward.
 tau_abs_gas = tau_noray_vert(sun_ii,:) - star.tau_aero_subtract_all(sun_ii,:);
-tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - aod_fit;
-star.AOD = aod_fit;
+tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - star.aod_fit_pii;
+tau_abs_gas_xfit = tau_noray_vert(sun_ii,:) - star.aod_xfit_pii;
+tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - star.aod_pfit_pii;
+% tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - aod_pfit_pii;
+star.tau_xfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_fit_pii;
+star.tau_pfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_pfit_pii;
+
+star.AOD = star.aod_fit_pii; % aod_fit_pii looks better than aod_fit
 star.AGOD = tau_abs_gas_fit;
 % If inferred absorbing gas is negative, instead define it as zero, and
 % compute new tau_vert_tot as the tau_ray + fitted tau_aero_subtract
+w_fin_i = find(wl>415 & wl<435);
+[~, fin_max_ii] = max(abs(tau_abs_gas_fit(w_fin_i))); 
+fin_max = tau_abs_gas_fit(w_fin_i(fin_max_ii));
 lte0 = star.AGOD<=0;
 star.AGOD(lte0) = 0;
 star.TOD = star.AGOD + aod_fit + star.tau_ray(sun_ii,:);
 % 2021-02-04 I think figured out to here...
 
 ii = [200:1044 1070:1550];
+
 figure_(3001);
 sx(1) = subplot(2,1,1);
 % I think this is just for visualization purposes
@@ -137,28 +172,32 @@ nix = single(tau_noray_vert(sun_ii,ii)<=0); nix(nix==1)= NaN;
 nox = single(star.tau_aero_subtract_all(sun_ii,ii)<=0); nox(nox==1)= NaN;
 plot(wl(ii), nix+tau_noray_vert(sun_ii,ii),'-', ...
     wl(ii), nox+star.tau_aero_subtract_all(sun_ii,ii),'-', ...
-    wl(ii), aod_fit(ii), 'r-',wl(w_ii), aod_fit(w_ii), 'o',......
-    wl(star.aeronetcols),tau_line, 'o'); 
+    wl(ii), star.aod_pfit_pii(ii), 'k-',wl(ii), star.aod_xfit_pii(ii), 'r-', ...
+    wl(w_pii), star.aod_fit_pii(w_pii), 'o',......
+    wl(star.aeronetcols),star.aod_fit_pii(star.aeronetcols), 'o'); 
 logx; 
 logy;clear nix nox
 ylabel('optical depth');
 yl = ylim;
 ylim([min(tau_line).*.25, 2]);
 lg = legend('tau noray vert', ...
-    'tau aero subtract all','aod fit','fit pixels', 'retrieval pixels');
-set(lg,'interp','none','location','southwest')
-tl = title({star.fstem;star.created_str}, 'interp','none');
-% This is getting pretty dicey in that it looks like the fitted line to
-% tau_aero_subtract_all is higher than tau_tot_vert which is impossible.
-% This may indicate stray light problems.  But what to do?
+    'tau aero subtract all',sprintf('pfit RMS=%1.1e',star.fit_rms_pii(3)),...
+    sprintf('xfit RMS=%1.1e',star.fit_rms_pii(1)),'fit pixels', 'retrieval pixels');
+set(lg,'interp','none');
+created = star.created_str(10:end-1);
+tl = title({[star.fstem, ' ',created];...
+[datestr(star.t(sun_ii),'yyyy-mm-dd HH:MM:SS UTC'), ' ',sprintf(', SunEl=%1.1f',star.sunel(sun_ii)), sprintf(', airmass=%1.2f',star.m_aero(sun_ii))]}, 'interp','none');
 sx(2) = subplot(2,1,2);
-plot(wl(ii), star.AGOD(ii),'-',wl(ii), tau_abs_gas(ii),'c-',...
-    wl(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'k*',...
+plot(wl(ii), star.AGOD(ii),'-',wl(ii), tau_abs_gas(ii),'-',wl(ii), tau_abs_gas_pfit(ii),'-k',...
+    wl(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'*',...
     wl(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
     ); logx;
 xlabel('wavelength [um]');
 ylabel('Gas OD'); ylim([-.02,.28])
-lg = legend('AGOD (tot-aod_fit)','tot - tau_aero_subtract_all'); set(lg,'interp','none', 'location','northwest')
+lg = legend('AGOD (tot-aod_xfit)','tot - tau_aero_subtract_all','(tot-aod_pfit)','AGOD fit pixels','tau noray - aero'); set(lg,'interp','none', 'location','northwest')
+title({sprintf('Lat=%2.4f, Lon=%2.4f, Alt=%1.0f m, Az=%1.0f deg',star.Lat(sun_ii), ...
+    star.Lon(sun_ii), star.Alt(sun_ii), acosd(cosd(star.Az_deg(sun_ii))));sprintf('Fin = %0.3f',fin_max)});
+
 linkaxes(sx,'x');
 xlim([wl(225), wl(1550)]);
 %%
@@ -759,9 +798,9 @@ if star.isPPL
     grid('on');
     set(gca,'Yminorgrid','off');
     if ~rain
-        leg_str{1} = sprintf('%2.0f nm AOD (%2.2f)',wl(star.aeronetcols(vis_pix(1)))*1000, star.tau_aero_skyscan(1));
+        leg_str{1} = sprintf('%2.0f nm (AOD=%2.2f)',wl(star.aeronetcols(vis_pix(1))), star.tau_aero_skyscan(1));
         for ss = 2:length(star.aeronetcols(vis_pix))
-            leg_str{ss} = sprintf('%2.0f nm AOD (%2.2f)',wl(star.aeronetcols(vis_pix(ss)))*1000,star.tau_aero_skyscan(ss));
+            leg_str{ss} = sprintf('%2.0f nm (AOD=%2.2f)',wl(star.aeronetcols(vis_pix(ss))),star.tau_aero_skyscan(ss));
         end
         legend(leg_str, 'location','northeast');
     else
@@ -806,9 +845,9 @@ elseif star.isALM
     grid('on'); set(gca,'Yminorgrid','off');
     
     if ~rain
-        leg_str{1} = sprintf('%2.0f nm, AOD(%2.2f)',wl(star.aeronetcols(1))*1000, star.tau_aero_skyscan(1));
+        leg_str{1} = sprintf('%2.0f nm (AOD=%2.2f)',wl(star.aeronetcols(1)), star.tau_aero_skyscan(1));
         for ss = 2:length(star.aeronetcols(vis_pix))
-            leg_str{ss} = sprintf('%2.0f nm, AOD(%2.2f)',wl(star.aeronetcols(ss))*1000, star.tau_aero_skyscan(ss));
+            leg_str{ss} = sprintf('%2.0f nm (AOD=%2.2f)',wl(star.aeronetcols(ss)), star.tau_aero_skyscan(ss));
         end
         legend(leg_str,'location','northeast');
     end
