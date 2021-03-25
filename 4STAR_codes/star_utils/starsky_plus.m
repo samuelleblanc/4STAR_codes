@@ -34,7 +34,7 @@ end
 %deployed with SSFR (in the toggle), the logic below determines whether
 %get_ssfr_flight_albedo came up empty
 if in_air && ~s.toggle.no_SSFR
-   [flight_alb, out_time] = get_ssfr_flight_albedo(s.t,s.w);
+   [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(s.t,s.w);
    imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,s.fstem,filesep];
    if ~isadir(skyimgdir) ; mkdir(imgdir,s.fstem); end
@@ -46,7 +46,8 @@ end
 no_SSFR = ~isavar('flight_alb')||isempty(flight_alb);
 
 if in_air && ~no_SSFR
-   s.sfc_alb = flight_alb;
+   s.sfc_alb = flight_alb; 
+   s.min_alb = min_alb; s.max_alb = max_alb;
    flag_modis_albedo = false;
 elseif on_ground || no_SSFR
 %     try
