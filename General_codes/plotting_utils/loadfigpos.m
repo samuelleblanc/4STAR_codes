@@ -15,10 +15,10 @@ elseif isnumeric(H)
 end
 figfile = [pathdir,'figpos.',num2str(num),'.mat'];
 
-if exist('pos','var') && isempty(pos)
+if isavar('pos') && isempty(pos)
     delete(figfile);
 end
-if exist(figfile,'file')
+if isafile(figfile)
     pos = load(figfile);
 else
     pos = [];
