@@ -42,9 +42,9 @@ function [gas] = retrieveGases(s)
 % -------------------------------------------------------------------------
 
  version_set('1.1');
+
  showfigure = 0;
- 
- colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
+  colorfig = [0 0 1; 1 0 0; 1 0 1;1 1 0;0 1 1];
  warning('off','MATLAB:rankDeficientMatrix');
  
 %% load cross-sections
@@ -114,7 +114,9 @@ end
 % figure_(1999); plot(s.w, [max(gas.no2.no2OD); max(gas.o3.o3OD);max(gas.o3.o4OD);max(gas.co2.co2OD);max(s.cwv.wvOD)],'-'); legend('NO2','O3','O4','CO2','H2O');logy
 
 %% save gas data to .mat file
-
+ suns = find(s.Str==1&s.Zn==0&~isnan(s.Alt))';
+%%
+if length(suns)>0
    Loschmidt          = 2.686763e19; %molecules/cm2
    d.no2_molec_cm2    = gas.no2.no2_molec_cm2;%gas.no2.no2DU*(Loschmidt/1000);
    d.no2err_molec_cm2 = gas.no2.no2resi;%gas.no2.no2resiDU*(Loschmidt/1000);
@@ -139,7 +141,7 @@ end
   
    fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary.mat');
    save([starpaths fi],'-struct','d');
-   
+end
   
 %---------------------------------------------------------------------
  return;
