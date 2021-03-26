@@ -209,15 +209,15 @@ hAxes(end+1) = subplot(2,2,4);
 hold off;
 plot(anetaip.Wavelength, anetaip.aod,'-+');logy;logx;
 hold on
-if ~isempty(anetaip.input.aods)
-plot(anetaip.Wavelength, anetaip.input.aods,'-o');
+if ~isempty(anetaip.input.extras.aod_fit)
+plot(anetaip.Wavelength, anetaip.input.extras.aod_fit,'-o', ...
+    anetaip.Wavelength, anetaip.input.extras.aod_meas,'-x' );
 end
-
 plot(anetaip.Wavelength, anetaip.aaod,'-*');
-plot(anetaip.Wavelength, anetaip.aod,'b+');
+plot(anetaip.Wavelength, anetaip.aod,'b+');% overplot for visibility
 hold on
-if ~isempty(anetaip.input.aods)
-   h = legend('AOD retr','AOD input','AAOD');
+if ~isempty(anetaip.input.extras.aod_fit)
+   h = legend('AOD retr','AOD input','AOD meas','AAOD');
 else
     h = legend('AOD retr','AAOD');
 end
@@ -250,7 +250,7 @@ big_title_str = skyscan;
 %%
 p=mtit(big_title_str,'fontsize',8,'interp','none');
 param_str = ['Parameters: ',sprintf('Scaling[%1.2g], ',...
-   anetaip.input.rad_scale),sprintf('houtput[%1.2g], ',houtput),...
+   anetaip.input.extras.rad_scale),sprintf('houtput[%1.2g], ',houtput),...
    sprintf('H[%1.3g,%1.3g], ',H),sprintf('W[,%1.3g,%1.3g], ',W), ...
     sprintf('NLYRS[%d], hlyr[%1.3g,%1.3g]',NLYRS, hlyr)];
 bot_ax = axes('position', [0,0,1,.01]);

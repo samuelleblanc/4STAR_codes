@@ -556,7 +556,29 @@ else
     inp.date_time_site_unit = [datestr(mean(star.t),'dd:mm:yyyy,HH:MM:SS,'),sky_str,',4STAR,01'];
     inp.geom = geom;
     % [inp.anet_level inp.anet_tests] = anet_preproc_dl(inp);
+%     [wl_, wl_ii,sky_wl,w_fit_ii] = get_last_wl(s);
     line_num = gen_aip_cimel_strings(inp);
+    extras.sky_test = inp.sky_test;
+    extras.tau_test = inp.tau_test;
+    extras.rad_scale = inp.rad_scale;
+    extras.dOD     = inp.dOD;
+    extras.min_alb = star.min_alb(star.wl_ii);
+    extras.max_alb = star.max_alb(star.wl_ii);
+    suns_ii = find(star.Str==1&star.Zn==0); sun_ii = [];
+    if ~isempty(suns_ii)
+        sun_ii = suns_ii(1);
+    end
+    extras.aod_meas = star.tau_aero_subtract_all(sun_ii,star.wl_ii);
+    extras.aod_fit = star.aod_fit_pii(star.wl_ii);
+    extras.aod_resid = extras.aod_meas - extras.aod_fit;
+    extras.pixels_header = '% WL_fit_ii  nm   AOD_meas  AOD_fit  AOD_resid ';
+    extras.pixels.WL_fit = star.w_ii_fit;
+    extras.pixels.nm = 1000.*star.w(star.w_ii_fit);
+    extras.pixels.AOD_meas = star.tau_aero_subtract_all(sun_ii,star.w_ii_fit);
+    extras.pixels.AOD_fit = star.aod_fit_pii(star.w_ii_fit);
+    extras.pixels.AOD_resid = extras.pixels.AOD_meas - extras.pixels.AOD_fit;
+
+    line_num = add_aip_extra(line_num, extras);
     %   [~,fstem,ext] = fileparts(star.filename{1});
     % fstem = strrep(fstem, '_VIS','');
     % % from run_4STAR_AERONET_retrieval
@@ -599,4 +621,34 @@ else
     end
     fclose(fid);
 end
+return
+
+function line_num = add_aip_extra(line_num, extras)
+ln = length(line_num)+1;
+line_num(ln) = {' '};
+ln = length(line_num)+1;
+line_num(ln) = {'% Extras '};
+ln = length(line_num)+1;
+fields = fieldnames(extras);
+for fld = 1:length(fields)
+    field = fields{fld};
+    if ~isstruct(extras.(field))&&isnumeric(extras.(field))
+        line_num(ln) = {[fields{fld},' = ',sprintf('%2.4g ',extras.(field)(1:end))]};
+        ln = ln +1;
+    elseif ischar(extras.(field))
+        line_num(ln) = {extras.(field)};
+        ln = ln +1;
+    elseif isstruct(extras.(field))
+        pixels = extras.(field);
+        block = [pixels.WL_fit; pixels.nm; pixels.AOD_meas; pixels.AOD_fit; pixels.AOD_resid];
+        for b = 1:size(block,2)
+            line_num(ln) = {sprintf('  %d  %2.2f  %1.4f  %1.4f  %1.3e ',block(:,b))};
+            ln = ln + 1;
+        end
+    end
+end
+% output extras to ".input" file including aods, dAOD, input data level
+% fit residuals for relevant WLs  
+
+
 return

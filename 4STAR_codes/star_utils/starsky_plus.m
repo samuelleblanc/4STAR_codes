@@ -34,7 +34,7 @@ end
 %deployed with SSFR (in the toggle), the logic below determines whether
 %get_ssfr_flight_albedo came up empty
 if in_air && ~s.toggle.no_SSFR
-   [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(s.t,s.w);
+   [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(s.t,s.w, s.wl_ii);
    imgdir = getnamedpath('starimg');
    skyimgdir = [imgdir,s.fstem,filesep];
    if ~isadir(skyimgdir) ; mkdir(imgdir,s.fstem); end

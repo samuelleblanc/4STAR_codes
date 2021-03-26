@@ -1,6 +1,6 @@
 function line_num = gen_aip_cimel_strings(inp)
 % I think this properly distinguishes ground-level (hlyr) from
-% flight-level (houtput) and H(NLYR) and W(NLYR).  
+% flight-level (houtput) and H(NLYR) and W(NLYR).
 % Adding input data level as ASCII tag to first line 'anet_level"
 
 % first_line: 94   31   1  -1  0  0  1   0  1  : KM KN KL IT ISZ IMSC IMSC1
@@ -21,7 +21,7 @@ ln = ln +1;
 [NSD,NW,NLYR,NBRDF,NBRDF1,NSHAPE,IEND] = ...
     deal(inp.NSD, inp.NW, inp.NLYR, inp.NBRDF, inp.NBRDF1, inp.NSHAPE, inp.IEND);
 line_num(ln) = {sprintf('%-3d %-3d %-3d %-3d %-3d %-3d %-3d : NSD,NW,NLYR,NBRDF,NBRDF1,NSHAPE,IEND', ...
- NSD,NW,NLYR,NBRDF,NBRDF1,NSHAPE,IEND)};
+    NSD,NW,NLYR,NBRDF,NBRDF1,NSHAPE,IEND)};
 ln = ln + 1;
 WAV = inp.geom.WAVE;
 % Third line: 0.4407 0.6743 0.8711 1.0204 WAVE(NW)
@@ -43,7 +43,7 @@ ln = ln + 1;
 % -1 22 22 0 -1  : IBIN, (NMIN(I),I=1,NSD)
 %       READ (*,*) IBIN, (NBIN(I),I=1,NSD)  !! Read line 8
 % C****************************************************
-% C***  NBIN(NSD) - the number of the bins in 
+% C***  NBIN(NSD) - the number of the bins in
 % C***                 the size distributions
 % C***  IBIN - index determining the binning of SD:
 % C***         = -1 equal in logarithms
@@ -54,7 +54,7 @@ line_num(ln) = {sprintf('%-d  %-d  %-d  %-d  %-d : IBIN, (NMIN(I),I=1,NSD)',...
     inp.IBIN, inp.NBIN, inp.NBIN, 0, inp.IBIN)};
 ln = ln + 1;
 
-% 0.05 15.0 0 (RMIN(ISD),RMAX(ISD),ISD=1,NSD) 
+% 0.05 15.0 0 (RMIN(ISD),RMAX(ISD),ISD=1,NSD)
 % READ(*,*) (RMIN(ISD),RMAX(ISD),IS(ISD),ISD=1,NSD)	!! Read line 9
 
 line_num(ln) = {sprintf('%-1.2f  %-1.2f  %-d  : (RMIN(ISD),RMAX(ISD),ISD=1,NSD)', ...
@@ -64,15 +64,15 @@ ln = ln + 1;
 %       READ (*,*) !! Skip line 10
 %       READ (*,*) IM,NQ,IMTX,KI !! Read line 11
 % C***  Parameters for ITERQ.f (details in "iterqP" subr.)
-% C***  IM=1 - q-linear iterations 
+% C***  IM=1 - q-linear iterations
 % C***  IM=2 - matrix inversion
-% C***  NQ - key defining the prcedure for stopping 
+% C***  NQ - key defining the prcedure for stopping
 % C***  q-iterations
 % C***  KI - defines the type of q-iterations (if IM=1)
 % C***  EPSP - for stoping p-iterations
 % C***  EPSQ and NQ see in "ITERQ"
 % C***  IMTX
-% C***  KI   - type of k-iterations 
+% C***  KI   - type of k-iterations
 % 3  17000 0 0 : IM,NQ,IMTX, KI
 line_num(ln) = {sprintf('PARAMETERS OF MATRIX INVERSION (or Q-iterations):')};
 ln = ln + 1;
@@ -96,15 +96,15 @@ ln = ln + 1;
 line_num(ln) = {sprintf('%-1.3f %-1.1f ',[inp.SHAPEMIN, inp.SHAPEMAX]')};
 ln = ln + 1;
 
-% 
+%
 % SMOOTHNESS parameters:
 % 0 1e-4 0 0 0 0
-% 3  1.0e-3 1 1.0e-1 1 1.0e-4 IO(...), GSM(...) (SD,Real, Imag) (for each layer !!!) 
-% 0 0 
+% 3  1.0e-3 1 1.0e-1 1 1.0e-4 IO(...), GSM(...) (SD,Real, Imag) (for each layer !!!)
+% 0 0
 % 0 0.00e-0
 
 % !! Not sure how to actually construct the information for the smoothing parameters
-% !! in terms of the dimensionality and order of the values.  
+% !! in terms of the dimensionality and order of the values.
 % !! So, just copying the values from the input files we have.
 line_num(ln) = {sprintf('SMOOTHNESS parameters:')};
 ln = ln + 1;
@@ -132,7 +132,7 @@ line_num(ln) = {[sprintf('%-1.1e ',EPSP,EPST,EPSQ,DL,AREF,EPSD), ' EPSP,EPST,EPS
 ln = ln + 1;
 % Here is where the indication of passing L1.5 or L2.0 input criteria goes
 line_num(ln) = {[sprintf('MEASUREMENTS: '),sprintf('(rad scaled by %1.3f)',...
-   inp.rad_scale), sprintf(' aods:'),sprintf(' %1.2f',inp.aod), ' dOD:',sprintf('%1.2f',inp.dOD)]};
+    inp.rad_scale), sprintf(' aods:'),sprintf(' %1.2f',inp.aod), ' dOD:',sprintf('%1.2f',inp.dOD)]};
 ln = ln + 1;
 for iw = 1:NW
     meas = inp.geom.WAVE_(iw).meas;
@@ -147,10 +147,10 @@ line_num(ln) = {[sprintf('%-1.2f ',inp.nreal), sprintf('%-1.3f ',inp.nimag)]};
 ln = ln + 1;
 
 for sdi = 1:inp.NBIN
-line_num(ln) = {sprintf('%-1.6f',inp.sd_guess(sdi))};
-ln = ln + 1;
+    line_num(ln) = {sprintf('%-1.6f',inp.sd_guess(sdi))};
+    ln = ln + 1;
 end
-%not sure what this final retrieved quantity is. Maybe sphericity?  
+%not sure what this final retrieved quantity is. Maybe sphericity?
 % In any case, since I don't know we'll just use the defaults for now.
 line_num(ln) = {sprintf('100.0 1.1 ')};
 ln = ln + 1;
@@ -194,18 +194,18 @@ ln = ln + 1;
 % CD      WRITE(*,*) 'BEFORE IC,IACOV, DWW'
 %       READ (*,*) IC,IACOV,DWW
 % CD      WRITE(*,*) IC,IACOV,DWW,' IC,IACOV, DWW'
-% C***    IC  =0 then 
+% C***    IC  =0 then
 % C***           C is unit matrix (for logarithms)
 % C***           C is diagonal matrix with the ellements
 % C***                1/((F(j)*F(j)) (for non-logarithm case)
-% C***    IC  =1 then C is diagonal and defined  
+% C***    IC  =1 then C is diagonal and defined
 % C*** with accounting for different levels of the errors in
-% C*** different measurements (according to Dubovik and King [2000] 
-% C*** !!! the measurements assigned by INOISE=1 usually         !!! 
-% C*** !!! correspond to the largest set of optical measurements !!! 
+% C*** different measurements (according to Dubovik and King [2000]
+% C*** !!! the measurements assigned by INOISE=1 usually         !!!
+% C*** !!! correspond to the largest set of optical measurements !!!
 % C***    IC   <0 then C is read from cov.dat
 % C**************************************************************
-% C*** IACOV 
+% C*** IACOV
 % C***       =0 - single inversion with unique COV matrix
 % C***       >0 - inversion is repeated with different COV matrix
 % 1 0 0.01  IC, IACOV,DWW
@@ -217,11 +217,11 @@ ln = ln + 1;
     deal(inp.NSTR, inp.NLYR, inp.NLYRS, inp.NW, inp.IGEOM, inp.IDF, inp.IDN, inp.DPF);
 %7 1 1 4 1 1 1  0.00 : NSTR NLYR NLYRS NW IGEOM IDF IDN DPF   - Almucantar
 if NLYRS==1
-line_num(ln) = {sprintf('%-d %-d %-d %-d %-d %-d %-d %-1.2f : NSTR NLYR NLYRS NW IGEOM IDF IDN DPF   - Almucantar',...
-    NSTR ,NLYR, NLYRS, NW, IGEOM, IDF, IDN, DPF)};
+    line_num(ln) = {sprintf('%-d %-d %-d %-d %-d %-d %-d %-1.2f : NSTR NLYR NLYRS NW IGEOM IDF IDN DPF   - Almucantar',...
+        NSTR ,NLYR, NLYRS, NW, IGEOM, IDF, IDN, DPF)};
 else
-line_num(ln) = {sprintf('%-d %-d %-d %-d %-d %-d %-d %-1.2f : NSTR NLYR NLYRS NW IGEOM IDF IDN DPF   - PPL',...
-    NSTR ,NLYR, NLYRS, NW, IGEOM, IDF, IDN, DPF)};
+    line_num(ln) = {sprintf('%-d %-d %-d %-d %-d %-d %-d %-1.2f : NSTR NLYR NLYRS NW IGEOM IDF IDN DPF   - PPL',...
+        NSTR ,NLYR, NLYRS, NW, IGEOM, IDF, IDN, DPF)};
 end
 ln = ln + 1;
 % H and W assumed atmospheric layers H(1) should be above hlyr, H(2) should
@@ -257,36 +257,36 @@ ln = ln + 1;
 s_str = [];
 
 for IW = 1:length(WAV)
-    NTAU = length(inp.geom.WAVE_(IW).HLYR);  
-
-% For each wavelength, we may need to screen out bad data.
-% For now, we treat them all as full, and also treat the altitude as fixed
-% and constant so NTAU = 1 (NLYR=NLYRS=NTAU), hlyr=houtput=mean(alt) 
-% hylr ~= houtput!!  houtput = mean(alt) but hlyr = ground level =
-% s.ground_level
+    NTAU = length(inp.geom.WAVE_(IW).HLYR);
+    
+    % For each wavelength, we may need to screen out bad data.
+    % For now, we treat them all as full, and also treat the altitude as fixed
+    % and constant so NTAU = 1 (NLYR=NLYRS=NTAU), hlyr=houtput=mean(alt)
+    % hylr ~= houtput!!  houtput = mean(alt) but hlyr = ground level =
+    % s.ground_level
     line_num(ln) = {sprintf('%1.4f WAV(IW)',inp.geom.WAVE(IW))}; ln = ln +1;
     line_num(ln) = {[sprintf('%1.6f ',inp.geom.WAVE_(IW).albedo), ' albedo(IW)']};
     ln = ln +1;
     line_num(ln) = {[sprintf('%1.4f  %3.1f   %3.1f ',...
-    inp.geom.WAVE_(IW).UO3,inp.geom.WAVE_(IW).DU,inp.geom.WAVE_(IW).PWV), ...
+        inp.geom.WAVE_(IW).UO3,inp.geom.WAVE_(IW).DU,inp.geom.WAVE_(IW).PWV), ...
         ' - UO3(IW) , Ozone Content(dobson) Water Vapor (cm)']}; ln = ln +1;
     line_num(ln) = {[sprintf('%d ',NTAU), ' - NTAU(IW)  -number of output layers']}; ln = ln +1;
     s_str = [s_str, '  '];
     for ITAU = 1:length(NTAU)
         %%
-%         houtput = mean(alt(good(IW,:)));
+        %         houtput = mean(alt(good(IW,:)));
         line_num(ln) = {[s_str,sprintf('%1.3f ',inp.geom.WAVE_(IW).HLYR(ITAU)) ' - houtput(IW,ITAU) ' ]};
         ln = ln +1;
         s_str = [s_str, '  '];
-%         SZA = sza(good(IW,:));
-%         dec = 10; % higher number saves more digits, more unique numbers
-%         [SZA_,SZA_ii, SZA_jj] = unique(round(SZA*dec)/dec);
+        %         SZA = sza(good(IW,:));
+        %         dec = 10; % higher number saves more digits, more unique numbers
+        %         [SZA_,SZA_ii, SZA_jj] = unique(round(SZA*dec)/dec);
         
         SZA_IW = inp.geom.WAVE_(IW).HLYR_(ITAU).SZA;
         NSZA = length(SZA_IW);
         line_num(ln) = {[s_str, sprintf('%d ',NSZA),...
             '    - NSZA(IW,ITAU)  - number of solar zenith angles']};
-        ln = ln +1; 
+        ln = ln +1;
         s_str = [s_str, '  '];
         for ISZA = 1:NSZA
             line_num(ln) = {[s_str, sprintf('%2.2f ',SZA_IW(ISZA)),...
@@ -304,13 +304,13 @@ for IW = 1:length(WAV)
                     ' - ZENOUTY(IW,ITAU,ISZA,IOZA) - observation zenith angle']};
                 ln = ln +1;
                 if ~isfield(inp.geom.WAVE_(IW).HLYR_(ITAU).SZA_(ISZA),'OZA_') %No children below OS
-                    NPHI = 1; 
-%                     [IW,ITAU,ISZA,zi]
-% There is only one PHI per Observatioon Zenith Angle (OZA).  This is PPL
-% since OZA is changing fast, prohibiting multiple PHI
+                    NPHI = 1;
+                    %                     [IW,ITAU,ISZA,zi]
+                    % There is only one PHI per Observatioon Zenith Angle (OZA).  This is PPL
+                    % since OZA is changing fast, prohibiting multiple PHI
                     PHI = inp.geom.WAVE_(IW).HLYR_(ITAU).SZA_(ISZA).PHI(zi);
                 else
-% There are many PHI per OZA.  This is ALM, OZA is held fixed, PHI varies
+                    % There are many PHI per OZA.  This is ALM, OZA is held fixed, PHI varies
                     NPHI = length(inp.geom.WAVE_(IW).HLYR_(ITAU).SZA_(ISZA).OZA_(zi).PHI);
                     PHI = inp.geom.WAVE_(IW).HLYR_(ITAU).SZA_(ISZA).OZA_(zi).PHI;
                 end
@@ -331,8 +331,8 @@ line_num(ln) = {sprintf('%d  ',inp.whoknows)};
 ln = ln +1;
 
 for bds = 1:length(inp.mod_brdf)
-line_num(ln) = {sprintf('%-8.6f  ',inp.mod_brdf{bds})};
-ln = ln +1;
+    line_num(ln) = {sprintf('%-8.6f  ',inp.mod_brdf{bds})};
+    ln = ln +1;
 end
 line_num(ln) = {sprintf('%s',inp.date_time_site_unit)};
 

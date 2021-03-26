@@ -126,18 +126,20 @@ wl_block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block'));
     tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),wl_block);
 
 % Now evaluate projecting get_wvl_subset for polyfit into block
-% w_pii: "w" for wavelength, "p" for polyfit, "ii" for index
-w_pii = get_wvl_subset(star.t(1),star.instrumentname);
-% w_pii(wl(w_pii)<400) = [];
-% w_pii(wl(w_pii)>900) = [];
-w_pii(wl(w_pii)>1100) = []; 
+% w_pii_fit: "w" for wavelength, "p" for polyfit, "ii" for index
+w_pii_fit = get_wvl_subset(star.t(1),star.instrumentname);
+% w_pii_fit(wl(w_pii_fit)<400) = [];
+% w_pii_fit(wl(w_pii_fit)>900) = [];
+w_pii_fit(wl(w_pii_fit)>1100) = []; 
 
-w_pii_ = false(size(wl)); w_pii_(w_pii) = true; 
-w_pii_(1:end-1) = w_pii_(1:end-1)| w_pii_(2:end);
-w_pii_(end) = w_pii_(end)|w_pii_(end-1); 
-w_pii = find(w_pii_); w_pii_block = return_wl_block(w_pii, wl);
+w_pii_fit_ = false(size(wl)); w_pii_fit_(w_pii_fit) = true; 
+w_pii_fit_(1:end-1) = w_pii_fit_(1:end-1)| w_pii_fit_(2:end);
+w_pii_fit_(end) = w_pii_fit_(end)|w_pii_fit_(end-1); 
+w_pii_fit = find(w_pii_fit_); w_pii_fit_block = return_wl_block(w_pii_fit, wl);
 [star.aod_fit_pii, star.min_rms_pii, star.fit_rms_pii, m_ij_pii, star.aod_xfit_pii, aod_afit_pii, star.aod_pfit_pii, w_ii_out_pii] = ...
-    tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),w_pii_block);
+    tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),w_pii_fit_block);
+
+star.w_ii_fit = w_pii_fit; % Using pixels from get_wvl_subset expanded to block for xfit
 
 %% Interestingly, the fits using a truncated range from get_wvl_subset yields 
 % lower residuals than the fits using the wavelengths in wv_block.mat
@@ -147,7 +149,8 @@ tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - star.aod_fit_pii;
 tau_abs_gas_xfit = tau_noray_vert(sun_ii,:) - star.aod_xfit_pii;
 tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - star.aod_pfit_pii;
 % tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - aod_pfit_pii;
-star.tau_xfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_fit_pii;
+star.tau_fit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_fit_pii;
+star.tau_xfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_xfit_pii;
 star.tau_pfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_pfit_pii;
 
 star.AOD = star.aod_fit_pii; % aod_fit_pii looks better than aod_fit
@@ -173,7 +176,7 @@ nox = single(star.tau_aero_subtract_all(sun_ii,ii)<=0); nox(nox==1)= NaN;
 plot(wl(ii), nix+tau_noray_vert(sun_ii,ii),'-', ...
     wl(ii), nox+star.tau_aero_subtract_all(sun_ii,ii),'-', ...
     wl(ii), star.aod_pfit_pii(ii), 'k-',wl(ii), star.aod_xfit_pii(ii), 'r-', ...
-    wl(w_pii), star.aod_fit_pii(w_pii), 'o',......
+    wl(w_pii_fit), star.aod_fit_pii(w_pii_fit), 'o',......
     wl(star.aeronetcols),star.aod_fit_pii(star.aeronetcols), 'o'); 
 logx; 
 logy;clear nix nox
@@ -188,13 +191,13 @@ created = star.created_str(10:end-1);
 tl = title({[star.fstem, ' ',created];...
 [datestr(star.t(sun_ii),'yyyy-mm-dd HH:MM:SS UTC'), ' ',sprintf(', SunEl=%1.1f',star.sunel(sun_ii)), sprintf(', airmass=%1.2f',star.m_aero(sun_ii))]}, 'interp','none');
 sx(2) = subplot(2,1,2);
-plot(wl(ii), star.AGOD(ii),'-',wl(ii), tau_abs_gas(ii),'-',wl(ii), tau_abs_gas_pfit(ii),'-k',...
+plot(wl(ii), tau_abs_gas_fit(ii),'-',wl(ii), tau_abs_gas(ii),'-',wl(ii), tau_abs_gas_pfit(ii),'-k',...
     wl(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'*',...
     wl(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
     ); logx;
 xlabel('wavelength [um]');
 ylabel('Gas OD'); ylim([-.02,.28])
-lg = legend('AGOD (tot-aod_xfit)','tot - tau_aero_subtract_all','(tot-aod_pfit)','AGOD fit pixels','tau noray - aero'); set(lg,'interp','none', 'location','northwest')
+lg = legend('AGOD (tot-aod_fit)','tot - tau_aero_subtract_all','(tot-aod_pfit)','AGOD fit pixels','tau noray - aero'); set(lg,'interp','none', 'location','northwest')
 title({sprintf('Lat=%2.4f, Lon=%2.4f, Alt=%1.0f m, Az=%1.0f deg',star.Lat(sun_ii), ...
     star.Lon(sun_ii), star.Alt(sun_ii), acosd(cosd(star.Az_deg(sun_ii))));sprintf('Fin = %0.3f',fin_max)});
 
@@ -213,11 +216,8 @@ saveas(gcf,[fig_out,'.fig']);
 saveas(gcf,[fig_out,'.png']);
 ppt_add_slide(star.pptname, fig_out);
 
-
-
 % Now, check agreement between any sun meausurements and Az_gnd and El_gnd
 % Apply offsets, then compute initial SA.
-
 
 Quad_devs = sqrt((star.QdVlr(suns_ii)./star.QdVtot(suns_ii)).^2 + (star.QdVtb(suns_ii)./star.QdVtot(suns_ii)).^2);
 [Quad_dev, min_i] = min(Quad_devs);
