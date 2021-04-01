@@ -42,7 +42,9 @@ function [rate, dark, darkstd, note]=starrate(s, bounds,instrumentname)
 %                         processing of non-sun mode files.  Also replaced
 %                         tests based on s.w with tests on q to eliminate
 %                         need for w.
-version_set('2.1');
+% SL: v2.2, 2021/04/01: - changed the highest value of darks permitted for
+%                         4STAR vis. 
+version_set('2.2');
 
 % development
 % !!! allow interpolation, rather than simple averaging, within each bound
@@ -179,8 +181,8 @@ for uu=1:length(tintu); % for each integration time
                   note=[note ' Dark for 2STAR too high, therefore ignored.'];
               end;
             else % for the VIS spectrometer
-              if any(dark(rowsu,500) > 1000); 
-                  dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+              if any(dark(rowsu,500) > 1250); %Changed in 2021-04-01 for 4STAR high darks 
+                  dark(rowsu(dark(rowsu,500)>1250),:)=NaN; 
                   note=[note ' Dark too high, therefore ignored.'];
               end;
             end;
@@ -236,7 +238,7 @@ elseif q==256; % it is for the vis on 2STAR
          warning('2STAR VIS darks too large, please double check');
     end;
 else % for the VIS spectrometer
-    if any(dark(:,500) > 1000);
+    if any(dark(:,500) > 1250);
         warning('VIS darks too large, please double check');
     end;
 end;
