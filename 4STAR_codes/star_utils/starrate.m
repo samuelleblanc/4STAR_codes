@@ -105,8 +105,8 @@ for uu=1:length(tintu); % for each integration time
                 note=[note ' Dark for 2STAR too high, therefore ignored.'];
             end;
         else % for the VIS spectrometer
-           if any(dark(rowsu,500) > 1000); 
-               dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+           if any(dark(rowsu,500) > 1250); 
+               dark(rowsu(dark(rowsu,500)>1250),:)=NaN; 
                note=[note ' Dark too high, therefore ignored.'];
            end;
         end;
@@ -144,8 +144,8 @@ for uu=1:length(tintu); % for each integration time
                   note=[note ' Dark for 2STAR too high, therefore ignored.'];
               end;
             else % for the VIS spectrometer
-              if any(dark(rowsu,500) > 1000); 
-                  dark(rowsu(dark(rowsu,500)>1000),:)=NaN; 
+              if any(dark(rowsu,500) > 1250); 
+                  dark(rowsu(dark(rowsu,500)>1250),:)=NaN; 
                   note=[note ' Dark too high, therefore ignored.'];
               end;
             end;
