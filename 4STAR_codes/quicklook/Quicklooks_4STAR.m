@@ -802,6 +802,13 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 %pptcontents0=[pptcontents0; {' ' 4}];
 fdrkv = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_uvis,s.t,s.dark(:,400));
+high_darks = find(s.dark(:,400)>600);
+if length(high_darks)>300; 
+    set(ax(1),'Color',[1,0.5,0.5]);
+    text(ax(2),s.t(1),0.5,'Darks > 600 counts: Too high!');
+    set(ftnp, 'InvertHardCopy', 'off');
+end;
+
 ylabel(ax(2),'Darks VIS 500 nm');
 ylabel(ax(1),'VIS temp [°C]');
 ylim(ax(1),[-5,5]); set(ax(1),'ytick',[-5,-2.5,0,2.5,5]);
@@ -815,6 +822,12 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 
 fdrkn = figure;
 [ax,h1,h2] = plotyy(st.track.t,st.track.T_spec_nir,s.t,s.dark(:,1200));
+high_darks_nir = find(s.dark(:,1200)>150);
+if length(high_darks_nir)>300; 
+    set(ax(1),'Color',[1,0.5,0.5]);
+    text(ax(2),s.t(1),0.5,'Darks > 150 counts: Too high!');
+    set(ftnp, 'InvertHardCopy', 'off');
+end;
 ylabel(ax(2),'Darks NIR 1213 nm');
 ylabel(ax(1),'NIR temp [°C]');
 ylim(ax(1),[0,30]); set(ax(1),'ytick',[0,10,20,30,40,50]);

@@ -23,7 +23,9 @@ function [savematfile, contents]=starsun(varargin)
 %                           exact properties of runs. Similar to starzen
 % Samuel, v1.2, 2016/02/17, made the program version be concatenation of
 %                           saved mat files and new version_set values.
-version_set('1.2');
+% Samuel, v1.3, 2021/04/01, Changed the saved mat file version to v7.3, to
+%                           support larger files.
+version_set('1.3');
 %********************
 % regulate input and read source
 %********************
@@ -88,9 +90,9 @@ disp(['Saving: ',savematfile])
 tic; 
 pathparts = strsplit(savematfile,filesep);
 if length(pathparts)>1
-    save(savematfile,'-struct','s','-mat');
+    save(savematfile,'-struct','s','-mat','-v7.3' );
 else
-    save(fullfile(getnamedpath('starsun'),savematfile),'-struct','s','-mat');
+    save(fullfile(getnamedpath('starsun'),savematfile),'-struct','s','-mat','-v7.3' );
 end
 toc
 
