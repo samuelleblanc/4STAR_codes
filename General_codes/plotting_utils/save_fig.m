@@ -74,7 +74,11 @@ if asktopause
       return
   end;
 end
-saveas(pid,[fi '.fig']);
+try
+  saveas(pid,[fi '.fig']);
+catch
+  hgsave(pid,[fi '.fig']);
+end
 set(pid,'PaperUnits','inches');
 po = get(pid,'Position');
 xwidth = po(3);
@@ -83,6 +87,11 @@ dpi = 150.0;
 set(pid,'PaperSize',[xwidth ywidth]./dpi);
 set(pid,'PaperPosition',[0 0 xwidth ywidth]./dpi);
 set(gcf,'paperpositionmode','auto');
-saveas(pid,[fi '.png']);
+
+try
+   saveas(pid,[fi '.png']);
+catch
+   hgsave(pid,[fi '.png']);
+end
 disp(['saving figure at:' fi])
 return
