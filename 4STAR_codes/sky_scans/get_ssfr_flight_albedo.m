@@ -1,7 +1,11 @@
 function [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(in_time,in_lambda, w_ii)
-% [flight_alb, out_time] = get_ssfr_flight_albedo(in_time,in_lambda)
+% [flight_alb, out_time, min_alb, max_alb] = get_ssfr_flight_albedo(in_time,in_lambda, w_ii)
 % in_time is required
 % in_lambda is optional. Will load txt file for lambda if not provided.
+% 
+% CJF: v1.2, 2021-04-09, Modified to include error bar plot showing min and
+% max values of sfc albedo over sky scan, and output same.
+version_set('1.2');
 if exist('in_time','var')
     file_str = [datestr(in_time(1),'yyyymmdd'), '_SSFR.mat; ',...
         datestr(in_time(1),'yyyymmdd'), '_SSFR.cdf; '...
@@ -212,7 +216,7 @@ else
     xlim([minx, maxx]);
 end
 
-    good = ~isnan(flight_alb)&(flight_alb>.1)&(flight_alb<1);
+    good = ~isnan(flight_alb)&(flight_alb>.01)&(flight_alb<1);
     if ~any(good)
         warning('Did not find ANY good flight level albedo values...');
         xl = xlim;
@@ -221,6 +225,8 @@ end
         %    pause(10);
         %    close(gcf);
         flight_alb=[]; out_time = [];
+    else
+        flight_alb(~good) = interp1(in_lambda(good), flight_alb(good),in_lambda(~good),'nearest','extrap');
     end
 
 
