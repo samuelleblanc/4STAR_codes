@@ -1,4 +1,10 @@
 function plot_anet_aip(anetaip)
+% plot_anet_aip(anetaip)
+% reads struct containing parsed contents of aeronet output file and
+% generates plots.
+% Connor, 2021-04-09: added plots from "extra" info including aod_meas,
+% aod_fit/aod_input, aod_ret and residuals.
+
 if ~isavar('anetaip')
     anetaip = parse_anet_aip_output;
 end
@@ -186,14 +192,16 @@ grid on
 
 hAxes(end+1) = subplot(2,2,3);
 hold off;
- plot(anetaip.Wavelength, [anetaip.ssa_fine;anetaip.ssa_coarse;anetaip.ssa_total]','-*',...
-    anetaip.Wavelength, anetaip.sfc_alb, 'k-s'); logx;
-h = legend('fine','coarse','total', 'sfc alb');
-set(h,'FontSize', 8, 'location','southwest');
+ plot(anetaip.Wavelength, anetaip.aod,'-x',...
+     anetaip.Wavelength, [anetaip.ssa_total;anetaip.ssa_fine;anetaip.ssa_coarse]','-*',...
+    anetaip.Wavelength, anetaip.sfc_alb, 'k--s'); logx;
+h = legend('AOD','SSA total','SSA fine','SSA total', 'sfc alb');
+set(h,'FontSize', 8);
 xx_here=get(gca,'xlim');
-yy_here=get(gca,'ylim');ylim([0,1.05]);
+yy_here=get(gca,'ylim');
+ylim([0,max([1.05,yy_here(2).*1.1])]);
 xlabel('Wavelength','FontSize', 10);
-ylabel('SSA','FontSize', 10);
+ylabel('SSA and AOD','FontSize', 10);
 % title('Single Scattering Albedo');
 
 % set(gca,'xlim',[0.4 1.1],'FontSize', 10)
@@ -207,27 +215,39 @@ hold on;
 
 hAxes(end+1) = subplot(2,2,4);
 hold off;
-plot(anetaip.Wavelength, anetaip.aod,'-+');logy;logx;
+plot(anetaip.Wavelength, anetaip.aaod,'-*',anetaip.Wavelength, abs(anetaip.tod_meas_less_fit), '-o'); logy;logx;
 hold on
 if ~isempty(anetaip.input.extras.aod_fit)
-plot(anetaip.Wavelength, anetaip.input.extras.aod_fit,'-o', ...
-    anetaip.Wavelength, anetaip.input.extras.aod_meas,'-x' );
-end
-plot(anetaip.Wavelength, anetaip.aaod,'-*');
-plot(anetaip.Wavelength, anetaip.aod,'b+');% overplot for visibility
-hold on
-if ~isempty(anetaip.input.extras.aod_fit)
-   h = legend('AOD retr','AOD input','AOD meas','AAOD');
-else
-    h = legend('AOD retr','AAOD');
+plot(anetaip.Wavelength,abs(anetaip.input.extras.aod_meas- anetaip.input.extras.aod_fit),'-o');
 end
 
-set(h,'FontSize', 10);
+if ~isempty(anetaip.input.extras.aod_fit)
+   h = legend('AAOD','abs(TOD input-TOD retr)','abs(AOD meas - AOD fit)');
+else
+    h = legend('AAOD','abs(TOD input-TOD retr)');
+end
+hold('off');
+% plot(anetaip.Wavelength, anetaip.aod,'-+');logy;logx;
+% hold on
+% if ~isempty(anetaip.input.extras.aod_fit)
+% plot(anetaip.Wavelength, anetaip.input.extras.aod_fit,'-o', ...
+%     anetaip.Wavelength, anetaip.input.extras.aod_meas,'-x');
+% end
+% plot(anetaip.Wavelength, anetaip.aaod,'-*');
+% plot(anetaip.Wavelength, anetaip.aod,'b+');% overplot for visibility
+% hold on
+% if ~isempty(anetaip.input.extras.aod_fit)
+%    h = legend('AOD retr','AOD fit','AOD meas','AAOD');
+% else
+%     h = legend('AOD retr','AAOD');
+% end
+
+set(h,'FontSize', 8,'location','south');
 
 xx_here=get(gca,'xlim');
-yy_here=get(gca,'ylim');
+yy_here=get(gca,'ylim'); ylim([yy_here(1)./2, 1.5.*yy_here(2)]);
 xlabel('Wavelength','FontSize', 10);
-ylabel('AOD and AAOD','FontSize', 10);
+ylabel('AAOD and AOD residuals','FontSize', 10);
 % title('Aerosol extinction optical depth');
 
 xlim(gca,[0.8.*min(anetaip.Wavelength),1.1.*max(anetaip.Wavelength)]);
