@@ -41,7 +41,7 @@ for F = length(skyinput):-1:1
       instnames{jf} = instrumentname;
       jf = jf+1;
       
-      bad_dir = [pname_tagged, 'bad',filesep];
+      bad_dir = [pname_tagged, 'crashed',filesep];
       if ~isadir(bad_dir)
          mkdir(bad_dir);
       end
@@ -125,10 +125,14 @@ for F = length(skyinput):-1:1
                %%replaces it with a separate number.
 %                [xls_fname] = print_anetretr_details_to_xls(s,xls_fname);
                save([done_dir,'..',filesep, fname_tagged, '.mat'],'-struct','anetaip')
-               movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir ); %the .mat is somehow not ending up in done_dir EVEN THOUGH THE PREVIOUS LINE SAYS IT SHOULD
+               movefile([done_dir,'..',filesep, fname_tagged, '.*'], done_dir ); 
+               %the .mat is somehow not ending up in done_dir EVEN THOUGH THE PREVIOUS LINE SAYS IT SHOULD
             catch ME
                disp(['Trouble displaying output from ',fname_tagged])
-               copyfile(infile, bad_dir);
+               movefile(infile, bad_dir);
+               if isavar('outname')&&isafile(outname)
+                   movefile(outname, bad_dir);
+               end
                [~, skyscan] = fileparts(fname_tagged);[~, skyscan] = fileparts(skyscan);
                figure; plot(0:1,0:1,'o'); title(['Crashed during ',skyscan], 'interp','none');
                text(0.1,0.8,ME.identifier,'color','red');
