@@ -5,8 +5,8 @@ function [savematfile, contents]=starskies_2(toggle)
 % splitting ALM into alma, almb, alm (avg). 
 %
 % Example
-%   sstarskies; % this prompts user interfaces
-%   [savematfile, contents]=starsun returns the path for the resulting mat-file and its contents.
+%   starskies_2; % this prompts user interfaces
+%   [savematfile, contents]=starskies_2 returns the path for the resulting mat-file and its contents.
 %
 % Modifications:
 % SL, v1.1, 2019-03-20, added excel file writing 
