@@ -1,4 +1,4 @@
-function [aod_fit, good_wl_,fit_rms] = xfit_aod_basis(wl, aod, block, mad_factor, wl_out);
+function [aod_fit, good_wl_,fit_rms, nonlog_fit, good_nwl,fit_rms_] = xfit_aod_basis(wl, aod, block, mad_factor, wl_out);
 % [aod_fit, good_wl_] = xfit_aod_basis(wl, aod, block, wl_out,  mad_factor);
 % Multi-stage aod_fit:
 %  0) Compose w_ii from "block"
@@ -31,7 +31,7 @@ for b = 1:size(block,1)
     wl_(block(b,3):block(b,4)) = true;
 end
 wl_ii = find(wl_);
-[aod_fit, Ks] = fit_aod_basis(wl(wl_ii), aod(wl_ii));
+[aod_fit, Ks] = fit_aod_basis_(wl(wl_ii), aod(wl_ii));
 res_ = aod(wl_ii)-aod_fit;
 fit_rms_ = sqrt(nanmean((res_).^2)); %rms(res_);
 fit_bias_ = mean(-res_);
