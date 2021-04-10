@@ -156,7 +156,8 @@ star.tau_pfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_pfit_pii;
 star.AOD = star.aod_fit_pii; % aod_fit_pii looks better than aod_fit
 star.AGOD = tau_abs_gas_fit;
 % If inferred absorbing gas is negative, instead define it as zero, and
-% compute new tau_vert_tot as the tau_ray + fitted tau_aero_subtract
+% compute new tau_vert_tot (TOD) as the sum of tau_ray, absorbing gas, plus fitted tau_aero_subtract
+% star.TOD = star.AGOD + aod_fit + star.tau_ray(sun_ii,:);
 w_fin_i = find(wl>415 & wl<435);
 [~, fin_max_ii] = max(abs(tau_abs_gas_fit(w_fin_i))); 
 fin_max = tau_abs_gas_fit(w_fin_i(fin_max_ii));
