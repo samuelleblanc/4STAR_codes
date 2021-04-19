@@ -25,10 +25,12 @@ function fig_paths = compare_star_2_aeronet(fname_starsun);
 %                  Changed pathing to use the getnamedpath starsun and
 %                  starfig
 %                  Added return of figure path files
+% Modified (v1.2): Samuel LeBlanc, Santa Cruz, CA, 2021-04-19
+%                  Added supprot for AERONET v3 diret beam files
 % -------------------------------------------------------------------------
 
 %% start of function
-version_set('1.1')
+version_set('1.2')
 
 %% load the file
 fp = getnamedpath('starsun');
@@ -68,7 +70,7 @@ else
     apname = [dis.folder filesep];
     afile = dis.name;
 end
-a = aeronet_read_lev([apname afile]);
+a = aeronet_read_lev_v3([apname afile]);
 
 %% filter out the bad aod 4STAR
 i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));

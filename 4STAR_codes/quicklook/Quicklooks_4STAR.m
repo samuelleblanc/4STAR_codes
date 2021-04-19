@@ -1818,7 +1818,11 @@ end
 end
 
 %% Compare to AERONET
-aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
+try
+    aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
+catch
+    aeronet_fig_paths = [];
+end
 if length(aeronet_fig_paths)>0
     pptcontents0=[pptcontents0; {aeronet_fig_paths{1} 1}];
     pptcontents0=[pptcontents0; {aeronet_fig_paths{2} 4}];
