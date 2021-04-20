@@ -65,6 +65,10 @@ if contains(C{1}{1},'Version 3')
     fseek(fid,0,'bof');
     for i=1:7
         head{i}=fgetl(fid);
+        if any(strfind(head{i},'AOD_')) % stop when it is the column header
+            colhead = head{i};
+            break
+        end
     end
     % level of AERONET
     C=split(head{3},': ');
@@ -75,15 +79,9 @@ if contains(C{1}{1},'Version 3')
     aero.email=C{2}{1};
     % get location
     aero.location=head{2};
-    
-    %% missing from this header:
-    %     aero.long=C{2};
-    %     aero.lat=C{3};
-    %     aero.elev=C{4};
-    %     aero.Nmeas=C{5};
-    
-    %% Wavelengths from line 7
-    C=textscan(head{7},'%s','delimiter',',');
+      
+    %% Wavelengths from column header
+    C=textscan(colhead,'%s','delimiter',',');
     aero.ncols=size(C{1},1);
     aero.nwlen=0;
     aero.tipvar_i = 0;
@@ -112,6 +110,13 @@ if contains(C{1}{1},'Version 3')
     end
     tmp_nwlen = find(diff(aero.wlen)<0);
     aero.nwlen_before_WV = tmp_nwlen(end)+1;
+    
+    % Latitude, Longitude Elevation
+    ilat = find(not(cellfun('isempty',strfind(C{1},'Latitude'))));
+    ilon = find(not(cellfun('isempty',strfind(C{1},'Longitude'))));
+    iele = find(not(cellfun('isempty',strfind(C{1},'Elev'))));
+    iname = find(not(cellfun('isempty',strfind(C{1},'Name'))));
+    inum = find(not(cellfun('isempty',strfind(C{1},'Instru'))));
 else 
     %% For v2
     v3 = false;
@@ -210,9 +215,10 @@ toc
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if v3
-   aero.lat = str2num(tmp{1}{74}); %instrument latitude
-   aero.long = str2num(tmp{1}{75}); %instrument longitude
-   aero.elev = str2num(tmp{1}{76}); %instrument elevation
+   aero.lat = str2num(tmp{1}{ilat}); %instrument latitude
+   aero.long = str2num(tmp{1}{ilon}); %instrument longitude
+   aero.elev = str2num(tmp{1}{iele}); %instrument elevation
+   aero.location = tmp{1}{iname}; %instrument location name
 end
 
 % memory allocation
@@ -229,6 +235,9 @@ jini=1;
 % Date and Time
 % num2str() will convert with right alignment
 % then we replace empty spaces with zeros
+if v3
+   jini = 2; 
+end
 dates=num2str(M(1:aero.ntimes,jini),'%08d'); dates(dates==' ')='0';
 times=num2str(M(1:aero.ntimes,jini+1),'%06d'); times(times==' ')='0';
 aero.jd(1:aero.ntimes,1)=datenum([dates times],'ddmmyyyyHHMMSS');
@@ -284,7 +293,7 @@ jini=jini+1;
 if (aero.ncols==63)
   % intrument
   if v3
-      aero.cimel(1:aero.ntimes,1) = M(1:aero.ntimes,72); % instrument number
+      aero.cimel(1:aero.ntimes,1) = M(1:aero.ntimes,iname); % instrument number
   else
     aero.cimel(1:aero.ntimes,1)=M(1:aero.ntimes,jini);
     jini=jini+1;
