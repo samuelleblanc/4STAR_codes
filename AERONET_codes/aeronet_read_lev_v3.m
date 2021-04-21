@@ -201,6 +201,11 @@ while ~feof(fid);
       mtmp = cellfun(@str2num,tmp{1},'un',0);
       mtmp(cellfun(@isempty, mtmp)) = {nan};
       M(i,:)=[mtmp{:}];
+      try
+          M(i,M(i,:)<-990.0) = nan;
+      catch
+         nul = nan; 
+      end
     else
       M(i,:)=tmp{1};
     end
