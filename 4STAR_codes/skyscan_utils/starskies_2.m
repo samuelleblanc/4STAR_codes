@@ -98,8 +98,8 @@ for in = 1:length(infiles)
 %                pause(4);
 %             end
                 [xls_fname] = print_skyscan_details_to_xls(s,xls_fname);
-                ppt_out = merge_ppts_for_day(getnamedpath('starimg'),s.daystr,s.instrumentname,'_allSKY');
-                if toggle.verbose; disp(['Powerpoint combined file saved to: ' ppt_out]), end;
+%                 ppt_out = merge_ppts_for_day(getnamedpath('starimg'),s.daystr,s.instrumentname,'_allSKY');
+%                 if toggle.verbose; disp(['Powerpoint combined file saved to: ' ppt_out]), end;
             toggle = s.toggle; close('all');
             end
          end
