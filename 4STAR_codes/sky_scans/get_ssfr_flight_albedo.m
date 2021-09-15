@@ -138,7 +138,7 @@ if isafile(in_file)
         else
             plot(ssfr.time(ainb), flight_alb(w_ii,ainb),'*', ssfr.time, flight_alb(w_ii,:),'k-');
             xlim([xl_time - 2./(24*60), xl_time + 2./(24*60)]);dynamicDateTicks; 
-            ylim([min(nanmin(flight_alb))-.2, max(nanmax(flight_alb))+.2]);
+            ylim([min(min(nanmin(flight_alb)))-.2, max(max(nanmax(flight_alb)))+.2]);
             for nms = 1:length(w_ii)
                 leg_str(nms) = string(sprintf('alb %1.0f nm',in_lambda(w_ii(nms))));
             end

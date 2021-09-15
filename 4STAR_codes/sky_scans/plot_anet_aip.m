@@ -195,7 +195,7 @@ hold off;
  plot(anetaip.Wavelength, anetaip.aod,'-x',...
      anetaip.Wavelength, [anetaip.ssa_total;anetaip.ssa_fine;anetaip.ssa_coarse]','-*',...
     anetaip.Wavelength, anetaip.sfc_alb, 'k--s'); logx;
-h = legend('AOD','SSA total','SSA fine','SSA total', 'sfc alb');
+h = legend('AOD','SSA total','SSA fine','SSA coarse', 'sfc alb');
 set(h,'FontSize', 8);
 xx_here=get(gca,'xlim');
 yy_here=get(gca,'ylim');
