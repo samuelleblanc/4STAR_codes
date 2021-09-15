@@ -1,4 +1,4 @@
-function [aod_fit, fit_rms, nolog_fit, nolog_rms, fit_abserr, nolog_abserr, fit_pcterr, nolog_pcterr,Ks,log_modes, Ks_, nonlog_modes] = fit_aod_basis_(wl, aod, wl_out);
+function [aod_fit, fit_rms, nolog_fit, nolog_rms, fit_abserr, nolog_abserr, fit_pcterr, nolog_pcterr,Ks,log_modes, Ks_, nolog_modes] = fit_aod_basis_(wl, aod, wl_out);
 % aod_fit = fit_aod_basis_(wl, aod,wl_out);
 % wl should be in nm and Mx1 or 1xM
 % aod should be Mx1 or 1xM or MxN with M matchin wl
@@ -13,7 +13,29 @@ function [aod_fit, fit_rms, nolog_fit, nolog_rms, fit_abserr, nolog_abserr, fit_
 %                   Nearly equivalent RMS for log and non-log fitting but
 %                   at least for aeronet&mfrsr tests log-fit appears to
 %                   extrapolate better (lower curvature at both ends)
+%   Although initially counter-intuitive to me, it begins to make sense
+%   that the log and non-log fits perform similarly since the AOD is
+%   typically between 0.02 and 1 (or less) so the dynamic range is not
+%   radically different for logged and nonlogged tau. 
+%   The conceptual benefit of logged values is that the fit coefficients
+%   can't imply non-physical negative AODs. Rather negative of logged
+%   coefficients simply indicates factors less than 1.  The down-side is
+%   that addition of logged AODs is not analogous to addition of tau.  
+%   In contrast, the fit using non-log quantities can be restricted to
+%   physical solutions by discarding negative coefs. But one is not
+%   guaranteed to obtain an optimal solution via sequential exclusion. 
+%   Thus, while either of these will frequently yield a decent fit with low
+%   RMS, neither is necessarily the "best fit" inasmuch as it is possible
+%   an multivariant approach may yield an even better fit.
+
+% Thinking about derivatives, resolution, and relevance/applicability 
+% Considering computing extinction at 0.1 nm resolution and then computing
+% 2nd order polynomial fit over a sliding window (of width 1-3 nm?) with resulting ext(z) and
+% corresponding first and second derivatives at 1 nm resolution.  The
+% derivatives will add in proportion to the tau components so should provide best-estimate tau, tau', and tau''
+% results (but will the logged values? Not without careful treatment, I expect). 
 version_set('1.1');
+
 % TBD: augment to output Ks, Cn, PDF etc.  Important if we want to use this
 % to identify "dust" for example
 
@@ -43,6 +65,9 @@ if size(wl,2)==1 && all(size(wl)==size(aod))
     if ~any(wl_out)>100
         wl_out = wl_out * 1000;
     end
+    bad = isnan(wl)|isnan(aod);
+    wl = wl(~bad);
+    aod = aod(~bad);
     aod_mode = load([strrep(which('fit_aod_basis.m'),'fit_aod_basis.m','aod_SD_nmode.mat')]);   
     sub_modes = aod_mode.log_nmodes;
 %     sub_modes = sub_modes -(ones(size(sub_modes,1),1)*max(sub_modes));
