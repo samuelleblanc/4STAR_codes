@@ -77,12 +77,15 @@ if fid>0
          for d = length(this):-1:1
             dates{d} = [this{d},' ',that{d}];
          end
-         try
-            cimel.time = datenum(dates,'dd:mm:yyyy HH:MM:SS');
-         catch
-            cimel.time = datenum(dates,'dd-mm-yyyy HH:MM:SS');
-         end
-         
+%          try
+%              cimel.time = datenum(dates);
+%          catch
+             try
+                 cimel.time = datenum(dates,'dd:mm:yyyy HH:MM:SS');
+             catch
+                 cimel.time = datenum(dates,'dd-mm-yyyy HH:MM:SS');
+             end
+%          end
          
          while length(label)>0
             if isnumeric(txt{1})&&~all(isNaN(txt{1}))
