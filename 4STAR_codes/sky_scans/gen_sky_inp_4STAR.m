@@ -131,12 +131,8 @@ else
     
     % Actually we should not be using Gueymard here.
     % We should be using the one Michal has used.  Thulier?
-    guey_ESR = gueymard_ESR;
+    guey_ESR = gueymard_ESR;  g_ESR = interp1(guey_ESR(:,1), 1000.*guey_ESR(:,3), 1000.*star.w(star.wl_ii),'pchip','extrap');
     % for iw = 1:length(star.w(star.aeronetcols(star.vis_pix)))
-    for iw = length(star.wl_ii):-1:1
-        %     guey_ESR = gueymard_ESR; % nm, W/(m2 nm)
-        g_ESR(iw) = interp1(guey_ESR(:,1), 1000.*guey_ESR(:,3), 1000.*star.w(star.wl_ii(iw)),'pchip','extrap');
-    end
     %%
     % figure; plot(1000.*star.w(star.aeronetcols(star.vis_pix)), g_ESR, 'o',guey_ESR(:,1), 1000.*guey_ESR(:,3),'-')
     %%
