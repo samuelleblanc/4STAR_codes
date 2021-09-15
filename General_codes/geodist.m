@@ -29,9 +29,10 @@ end
 % SA = scat_ang_rads(sza,saz,za,az);
 SA = zeros(size(lat1));
 SA(:) = scat_ang_rads(lat1(:),lon1(:),lat2(:),lon2(:));
-a = 6378137; % meters,  semi-major axis
-b = 6356752.3142; % meters, minor axis
-r = (a+b)./2;
+% a = 6378137; % meters,  semi-major axis
+% b = 6356752.3142; % meters, minor axis
+% r = (a+b)./2;
+r = 6367444.6571;
 dist = r.*SA;
 return    
   
