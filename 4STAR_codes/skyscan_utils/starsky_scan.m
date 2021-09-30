@@ -119,9 +119,7 @@ lte0 = star.tau_aero_subtract_all(sun_ii,w_ii)<=0;  w_ii(lte0) = [];
 tau_noray_vert = star.tau_tot_vert -star.tau_ray;
 % star.tau_tot_vert(sun_ii,lte0) = tau_noray_vert(sun_ii,lte0) + star.tau_ray(sun_ii,lte0);
 % [aod, min_rms, fit_rms, m_ij, aod_pfit, aod_afit, aod_xfit]
-wl_block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block'));
-    if isfield(block,'block') block = block.block; end;
-    if isfield(block,'blocks') block = block.blocks; end;    
+wl_block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block'));  
 [aod_fit, min_rms, fit_rms, m_ij, aod_xfit, aod_afit, aod_pfit, w_ii_out] = ...
     tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),wl_block);
 
@@ -129,7 +127,7 @@ wl_block = load(getfullname([star.instrumentname,'_wl_block.mat'],'block'));
 % w_pii_fit: "w" for wavelength, "p" for polyfit, "ii" for index
 w_pii_fit = get_wvl_subset(star.t(1),star.instrumentname);
 % w_pii_fit(wl(w_pii_fit)<400) = [];
-% w_pii_fit(wl(w_pii_fit)>900) = [];
+w_pii_fit(wl(w_pii_fit)>900) = [];
 w_pii_fit(wl(w_pii_fit)>1100) = []; 
 
 w_pii_fit_ = false(size(wl)); w_pii_fit_(w_pii_fit) = true; 
@@ -140,14 +138,34 @@ w_pii_fit = find(w_pii_fit_); w_pii_fit_block = return_wl_block(w_pii_fit, wl);
     tau_xfit(wl,star.tau_aero_subtract_all(sun_ii,:),w_pii_fit_block);
 
 star.w_ii_fit = w_pii_fit; % Using pixels from get_wvl_subset expanded to block for xfit
+%% 
+% This is the previous polyfit stuff (probably used in Oracles 2016 paper)
+w_ii = [225,get_wvl_subset(star.t(1),star.instrumentname)];
+% SEAC4RS and ORACLES seem to require different WL ranges 
+% w_ii(star.w(w_ii)>1.1) = [];%w_ii(star.w(w_ii)>.9) = [];w_ii(star.w(w_ii)<.4) = [];% SEAC4RS
+w_ii(star.w(w_ii)>1.1) = []; w_ii(star.w(w_ii)>.9) = [];
+PP_ = polyfit(log(star.w(w_ii)), log(star.tau_aero_subtract_all(sun_ii,w_ii)),2);
+% Overwriting .aod_fit_pii from tau_xfit with this one from polyfit
+star.aod_fit_pii = exp(polyval(PP_,log(star.w)));
+star.PP_res = star.tau_aero_subtract_all(sun_ii,w_ii) -star.aod_fit_pii(w_ii); 
+star.PP_rms = sqrt(nanmean(star.PP_res.^2,2));
 
-%% Interestingly, the fits using a truncated range from get_wvl_subset yields 
-% lower residuals than the fits using the wavelengths in wv_block.mat
-% Thus, we'll carry the _pii fields and residuals forward.
+% Using the above and the below, I confirmed equivalent RMS for polyfit
+% whether or not w_ii is "blocked". The previously noted difference was due
+% to whether or not star.w < 1.1 was included or only star.w < 0.9
+% PP_i = polyfit(log(star.w(w_pii_fit)), log(star.tau_aero_subtract_all(sun_ii,w_pii_fit)),2);
+% tau_aero_subtract_all_fit_ = exp(polyval(PP_i,log(star.w)));
+% PP_res_ = star.tau_aero_subtract_all(sun_ii,w_pii_fit) -tau_aero_subtract_all_fit_(w_pii_fit); 
+% star.PP_rms = sqrt(nanmean(PP_res_.^2,2));
+
+
+
 tau_abs_gas = tau_noray_vert(sun_ii,:) - star.tau_aero_subtract_all(sun_ii,:);
+% tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - star.aod_fit_pii;
 tau_abs_gas_fit = tau_noray_vert(sun_ii,:) - star.aod_fit_pii;
 tau_abs_gas_xfit = tau_noray_vert(sun_ii,:) - star.aod_xfit_pii;
 tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - star.aod_pfit_pii;
+
 % tau_abs_gas_pfit = tau_noray_vert(sun_ii,:) - aod_pfit_pii;
 star.tau_fit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_fit_pii;
 star.tau_xfit_res = star.tau_aero_subtract_all(sun_ii,:) - star.aod_xfit_pii;
