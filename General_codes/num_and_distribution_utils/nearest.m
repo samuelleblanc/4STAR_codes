@@ -7,6 +7,9 @@ function [Aind, Bind] = nearest(A,B,nearby);
 % Idea is to use interp1('nearest','extrap') to first identify nearest points.  
 % This may yield repeats, so follow it with unique and then another interp1
 % pass with A and B swapped.
+
+% Would be nice to add logic to accept non-unique inputs, pushing them into
+% unique but indexing to the original values (as indexed by unique)
 if (find(size(A)==1,1))~=(find(size(B)==1,1))
    B = B';
 end
