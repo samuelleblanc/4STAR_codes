@@ -680,7 +680,31 @@ if isfield(anc.vdata,field)
                &&(~isempty(findstr('3 = Missing',anc.vatts.(qc_field).description))))
             %Then this is S level QC
             impact = anc.vdata.(qc_field);
-         elseif isfield(anc.vatts, qc_field) && isfield(anc.vatts.(qc_field),'bit_1_description')
+         elseif isfield(anc.vatts, qc_field) 
+             if ~isfield(anc.vatts.(qc_field), 'bit_1_description') && isfield(anc.gatts,'qc_bit_1_description')
+                 anc.vatts.(qc_field).bit_1_description = anc.gatts.qc_bit_1_description;
+             end
+             if ~isfield(anc.vatts.(qc_field), 'bit_1_assessment') && isfield(anc.gatts,'qc_bit_1_assessment')
+                 anc.vatts.(qc_field).bit_1_assessment = anc.gatts.qc_bit_1_assessment;
+             end
+             if ~isfield(anc.vatts.(qc_field), 'bit_2_description') && isfield(anc.gatts,'qc_bit_2_description')
+                 anc.vatts.(qc_field).bit_2_description = anc.gatts.qc_bit_2_description;
+             end
+             if ~isfield(anc.vatts.(qc_field), 'bit_2_assessment') && isfield(anc.gatts,'qc_bit_2_assessment')
+                 anc.vatts.(qc_field).bit_2_assessment = anc.gatts.qc_bit_2_assessment;
+             end             
+             if ~isfield(anc.vatts.(qc_field), 'bit_3_description') && isfield(anc.gatts,'qc_bit_3_description')
+                 anc.vatts.(qc_field).bit_3_description = anc.gatts.qc_bit_3_description;
+             end
+             if ~isfield(anc.vatts.(qc_field), 'bit_3_assessment') && isfield(anc.gatts,'qc_bit_3_assessment')
+                 anc.vatts.(qc_field).bit_3_assessment = anc.gatts.qc_bit_3_assessment;
+             end             
+             if ~isfield(anc.vatts.(qc_field), 'bit_4_description') && isfield(anc.gatts,'qc_bit_4_description')
+                 anc.vatts.(qc_field).bit_4_description = anc.gatts.qc_bit_4_description;
+             end
+             if ~isfield(anc.vatts.(qc_field), 'bit_4_assessment') && isfield(anc.gatts,'qc_bit_4_assessment')
+                 anc.vatts.(qc_field).bit_4_assessment = anc.gatts.qc_bit_4_assessment;
+             end                                               
             impact = anc_qc_impacts(anc.vdata.(qc_field), anc.vatts.(qc_field));
          end
          if qc_mode ==2 % mask out impact>1, but check dimensionality

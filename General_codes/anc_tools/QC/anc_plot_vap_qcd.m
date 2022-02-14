@@ -8,7 +8,7 @@ status = 0;
 ryg =      [0     1     0;      1     1     0;     1     0     0];
 ryg_w = [[1,1,1];ryg];
 
-if isfield(anc.vdata,field)&& isfield(anc.vdata,['qc_',field])&& ~isempty(strfind(anc.ncdef.recdim.name,char(anc.ncdef.vars.(field).dims)))
+if isfield(anc.vdata,field)&& isfield(anc.vdata,['qc_',field])&& ~isempty(strfind(char(anc.ncdef.vars.(field).dims),anc.ncdef.recdim.name))
     [pname, fname,ext] = fileparts(anc.fname);
     fname = [fname,ext];
     status = 1;
