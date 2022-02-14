@@ -230,7 +230,7 @@ if ~isempty(fields)
                                  if colr<=length(colors)
                                      set(kids(lg),'MarkerEdgeColor',colors{colr});
                                  else
-                                     rgb = sscanf(input('Enter a RBG values: ','s'),'%f')'; 
+                                     rgb = sscanf(input('Enter a RGB values [R G B]: ','s'),'[%f %f %f')';  
                                      if any(rgb)>1 
                                         rgb = rgb./max(rgb);
                                      end
@@ -242,7 +242,7 @@ if ~isempty(fields)
                                   if colr<=length(colors)
                                       set(kids(lg),'MarkerFaceColor',colors{colr});
                                   else
-                               rgb = sscanf(input('Enter a RBG values: ','s'),'%f')'; 
+                               rgb = sscanf(input('Enter a RGB values [R G B]: ','s'),'[%f %f %f')'; 
                                      if any(rgb)>1 
                                         rgb = rgb./max(rgb);
                                      end
