@@ -20,6 +20,7 @@ cc = [0 0.4470 0.7410; 0.8500 0.3250 0.0980; 0.9290  0.6940  0.1250;...
 cc = [ 0 0  1;  0 0.5 0; 1 0 0; 0 .75 .75; .75 0 .75; .75 .75 0; .25 .25 .25];
 set(groot,'DefaultAxesColorOrder', cc);
 clear cc
+set(groot,'DefaultFigureColorMap',jet); 
 % colormap([.20,.20,.20;colormap('jet'); 1,1,1]);
 % set(0,'DefaultFigureColormap', colormap)
 % The following DefaultFigure settings are intended to allow figure
