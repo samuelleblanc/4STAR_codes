@@ -13,6 +13,9 @@ version_set('1.1');
 % TBD: augment to output Ks, Cn, PDF etc.  Important if we want to use this
 % to identify "dust" for example, or identify/remove "425 bip"
 
+warning off 'MATLAB:nearlySingularMatrix'
+warning off 'MATLAB:rankDeficientMatrix'
+
 if ~any(wl)>100
     wl = wl*1000;
 end
@@ -85,4 +88,7 @@ else
     warning('wl and aod must be row vectors of same length')
     aod_fit = NaN(size(aod)); Ks = []; log_modes = [];
 end
+
+warning on 'MATLAB:nearlySingularMatrix'
+warning on 'MATLAB:rankDeficientMatrix'
 return
