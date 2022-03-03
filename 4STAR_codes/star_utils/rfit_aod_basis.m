@@ -1,4 +1,4 @@
-function [aod_fit, good_wl_,fit_rms, nonlog_fit, good_nwl,fit_rms_] = rfit_aod_basis(wl, aod, wl_out, mad_factor);
+function [aod_fit, good_wl_,fit_rms, fit_bias] = rfit_aod_basis(wl, aod, wl_out, mad_factor);
 % [aod_fit, good_wl_] = rfit_aod_basis(wl, aod, wl_out,  mad_factor);
 
 % Starting from xfit, modify to provide "robust" aod-fitting.
@@ -11,24 +11,24 @@ function [aod_fit, good_wl_,fit_rms, nonlog_fit, good_nwl,fit_rms_] = rfit_aod_b
 % convergent solution to the original full sample, applying a stringent
 % outlier rejection criterion, retrieving the convergent solution from this
 % reduced set, and then comparing RMS and bias of both retrieved solutions
-% against the full and reduced sample sets. 
+% against the full and reduced sample sets.
 
 % Multi-stage aod_fit: (in progress)
 %  1) interatively apply fit_aod_basis rejecting outliers to yield a robust subset of pixels
 %  2)  Assess RMS and bias of robust and extended subsets.  Output best.
 
 % 2021-02-04: v1.0 Connor add version control
-
+% 2022-02-20: v1.1 Connor adapting for sashe and lang_tau_series.  Saved
+% copy of original as *_bak.m  Removed non-log fit (since one is as good as
+% the other, essentially), and test of extended WL set (since that applied
+% to examination of hyperspectral fits but this is now focused on using
+% filter-based AOD as pin for hyperspectral
+% warning off all
 version_set('1.0');
 if nargin<2
     error(['wl, aod']);
 end
-if ~isavar('block')
-    block = load(getfullname('4STAR*_wl_block.mat','block','Select block file indicating contiguous pixels.')); 
-    if isfield(block,'block') block = block.block; end;
-    if isfield(block,'blocks') block = block.blocks; end;
-end
-    
+
 if ~isavar('wl_out')
     wl_out = wl;
 end
@@ -36,77 +36,27 @@ if ~isavar('mad_factor')
     mad_factor = 3;
 end
 
-wl_ = false(size(wl));
-for b = 1:size(block,1)
-    wl_(block(b,3):block(b,4)) = true;
-end
-wl_ii = find(wl_);
-[aod_fit, Ks] = fit_aod_basis_(wl(wl_ii), aod(wl_ii));
-res_ = aod(wl_ii)-aod_fit;
+[aod_fit] = fit_aod_basis(wl, aod);
+res_ = aod-aod_fit;
 fit_rms_ = sqrt(nanmean((res_).^2)); %rms(res_);
 fit_bias_ = mean(-res_);
 % Note aod_fit is same size as wl_ii
 % Identify and exclude statistical outliers from contiguous blocks
 changed = false;
-for B = 1:size(block,1)
-    aa = [block(B,1):block(B,2)];% indices in wl_ii and aod_fit
-    bb =[block(B,3):block(B,4)]; % indices in wl and aod    
-    w = true(size(bb)); % Assign weights to 1
-    done = false;
-    while ~done
-        b4 = sum(w);
-        [w(w), mad, abs_dev] = madf(aod(bb(w))-aod_fit(aa(w)),3);
-        done = (sum(w)==b4);
-        changed = changed | ~done;
-    end
-    wl_(bb) = w;    
+w_ = true(size(wl)); % Assign weights to 1
+done = false;
+while ~done
+    b4 = sum(w_);
+    [w_(w_), mad, abs_dev] = madf(aod(w_)-aod_fit(w_),mad_factor);
+    done = (sum(w_)==b4);
+    changed = changed | ~done;
 end
-if changed & sum(wl_)>2
-    [block, wl_ii] = return_wl_block(wl_, wl); % this is for reduced set of pixels    
-    % Note, aod_fit is now same size as wl!
-% else
-%     disp('No pixels removed')
-end
-[aod_fit, Ks] = fit_aod_basis(wl(wl_ii), aod(wl_ii),wl);
-res = aod-aod_fit;
-fit_rms = sqrt(nanmean((res(wl_ii)).^2));%rms(res(wl_ii));
-fit_bias = mean(-res(wl_ii));
-% Now, compute the RMSE at each block, interpolate over wavelength, and
-% identify new block 
-for B = size(block,1):-1:1
-    aa = [block(B,1):block(B,2)];% indices in wl_ii and aod_fit
-    bb =[block(B,3):block(B,4)]; % indices in wl and aod
-    RR = sqrt(nanmean((res(bb)).^2)); %rms(res(bb));
-    block(B,8) = RR;
-end
-RR = interp1(block(:,7), block(:,8), wl,'linear');
-if sum(~isnan(RR))>1
-RR(isnan(RR)) = interp1(wl(~isnan(RR)),RR(~isnan(RR)),wl(isnan(RR)),'nearest','extrap');
-end
-% figure; plot(block(:,7), block(:,8), 'o',wl, RR, '-',wl(wl_ii), res(wl_ii),'rs'); 
 
-wl_x_ = (abs(res)<0.3.*RR); %this is an extended set of pixels including other close values
-[block_x, wl_x] = return_wl_block(unique([find(wl_x_),wl_ii]),wl);
-
- [aod_fit_x, Ks_x] = fit_aod_basis(wl(wl_x), aod(wl_x),wl);
-res_x = aod-aod_fit_x;
-fit_rms_x = sqrt(nanmean((res_x(wl_x)).^2)); %rms(res_x(wl_x));
-fit_bias_x = mean(-res_x(wl_x));
-
-% figure; plot(wl, aod, '-', wl(wl_ii), aod_fit(wl_ii),'-o',wl(wl_x), aod_fit_x(wl_x),'-x',wl, aod-aod_fit, 'r-', wl, aod-aod_fit_x,'k-')
-
-good_wl_ = false(size(wl));
-if (fit_rms_x < fit_rms) && (abs(fit_bias_x)<abs(fit_bias))
-    aod_fit = aod_fit_x; 
-    good_wl_(wl_x) = true;
-    fit_rms = fit_rms_x;
-%     disp('Extended set is better')
-else
-    good_wl_(wl_ii) = true;
-%     disp('Initial set is better')
-end
-    
-% Now we can compare the RMS (and bias?) of the reduced and extended fits
-% and report whichever has better statistics
-
+[aod_fit] = fit_aod_basis(wl(w_), aod(w_),wl(w_));
+res= aod(w_)-aod_fit;
+fit_rms = sqrt(nanmean((res).^2)); %rms(res_x(wl_x));
+fit_bias = mean(res);
+good_wl_ = w_;
+[aod_fit] = fit_aod_basis(wl(w_), aod(w_),wl_out);
+% warning on all
 return
