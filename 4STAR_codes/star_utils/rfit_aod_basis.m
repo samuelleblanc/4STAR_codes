@@ -24,7 +24,9 @@ function [aod_fit, good_wl_,fit_rms, fit_bias] = rfit_aod_basis(wl, aod, wl_out,
 % to examination of hyperspectral fits but this is now focused on using
 % filter-based AOD as pin for hyperspectral
 % warning off all
-version_set('1.0');
+% 2022-02-20: v1.2 Connor, discard only 1 outlier at a time, max and >
+% mad_factor, and evaluate madf1 on log(aod/aod_fit)
+version_set('1.2');
 if nargin<2
     error(['wl, aod']);
 end
@@ -33,7 +35,7 @@ if ~isavar('wl_out')
     wl_out = wl;
 end
 if ~isavar('mad_factor')
-    mad_factor = 3;
+    mad_factor = 3.5;
 end
 
 [aod_fit] = fit_aod_basis(wl, aod);
@@ -41,14 +43,13 @@ res_ = aod-aod_fit;
 fit_rms_ = sqrt(nanmean((res_).^2)); %rms(res_);
 fit_bias_ = mean(-res_);
 % Note aod_fit is same size as wl_ii
-% Identify and exclude statistical outliers from contiguous blocks
 changed = false;
 w_ = true(size(wl)); % Assign weights to 1
 done = false;
 while ~done
     b4 = sum(w_);
-    [w_(w_), mad, abs_dev] = madf(aod(w_)-aod_fit(w_),mad_factor);
-    done = (sum(w_)==b4);
+    [w_(w_), mad, abs_dev] = madf1(log(aod(w_)./aod_fit(w_)),mad_factor);                          
+        done = (sum(w_)==b4);
     changed = changed | ~done;
 end
 
