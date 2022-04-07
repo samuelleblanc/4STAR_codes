@@ -62,7 +62,9 @@ if strcmp(instrumentname,'2STAR');
     error('Not yet implemented for 2STAR')
 end;
 
+daystr = datestr(ins.t(1),'yyyymmdd');
 if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
     mkdir([apname instrumentname '_' daystr]);
     apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
 else
@@ -238,14 +240,14 @@ if ~isfield(ins,'sunel');
     v = datevec(ins.t(1));
     [ins.sunaz, ins.sunel, refract]=sun(ins.Lon, ins.Lat,v(3), v(2), v(1), rem(ins.t,1)*24,ins.t*0.0+298.15,ins.t*0.0+1013.15);
 end;
-dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
-sza = (90-abs(ins.sunel)) + dza
+dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter));
+sza = (90-abs(ins.sunel)) + dza;
 %saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));
 %saz = interp1(ins.t(tracking),abs(ins.AZ_deg(tracking)),ins.t,'linear','extrap')
-daz = ins.AZ_deg(icenter) - ins.sunaz(icenter)
-saz = ins.sunaz + daz
+daz = ins.AZ_deg(icenter) - ins.sunaz(icenter);
+saz = ins.sunaz + daz;
 
-ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg)
+ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg);
    
  % Old code  
  %  ins.SA = scat_ang_degs(90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), ins.AZ_deg,...
@@ -312,7 +314,8 @@ ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
-save_fig(fig2,[apname, ins.fname(1:end-4),'.line_FOV']);
+asktopause = usejava('desktop');
+save_fig(fig2,[apname, ins.fname(1:end-4),'.line_FOV'],asktopause);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
 ins.fig_name = {[apname, ins.fname(1:end-4),'.line_FOV.png']};
