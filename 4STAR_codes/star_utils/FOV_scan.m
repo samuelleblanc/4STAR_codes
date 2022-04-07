@@ -58,7 +58,7 @@ if nargin<2;
     instrumentname = '4STAR';
 end;
 
-asktopause = use_java('desktop');
+asktopause = usejava('desktop');
 if strcmp(instrumentname,'2STAR');
     error('Not yet implemented for 2STAR')
 end;
@@ -239,8 +239,8 @@ if ~isfield(ins,'sunel');
     v = datevec(ins.t(1));
     [ins.sunaz, ins.sunel, refract]=sun(ins.Lon, ins.Lat,v(3), v(2), v(1), rem(ins.t,1)*24,ins.t*0.0+298.15,ins.t*0.0+1013.15);
 end;
-dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
-sza = (90-abs(ins.sunel)) + dza
+dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter));
+sza = (90-abs(ins.sunel)) + dza;
 %saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));
 %saz = interp1(ins.t(tracking),abs(ins.AZ_deg(tracking)),ins.t,'linear','extrap')
 daz = ins.AZ_deg(icenter) - ins.sunaz(icenter);

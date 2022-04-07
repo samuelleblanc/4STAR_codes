@@ -293,8 +293,8 @@ else; % copy an existing old starinfo file and run it
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if isafile(infofile_previous);
-          change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
-         %copyfile(infofile_previous, infofile_);
+         change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
+         copyfile(infofile_,fullfile(getnamedpath('starinfo'),infofile_));
          try
              open(infofile_);
          catch
