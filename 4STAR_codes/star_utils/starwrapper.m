@@ -740,6 +740,7 @@ if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox 
    toggle.runwatervapor = false;
    warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
 end
+if ~isfield(toggle,'check4STARB_nogasretrieval');toggle.check4STARB_nogasretrieval=true;end;
 if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
     toggle.runwatervapor = false;
     if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
