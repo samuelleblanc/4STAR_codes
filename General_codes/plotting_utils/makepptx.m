@@ -109,16 +109,22 @@ end;
 [path,name,ext]=fileparts(pptfilename);
 if exist(path)==7;
     if exist(pptfilename)==2;
-        ButtonName=questdlg(['File ' name ext ' already exists.  Do you want to overwrite?'], ...
-            'Overwriting', 'OK','Cancel','Save Both','OK');
-        switch ButtonName,
-            case 'Cancel',
-                return;
-            case 'Save Both'
-                dd=dir(pptfilename);
-                disp(['Renaming existing file ' name '_' datestr(datenum(dd.date),30) ext]);
-                copyfile(pptfilename, fullfile(path,[name '_' datestr(datenum(dd.date),30) ext]));
-        end % switch
+        if usejava('desktop')
+            ButtonName=questdlg(['File ' name ext ' already exists.  Do you want to overwrite?'], ...
+                'Overwriting', 'OK','Cancel','Save Both','OK');
+            switch ButtonName,
+                case 'Cancel',
+                    return;
+                case 'Save Both'
+                    dd=dir(pptfilename);
+                    disp(['Renaming existing file ' name '_' datestr(datenum(dd.date),30) ext]);
+                    copyfile(pptfilename, fullfile(path,[name '_' datestr(datenum(dd.date),30) ext]));
+            end % switch
+        else
+            dd=dir(pptfilename);
+            disp(['Renaming existing file ' name '_' datestr(datenum(dd.date),30) ext]);
+            copyfile(pptfilename, fullfile(path,[name '_' datestr(datenum(dd.date),30) ext]));
+        end
     end;
     newFile = exportToPPTX('saveandclose',pptfilename);
     %Presentation.SaveAs(pptfilename);
