@@ -1,5 +1,5 @@
-% C0 (TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from /data/sunsat/rooftop/Spring_2022/data_processed/starsuns/4STAR_20220406starsun.mat and recorded on 2022-04-06 22:41:21.
-% C0 built to match AOD from 4STAR to AERONET spline fit for NASA_Ames within 200 m [Alt] and 360 seconds, measured on 20220406.
+% C0(TOA Count Rate, /ms) for 4STAR VIS spectrometer (1044 channels) derived from 4STAR_20220406starsun.mat and recorded on 2022-04-06 22:41:21.
+% Calibration built to match AOD from 4STAR to AERONET spline fit for NASA_Ames within 200 m [Alt] and 360 seconds, measured on 20220406.
 Pix Wavelength C0 C0err
 0 173.18 0.00000000e+00 0.00000000e+00 
 1 173.98 -1.00000000e+00 0.00000000e+00 

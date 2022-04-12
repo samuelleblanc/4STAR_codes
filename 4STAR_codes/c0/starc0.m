@@ -450,7 +450,10 @@ if ~exist('visc0')
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
             try;
-                a=importdata(which(visfilename));
+                fid = fopen(which(visfilename));
+                n = 1; while startsWith(fgetl(fid),'%'), n=n+1; end
+                fclose(fid);
+                a=importdata(which(visfilename),' ',n);
             catch;
                 error(['Cant open file: ' visfilename])
             end;
@@ -477,7 +480,10 @@ if ~exist('visc0')
         if ~strcmp(instrumentname, '2STAR');
             nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
             if isequal(orientation,'vertical');
-                a=importdata(which(nirfilename));
+                fid = fopen(which(nirfilename));
+                n = 1; while startsWith(fgetl(fid),'%'), n=n+1; end
+                fclose(fid);
+                a=importdata(which(nirfilename),' ',n);
                 nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
                 if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                     nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
