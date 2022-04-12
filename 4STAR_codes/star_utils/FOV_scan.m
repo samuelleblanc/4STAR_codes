@@ -58,15 +58,14 @@ if nargin<2;
     instrumentname = '4STAR';
 end;
 
+asktopause = usejava('desktop');
 if strcmp(instrumentname,'2STAR');
     error('Not yet implemented for 2STAR')
 end;
-
 daystr = datestr(ins.t(1),'yyyymmdd');
 if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
     apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
     mkdir([apname instrumentname '_' daystr]);
-    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
 else
     apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
 end
@@ -314,7 +313,6 @@ ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
-asktopause = usejava('desktop');
 save_fig(fig2,[apname, ins.fname(1:end-4),'.line_FOV'],asktopause);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
