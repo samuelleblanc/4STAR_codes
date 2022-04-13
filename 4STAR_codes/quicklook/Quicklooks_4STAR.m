@@ -1841,6 +1841,16 @@ if length(aeronet_fig_paths)>0
     end
 end
 
+%% Plot out some quicklooks of the skyscans
+if isfield(st,'vis_skyp') | isfield(st,'vis_skya')
+    sky_figs = quicklooks_skyscans_fx(st,p1);
+    for jj=1:length(sky_figs)
+        pptcontents0=[pptcontents0; {sky_figs{jj} 4}];
+    end
+    for jo=1:mod(length(sky_figs),4)
+        pptcontents0=[pptcontents0; {' ' 4}];
+    end
+end
 
 %% Print out the toggle states
 
