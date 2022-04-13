@@ -56,12 +56,20 @@ end;
 fp = getnamedpath('aeronet');
 dis = dir([fp daystr(3:end) '*.lev*']);
 if length(dis) ~= 1
+    if use_java('desktop')
     try
         [afile apname afi]=uigetfile2('*.lev10; *.lev15; *.lev20','Select the aeronet file containing AOD (level 1.0, 1.5, or 2.0)',fp);
     catch
         fig_paths = {};
+        disp(['Did not find aeronet files for daystr:' daystr(3:end) ', in folder: ' fp ])
         return
     end
+    else
+        fig_paths = {};
+        disp(['Did not find aeronet files for daystr:' daystr(3:end) ', in folder: ' fp ])
+        return
+    end
+
     if afile==0
         fig_paths = {};
         return 

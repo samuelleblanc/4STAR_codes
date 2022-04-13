@@ -29,7 +29,7 @@ function change_starinfo_times(starinfo_in,starinfo_out,time_start,time_end,forc
 %                  starfig
 %                  Added return of figure path files
 % -------------------------------------------------------------------------
-version_set('v1.0');
+version_set('v1.1');
 
 %% start of function
 fidi=fopen(starinfo_in,'r');
@@ -53,9 +53,12 @@ while ~feof(fidi)
   end
   if strfind(l,'s.flight') & ~startsWith(strtrim(l),'%')
     % modify line here
-    l = ['s.flight = [datenum(' datenum_str_start ') datenum(' datenum_str_end ')];'];;
+    l = ['s.flight = [datenum(' datenum_str_start ') datenum(' datenum_str_end ')];'];
     changed = true;
   end
+  if strfind(l, 's.langley1') & ~startsWith(strtrim(l),'%')
+    % modifiy any langley values
+    l = ['s.langley1 = [datenum(' datenum_str_start ') datenum(' datenum_str_end ')];'];
   lines = [lines; l];
 %  fprintf(fido,'%s',l)  % 'fgetl returns \n so it's embedded
 end
@@ -70,4 +73,5 @@ for i=1:length(lines)
 end
 fidi=fclose(fidi);
 fido=fclose(fido);
+
 return

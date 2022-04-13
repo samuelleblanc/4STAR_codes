@@ -293,8 +293,8 @@ else; % copy an existing old starinfo file and run it
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if isafile(infofile_previous);
-          change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
-         %copyfile(infofile_previous, infofile_);
+         change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
+         copyfile(infofile_,fullfile(getnamedpath('starinfo'),infofile_));
          try
              open(infofile_);
          catch
@@ -740,6 +740,7 @@ if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox 
    toggle.runwatervapor = false;
    warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
 end
+if ~isfield(toggle,'check4STARB_nogasretrieval');toggle.check4STARB_nogasretrieval=true;end;
 if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
     toggle.runwatervapor = false;
     if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;

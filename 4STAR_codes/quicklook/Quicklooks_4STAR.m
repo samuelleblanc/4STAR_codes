@@ -1490,7 +1490,7 @@ if isafile(starzenfile)
         'filename', [p1 instrumentname '_' daystr '_' platform 'zenradtseries']);
     pptcontents0=[pptcontents0; {fullfile([filename '.png']) 1}];
 else
-    warning([starzenfile ' does not exist. No zenith radiance plot is created.']);
+    disp([starzenfile ' does not exist. No zenith radiance plot is created.'])
 end
 
 %********************
