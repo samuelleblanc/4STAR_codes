@@ -74,6 +74,12 @@ if asktopause
       return
   end;
 end
+
+[fpath,fname,fext] = fileparts(fi);
+if exist(fpath,'dir')~=7
+  mkdir(fpath);
+end
+
 try
   saveas(pid,[fi '.fig']);
 catch
