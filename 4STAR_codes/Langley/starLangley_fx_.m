@@ -36,10 +36,12 @@ function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_
 % Modified (v1.1):Samuel LeBlanc, Moncton, NB, 2017-12-19
 %                 added colsub, for shortened airmass regression at shorter
 %                 wavelengths
+% Modified (v1.2):Samuel LeBlanc, Santa Cruz, CA, 2022-04-25
+%                 added error handling for automated processing 
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.1');
+version_set('1.2');
 
 %********************
 %% set parameters and santize inputs
@@ -133,7 +135,13 @@ else;
     ok = ok((m_aero(ok)<=50)&(Str(ok)==1)); % ony take the data with shutter open to sun
 end;
 if length(ok)==0;
-    error('No valid airmass found within the Langley ends')
+    if usejava('desktop')
+    	error('No valid airmass found within the Langley ends')
+    else
+        disp('*** ERROR No valid airmass found within the Langley ends. No Langley has been done ***')
+        fig_names = {};
+        return
+    end
 end;
 %********************
 % generate a new cal
