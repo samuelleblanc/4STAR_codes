@@ -230,8 +230,13 @@ for ll = lamps
     %% load the files
     disp(strcat('Getting lamp #',num2str(ll)))
     [pname,filesep,lamp_str, filesep,instname,date,'_',fnum,'_NIR_',pp,'.dat']
-    nir = rd_spc_TCAP_v2([pname,filesep,lamp_str, filesep,instname,date,'_',fnum,'_NIR_',pp,'.dat']);
-    vis = rd_spc_TCAP_v2([pname,filesep,lamp_str, filesep,instname,date,'_',fnum,'_VIS_',pp,'.dat']);
+    if ~isafolder([pname,filesep,lamp_str])
+        nir = rd_spc_TCAP_v2([pname,filesep,instname,date,'_',fnum,'_NIR_',pp,'.dat']);
+        vis = rd_spc_TCAP_v2([pname,filesep,instname,date,'_',fnum,'_VIS_',pp,'.dat']);
+    else
+        nir = rd_spc_TCAP_v2([pname,filesep,lamp_str, filesep,instname,date,'_',fnum,'_NIR_',pp,'.dat']);
+        vis = rd_spc_TCAP_v2([pname,filesep,lamp_str, filesep,instname,date,'_',fnum,'_VIS_',pp,'.dat']);
+    end
     shut = nir.t.shutter==0;
     shut(2:end)= shut(1:end-1)&shut(2:end); shut(1:end-1) = shut(1:end-1)&shut(2:end);
     sun = nir.t.shutter==1;
@@ -480,7 +485,7 @@ else
     corstr='';
 end
 
-fname=[pname filesep date '_rad_cal' corstr];
+fname=[pname filesep instname date '_rad_cal' corstr];
 save(fname)
 disp(['saved to ' fname '.mat'])
 disp('Now stopping program')

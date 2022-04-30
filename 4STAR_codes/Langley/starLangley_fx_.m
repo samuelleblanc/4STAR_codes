@@ -136,9 +136,9 @@ else;
 end;
 if length(ok)==0;
     if usejava('desktop')
-    	error('No valid airmass found within the Langley ends')
+        error('No valid airmass found within the Langley ends')
     else
-        disp('*** ERROR No valid airmass found within the Langley ends. No Langley has been done ***')
+        disp('* Error no valid airmass for langley *')
         fig_names = {};
         return
     end
