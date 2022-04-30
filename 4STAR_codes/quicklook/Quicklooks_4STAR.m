@@ -1825,6 +1825,7 @@ end
 try
     aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
 catch
+    disp('Error making plots for AERONET files')
     aeronet_fig_paths = [];
 end
 if length(aeronet_fig_paths)>0

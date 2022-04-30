@@ -42,7 +42,8 @@ wvls = [0.40,0.5,0.86,1.2];
 %********************
 if isfield(s,'vis_skya')
     for ia=1:numel(s.vis_skya)
-        sa=starwrapper(s.vis_skya(ia), s.nir_skya(ia),update_toggle);
+        toggle.verbose = false;
+        sa=starwrapper(s.vis_skya(ia), s.nir_skya(ia),update_toggle(toggle));
         sa.SA = scat_ang_degs(sa.sza,sa.sunaz,90-abs(sa.El_deg),sa.Az_deg);
         iw=1; for ww=wvls, [nul,wi(iw)]=min(abs(sa.w-ww)); iw=iw+1; end
         CM = jet(iw-1);
@@ -70,15 +71,16 @@ if isfield(s,'vis_skya')
         legend([sup,sum,skp,skm],{'sun right','sun left','sky right','sky left'})
         colormap(CM)
         lcolorbar(string(wvls*1000.0),'TitleString','Wavelength [nm]')
-        fnameout = [sa.instrumentname sa.daystr '_SKYA' sa.filen '_rate2scatteringangle.png'];
-        fig_names = [fig_names;{fullfile(fig_path, fnameout)}];
+        fnameout = [sa.instrumentname sa.daystr '_SKYA' sa.filen '_rate2scatteringangle'];
+        fig_names = [fig_names;{fullfile(fig_path, [fnameout '.png'])}];
         save_fig(fig,fullfile(fig_path, fnameout),0);
     end
 end
 
 if isfield(s,'vis_skyp')
         for ia=1:numel(s.vis_skyp)
-        sa=starwrapper(s.vis_skyp(ia), s.nir_skyp(ia),update_toggle);
+        toggle.verbose = false;
+        sa=starwrapper(s.vis_skyp(ia), s.nir_skyp(ia),update_toggle(toggle));
         sa.SA = scat_ang_degs(sa.sza,sa.sunaz,90-abs(sa.El_deg),sa.Az_deg);
         iw=1; for ww=wvls, [nul,wi(iw)]=min(abs(sa.w-ww)); iw=iw+1; end
         CM = jet(iw-1);
@@ -106,8 +108,8 @@ if isfield(s,'vis_skyp')
         legend([sup,sum,skp,skm],{'sun above','sun below','sky above','sky bbelow'})
         colormap(CM)
         lcolorbar(string(wvls*1000.0),'TitleString','Wavelength [nm]')
-        fnameout = [sa.instrumentname sa.daystr '_SKYP' sa.filen '_rate2scatteringangle.png'];
-        fig_names = [fig_names;{fullfile(fig_path, fnameout)}];
+        fnameout = [sa.instrumentname sa.daystr '_SKYP' sa.filen '_rate2scatteringangle'];
+        fig_names = [fig_names;{fullfile(fig_path, [fnameout '.png'])}];
         save_fig(fig,fullfile(fig_path, fnameout),0);
     end
 end
