@@ -133,7 +133,12 @@ else;
     ok = ok((m_aero(ok)<=50)&(Str(ok)==1)); % ony take the data with shutter open to sun
 end;
 if length(ok)==0;
-    error('No valid airmass found within the Langley ends')
+    if usejava('desktop')
+        error('No valid airmass found within the Langley ends')
+    else
+        disp('* Error no valid airmass for langley *')
+        fig_names = {};
+        return
 end;
 %********************
 % generate a new cal
