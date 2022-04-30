@@ -1836,6 +1836,7 @@ if length(aeronet_fig_paths)>0
     if length(aeronet_fig_paths)>3
         pptcontents0=[pptcontents0; {aeronet_fig_paths{4} 1}];
         pptcontents0=[pptcontents0; {aeronet_fig_paths{5} 1}];
+        pptcontents0=[pptcontents0; {aeronet_fig_paths{6} 1}];
         if length(aeronet_fig_paths)>5
             pptcontents0=[pptcontents0; {aeronet_fig_paths{6} 4}];
             pptcontents0=[pptcontents0; {aeronet_fig_paths{7} 4}];

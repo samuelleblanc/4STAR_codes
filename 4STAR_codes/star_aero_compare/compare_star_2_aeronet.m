@@ -27,10 +27,12 @@ function fig_paths = compare_star_2_aeronet(fname_starsun);
 %                  Added return of figure path files
 % Modified (v1.2): Samuel LeBlanc, Santa Cruz, CA, 2021-04-19
 %                  Added supprot for AERONET v3 diret beam files
+% Modified (v1.3): Samuel LeBlanc, Santa Cruz, CA, 2022-04-29
+%                  Added plotting vs. Azimuth Angle
 % -------------------------------------------------------------------------
 
 %% start of function
-version_set('1.2')
+version_set('1.3')
 
 %% load the file
 fp = getnamedpath('starsun');
@@ -48,7 +50,7 @@ max_alt_diff = 200.0;
 max_seconds_diff = 360.0;
 
 try; 
-    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0','note');
+    load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0','note','Az_deg');
 catch;
     load(fname_starsun);
 end;
@@ -265,6 +267,25 @@ grid;
 colormap(cm);
 lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 fname = fullfile([apname instrumentname '_AERONET_delta_c0_' a.location '_' daystr]);
+save_fig(gcf(),fname,0);
+fig_paths = [fig_paths; [fname '.png']];
+
+
+%  plot ratio of AERONET vs. 4STAR as a function of Azimuth Angle
+figure; 
+plot(Az_deg(ii),dc0(:,iw(1)),'o-','Color',cm(1,:));
+hold on;
+plot(Az_deg(ii),Az_deg(ii).*0.0,'--k');
+for n=2:length(wvls)
+    plot(Az_deg(ii),dc0(:,iw(n)),'o-','Color',cm(n,:));
+end
+xlabel('Azimuth Angle [degree]');
+ylabel('Diff (c0-c0_from_aeronet)/c0 [%]','Interpreter','none');
+title([instrumentname ' c0s to match AERONET AOD at:' a.location],'Interpreter','none')
+grid;
+colormap(cm);
+lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
+fname = fullfile([apname instrumentname '_AERONET_delta_c0_vsAZDeg_' a.location '_' daystr]);
 save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
 
