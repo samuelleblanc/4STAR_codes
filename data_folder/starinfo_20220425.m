@@ -9,7 +9,7 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.langley1 = [datenum(2022,24,04,19,59,24) datenum(2022,24,04,22,57,43)];
+s.langley1 = [datenum(2022,25,04,16,46,15) datenum(2022,25,04,22,38,27)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
              
@@ -19,7 +19,7 @@ s.O3col=0.297; %297
 s.NO2col=5.0e15; %  
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
-s.ground = [datenum(2022,24,04,19,59,24) datenum(2022,24,04,22,57,43)];
+s.ground = [datenum(2022,25,04,16,46,15) datenum(2022,25,04,22,38,27)];
 %s.flight = [datenum(2020,07,08,11,00,00) datenum(2020,07,08,23,30,30)];
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))

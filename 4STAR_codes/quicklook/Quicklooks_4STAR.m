@@ -189,18 +189,20 @@ if isfield(s,'langley')||isfield(s,'langley1');
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
     langley_figs = starLangley_fx_(s,1,p1,xtra);
-    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+    if length(langley_figs)>0
+      pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+      pptcontents0=[pptcontents0; {' ' 4}];
+      pptcontents0=[pptcontents0; {' ' 4}];
+      pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+    end
 end
 end
 
@@ -1802,18 +1804,20 @@ if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
     langley_figs = starLangley_fx_(s,1,p1,xtra);
-    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {' ' 4}];
-    pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
-    pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+    if length(langley_figs)>0
+      pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+      pptcontents0=[pptcontents0; {' ' 4}];
+      pptcontents0=[pptcontents0; {' ' 4}];
+      pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+   end
 end
 end
 
@@ -1832,6 +1836,7 @@ if length(aeronet_fig_paths)>0
     if length(aeronet_fig_paths)>3
         pptcontents0=[pptcontents0; {aeronet_fig_paths{4} 1}];
         pptcontents0=[pptcontents0; {aeronet_fig_paths{5} 1}];
+        pptcontents0=[pptcontents0; {aeronet_fig_paths{6} 1}];
         if length(aeronet_fig_paths)>5
             pptcontents0=[pptcontents0; {aeronet_fig_paths{6} 4}];
             pptcontents0=[pptcontents0; {aeronet_fig_paths{7} 4}];

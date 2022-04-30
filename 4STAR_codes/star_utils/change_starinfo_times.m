@@ -61,7 +61,6 @@ while ~feof(fidi)
     l = ['s.langley1 = [datenum(' datenum_str_start ') datenum(' datenum_str_end ')];'];
     changed = true;
   end
-
   lines = [lines; l];
 %  fprintf(fido,'%s',l)  % 'fgetl returns \n so it's embedded
 end

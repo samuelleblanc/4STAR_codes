@@ -36,10 +36,12 @@ function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_
 % Modified (v1.1):Samuel LeBlanc, Moncton, NB, 2017-12-19
 %                 added colsub, for shortened airmass regression at shorter
 %                 wavelengths
+% Modified (v1.2):Samuel LeBlanc, Santa Cruz, CA, 2022-04-25
+%                 added error handling for automated processing 
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.1');
+version_set('1.2');
 
 %********************
 %% set parameters and santize inputs
@@ -139,6 +141,7 @@ if length(ok)==0;
         disp('* Error no valid airmass for langley *')
         fig_names = {};
         return
+    end
 end;
 %********************
 % generate a new cal

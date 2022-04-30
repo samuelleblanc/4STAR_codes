@@ -9,7 +9,7 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.langley1 = [datenum(2022,24,04,19,59,24) datenum(2022,24,04,22,57,43)];
+% s.langley1 = [datenum(2018,10,27,13,25,00) datenum(2018,10,27,16,20,00)]; %put in if condition below if different for different 4STARs
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
              
@@ -19,7 +19,7 @@ s.O3col=0.297; %297
 s.NO2col=5.0e15; %  
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
-s.ground = [datenum(2022,24,04,19,59,24) datenum(2022,24,04,22,57,43)];
+s.ground = [datenum(2021,08,02,16,34,36) datenum(2021,08,02,23,42,14)];
 %s.flight = [datenum(2020,07,08,11,00,00) datenum(2020,07,08,23,30,30)];
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
@@ -34,6 +34,8 @@ if isfield(s,'instrumentname')
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
     %             s.flagfilenameHCOH = '20170831_starflag_auto_created_for_HCOH_20170902_2338.mat';
     elseif(strcmp(s.instrumentname,'4STARB'))
+    s.toggle.runwatervapor = false;
+    
      %   s.ground = [datenum(2019,09,27,13,00,00) datenum(2019,09,27,17,13,30)];
      %   s.langley1 = [datenum(2019,09,27,13,30,30) datenum(2019,09,27,17,10,30)];
     %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
