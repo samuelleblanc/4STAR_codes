@@ -188,7 +188,11 @@ if plotting_langley_first;
 if isfield(s,'langley')||isfield(s,'langley1');
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
-    langley_figs = starLangley_fx_(s,1,p1,xtra);
+    try
+      langley_figs = starLangley_fx_(s,1,p1,xtra);
+    catch
+      langley_figs = {};
+    end
     if length(langley_figs)>0
       pptcontents0=[pptcontents0; {langley_figs{1} 1}];
       pptcontents0=[pptcontents0; {langley_figs{2} 4}];
@@ -1803,7 +1807,11 @@ if ~plotting_langley_first
 if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
-    langley_figs = starLangley_fx_(s,1,p1,xtra);
+    try
+      langley_figs = starLangley_fx_(s,1,p1,xtra);
+    catch
+      langley_figs = {};
+    end
     if length(langley_figs)>0
       pptcontents0=[pptcontents0; {langley_figs{1} 1}];
       pptcontents0=[pptcontents0; {langley_figs{2} 4}];
