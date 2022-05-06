@@ -23,11 +23,17 @@
 % -------------------------------------------------------------------------
 version_set('1.0');
 %% Load and prep data
-fp = '\\cloudgazer\data_sunsat\cal_lab_all\data_processed\allstarmats\';
-fstarpath = [fp '4STARB_20220413star.mat'];
-HgAr_filen = 24;
-Kr_filen = 26;
+%fp = '\\cloudgazer\data_sunsat\cal_lab_all\data_processed\allstarmats\';
+%fstarpath = [fp '4STARB_20220413star.mat'];
+%HgAr_filen = 24;
+%Kr_filen = 26;
+fp = 'C:\Users\lebla\Research\4STAR\cal\4STAR_20220414_callab_linelamps\';
+fstarpath = [fp '4STAR_20220414star.mat'];
+HgAr_filen = 21;
+Kr_filen = 20;
+
 max_wdiff = 3.5;
+max_peak_line_diff = 0.4;
 fp = getnamedpath('starfig');
 
 s = load(fstarpath);
@@ -35,6 +41,35 @@ ihg_ar_lamp = s.vis_zen.filen==HgAr_filen;
 f_HgAr = s.vis_zen.filename{find(contains(s.vis_zen.filename,sprintf( '_%03d_',HgAr_filen)))};
 ikrypton_lamp = s.vis_zen.filen==Kr_filen;
 f_Kr = s.vis_zen.filename{find(contains(s.vis_zen.filename,sprintf( '_%03d_',Kr_filen)))};
+
+%% Special fitlering for defined measurement timing.
+if length(strsplit(fstarpath,'20220414'))>1
+    max_peak_line_diff = 1.4; % seems like 4STAR has larger wavelength difference
+    t_light_kr = [datenum(2022,4,14,17,45,38),datenum(2022,4,14,17,47,30)];
+    t_dark_kr = [datenum(2022,4,14,17,47,39),datenum(2022,4,14,17,48,33)];
+    ikrypton_lamp = s.vis_zen.t>t_light_kr(1) & s.vis_zen.t<t_light_kr(2);
+    ikrypton_dark = s.vis_zen.t>t_dark_kr(1) & s.vis_zen.t<t_dark_kr(2);
+
+    s.vis_zen.Str = s.vis_zen.Str.*0 + 2; % reset all the measurements 
+    s.nir_zen.Str = s.nir_zen.Str.*0 + 2; % reset all the measurements 
+    
+    s.vis_zen.Str(ikrypton_lamp) = 2;
+    s.vis_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
+    s.nir_zen.Str(ikrypton_lamp) = 2;
+    s.nir_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
+
+    t_light_hg = [datenum(2022,4,14,17,54,11),datenum(2022,4,14,17,54,42)];
+    t_dark_hg = [datenum(2022,4,14,17,54,47),datenum(2022,4,14,17,55,18)];
+    ihg_ar_lamp = s.vis_zen.t>t_light_hg(1) & s.vis_zen.t<t_light_hg(2);
+    ihg_ar_dark = s.vis_zen.t>t_dark_hg(1) & s.vis_zen.t<t_dark_hg(2);
+    s.vis_zen.Str(ihg_ar_lamp) = 2;
+    s.vis_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
+    s.nir_zen.Str(ihg_ar_lamp) = 2;
+    s.nir_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
+
+end
+
+%% load
 s = starwrapper(s.vis_zen,s.nir_zen);
 
 ppt_fname = fullfile(fp,[s.daystr '_' s.instrumentname '_LineLamps.ppt']);
@@ -160,7 +195,12 @@ save_fig(figd,fn,0);
 % build a new spectral array for each of the peaks 
 spectras = [repmat(mean_spectra_hgar,length(wpeaks_Hg),1);repmat(mean_spectra_hgar,length(wpeaks_Ar),1);repmat(mean_spectra_krypton,length(wpeaks_Kr),1)];
 peaks = [wpeaks_Hg,wpeaks_Ar,wpeaks_Kr];
+peak_names = {'Hg(Ar)','Hg(Ar)','Kr'};
+peaks_inames = [wpeaks_Hg.*0+1,wpeaks_Ar.*0+2,wpeaks_Kr.*0+3];
 lines = [wlines_Hg,wlines_Ar,wlines_Kr];
+lines_names = {'Hg','Ar','Kr'};
+lines_inames = [wlines_Hg.*0+1,wlines_Ar.*0+2,wlines_Kr.*0+3];
+
 wvl_range = 7.0 ; %Range of wavelength to fit +/-
 wavelength = s.w.*1000.0;
 fitted_peak = [];
@@ -206,24 +246,29 @@ for ip = 1:length(peaks)
     plot(wave_to_fit,spec_to_fit,'.-k');
     hold on;
     plot(f1);
-    xline(lines(ip),'g');
-    legend('Measurement',['gaussian fit, FWHM=' num2str(FWHM(ip)) ' nm'],'line lamp');
-    title(['Peak at ' num2str(lines(ip)) ' nm']);
+    xline(lines(ip),'g','LineWidth',2);
+    legend('Measurement',['gaussian fit, FWHM=' num2str(FWHM(ip)) ' nm'],[lines_names{lines_inames(ip)} '-line lamp'],'Location','southeast');
+    title(['Peak at ' num2str(lines(ip)) ' nm from ' peak_names{peaks_inames(ip)} ' lamp']);
     xlabel('Wavelength [nm]');
     ylabel('Radiance count rate [#/ms]');
     lm = get(gca,'xlim');
-    for ppl=peaks_HgAr, if ppl>lm(1) & ppl<lm(2), xline(ppl,'b'); end, end
-    for ppl=peaks_argon, if ppl>lm(1) & ppl<lm(2), xline(ppl,'r'); end, end
-    for ppl=peaks_krypton, if ppl>lm(1) & ppl<lm(2), xline(ppl,'g'); end, end
+    for ppl=peaks_HgAr, if ppl>lm(1) & ppl<lm(2), xline(ppl,'b','DisplayName','other Hg-line'); end, end
+    for ppl=peaks_argon, if ppl>lm(1) & ppl<lm(2), xline(ppl,'r','DisplayName','other Ar-line'); end, end
+    for ppl=peaks_krypton, if ppl>lm(1) & ppl<lm(2), xline(ppl,'c','DisplayName','other Kr-line'); end, end
     hold off;
     
     pp = menu('Use this line?','yes','no');
     if pp>1
         % don't use this line
         not_use(end+1) = ip;
+        title(['** Not used **' 'Peak at ' num2str(lines(ip)) ' nm from ' peak_names{peaks_inames(ip)} ' lamp']);
+        
+        fn = [fp s.instrumentname s.daystr '_peakfit_FWHM_' num2str(lines(ip)) 'nm_BAD'];
+        fig_paths = [fig_paths;{[fn '.png'] 4}];    
+        save_fig(figsp,fn,0);
     else
         fn = [fp s.instrumentname s.daystr '_peakfit_FWHM_' num2str(lines(ip)) 'nm'];
-        fig_paths = [fig_paths;{[fn '.png'] 4}];
+        fig_paths = [fig_paths;{[fn '.png'] 4}];    
         save_fig(figsp,fn,0);
     end
 end
@@ -254,16 +299,22 @@ ylabel('Difference in peak calculations (fitted peaks - line value)')
 visfwh = interp1(linee/1000.0,FWHM(ilines),s.w(1:1044),'makima');
 nirfwh = interp1(linee/1000.0,FWHM(ilines),s.w(1045:end),'makima');
 
+[old_visw, old_nirw, old_visfwhm, old_nirfwhm]=starwavelengths(s.t,s.instrumentname);
 
 fwh = figure; 
 plot(lines,FWHM,'.'); hold on;
 plot(s.w(1:1044).*1000.0,visfwh,'-b');
 plot(s.w(1045:end).*1000.0,nirfwh,'-r');
-legend('fit to measurement','VIS spline','NIR spline')
+
+plot(old_visw.*1000.0,old_visfwhm.*1000,'--b');
+plot(old_nirw.*1000.0,old_nirfwhm,'--r');
+
+legend('fit to measurement','VIS spline','NIR spline','Previous VIS','Previous NIR')
 xlabel('Wavelength [nm]');
 ylabel('FWHM from gaussian fit [nm]');
 title([s.instrumentname ' - ' s.daystr ' FWHM calculations from Hg(Ar) and Kr']);
 grid on;
+ylim([0,12]);
 fn = [fp s.instrumentname s.daystr '_FWHM'];
 fig_paths = [fig_paths;{[fn '.png'] 1}];
 save_fig(fwh,fn,0);
@@ -277,8 +328,13 @@ save_fig(fwh,fn,0);
 ipixels = 0:1043;
 fitted_i= interp1(s.w(1:1044)',ipixels,fitted_peak./1000.0);
 ft = fittype('C0+C1*p+C2*p.^2+C3*p.^3','independent','p');
-flt_i = isfinite(fitted_i) & abs(fitted_peak-lines)<0.4; 
-mdl = fit(fitted_i(flt_i)',fitted_peak(flt_i)',ft,'start',[171.7 0.81254 -1.55568e-6 -1.59216e-8]);
+flt_i = isfinite(fitted_i) & abs(fitted_peak-lines)<max_peak_line_diff; 
+if strcmp(s.instrumentname,'4STAR')
+    Cns = [171.855 0.81143 -1.98521e-6 -1.58185e-8]; % from manufacture
+elseif strcmp(s.instrumentname,'4STARB')
+    Cns = [171.7 0.81254 -1.55568e-6 -1.59216e-8]; % from manufacture
+end
+mdl = fit(fitted_i(flt_i)',fitted_peak(flt_i)',ft,'start',Cns);
 
 % run through better fitting
 delta = polyfit(lines(flt_i),ft(mdl.C0,mdl.C1,mdl.C2,mdl.C3,fitted_i(flt_i))-lines(flt_i),1);
