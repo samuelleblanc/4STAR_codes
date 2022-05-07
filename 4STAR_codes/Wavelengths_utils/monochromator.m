@@ -69,25 +69,25 @@ s = starwrapper(s.vis_zen,s.nir_zen);
 
 %% plot out each monochromator file and corresponding spectromoeter file
 for inum=1:length(m_logs(:,11))
-    fig_wv = figure;
-    fig_vis = figure;
-    fig_nir = figure;
+    fig_wv = figure(11);
+    fig_vis = figure(12);
+    fig_nir = figure(13);
     mean_rate = [[]]; %mean spectra for each wavelenght step in the monochromator
     labels = {};
     
     cm=hsv(length(mono{inum}.wvs));
-    fig_wv; set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
-    fig_vis; set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
-    fig_nir; set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(11); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(12); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(13); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
     for it = 1:length(mono{inum}.wvs)
        its = s.t>mono{inum}.t_ranges(it,1) & s.t<mono{inum}.t_ranges(it,2);
        mean_rate(end+1,:) = nanmean(s.rate(its,:));
-       fig_wv; plot(s.w,mean_rate(end,:),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_wv); hold on;
-       fig_vis; plot(s.w(1:1044),mean_rate(end,1:1044),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_vis); hold on;
-       fig_nir; plot(s.w(1045:end),mean_rate(end,1045:end),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_nir); hold on;
+       figure(11); plot(s.w,mean_rate(end,:),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_wv); hold on;
+       figure(12); plot(s.w(1:1044),mean_rate(end,1:1044),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_vis); hold on;
+       figure(13); plot(s.w(1045:end),mean_rate(end,1045:end),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_nir); hold on;
        labels = [labels; {num2str(mono{inum}.wvs(it))}]; 
     end
-    fig_wv; 
+    figure(11); 
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
@@ -97,7 +97,7 @@ for inum=1:length(m_logs(:,11))
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 
-    fig_vis;
+    figure(12);
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
@@ -107,7 +107,7 @@ for inum=1:length(m_logs(:,11))
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     
-    fig_nir;
+    figure(13);
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
