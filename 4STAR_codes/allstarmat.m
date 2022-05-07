@@ -107,6 +107,19 @@ for i=1:length(filenames);
                        type = type;
                     end
                     contents=[contents;{type}];
+                    
+                    % check for duplicate lines/times
+                    [uu,iu,cu] = unique(s.t);
+                    len_t = length(s.t);
+                    if length(uu) ~= len_t %duplicate lines found
+                        note = [note; {['Duplicate lines found (N=' num2str(len_t-length(uu)) ') removing those from all fields']}];                        
+                        for fnn = fieldnames(s.vis_zen)
+                           if length(s.(fnn)) == len_t
+                              s.(fnn) = s.(fnn)(iu); %subset the fields hat have the same number of lines as the time to 
+                           end
+                        end                       
+                    end
+                
                     if isequal(type(end-2:end), 'sun') || isequal(type(end-2:end), 'zen')  || isequal(type(end-3:end), 'park') || isequal(type(end-3:end), 'forj') || isequal(type(end-4:end), 'track');
                         s.filename=filenames(i);
                         s.filen=repmat(filen, size(s.t));
