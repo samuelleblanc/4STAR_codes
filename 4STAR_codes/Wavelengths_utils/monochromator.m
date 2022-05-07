@@ -69,50 +69,50 @@ s = starwrapper(s.vis_zen,s.nir_zen);
 
 %% plot out each monochromator file and corresponding spectromoeter file
 for inum=1:length(m_logs(:,11))
-    fig_wv = figure(11);
-    fig_vis = figure(12);
-    fig_nir = figure(13);
+    fig_wv = figure(1+inum*10);
+    fig_vis = figure(2+inum*10);
+    fig_nir = figure(3+inum*10);
     mean_rate = [[]]; %mean spectra for each wavelenght step in the monochromator
     labels = {};
     
     cm=hsv(length(mono{inum}.wvs));
-    figure(11); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
-    figure(12); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
-    figure(13); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(1+inum*10); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(2+inum*10); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
+    figure(3+inum*10); set(gca, 'ColorOrder', cm, 'NextPlot', 'replacechildren');
     for it = 1:length(mono{inum}.wvs)
        its = s.t>mono{inum}.t_ranges(it,1) & s.t<mono{inum}.t_ranges(it,2);
        mean_rate(end+1,:) = nanmean(s.rate(its,:));
-       figure(11); plot(s.w,mean_rate(end,:),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_wv); hold on;
-       figure(12); plot(s.w(1:1044),mean_rate(end,1:1044),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_vis); hold on;
-       figure(13); plot(s.w(1045:end),mean_rate(end,1045:end),'DisplayName',num2str(mono{inum}.wvs(it)),'Parent',fig_nir); hold on;
+       figure(1+inum*10); plot(s.w,mean_rate(end,:),'DisplayName',num2str(mono{inum}.wvs(it))); hold on;
+       figure(2+inum*10); plot(s.w(1:1044),mean_rate(end,1:1044),'DisplayName',num2str(mono{inum}.wvs(it))); hold on;
+       figure(3+inum*10); plot(s.w(1045:end),mean_rate(end,1045:end),'DisplayName',num2str(mono{inum}.wvs(it))); hold on;
        labels = [labels; {num2str(mono{inum}.wvs(it))}]; 
     end
-    figure(11); 
+    figure(1+inum*10); 
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
-    grid;
+    grid on;
     ylim([0.0005,10000.0]);  
     title(['Monochromator ' num2str(m_logs{inum,3}) ' to ' num2str(m_logs{inum,4}) ' nm ' datestr(m_logs{inum,1},'THHMMSS') ' by ' s.instrumentname s.daystr])
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
 
-    figure(12);
+    figure(2+inum*10);
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
-    grid;
-    ylim([0.0005,10000.0]);  
+    grid on;
+    ylim([0.01,10000.0]);  
     title(['VIS - Monochromator ' num2str(m_logs{inum,3}) ' to ' num2str(m_logs{inum,4}) ' nm ' datestr(m_logs{inum,1},'THHMMSS') ' by ' s.instrumentname s.daystr])
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
     
-    figure(13);
+    figure(3+inum*10);
     set(gca, 'YScale', 'log');
     xlabel('Wavelength [nm]');
     ylabel('Count rate [#/ms]');
-    grid;
-    ylim([0.0005,10000.0]);  
+    grid on;
+    ylim([0.0005,500.0]);  
     title(['NIR - Monochromator ' num2str(m_logs{inum,3}) ' to ' num2str(m_logs{inum,4}) ' nm ' datestr(m_logs{inum,1},'THHMMSS') ' by ' s.instrumentname s.daystr])
     colormap(cm);
     lcolorbar(labels','TitleString','\lambda [nm]','fontweight','bold');
