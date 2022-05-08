@@ -42,8 +42,8 @@ end
 fido=fopen(starinfo_out,'w');
 lines = {};
 changed = false;
-datenum_str_start = datestr(time_start,'yyyy,dd,mm,HH,MM,SS');
-datenum_str_end = datestr(time_end,'yyyy,dd,mm,HH,MM,SS');
+datenum_str_start = datestr(time_start,'yyyy,mm,dd,HH,MM,SS');
+datenum_str_end = datestr(time_end,'yyyy,mm,dd,HH,MM,SS');
 while ~feof(fidi)
   l=fgetl(fidi);   % read line
   if strfind(l,'s.ground') & ~startsWith(strtrim(l),'%')
