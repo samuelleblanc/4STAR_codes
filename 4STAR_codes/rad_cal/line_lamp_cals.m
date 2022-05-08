@@ -1,4 +1,4 @@
-%function fig_paths = line_lamp_cals(fstarpath)
+function fig_paths = line_lamp_cals(fstarpath)
 %% PURPOSE:
 %   To quantify the line_lamp_cals and their wavelength representation
 %
@@ -19,7 +19,7 @@
 %
 % MODIFICATION HISTORY:
 % Written (v1.0): by Samuel LeBlanc, Santa Cruz, 2022-04-14 
-% Modified (v1.0): 
+% Modified (v1.0): Added specifications for MLO line lamps
 % -------------------------------------------------------------------------
 version_set('1.0');
 %% Load and prep data
@@ -27,53 +27,69 @@ version_set('1.0');
 %fstarpath = [fp '4STARB_20220413star.mat'];
 %HgAr_filen = 24;
 %Kr_filen = 26;
-fp = 'C:\Users\lebla\Research\4STAR\cal\4STAR_20220414_callab_linelamps\';
-fstarpath = [fp '4STAR_20220414star.mat'];
-HgAr_filen = 21;
-Kr_filen = 20;
 
+if nargin<1
+    fp = 'C:\Users\lebla\Research\4STAR\cal\4STAR_20220414_callab_linelamps\';
+    fstarpath = [fp '4STAR_20220414star.mat'];
+    HgAr_filen = 21;
+    Kr_filen = 20;
+end
 max_wdiff = 3.5;
 max_peak_line_diff = 0.4;
 fp = getnamedpath('starfig');
 
-s = load(fstarpath);
-ihg_ar_lamp = s.vis_zen.filen==HgAr_filen;
-f_HgAr = s.vis_zen.filename{find(contains(s.vis_zen.filename,sprintf( '_%03d_',HgAr_filen)))};
-ikrypton_lamp = s.vis_zen.filen==Kr_filen;
-f_Kr = s.vis_zen.filename{find(contains(s.vis_zen.filename,sprintf( '_%03d_',Kr_filen)))};
+star = load(fstarpath);
+s = starwrapper(star.vis_zen,star.nir_zen);
+
+ppt_fname = fullfile(fp,[s.daystr '_' s.instrumentname '_LineLamps']);
+fig_paths = {};
+
+%% load from the starinfo file (if exists)
+if isfield(s,'HgAr_filen'), HgAr_filen = s.HgAr_filen; end
+if isfield(s,'Kr_filen'), Kr_filen = s.Kr_filen; end
+
+
+%% subset the correct files and lamps timing
+f_HgAr = star.vis_zen.filename{find(contains(star.vis_zen.filename,sprintf( '_%03d_',HgAr_filen)))};
+f_Kr = star.vis_zen.filename{find(contains(star.vis_zen.filename,sprintf( '_%03d_',Kr_filen)))};
+
+if isfield(s,'t_hg_ar_lamp') %prioritize using the time ranges if present than the filen
+    ihg_ar_lamp = s.t>s.t_hg_ar_lamp(1) & s.t<s.t_hg_ar_lamp(2);
+else
+    ihg_ar_lamp = star.vis_zen.filen==HgAr_filen;
+end
+if isfield(s,'t_krypton_lamp') %prioritize using the time ranges if present than the filen
+    ikrypton_lamp = s.t>s.t_krypton_lamp(1) & s.t<s.t_krypton_lamp(2);
+else
+    ikrypton_lamp = star.vis_zen.filen==Kr_filen;
+end
 
 %% Special fitlering for defined measurement timing.
 if length(strsplit(fstarpath,'20220414'))>1
     max_peak_line_diff = 1.4; % seems like 4STAR has larger wavelength difference
     t_light_kr = [datenum(2022,4,14,17,45,38),datenum(2022,4,14,17,47,30)];
     t_dark_kr = [datenum(2022,4,14,17,47,39),datenum(2022,4,14,17,48,33)];
-    ikrypton_lamp = s.vis_zen.t>t_light_kr(1) & s.vis_zen.t<t_light_kr(2);
-    ikrypton_dark = s.vis_zen.t>t_dark_kr(1) & s.vis_zen.t<t_dark_kr(2);
+    ikrypton_lamp = star.vis_zen.t>t_light_kr(1) & star.vis_zen.t<t_light_kr(2);
+    ikrypton_dark = star.vis_zen.t>t_dark_kr(1) & star.vis_zen.t<t_dark_kr(2);
 
-    s.vis_zen.Str = s.vis_zen.Str.*0 + 2; % reset all the measurements 
-    s.nir_zen.Str = s.nir_zen.Str.*0 + 2; % reset all the measurements 
+    star.vis_zen.Str = star.vis_zen.Str.*0 + 2; % reset all the measurements 
+    star.nir_zen.Str = star.nir_zen.Str.*0 + 2; % reset all the measurements 
     
-    s.vis_zen.Str(ikrypton_lamp) = 2;
-    s.vis_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
-    s.nir_zen.Str(ikrypton_lamp) = 2;
-    s.nir_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
+    star.vis_zen.Str(ikrypton_lamp) = 2;
+    star.vis_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
+    star.nir_zen.Str(ikrypton_lamp) = 2;
+    star.nir_zen.Str(ikrypton_dark) = 0; % only dark for a small subset of time
 
     t_light_hg = [datenum(2022,4,14,17,54,11),datenum(2022,4,14,17,54,42)];
     t_dark_hg = [datenum(2022,4,14,17,54,47),datenum(2022,4,14,17,55,18)];
-    ihg_ar_lamp = s.vis_zen.t>t_light_hg(1) & s.vis_zen.t<t_light_hg(2);
-    ihg_ar_dark = s.vis_zen.t>t_dark_hg(1) & s.vis_zen.t<t_dark_hg(2);
-    s.vis_zen.Str(ihg_ar_lamp) = 2;
-    s.vis_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
-    s.nir_zen.Str(ihg_ar_lamp) = 2;
-    s.nir_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
+    ihg_ar_lamp = star.vis_zen.t>t_light_hg(1) & star.vis_zen.t<t_light_hg(2);
+    ihg_ar_dark = star.vis_zen.t>t_dark_hg(1) & star.vis_zen.t<t_dark_hg(2);
+    star.vis_zen.Str(ihg_ar_lamp) = 2;
+    star.vis_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
+    star.nir_zen.Str(ihg_ar_lamp) = 2;
+    star.nir_zen.Str(ihg_ar_dark) = 0; % only dark for a small subset of time
 
 end
-
-%% load
-s = starwrapper(s.vis_zen,s.nir_zen);
-
-ppt_fname = fullfile(fp,[s.daystr '_' s.instrumentname '_LineLamps.ppt']);
-fig_paths = {};
 
 %% Select data to look at
 [p,nm_HgAr,ex] = fileparts(f_HgAr);
@@ -423,8 +439,9 @@ for ii=1:size(pptcontents0,1)
         error('Paste either 1 or 4 figures per slide.');
     end
 end
+disp(['Saving to power point file: ' ppt_fname '.pptx'])
 makepptx(ppt_fname, [s.instrumentname ' - '  s.daystr ' Cal Lab Line lamps'], pptcontents{:});
-
+end
 
 function [wpeaks,wlines] = match_peaks(wpeak,lamp_peaks,max_wdiff)
 % Function that pulls out the peaks from peak selected and nearest line
