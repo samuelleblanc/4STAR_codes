@@ -54,8 +54,11 @@ switch instrumentname;
     case {'4STAR'}
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-            if t>=datenum([2021 11 1 0 0 0]) % for after rebuild of spectrobox heat sinks and wind maker
-                daystr = '20220406' % using the match to AERONET until MLO 20220406_NIR_C0_4STAR_AODmatch_toAERONET_fromNASA_Ames.dat
+            if t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STAR fiber break and fix
+                daystr = '20220429';
+                filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
+            elseif t>=datenum([2021 11 1 0 0 0]) % for after rebuild of spectrobox heat sinks and wind maker
+                daystr = '20220406'; % using the match to AERONET until MLO 20220406_NIR_C0_4STAR_AODmatch_toAERONET_fromNASA_Ames.dat
                 filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
             elseif t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
                 daystr = '20200701';
@@ -402,7 +405,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>=datenum([2022 4 1 0 0 0]) % for after rebuild and adding spare azimutt clockspring fiber
+        if t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
+                daystr = '20220429';
+                filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
+        elseif t>=datenum([2022 4 1 0 0 0]) % for after rebuild and adding spare azimutt clockspring fiber
                 daystr = '20220406';
                 filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';
         elseif t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
