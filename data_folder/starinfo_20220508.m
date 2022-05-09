@@ -7,7 +7,7 @@ end
 if isfield(s, 'toggle')
     s.toggle = update_toggle(s.toggle);
 else
-    s.toggle = update_toggle;
+    s.toggle = update_toggle;h
 end
 s.langley1 = [datenum(2022,05,08,15,58,00) datenum(2022,05,08,22,20,0)];
 s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
