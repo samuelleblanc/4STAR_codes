@@ -357,7 +357,7 @@ ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.quad_sigs.png']}];
 
 %%
 %ins.SA(3:end-2), ins.CCD_norm(3:end-2,good_pix)
-midSA = icenter %ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
+midSA = icenter; %ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
 %for ix = length(ins.nm):-1:1
 %    P{ix} = polyfit(ins.SA(midSA),ins.CCD_norm(midSA,ix),1);
 %    midv = polyval(P{ix},0);
