@@ -364,16 +364,16 @@ starsavec0([getnamedpath('starmat') nirfilename], fname_starsun, additionalnotes
 
 %% Compare the resulting c0s
 
-%try
+try
    % get used c0 filename
    for i=1:length(note); if contains(note{i},'VIS_C0'); cofiles = strsplit(note{i}); end; end;
    fig_names = compare_Co_fx({which(cofiles{end}(1:end-1));[getnamedpath('starmat') visfilename]},1);
    for n=1:length(fig_names)
        fig_paths = [fig_paths; fig_names{n}];
    end
-%catch
+catch
     disp('Problem comparing the new C0s')
-%end
+end
 return
 
 function [line,label] = get_linfit(x,y,color)
