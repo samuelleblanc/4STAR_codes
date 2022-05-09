@@ -18,9 +18,9 @@ s.xtra_langleyfilesuffix = 'MLO_May2022_Day2';
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.2694; %2699 at solar noon From Mauna Loa Pandora at 12:20 local, 
+s.O3col=269.4; %269.9 at solar noon From Mauna Loa Pandora at 12:20 local, 
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=8.266e-2*(Loschmidt/1000) %  8.266e-2 DU from Mauna Loa Pandora at 12:20 local (solar noon), median for the time period is 7.927e-2DU
+s.NO2col=8.266e-2*(Loschmidt/1000); %  8.266e-2 DU from Mauna Loa Pandora at 12:20 local (solar noon), median for the time period is 7.927e-2DU
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 s.ground = [datenum(2022,05,08,15,02,56) datenum(2022,05,09,2,40,00)];
