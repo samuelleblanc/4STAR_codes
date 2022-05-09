@@ -107,7 +107,7 @@ p1 = getnamedpath('starimg');
 savefigure = true;
 
 if nargin <3;
-    ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks.ppt']);
+    ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks']);
 end;
 
 %% Check if figures subfolder exist for day and instrument, if not then create it
@@ -189,7 +189,7 @@ if isfield(s,'langley')||isfield(s,'langley1');
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
     try
-      langley_figs = starLangley_fx_(s,1,p1,xtra);
+      langley_figs = starLangley_fx_(s,1,p1,xtra,true);
     catch
       langley_figs = {};
     end
@@ -204,8 +204,12 @@ if isfield(s,'langley')||isfield(s,'langley1');
       pptcontents0=[pptcontents0; {langley_figs{10} 4}];
       pptcontents0=[pptcontents0; {' ' 4}];
       pptcontents0=[pptcontents0; {' ' 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{end} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{end-5} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{end-4} 1}];
+      pptcontents0=[pptcontents0; {langley_figs{end-3} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{end-2} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{end-1} 4}];
+      pptcontents0=[pptcontents0; {langley_figs{end} 4}];
     end
 end
 end
@@ -1808,7 +1812,7 @@ if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
     if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
     try
-      langley_figs = starLangley_fx_(s,1,p1,xtra);
+      langley_figs = starLangley_fx_(s,1,p1,xtra,true);
     catch
       langley_figs = {};
     end

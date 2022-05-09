@@ -325,7 +325,7 @@ end;
 % plot 500 nm count rate with Tst
 for k=1;
     figure;
-    h2=scatter(s.m_aero(ok),s.rateaero(ok,cols(4)),6,Tst(ok),'filled');
+    h2=scatter(real(s.m_aero(ok)),real(s.rateaero(ok,cols(4))),6,real(Tst(ok)),'filled');
     colorbar;
     ch=colorbarlabeled('Tst');
     xlabel('aerosol Airmass','FontSize',14);
@@ -345,7 +345,7 @@ end;
 % plot 500 nm count rate with Az_deg
 for k=1;
     figure;
-    h1=scatter(m_aero(ok),real(s.rateaero(ok,cols(4))),6,s.AZ_deg(ok),'filled');
+    h1=scatter(real(m_aero(ok)),real(s.rateaero(ok,cols(4))),6,s.AZ_deg(ok),'filled');
     colorbar;
     ch=colorbarlabeled('AZdeg');
     xlabel('aerosol Airmass','FontSize',14);
@@ -436,6 +436,17 @@ if ~strcmp(instrumentname,'2STAR');
 end;
 
 
-%if compare_to_previous
+if compare_to_previous
 % be sure to modify starc0.m so that starsun.m will read the new c0 files.
+    try
+       % get used c0 filename
+       for i=1:length(s.note); if contains(s.note{i},'VIS_C0'); cofiles = strsplit(s.note{i}); end; end;
+       fig_names_co = compare_Co_fx({which(cofiles{end}(1:end-1));visfilename},1);
+       for n=1:length(fig_names_co)
+           fig_names = [fig_names; fig_names_co{n}];
+       end
+    catch
+        disp('Problem comparing the new C0s')
+    end
+end
 return
