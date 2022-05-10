@@ -1,4 +1,4 @@
-function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
+function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname)
 %% Details of the program:
 % NAME:
 %   Quicklooks_4STAR
@@ -77,11 +77,12 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname);
 %                    var2plot doesn't exist
 % MS   , 2018-09-20, fixed backcompatability bug using ytick instead of
 %                    yticklabels
+% SL   , 2022-05-09, debugged and fixed some langley plotting
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.2');
-plotting_langley_first = false;
+version_set('1.3');
+plotting_langley_first = true;
 %% prepare to save a PowerPoint file
 set(groot, 'defaultAxesTickLabelInterpreter','None'); set(groot, 'defaultLegendInterpreter','None');
 set(groot, 'defaultAxesTitle','None'); 
@@ -90,25 +91,23 @@ pptcontents={}; % pairs of a figure file name and the number of figures per slid
 pptcontents0={};
 
 %% Sanitize inputs and get file paths
-if nargin<1; % no file path set
+if nargin<1 % no file path set
     fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
     fname_4starsun = getfullname('4STAR*starsun.mat','starsun','Choose starsun file');  
     [p1, f, ext0]=fileparts(fname_4starsun);
-elseif nargin<2;
+elseif nargin<2
     [p1, f, ext0]=fileparts(fname_4starsun);
     fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
 %     [ft,pt] = uigetfile2('4STAR*star.mat','Choose the 4STAR star.mat file');
 %     fname_4star = [pt ft];
-else;
+else
     [p1, f, ext0]=fileparts(fname_4starsun);
-end;
+end
 p1 = getnamedpath('starimg');
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_4starsun});
 savefigure = true;
 
-if nargin <3;
-    ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks']);
-end;
+if nargin <3, ppt_fname = fullfile(getnamedpath('starppt'),[daystr '_' instrumentname '_Quicklooks']); end
 
 %% Check if figures subfolder exist for day and instrument, if not then create it
 if isfolder([p1 instrumentname '_' daystr])
@@ -126,12 +125,7 @@ s = load(fname_4starsun);
 %********************
 %% set parameters and default titles
 %********************
-if length(unique(s.Lat))<=5;
-    platform = 'ground';
-else;
-    platform = 'flight';
-end;
-
+if length(unique(s.Lat))<=5, platform = 'ground'; else, platform = 'flight'; end
 tit = [instrumentname ' - ' daystr];
 
 %********************
@@ -139,26 +133,22 @@ tit = [instrumentname ' - ' daystr];
 %********************
 t = s.t;
 dt = s.t(end)-s.t(1);
-if dt>0.2;
-    ddt = 0.01;
-else;
-    ddt = 0.0005;
-end;
+if dt>0.2, ddt = 0.01; else, ddt = 0.0005; end
 
 %% get the track info
-if strcmp(instrumentname,'4STARB'); st.track.T2 =st.track.T2+273.15; end;
+if strcmp(instrumentname,'4STARB'); st.track.T2 =st.track.T2+273.15; end
 track.T=[st.track.T1 st.track.T2 st.track.T3 st.track.T4];
 track.P=[st.track.P1 st.track.P2 st.track.P3 st.track.P4];
 bl=60/86400;
-if numel(st.track.t)<=1;
+if numel(st.track.t)<=1
     track.Tsm=track.T;
     track.Psm=track.P;
-else;
-    for i=1:4;
+else
+    for i=1:4
         track.Tsm(:,i)=boxxfilt(st.track.t, track.T(:,i), bl);
         track.Psm(:,i)=boxxfilt(st.track.t, track.P(:,i), bl);
-    end;
-end;
+    end
+end
 track.Psm(:,1) = (track.Psm(:,1)-0.19).*10.0./1000.0; % to convert V to mbar
 track.Psm(:,4) = (track.Psm(:,3)-0.19).*10.0./1000.0; % to convert V to mbar
 track.Psm(:,3) = (track.Psm(:,4)-0.19).*10.0./1000.0; % to convert V to mbar
@@ -184,34 +174,11 @@ s.Lon(ngs) = NaN; s.Lat(ngs) = NaN;
 
 
 %% Check if langley is defined
-if plotting_langley_first;
-if isfield(s,'langley')||isfield(s,'langley1');
+if plotting_langley_first
+  if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
-    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end;
-    try
-      langley_figs = starLangley_fx_(s,1,p1,xtra,true);
-    catch
-      langley_figs = {};
-    end
-    if length(langley_figs)>0
-      pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-      pptcontents0=[pptcontents0; {' ' 4}];
-      pptcontents0=[pptcontents0; {' ' 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end-5} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{end-4} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{end-3} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end-2} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end-1} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end} 4}];
-    end
-end
+    pptcontents0 = plot_langleys(s,p1,pptcontents0);
+  end
 end
 
 
@@ -245,17 +212,17 @@ catch
 end
 
 %% Load the flag files and see if gas flags exist
-if isfield(s, 'flagfilename');
+if isfield(s, 'flagfilename')
     disp(['Loading flag file: ' s.flagfilename])
     flag = load(s.flagfilename);
     % read flags
     flag  = convert_flags_to_qual_flag(flag,s.t,s.flight);
     %flag.manual_flags.screen;
-else;
+else
     flag = zeros(length(s.t),1);
-end;
+end
 
-if isfield(s, 'flagfilenameO3');
+if isfield(s, 'flagfilenameO3')
     disp(['Loading flag file: ' s.flagfilenameO3])
     flagO3 = load(s.flagfilenameO3);
     % read flags
@@ -268,7 +235,7 @@ elseif isavar('o32plot')
     end
 end
 
-if isfield(s,'flagfilenameCWV');
+if isfield(s,'flagfilenameCWV')
     disp(['Loading flag file: ' s.flagfilenameCWV])
     flagCWV = load(s.flagfilenameCWV);
     flagCWV = flagCWV.manual_flags.screen;
@@ -277,9 +244,9 @@ elseif isavar('cwv2plot')
     if isavar('cwv2plot')==1
         flagCWV(cwv2plot<0 | cwv2plot> 4) = 1;
     end
-end;
+end
 
-if isfield(s,'flagfilenameNO2');
+if isfield(s,'flagfilenameNO2')
     disp(['Loading flag file: ' s.flagfilenameNO2])
     flagNO2 = load(s.flagfilenameNO2);
     flagNO2 = flagNO2.manual_flags.screen;
@@ -288,9 +255,9 @@ elseif isavar('no22plot')
     if isavar('no22plot')==1
         flagNO2(no22plot<0 | no22plot> 1e18) = 1;
     end
-end;
+end
 
-if isfield(s,'flagfilenameHCOH');
+if isfield(s,'flagfilenameHCOH')
     disp(['Loading flag file: ' s.flagfilenameHCOH])
     flagHCOH = load(s.flagfilenameHCOH);
     flagHCOH = flagHCOH.manual_flags.screen;
@@ -299,17 +266,17 @@ elseif isavar('hcoh2plot')
     if isavar('hcoh2plot')==1
         flagHCOH(hcoh2plot<0 | hcoh2plot> 10) = 1;
     end
-end;
+end
 
 
 %% read auxiliary data from starinfo and select rows
-if isequal(platform, 'flight');
-    if ~isfield(s,'flight');
+if isequal(platform, 'flight')
+    if ~isfield(s,'flight')
         error(['Specify flight time period in starinfo_' daystr '.m.']);
-    end;
+    end
     tlim=s.flight;
-elseif isequal(platform, 'ground');
-    if isfield(s,'flight');
+elseif isequal(platform, 'ground')
+    if isfield(s,'flight')
         tlim=NaN(size(s.flight,1)+1,2);
         tlim(1,1)=t(1);
         tlim(end,2)=t(end);
@@ -317,11 +284,11 @@ elseif isequal(platform, 'ground');
         tlim(2:end,1)=s.flight(:,2);
     else
         tlim=t([1 end])';
-    end;
-    if ~isfield(s,'groundcomparison');
+    end
+    if ~isfield(s,'groundcomparison')
         s.groundcomparison=tlim;
-    end;
-end;
+    end
+end
 
 
 %% Set up fields to plot
@@ -338,15 +305,15 @@ cls = 'krgbcmy';
 % plot altitude and modes
 falt = figure;
 sso = plot(s.t,s.Alt,[cls(1) fld_marks(1)]); hold on; leg={'vis_sun'}; plo = sso;
-for ii = 2:length(fld);
-    if length(st.(fld{ii}))>1;
-        for jj=1:length(st.(fld{ii})); sso = plot(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Alt,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8); end;
-    else;
+for ii = 2:length(fld)
+    if length(st.(fld{ii}))>1
+        for jj=1:length(st.(fld{ii})); sso = plot(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Alt,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8); end
+    else
         sso = plot(st.(fld{ii}).t,st.(fld{ii}).Alt,'Marker',fld_marks(ii),'MarkerFaceColor',cls(ii),'MarkerEdgeColor',cls(ii),'MarkerSize',8);
-    end;
+    end
     leg = [leg; {fld{ii}}];
     plo = [plo sso];
-end;
+end
 grid on;
 ylabel('Altitude [m]'); xlabel('Time'); title([tit ' - Altitude vs. time']);
 dynamicDateTicks;
@@ -363,29 +330,29 @@ subplot(3,1,[1,2]);
 [Ts,tt] = nfsmooth(s.Tprecon_C,60);
 [RHs,rr] = nfsmooth(s.RHprecon_percent,60); high_RH = find(RHs>2);
 [ax,h1,h2] = plotyy(s.t(tt),Ts,s.t(rr),RHs);
-if length(high_RH)>300; 
+if length(high_RH)>300
     set(ax(1),'Color',[1,0.5,0.5]);
     text(ax(2),s.t(1),0.5,'RH > 2% Too high!');
     set(ftnp, 'InvertHardCopy', 'off');
-end;
+end
 
-if length(find(nfsmooth(s.Tprecon_C,60)>35.0))>300; 
+if length(find(nfsmooth(s.Tprecon_C,60)>35.0))>300
     set(ax(1),'Color',[1,0.5,0.0]);
     text(ax(1),s.t(1),20,'Temperatures Too high! (larger than 35C)');
     set(ftnp, 'InvertHardCopy', 'off');
-end;
+end
 
-if std(nfsmooth(s.Tprecon_C,60))>2.5; 
+if std(nfsmooth(s.Tprecon_C,60))>2.5
     set(ax(1),'Color',[1,0.5,0.0]);
     text(ax(1),s.t(1),20,'Temperatures are too variable!','FontSize',18);
     set(ftnp, 'InvertHardCopy', 'off');
-end;
+end
 
 dynamicDateTicks(ax(1));dynamicDateTicks(ax(2));
 set(gca,'xticklabels',[''])
 grid on;
 [lg,ic] = legend(starfieldname2label('Tprecon'),starfieldname2label('RHprecon'),'Location', 'Best');
-for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
+for uu=1:length(ic); try, set(ic(uu),'MarkerSize',18);catch, nul=0; end;end
 
 ax2 = subplot(3,1,3);
 linkaxes([ax(1),ax(2),ax2],'x');
@@ -401,7 +368,7 @@ ylabel(ax(2),'RH [%], smoothed over 60s');
 ylabel(ax(1),'Temperature [^\circC], smoothed over 60s');
 ylabel(ax2,'T [^\circC]');
 [lg,ic] = legend(['raw ' starfieldname2label('Tbox')],['smoothed over 60s ' starfieldname2label('Tbox')],'Location', 'Best');
-for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);end;end;
+for uu=1:length(ic); try; set(ic(uu),'MarkerSize',18);catch, nul=0; end, end
 title(ax(1),[instrumentname ' - ' daystr ' - Temperature and Pressure (precon) in spectrometer box']);
 fname = fullfile(p1,[instrumentname '_' daystr '_TnP']);
 fig_names = [fig_names,{[fname '.png']}];
@@ -569,15 +536,15 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 % altitude
 falt = figure;
 plot(s.t,s.Alt,'.');hold on;
-for ii = 2:length(fld);
-    if length(st.(fld{ii}))>1;
-        for jj=1:length(st.(fld{ii}));
+for ii = 2:length(fld)
+    if length(st.(fld{ii}))>1
+        for jj=1:length(st.(fld{ii}))
             sso = scatter(st.(fld{ii})(jj).t,st.(fld{ii})(jj).Alt,1,'MarkerEdgeColor','k');
-        end;
-    else;
+        end
+    else
         sso = scatter(st.(fld{ii}).t,st.(fld{ii}).Alt,1,'MarkerEdgeColor','k');
-    end;
-end;
+    end
+end
 dynamicDateTicks;
 grid on;
 xlabel('UTC time');
@@ -1017,7 +984,7 @@ if isavar('tau_aero');
     xlabel('UTC time');
     ylabel('tau_aero');
     if max(s.tau_aero(:,iwvlv(1)))<2.5; tma = max(max(s.tau_aero(:,iwvlv(1))))*1.05; else tma=2.5; end;
-    ylim([0.0,tma]);
+    if ~tma<0, ylim([0.0,tma]); end
     xlim([s.t(1)-ddt s.t(end)+ddt]);
     title([tit ' - VIS AOD' ]);
     grid on;
@@ -1072,26 +1039,26 @@ end
         figma = figure;
         ss = scatter(s.Lon,s.Lat,8,s.tau_aero(:,i500),'o');
         hold on;
-        for ii = 2:length(fld);
-            if length(st.(fld{ii}))>1;
-                for jj=1:length(st.(fld{ii}));
+        for ii = 2:length(fld)
+            if length(st.(fld{ii}))>1
+                for jj=1:length(st.(fld{ii}))
                     sso = scatter(st.(fld{ii})(jj).Lon,st.(fld{ii})(jj).Lat,1,'MarkerEdgeColor','k');
-                end;
-            else;
+                end
+            else
                 sso = scatter(st.(fld{ii}).Lon,st.(fld{ii}).Lat,1,'MarkerEdgeColor','k');
-            end;
+            end
             leg = [leg; {fld{ii}}];
             plo = [plo sso];
-        end;
+        end
         
         utch = t2utch(s.t);
         t_low = min(utch); t_high = max(utch); nt =floor((t_high-t_low)/0.5);
         times_15min = linspace(floor(t_low),t_high,nt);
-        for q=1:nt;
+        for q=1:nt
             [nul,iq] = min(abs(utch-times_15min(q)));
             plot(s.Lon(iq),s.Lat(iq),'k+');
             text(s.Lon(iq),s.Lat(iq),num2str(times_15min(q),4));
-        end;
+        end
         xlabel('Longitude [^\circ]')
         ylabel('Latitude [^\circ]');
         grid on;
@@ -1808,36 +1775,17 @@ end
 
 %% Check if langley is defined
 if ~plotting_langley_first
-if isfield(s,'langley')||isfield(s,'langley1')
+  if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
-    if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
-    try
-      langley_figs = starLangley_fx_(s,1,p1,xtra,true);
-    catch
-      langley_figs = {};
-    end
-    if length(langley_figs)>0
-      pptcontents0=[pptcontents0; {langley_figs{1} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{2} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{3} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{4} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{5} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{6} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{9} 4}];
-      pptcontents0=[pptcontents0; {langley_figs{10} 4}];
-      pptcontents0=[pptcontents0; {' ' 4}];
-      pptcontents0=[pptcontents0; {' ' 4}];
-      pptcontents0=[pptcontents0; {langley_figs{end-1} 1}];
-      pptcontents0=[pptcontents0; {langley_figs{end} 1}];
-   end
-end
+    pptcontents0 = plot_langleys(s,p1,pptcontents0);
+  end
 end
 
 %% Compare to AERONET
 try
     aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
-catch
-    disp('Error making plots for AERONET files')
+catch e
+    disp(['Error making plots for AERONET files: ' e.identifier e.message])
     aeronet_fig_paths = [];
 end
 if length(aeronet_fig_paths)>0
@@ -1898,5 +1846,81 @@ if savefigure
             error('Paste either 1 or 4 figures per slide.');
         end
     end
+    disp(['Writing Quicklooks to ' ppt_fname])
     makepptx(ppt_fname, [instrumentname ' - '  daystr ' ' platform], pptcontents{:});
 end
+return
+
+%% simplifying fuctions
+function pptcontents0 = plot_langleys(s,p1,pptcontents0)
+
+% load info file
+infofile_ = ['starinfo_' s.daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s)']);
+end
+
+
+if isfield(s,'ground')||strcmp(platform,'ground');  xtra = '_ground_langley'; elseif isfield(s,'flight'); xtra = '_flight_langley'; end
+try
+    langley_figs = starLangley_fx_(s,1,p1,xtra,true,true);
+catch e
+    disp('** Error making Langleys **')
+    disp(['Error: ' e.identifier])
+    disp(['E Message: ' e.message])
+    disp([e.stack(1).name, ', line :' num2str(e.stack(1).line)])
+    disp([e.stack(2).name, ', line :' num2str(e.stack(2).line)])
+    langley_figs = {};
+end
+if length(langley_figs)>0
+    pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {' ' 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end-5} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{end-4} 1}];
+    pptcontents0=[pptcontents0; {langley_figs{end-3} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end-2} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end-1} 4}];
+    pptcontents0=[pptcontents0; {langley_figs{end} 4}];
+end
+if isfield(s,'langley2')
+    try
+        langley_figs = starLangley_fx_(s,1,p1,xtra,true,false);
+    catch e
+        disp('** Error making Langley PM **')
+        disp(['Error: ' e.identifier])
+        disp(['E Message: ' e.message])
+        disp([e.stack(1).name, ', line :' num2str(e.stack(1).line)])
+        disp([e.stack(2).name, ', line :' num2str(e.stack(2).line)])
+        langley_figs = {};
+    end
+    if length(langley_figs)>0
+        pptcontents0=[pptcontents0; {langley_figs{1} 1}];
+        pptcontents0=[pptcontents0; {langley_figs{2} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{3} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{4} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{5} 1}];
+        pptcontents0=[pptcontents0; {langley_figs{6} 1}];
+        pptcontents0=[pptcontents0; {langley_figs{9} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{10} 4}];
+        pptcontents0=[pptcontents0; {' ' 4}];
+        pptcontents0=[pptcontents0; {' ' 4}];
+        pptcontents0=[pptcontents0; {langley_figs{end-5} 1}];
+        pptcontents0=[pptcontents0; {langley_figs{end-4} 1}];
+        pptcontents0=[pptcontents0; {langley_figs{end-3} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{end-2} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{end-1} 4}];
+        pptcontents0=[pptcontents0; {langley_figs{end} 4}];
+    end
+end
+return
