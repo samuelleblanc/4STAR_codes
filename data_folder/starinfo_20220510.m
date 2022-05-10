@@ -7,23 +7,24 @@ end
 if isfield(s, 'toggle')
     s.toggle = update_toggle(s.toggle);
 else
-    s.toggle = update_toggle;
+    s.toggle = update_toggle;h
 end
-s.langley1 = [datenum(2022,05,08,15,58,00) datenum(2022,05,08,22,20,0)];
-s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,4,40,0)];
+s.langley1 = [datenum(2022,05,10,16,21,00) datenum(2022,05,10,19,10,0)];
+%s.langley = [datenum(2022,05,09,15,58,00) datenum(2022,05,09,19,40,0)];
+%s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
-s.xtra_langleyfilesuffix = 'MLO_May2022_Day2';
+s.xtra_langleyfilesuffix = 'MLO_May2022_Day4';
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.2694; %269.9 at solar noon From Mauna Loa Pandora at 12:20 local, 
+s.O3col=0.2690; %From Mauna Loa Pandora
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=8.266e-2*(Loschmidt/1000); %  8.266e-2 DU from Mauna Loa Pandora at 12:20 local (solar noon), median for the time period is 7.927e-2DU
+s.NO2col=6.567e-2*(Loschmidt/1000); %  .567e-2 DU from Mauna Loa Pandora
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
-s.ground = [datenum(2022,05,08,15,02,56) datenum(2022,05,09,4,40,00)];
+s.ground = [datenum(2022,05,10,15,12,56) datenum(2022,05,09,19,10,00)];
 %s.flight = [datenum(2020,07,08,11,00,00) datenum(2020,07,08,23,30,30)];
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
@@ -63,7 +64,7 @@ end
 %s.AODuncert_constant_extra = 0.2;
   
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=686.3; %MLO on 2022-05-08
+    s.Pst(find(s.Pst<10))=680.93; %MLO on 2022-05-08
 end;
 % other tweaks 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
