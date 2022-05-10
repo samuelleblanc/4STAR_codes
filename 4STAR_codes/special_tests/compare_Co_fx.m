@@ -380,7 +380,7 @@ fig_names = {};
 fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_' gdaystr '.png']];
 fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_relative_' gdaystr '.png']];
 fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_relative_zoom' gdaystr '.png']];
-fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_avg_' gdaystr '.png']]
+fig_names = [fig_names; [fp_out filesep fignames '_cal_c0_avg_' gdaystr '.png']];
 
 return
 

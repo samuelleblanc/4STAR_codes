@@ -58,7 +58,7 @@ end
 % to_uint16 = {'Str','Md','Zn','aerosolcols','viscols',...
 %           'nircols','visTint','nirTint','visAVG','nirAVG','visfilen','nirfilen'};
 % to_int16 = {'AZstep','Elstep'};
-keep_double = {'t','Lat','Lon','vist','nirt'};
+keep_double = {'t','Lat','Lon','vist','nirt','langley1','langley2','langley','ground','flight'};
 flds = fields(s);
 
 %% Run through the fields and substitute for single precision (or int)
