@@ -83,6 +83,8 @@ else;
     xtra = '_ground';
 end;
 % filter out bad data
+aod_380nm = real(aod_380nm); aod_452nm = real(aod_452nm); aod_500nm = real(aod_500nm); aod_620nm = real(aod_620nm); 
+aod_865nm = real(aod_865nm); aod_1040nm = real(aod_1040nm); aod_1215nm = real(aod_1215nm); 
 aod_380nm(find(aod_380nm>1.5)) = NaN;
 aod_452nm(find(aod_452nm>1.5)) = NaN;
 aod_500nm(find(aod_500nm>1.5)) = NaN;
@@ -147,13 +149,13 @@ set(gca,'Position',[0.07 1-(7/7-0.01) .92 1/7-0.02])
 
 linkaxes([ax1,ax2,ax3,ax4,ax5,ax6,ax7],'x');
 
-plot(ax1,t(i),calc_new_aod(aod_380nm(i),m_aero(i),oc0(1),nc0(1)),'.','color',cm(1,:));
-plot(ax2,t(i),calc_new_aod(aod_452nm(i),m_aero(i),oc0(2),nc0(2)),'.','color',cm(2,:));
-plot(ax3,t(i),calc_new_aod(aod_500nm(i),m_aero(i),oc0(3),nc0(3)),'.','color',cm(3,:));
-plot(ax4,t(i),calc_new_aod(aod_620nm(i),m_aero(i),oc0(4),nc0(4)),'.','color',cm(4,:));
-plot(ax5,t(i),calc_new_aod(aod_865nm(i),m_aero(i),oc0(5),nc0(5)),'.','color',cm(5,:));
-plot(ax6,t(i),calc_new_aod(aod_1040nm(i),m_aero(i),oc0(6),nc0(6)),'.','color',cm(6,:));
-v = plot(ax7,t(i),calc_new_aod(aod_1215nm(i),m_aero(i),oc0(7),nc0(7)),'.','color',cm(7,:));
+plot(ax1,t(i),real(calc_new_aod(aod_380nm(i),m_aero(i),oc0(1),nc0(1))),'.','color',cm(1,:));
+plot(ax2,t(i),real(calc_new_aod(aod_452nm(i),m_aero(i),oc0(2),nc0(2))),'.','color',cm(2,:));
+plot(ax3,t(i),real(calc_new_aod(aod_500nm(i),m_aero(i),oc0(3),nc0(3))),'.','color',cm(3,:));
+plot(ax4,t(i),real(calc_new_aod(aod_620nm(i),m_aero(i),oc0(4),nc0(4))),'.','color',cm(4,:));
+plot(ax5,t(i),real(calc_new_aod(aod_865nm(i),m_aero(i),oc0(5),nc0(5))),'.','color',cm(5,:));
+plot(ax6,t(i),real(calc_new_aod(aod_1040nm(i),m_aero(i),oc0(6),nc0(6))),'.','color',cm(6,:));
+v = plot(ax7,t(i),real(calc_new_aod(aod_1215nm(i),m_aero(i),oc0(7),nc0(7))),'.','color',cm(7,:));
 
 try;
     legend([u,v],'Original','Modified c0');
@@ -167,28 +169,29 @@ saved_fig_path = [fname '.png'];
 
 %% Now redo the multi plot panel but for vs. airmass
 figm = figure('pos',[500 10 800 1000]);
+m_aero = real(m_aero);
 
 setappdata(gcf, 'SubplotDefaultAxesLocation', [0, 0, 1, 1]);
 ax1 = subplot(7,1,1);
-plot(ax1,m_aero(i),aod_380nm(i),'.','color',cm(1,:).*0.5);
+plot(ax1,real(m_aero(i)),real(aod_380nm(i)),'.','color',cm(1,:).*0.5);
 title([instrumentname ' - ' tit ' AODs: ' file],'Interpreter','none');
 hold on;grid on; ylim([-0.02,0.04]);ylabel(['AOD ' leg{1} ' nm']);
 set(gca,'Position',[0.07 1-(1/7-0.01) .92 1/7-0.03]);
 set(gca,'XTickLabel','');
 
 ax2 = subplot(7,1,2);
-plot(ax2,m_aero(i),aod_452nm(i),'.','color',cm(2,:).*0.5);
+plot(ax2,real(m_aero(i)),real(aod_452nm(i)),'.','color',cm(2,:).*0.5);
 hold on;grid on; ylim([-0.02,0.04]);ylabel(['AOD ' leg{2} ' nm']);
 title(['Current c0: ' note{6}],'Interpreter','none')
 set(gca,'Position',[0.07 1-(2/7-0.01) .92 1/7-0.03]);
 set(gca,'XTickLabel','');
 
 ax3 = subplot(7,1,3);
-plot(ax3,m_aero(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
+plot(ax3,real(m_aero(i)),real(aod_500nm(i)),'.','color',cm(3,:).*0.5);
 hold on;grid on; ylim([-0.02,0.04]);ylabel(['AOD ' leg{3} ' nm']);
 if length(find(aod_500nm(i)<0.04))==0
     try
-        text(ax3,nanmin(m_aero(i))+0.2*(nanmax(m_aero(i))-nanmin(m_aero(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
+        text(ax3,nanmin(m_aero(i))+0.2*(nanmax(real(m_aero(i)))-nanmin(real(m_aero(i)))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
     catch
         legend('No Low AOD data for testing cal.')
     end
