@@ -233,6 +233,7 @@ for ip = 1:length(peaks)
         [nul,ikm] = min(abs(wavelength-(peaks(ip)-wvl_range)));
         [nul,ikp] = min(abs(wavelength-(peaks(ip)+wvl_range)));
         spec_to_fit = spectras(ip,ikm:ikp);
+        spec_to_fit = spec_to_fit-min(spec_to_fit); % make it go from 0 for better fitting with gaussian;
         wave_to_fit = wavelength(ikm:ikp);
         try
             [f1,gof1] = fit(wave_to_fit',spec_to_fit','gauss1');
@@ -336,6 +337,14 @@ fig_paths = [fig_paths;{[fn '.png'] 1}];
 save_fig(fwh,fn,0);
 
 
+fw.lines_individual = lines;
+fw.FWHM = FWHM;
+fw.visfwhm = visfwh; %spline 'makima' fit
+fw.nirfwhm = nirfwh; %spline 'makima' fit
+fw.vis_nm = s.w(1:1044).*1000.0;
+fw.nir_nm = s.w(1045:end).*1000.0;
+
+save([fp s.instrumentname s.daystr '_FWHM.mat'], fw);
 
 
 %% calculate the nominal pixel to wavelength arrangement
