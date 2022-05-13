@@ -60,13 +60,13 @@ switch instrumentname;
             nirw=flip(nirw)/1000;
             nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
             
-            fwhmfile='4STAR_FWHM_fits_from_monoscan_27.mat';
+            fwhmfile='4STARB_FWHM_combinedlinelamps_20220507.mat';
             load(which(fwhmfile));
-            visfwhm=interp1(outs(:,1)/1000, outs(:,2), visw);
+            visfwhm=interp1(vis_nm./1000.0, fwhm_vis, visw);
             visnote=[visnote ' FWHM from ' fwhmfile '.'];
-            nirfwhm=interp1(outs(:,1)/1000, outs(:,3), nirw);
+            nirfwhm=interp1(nir_nm./1000.0, fwhm_nir, nirw);
             nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
-            warning('Update the FWHM for 4STARB using the 4STAR values');
+            %warning('Update the FWHM for 4STARB using the 4STAR values');
         elseif t(1)>datenum([2015 1 1 1 0 0 0]);
             C0 = 171.7;
             C1 = 0.81254;
