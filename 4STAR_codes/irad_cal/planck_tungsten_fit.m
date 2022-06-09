@@ -34,7 +34,7 @@ function [rad,lamp] = planck_tungsten_fit(nm_in,Irad_in, nm_out)
 % I presume that the measured wavelength can be taken at face value, as can
 % the linearity of the absolute calibration.
 % figure(67);
-if ~exist('nm_in','var')||~exist('Irad_in','var')
+if ~isavar('nm_in')||isempty(nm_in)||~isavar('Irad_in')||isempty(Irad_in)
     lamp.nm = [250:10:400 450 500 555 600 654.6 700 800 900 1050 1150 1200 1300 1540 1600 1700 2000 2100 2300 2400 2500];
     lamp.I = [1.806e-8, 3.203e-8, 5.299e-8, 8.343e-8, 1.26e-7, 1.832e-7,2.585e-7,3.544e-7,4.732e-7,6.197e-7,7.956e-7,...
         1.001e-6, 1.237e-6, 1.505e-6, 1.818e-6, 2.164e-6, 4.368e-6, 7.236e-6, 1.075e-5,1.353e-5, 1.665e-5, 1.878e-5, 2.178e-5,...
@@ -45,7 +45,7 @@ else
     lamp.nm = nm_in;
     lamp.I = Irad_in;
 end
-if ~exist('nm_out','var');
+if ~isavar('nm_out');
     nm = [min(lamp.nm):max(lamp.nm)];
 else
     nm = nm_out;
