@@ -42,6 +42,8 @@ elseif ~isempty(strfind(usr,'kpistone'))
     author='Kristina';
 elseif ~isempty(strfind(lower(userpath), 'logan'))
     author='Logan';
+elseif ~isempty(strfind(lower(userpath), 'sbroccar'))
+    author='SteveB';
 else
     warning('Update get_starauthor.m');
     author='anon_star_user';
