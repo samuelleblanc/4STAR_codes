@@ -463,7 +463,7 @@ if ~exist('visc0')
         if isequal(orientation,'vertical');
             try;
                 fid = fopen(which(visfilename));
-                n = 1; while startsWith(fgetl(fid),'%'), n=n+1; end
+                n = 1; while regexp(strip(fgetl(fid)),'%') == 1, n=n+1; end
                 fclose(fid);
                 a=importdata(which(visfilename),' ',n);
             catch;
@@ -493,7 +493,7 @@ if ~exist('visc0')
             nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
             if isequal(orientation,'vertical');
                 fid = fopen(which(nirfilename));
-                n = 1; while startsWith(fgetl(fid),'%'), n=n+1; end
+                n = 1; while regexp(strip(fgetl(fid)),'%') == 1, n=n+1; end
                 fclose(fid);
                 a=importdata(which(nirfilename),' ',n);
                 nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
@@ -603,4 +603,3 @@ end;
 % visc0=visc0*NaN;nirc0=nirc0*NaN;
 % visnotec0='VIS C0 turned off';
 % nirnotec0='NIR C0 turned off';
-
