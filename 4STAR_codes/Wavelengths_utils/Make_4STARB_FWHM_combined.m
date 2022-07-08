@@ -25,7 +25,7 @@ FWHM  = accumarray(idx,FWHMs,[],@mean);
 fwhm_nir = interp1(FWHM_wv,FWHM,nir_nm,'makima');
 fwhm_vis = interp1(FWHM_wv,FWHM,vis_nm,'makima');
 
-figure; 
+fig = figure; 
 plot(FWHM_wv,FWHM,'s');
 hold on;
 plot(vis_nm,fwhm_vis,'--b');
@@ -34,6 +34,8 @@ xlabel('Wavelength [nm]')
 ylabel('FWHM [nm]')
 title([instrumentname ' - 20220507 - FWHM combination'])
 legend('Points from average [20220507 and 20220412]','VIS makima fit','NIR makima fit');
+grid on;
+save_fig(fig,[getnamedpath('starfig') instrumentname '_combined_FWHM_20220507_20220412_fit']);
 
 fp = getnamedpath('stardat');
 fname = [fp instrumentname '_FWHM_combinedlinelamps_20220507.mat'];

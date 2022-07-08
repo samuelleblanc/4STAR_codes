@@ -347,7 +347,9 @@ fig_paths = [fig_paths; [fname '.png']];
 
 %% Save the c0s to new file.
 filesuffix=[instrumentname '_AODmatch_toAERONET' '_from' a.location]; %_loglogquad';
-additionalnotes={['C0 built to match AOD from ' instrumentname ' to AERONET spline fit for ' a.location ' within ' num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds, measured on ' daystr '.']};
+additionalnotes={['Data C0 built to match AOD from ' instrumentname ' to AERONET spline fit for ' a.location ' within ' ...
+    num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds, measured on ' daystr '.' ...
+    ' Using the AERONET file: ' afile ' as input for this comparison. Date of creation: ' datestr(now]};
 w_vis = w(1:1044);
 w_nir = w(1045:end);
 vis_c0 = nanmean(c0_A(:,1:1044));
