@@ -18,15 +18,13 @@ s.sd_aero_crit=0.01;
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.297; %default guess
-s.NO2col=6.0e15; %default guess
-%Loschmidt= 2.686763e19; %molecules/cm2
-%s.NO2col=7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
-
+s.O3col=0.2676; %From Mauna Loa Pandora
+Loschmidt= 2.686763e19; %molecules/cm2
+s.NO2col=7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
-s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
-
+%s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
+%s.flight = [datenum(2020,07,08,11,00,00) datenum(2020,07,08,23,30,30)];
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
 %         s.t_hg_ar_lamp = [datenum(2022,5,7,19,20,30),datenum(2022,5,7,19,25,30)];
@@ -65,7 +63,7 @@ end
 %s.AODuncert_constant_extra = 0.2;
   
 if isfield(s, 'Pst'); 
-    s.Pst(find(s.Pst<10))=1013.4; %MLO on 2022-05-08
+    s.Pst(find(s.Pst<10))=680.50; %MLO on 2022-05-08
 end;
 % other tweaks 
 if isfield(s, 'Lon') & isfield(s, 'Lat'); 
