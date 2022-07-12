@@ -82,7 +82,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname)
 
 %% function start
 version_set('1.3');
-plotting_langley_first = true;
+plotting_langley_first = false;
 %% prepare to save a PowerPoint file
 set(groot, 'defaultAxesTickLabelInterpreter','None'); set(groot, 'defaultLegendInterpreter','None');
 set(groot, 'defaultAxesTitle','None'); 
@@ -1735,16 +1735,19 @@ if isequal(platform, 'ground') && isafile(fullfile(starpaths, [daystr 'aats.mat'
 end
 
 %% Check a delta c0
-if isfield(s,'ground');  isflight = false; elseif isfield(s,'flight'); isflight = true; else; isflight = false; end;
-deltac0_figs = Apply_deltac0(fname_4starsun,+2.0,isflight);
-pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
-pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
-%pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
-deltac0_figs = Apply_deltac0(fname_4starsun,-2.0,isflight);
-pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
-pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
-pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
-
+try
+    if isfield(s,'ground');  isflight = false; elseif isfield(s,'flight'); isflight = true; else; isflight = false; end;
+    deltac0_figs = Apply_deltac0(fname_4starsun,+2.0,isflight);
+    pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
+    pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
+    %pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
+    deltac0_figs = Apply_deltac0(fname_4starsun,-2.0,isflight);
+    pptcontents0=[pptcontents0; {deltac0_figs{1} 1}];
+    pptcontents0=[pptcontents0; {deltac0_figs{2} 1}];
+    pptcontents0=[pptcontents0; {deltac0_figs{3} 1}];
+catch
+    disp('Error in finding low AOD, high Alt values for delta-c0 checking') 
+end
 %% Plot high alt aod with alt trace for dirty - clean checking
 if false %isflight
     fighalt = figure; 
