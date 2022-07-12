@@ -118,7 +118,7 @@ if ~exist('matname','var')
 end
 matname = strrep(matname, '_for_starflag.mat','.mat');
 f_out = strrep(matname,'.mat', '_for_starflag.mat');
-disp(['creating file for smaller size flagging: ' f_out gas_note])
+disp(['...creating file for smaller size flagging: ' f_out gas_note])
 pathparts = strsplit(f_out,filesep);
 if length(pathparts)>1
     save(f_out,'-struct','s','-mat','-v7.3');

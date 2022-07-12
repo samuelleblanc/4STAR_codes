@@ -69,12 +69,12 @@ end;
 
 %% Change the types of variables to make smaller variables
 if ~isfield(s.toggle, 'reduce_variable_size'); 
-    if s.toggle.verbose; disp('reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
+    if s.toggle.verbose; disp('...reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
     s.toggle.reduce_variable_size = true;
 end;
 
 if s.toggle.reduce_variable_size;
-  if s.toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+  if s.toggle.verbose; disp('...Reducing the variable precision for smaller starsun file size'), end;
   s = make_starsun_single(s);
 end;
 
@@ -86,12 +86,14 @@ if exist('program_version','var');
 end;
 tic; make_small(s, savematfile);toc
 tic; make_for_starflag(s, savematfile);toc
-disp(['Saving: ',savematfile])
+
 tic; 
 pathparts = strsplit(savematfile,filesep);
 if length(pathparts)>1
+    disp(['Saving: ',savematfile])
     save(savematfile,'-struct','s','-mat','-v7.3' );
 else
+    disp(['Saving: ',fullfile(getnamedpath('starsun'),savematfile)])
     save(fullfile(getnamedpath('starsun'),savematfile),'-struct','s','-mat','-v7.3' );
 end
 toc
