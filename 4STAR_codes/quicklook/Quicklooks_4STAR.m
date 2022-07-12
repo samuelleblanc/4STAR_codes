@@ -1167,7 +1167,14 @@ if isavar('tau_aero')
             if max_aod<s.tau_aero(ik,250), max_aod = ceil(s.tau_aero(ik,250)); end;
             if min_aod<s.tau_aero(ik,1510), min_aod = floor(10^decimal*s.tau_aero(ik,1510))/(10^decimal); end;
         end;
-        ylim([min_aod,max_aod]);
+        if length(min_aod)<1, min_aod=0.0001; end
+        if length(max_aod)<1, max_aod=1.0; end
+        if min_aod>max_aod
+           %text(600.0,0.3,'Very high minimum AOD');
+           disp('Potential error in determining limits of aod in spectra_aod plot')
+        else 
+           ylim([min_aod,max_aod]);
+        end
         xlabel('Wavelength [nm]'); xlim([330,1710]);
         ylabel('tau_aero','Interpreter','None');
         title([daystr ' - Spectra of AOD'])
