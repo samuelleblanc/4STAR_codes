@@ -214,7 +214,7 @@ if nargin>=2+nnarg && ~isfield(s2, 'note');
       s2.note = {s2.note};
    end
 end;
-s2.note={};
+if isavar('s2'), s2.note={}; end
 
 %% get data type
 if toggle.verbose; disp('...get data types'), end;
@@ -706,6 +706,18 @@ s.tau_tot_vert(~sun_,:) = NaN;
 
 [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
 
+% trim the tau if only one spectrometer is used
+tau_flds = [{'tau_O3'},{'tau_NO2'},{'tau_O4'},{'tau_CO2_CH4_N2O'},{'tau_CO2_CH4_N2O_abserr'}];
+if qq==512 %nir
+    for k=1:length(tau_flds)
+        s.(tau_flds{k}) = s.(tau_flds{k})(:,1045:end);
+    end
+elseif qq==1044 %vis
+    for k=1:length(tau_flds)
+        s.(tau_flds{k}) = s.(tau_flds{k})(:,1:1044);
+    end
+end
+
 s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
 s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
 s.tau_aero=s.tau_aero_noscreening;
@@ -718,7 +730,7 @@ s.tau_aero=s.tau_aero_noscreening;
 %     if toggle.gassubtract
 tau_O4nir          = s.tau_O4;
 if ~strcmp(instrumentname,'2STAR');
-   tau_O4nir(:,1:1044)=0;
+    if qq>1043, tau_O4nir(:,1:1044)=0; end
 else;
    tau_O4nir(:,1:256)=0;
 end;
