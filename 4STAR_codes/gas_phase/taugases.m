@@ -20,8 +20,12 @@ function [cross_sections, tau_O3, tau_NO2, tau_O4 , tau_CO2_CH4_N2O, tau_O3_err,
 % SL, modified, 2017-05-28  Modified codes to add multi-instrument
 %                           functionality via the instrumentname variable
 % MS, modified, 2018-10-01  Added 4STARB cross section functionality
+% SL, modified, 2022-07-12 v2.1, Added the newest cross sections for 4STARB
+%                           Added returns of CH4 and CO2 tau using
+%                           cross-sections, and calculated expected trace
+%                           gas column (new CO2_CH4_VCYMSez)
 %----------------------------------------------------------------------
-version_set('v2.0')
+version_set('v2.1')
 Loschmidt=2.686763e19; %molecules/cm3xatm%molecules/cm3xatm
 % set functionallity
 if ~exist('instrumentname'); % no instrumentname defaults to 4STAR
@@ -56,7 +60,27 @@ else
      coeff_polyfit_tauO3model = [2.0744e-06 -7.3077e-05 7.9684e-04 -0.0029 -0.0092 0.9995];
 end
 
-if t(1)>=datenum([2012 7 3 0 0 0]);
+if t(1)>=datenum([2016 1 1 0 0 0]);
+    if strcmp(instrumentname,'4STAR')
+        cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load old cross section vesion (October 15th 2012) MS
+    elseif strcmp(instrumentname,'4STARB')
+        cross_sections=load(which( 'cross_sections_4starb_20220708.mat')); % load corssections based on convolution with new fwhm for 4STARB (July 2022 - SL)
+        cross_sections.o4 = cross_sections.o4/Loschmidt/Loschmidt;
+        cross_sections.co2 = cross_sections.co2/Loschmidt;
+        cross_sections.ch4 = cross_sections.ch4/Loschmidt;
+    end
+    fn=fieldnames(cross_sections);
+    for ff=1:length(fn);
+        if regexp(fn{ff},'_notes')>0, continue, end
+        orig=cross_sections.(fn{ff});
+        cross_sections.(fn{ff})=transpose(orig(:));
+        if isequal(lower(datatype(1:3)), 'vis'); % return the first 1044 columns
+            cross_sections.(fn{ff})=cross_sections.(fn{ff})(:,1:1044);
+        elseif isequal(lower(datatype(1:3)), 'nir'); % return the last 512 columns
+            cross_sections.(fn{ff})=cross_sections.(fn{ff})(:,(1:512)+1044);
+        end;
+    end;
+elseif t(1)>=datenum([2012 7 3 0 0 0]);
     if strcmp(instrumentname,'4STAR')
         cross_sections=load(which( 'cross_sections_uv_vis_swir_all.mat')); % load newest cross section vesion (October 15th 2012) MS
     elseif strcmp(instrumentname,'4STARB')
@@ -125,7 +149,7 @@ end;
 
 switch instrumentname; % defaults to use 4STAR, here you put special code to modify 4STAR
     case {'4STARB'}
-        warning('Cross sections for 4STARB are convolved using 4STAR-A FWHM values')
+        %warning('Cross sections for 4STARB are convolved using 4STAR-A FWHM values')
         nwl = size(cross_sections.wln);
     case {'2STAR'}
         warning('Gas phase cross sections for 2STAR not yet defined, using 4STAR and then convolving')
@@ -188,9 +212,17 @@ else
 end;
 tau_O2=zeros(nwl); % don't subtract O2 % O2_vercol*cross_sections.o2;
 
+%% get CO2 and CH4 optical depths
 %tau_CO2_CH4_N2O=zeros(size(cross_sections.wln)); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
-
-tau_CO2_CH4_N2O=zeros(nwl); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
+try
+    [CO2_vercol,CH4_vercol]=CO2_CH4_VCYMSez(Alt,t,Lat);
+    tau_CO2 = CO2_vercol*cross_sections.co2;
+    tau_CH4 = CH4_vercol*cross_sections.ch4;
+    tau_CO2_CH4_N2O = tau_CO2 + tau_CH4;
+catch
+    disp('**Error on getting cross sections and tau for  CO2 and CH4, setting to 0. (Does not affect vis regardless)')
+    tau_CO2_CH4_N2O=zeros(nwl); % legacy from AATS's 14th channel, not covered by 4STAR VIS.
+end
 
 %% get O3 optical depths
 

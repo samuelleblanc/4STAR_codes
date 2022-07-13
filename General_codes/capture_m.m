@@ -1,7 +1,7 @@
 function m_out = capture_m(mfile)
 % Captures the text inside an m-file skipping the function definitition and
 %  stripping all leading commnents.
-
+warning('off','MATLAB:deblank:NonStringInput')
 if ~exist('mfile','var')||~exist(mfile,'file')
     mfile = getfullname('*.m','mfile','Select an m-file to capture');
 end
@@ -23,5 +23,5 @@ if exist(mfile,'file')
 else
     m_out  =[];
 end
-
+warning('on','MATLAB:deblank:NonStringInput')
 return

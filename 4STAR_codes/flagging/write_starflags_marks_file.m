@@ -47,7 +47,7 @@ ng_str = [ng_str, sprintf('%s \n', ']; ')];
 
 ng_str = [sprintf('%s \n', ng_str),'return'];    
 % mark_fname = [daystr,'_starflags_man',marks,'_created_',datestr(now,'yyyymmdd_hhMM_'),by,'.m'];    
-disp(['Writing marks file: ', marks_fname])
+disp(['...Writing marks flag file: ', marks_fname])
 f1=fopen([pname, marks_fname,'.m'],'w');
 
 fprintf(f1,'%s', ng_str);

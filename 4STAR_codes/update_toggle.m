@@ -5,7 +5,8 @@ function toggle_out = update_toggle(toggle_in)
 % of the same name defined beneath starinfo files.
 % un-test commit michal 2016-05-08
 % CJF: v1.1, 2020-05-03, Replaced catstruct with explicit loop to prevent sorting
-version_set('1.1');
+% adding a few toggles (check4STARB_nogasretrieval, hires_rayleigh) needed for some additional checks in starwrapper for 2STAR and 4STARB
+version_set('1.2');
 
 toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
@@ -23,12 +24,13 @@ toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
 toggle_out.doflagging = false; % for running any Yohei style flagging
 toggle_out.dostarflag = true; % for newer style flagging
 toggle_out.lampcalib  = false; 
-toggle_out.runwatervapor = true;
+toggle_out.runwatervapor = false;
 toggle_out.check4STARB_nogasretrieval = true;
 toggle_out.applyforjcorr = true;
 toggle_out.applystraycorr = false;
 toggle_out.editstarinfo = false;
 toggle_out.reduce_variable_size = true; % for changing the starsun saved variables to single precision, reducing by more than half saved file size
+toggle_out.hires_rayleigh = false; % for 2STAR subpixel rayleigh correction for large band widths
 toggle_out.save_marks_flags = false;
 toggle_out.no_SSFR = false;
 toggle_out.use_last_wl = true;

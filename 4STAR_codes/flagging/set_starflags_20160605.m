@@ -1,7 +1,7 @@
 function flags = set_starflags_20160605(inp, flags)
 % Should be modified to reflect the desired criterion for specific flights
 % or missions
-
+%
 if ~exist('flags','var')
     flags = [];
 end
@@ -22,5 +22,5 @@ flags.bad_aod = inp.aod_500nm<inp.min_aod | inp.aod_865nm<inp.min_aod | ~isfinit
 if isfield(inp,'darkstd_500nm')
     flags.bad_aod = flags.bad_aod | (inp.raw_500nm-inp.dark_500nm)<=inp.darkstd_500nm;
 end
-
+%
 return

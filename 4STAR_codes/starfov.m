@@ -39,7 +39,7 @@ end;
 %********************
 % do the core calculations
 %********************
-toggle.applytempcorr = false;
+%toggle.applytempcorr = false;
 for ff=1:length(contents0);
     % grab each structure
     s0=load(sourcefile, contents0{ff});
@@ -50,7 +50,8 @@ for ff=1:length(contents0);
         if ~isempty(s.t);
             
             % add variables and make adjustments common among all data types
-            s=starwrapper(s,toggle);
+            [s.daystr, s.filen, s.datatype, s.instrumentname]=starfilenames2daystr(s.filename, 1);
+            s=starwrapper(s); %,toggle);
             
             % normalize the count rate
             rows_before_initial_sun=4;
