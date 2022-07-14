@@ -92,8 +92,8 @@ pptcontents0={};
 
 %% Sanitize inputs and get file paths
 if nargin<1 % no file path set
-    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
-    fname_4starsun = getfullname('4STAR*starsun.mat','starsun','Choose starsun file');  
+    fname_4star = getfullname__('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
+    fname_4starsun = getfullname__('4STAR*starsun.mat','starsun','Choose starsun file');  
     [p1, f, ext0]=fileparts(fname_4starsun);
 elseif nargin<2
     [p1, f, ext0]=fileparts(fname_4starsun);
