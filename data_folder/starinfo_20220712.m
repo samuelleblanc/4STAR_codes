@@ -9,7 +9,8 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.flight = [datenum(2022,07,11,14,29,44) datenum(2022,07,11,17,54,41)];
+s.flight = [datenum(2022,07,12,13,42,20) datenum(2022,07,12,17,12,50); ...
+            datenum(2022,07,12,18,33,15) datenum(2022,07,12,21,11,41)];
 %s.langley = [datenum(2022,05,09,15,58,00) datenum(2022,05,09,19,40,0)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
