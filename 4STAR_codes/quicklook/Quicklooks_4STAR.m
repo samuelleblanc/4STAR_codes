@@ -270,6 +270,15 @@ end
 
 
 %% read auxiliary data from starinfo and select rows
+% load info file
+infofile_ = ['starinfo_' s.daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s)']);
+end
+
 if isequal(platform, 'flight')
     if ~isfield(s,'flight')
         error(['Specify flight time period in starinfo_' daystr '.m.']);
