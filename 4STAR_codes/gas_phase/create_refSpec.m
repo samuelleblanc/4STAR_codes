@@ -141,7 +141,7 @@ elseif strcmp(gas,'NO2')
     elseif strcmp(daystr,'20180811') || strcmp(daystr,'20180812') || strcmp(daystr,'20180813')
         ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
     elseif strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212')
-        ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
+        ref_spec.no2scdref = 1.8452e+15*ref_spec.mean_m;% from OMI overpass on 20180212
     elseif strcmp(daystr,'20220508')
         Loschmidt= 2.686763e19; %molecules/cm2
         ref_spec.no2scdref = 8.266e-2*(Loschmidt/1000.0)*ref_spec.mean_m;% From MLO May 2022, based on pandora measurements
