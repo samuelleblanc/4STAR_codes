@@ -177,7 +177,7 @@ s.Lon(ngs) = NaN; s.Lat(ngs) = NaN;
 if plotting_langley_first
   if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
-    pptcontents0 = plot_langleys(s,p1,pptcontents0);
+    pptcontents0 = plot_langleys(s,p1,pptcontents0,platform);
   end
 end
 
@@ -1862,7 +1862,7 @@ end
 return
 
 %% simplifying fuctions
-function pptcontents0 = plot_langleys(s,p1,pptcontents0)
+function pptcontents0 = plot_langleys(s,p1,pptcontents0,platform)
 
 % load info file
 infofile_ = ['starinfo_' s.daystr '.m'];
