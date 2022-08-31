@@ -225,7 +225,7 @@ end
 
    if plotting
    % plot fitted and "measured" no2 spectrum
-         for i=1:500:length(s.t)
+         for i=1:50:length(s.t)
              figure(8882);
              %plot(s.w((wln)),eta1(i,:),'-y','linewidth',2);hold on;
              plot(s.w((wln)),eta(i,:),'--k','linewidth',2);hold on;

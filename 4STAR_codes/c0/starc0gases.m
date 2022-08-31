@@ -29,7 +29,7 @@ if ~exist('verbose','var')
     verbose=true;
 end;
 
-if verbose; disp('In starc0gases'), end;
+if verbose; disp('...in starc0gases'), end;
 
 % control the input
 if nargin==0;
