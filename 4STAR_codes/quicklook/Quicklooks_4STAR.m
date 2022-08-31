@@ -82,7 +82,7 @@ function fig_names = Quicklooks_4STAR(fname_4starsun,fname_4star,ppt_fname)
 
 %% function start
 version_set('1.3');
-plotting_langley_first = false;
+plotting_langley_first = true;
 %% prepare to save a PowerPoint file
 set(groot, 'defaultAxesTickLabelInterpreter','None'); set(groot, 'defaultLegendInterpreter','None');
 set(groot, 'defaultAxesTitle','None'); 
@@ -172,12 +172,22 @@ st.vis_sun.Lat(ng) = NaN;
 ngs=find((s.Lon==0 & s.Lat==0  | abs(s.Lon)>180 | abs(s.Lat)>90));
 s.Lon(ngs) = NaN; s.Lat(ngs) = NaN;
 
+% read starinfo files
+
+disp(['on day:' daystr])
+infofile_ = ['starinfo_' daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s)']);
+end
 
 %% Check if langley is defined
 if plotting_langley_first
   if isfield(s,'langley')||isfield(s,'langley1')
     % run the langley codes and get the figures;
-    pptcontents0 = plot_langleys(s,p1,pptcontents0);
+    pptcontents0 = plot_langleys(s,p1,pptcontents0,platform);
   end
 end
 
@@ -200,16 +210,7 @@ else
 end
 
 %% filter the gas fields to plot
-% read starinfo files
 
-disp(['on day:' daystr])
-infofile_ = ['starinfo_' daystr '.m'];
-infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-try
-    s = infofnt(s);
-catch
-    eval([infofile_(1:end-2),'(s)']);
-end
 
 %% Load the flag files and see if gas flags exist
 if isfield(s, 'flagfilename')
@@ -796,7 +797,7 @@ if length(high_darks)>300;
 end;
 
 ylabel(ax(2),'Darks VIS 500 nm');
-ylabel(ax(1),'VIS temp [°C]');
+ylabel(ax(1),'VIS temp [ï¿½C]');
 ylim(ax(1),[-5,5]); set(ax(1),'ytick',[-5,-2.5,0,2.5,5]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
@@ -815,7 +816,7 @@ if length(high_darks_nir)>300;
     set(ftnp, 'InvertHardCopy', 'off');
 end;
 ylabel(ax(2),'Darks NIR 1213 nm');
-ylabel(ax(1),'NIR temp [°C]');
+ylabel(ax(1),'NIR temp [ï¿½C]');
 ylim(ax(1),[0,30]); set(ax(1),'ytick',[0,10,20,30,40,50]);
 set(h1,'linestyle','none','marker','.'); set(h2,'linestyle','none','marker','.');
 dynamicDateTicks;
@@ -1776,9 +1777,13 @@ end
 
 %% Check if dirty/clean time period was done, if so plot them
 if isfield(s,'dirty') & isfield(s,'clean')
-    [sdirty,sclean,sdiff,saved_fig_path] = stardirty(daystr,fname_4star,false);
-    pptcontents0=[pptcontents0; {saved_fig_path{1} 1}];
-    pptcontents0=[pptcontents0; {saved_fig_path{2} 1}];
+    try
+        [sdirty,sclean,sdiff,saved_fig_path] = stardirty(daystr,fname_4star,false);
+        pptcontents0=[pptcontents0; {saved_fig_path{1} 1}];
+        pptcontents0=[pptcontents0; {saved_fig_path{2} 1}];
+    catch
+        disp(['Problem loading the dirty/clean comparison for times: ', datestr(s.dirty(1))])
+    end
 end
 
 %% Check if FOVs were created, if so, plot them
@@ -1871,7 +1876,7 @@ end
 return
 
 %% simplifying fuctions
-function pptcontents0 = plot_langleys(s,p1,pptcontents0)
+function pptcontents0 = plot_langleys(s,p1,pptcontents0,platform)
 
 % load info file
 infofile_ = ['starinfo_' s.daystr '.m'];
