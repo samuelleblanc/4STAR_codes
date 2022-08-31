@@ -54,7 +54,9 @@ end;
                     % use ref_spec
                     try
                         %tmp = load(['20160113O3refspec.mat']);
-                        tmp = load(['20160702O3refspec.mat']);
+                        %tmp = load(['20160702O3refspec.mat']);
+                        tmp = load(['4STAR_20160702O3refspec.mat']);
+                        disp(['...using updated gas c0 from: ', '4STAR_20160702O3refspec.mat'])
                     catch
                         %tmp = load([starpaths,'20160113O3refspec.mat']);
                         tmp = load([starpaths,'20160702O3refspec.mat']);
@@ -75,7 +77,8 @@ end;
                     % use ref_spec
                     %tmp = load([starpaths,'20160113NO2refspec.mat']);
                     try
-                        tmp = load(['20160702NO2refspec.mat']);
+                        %tmp = load(['20160702NO2refspec.mat']);
+                        tmp = load(['4STAR_20160702NO2refspec.mat']);
                     catch
                         tmp = load([starpaths,'20160702NO2refspec.mat']);
                     end
@@ -94,7 +97,8 @@ end;
                 elseif mode==1
                     % use ref_spec
                     try
-                        tmp = load(['20160702HCOHrefspec.mat']);
+                        %tmp = load(['20160702HCOHrefspec.mat']);
+                        tmp = load(['4STAR_20160702HCOHrefspec.mat']);
                     catch
                         tmp = load([starpaths,'20160702HCOHrefspec.mat']);
                     end
