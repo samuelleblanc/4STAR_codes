@@ -216,6 +216,8 @@ switch instrumentname;
                     
                     daystr='20160707';
                     filesuffix='Langley_MLO_June2016_mean';
+                    daystr='20160702';
+                    filesuffix = '4STAR_refined_ground_langley_am';
                     
                 elseif now>=datenum([2016 1 19 0 0 0]);
                     %daystr='20160109';
