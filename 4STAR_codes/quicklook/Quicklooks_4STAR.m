@@ -92,8 +92,8 @@ pptcontents0={};
 
 %% Sanitize inputs and get file paths
 if nargin<1 % no file path set
-    fname_4star = getfullname('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
-    fname_4starsun = getfullname('4STAR*starsun.mat','starsun','Choose starsun file');  
+    fname_4star = getfullname__('4STAR*star.mat','starmat','Choose the 4STAR star.mat file');
+    fname_4starsun = getfullname__('4STAR*starsun.mat','starsun','Choose starsun file');  
     [p1, f, ext0]=fileparts(fname_4starsun);
 elseif nargin<2
     [p1, f, ext0]=fileparts(fname_4starsun);
@@ -270,6 +270,15 @@ end
 
 
 %% read auxiliary data from starinfo and select rows
+% load info file
+infofile_ = ['starinfo_' s.daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s)']);
+end
+
 if isequal(platform, 'flight')
     if ~isfield(s,'flight')
         error(['Specify flight time period in starinfo_' daystr '.m.']);
