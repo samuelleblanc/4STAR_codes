@@ -55,8 +55,8 @@ switch instrumentname;
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
             if t>datenum([2022 5 6 0 0 0]) % MLO May 2022
-                daystr = '20220509';
-                filesuffix = '4STAR_refined_ground_langley_amMLO_May2022_Day3';
+                daystr = '20220514';
+                filesuffix = '4STAR_refined_averaged_good_MLO_May2022';
             elseif t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STAR fiber break and fix
                 daystr = '20220429';
                 filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
@@ -411,8 +411,8 @@ switch instrumentname;
         
     case{'4STARB'}
         if t>datenum([2022 5 6 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
-                daystr = '20220508';
-                filesuffix = '4STARB_refined_ground_langley_amMLO_May2022_Day2';
+                daystr = '20220515';
+                filesuffix = '4STARB_refined_averaged_good_MLO_May2022';
         elseif t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
                 daystr = '20220429';
                 filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';

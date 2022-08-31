@@ -106,8 +106,9 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % false if 2STAR, 4STARB, or forj measurement
 % SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
 % SL: v3.4, 2020-10-05, Added check if 4STARB to disable water vapor and trace gas retrieval
+% SL: v3.5, 2022-08-31, Added toggles for separate gas retrieval and water vapor retrievals
 
-version_set('3.4');
+version_set('3.5');
 %********************
 %% prepare for processing
 %********************
@@ -760,33 +761,38 @@ if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
     if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
 end
 if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'))||~isempty(strfind(lower(datatype),'sky'));
-   if toggle.runwatervapor;
-      if toggle.verbose; disp('...water vapor retrieval start'), end;
-      [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
-      
-      % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
-      s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
-      
-      if toggle.verbose; disp('...water vapor retrieval end'), end;
-      % gases subtractions and o3/no2 conc [in DU] from fit
-      %-----------------------------------------------------
-      if toggle.gassubtract
-         disp('...gases retrieval and subtractions start')
-         [s.gas] = retrieveGases(s);         
-         % subtract derived gasess         
-         s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
+    if toggle.runwatervapor;
+        if toggle.verbose; disp('...water vapor retrieval start'), end;
+        [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+        
+        % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
+        s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
+        if toggle.verbose; disp('...water vapor retrieval end'), end;
+    end
+    
+    % gases subtractions and o3/no2 conc [in DU] from fit
+    %-----------------------------------------------------
+    if toggle.rungasretrievals
+        if toggle.verbose; disp('...gases retrieval start'), end
+        [s.gas] = retrieveGases(s);
+        if toggle.verbose; disp('...gases retrieval end'), end
+    end
+    % subtract derived gasess
+    if toggle.gassubtract & toggle.rungasretrievals & toggle.runwatervapor
+        if toggle.verbose; disp('...gases subtractions start'), end
+        s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;  %tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
-         %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-         %                                                s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.ch4OD;%
-         if toggle.verbose; disp('...gases subtractions end'); end
-         %s.tau_aero=s.tau_aero_wvsubtract;
-      end;
-      
-   end;
-   tau=real(-log(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % tau, just for the error analysis below
-   disp('Diffuse light correction and its uncertainty (tau_aero_err10) to be amended. - currently set to 0');
-   % % % s=rmfield(s, 'rate'); YS 2012/10/09
-   
+        %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
+        %                                                s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.ch4OD;%
+        if toggle.verbose; disp('...gases subtractions end'); end
+        %s.tau_aero=s.tau_aero_wvsubtract;
+    end
+    
+
+tau=real(-log(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % tau, just for the error analysis below
+disp('Diffuse light correction and its uncertainty (tau_aero_err10) to be amended. - currently set to 0');
+% % % s=rmfield(s, 'rate'); YS 2012/10/09
+
    % estimate uncertainties in tau aero - largely inherited from AATS14_MakeAOD_MLO_2011.m
    if toggle.computeerror;
       s.m_err=0.0003.*(s.m_ray/2).^2.2; % expression for dm/m is from Reagan report
@@ -893,7 +899,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
    s.tau_aero_polynomial=[a2 a1 a0];
    
-end; % End of sun-specific processing
+end % End of sun-specific processing
 
 if ~isempty(strfind(lower(datatype),'sky'))||~isempty(strfind(lower(datatype),'zen'))||...
       ~isempty(strfind(lower(datatype),'cld')); % if clause added by Yohei, 2012/10/22
