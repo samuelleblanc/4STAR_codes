@@ -119,6 +119,7 @@ gas.no2; gas.o3; gas.co2; gas.hcoh;
    
   
    fi = strcat(s.instrumentname,'_',datestr(s.t(1),'yyyymmdd'),'_gas_summary.mat');
+   if s.toggle.verbose; disp(['...saving gas summary file to: ' getnamedpath('gas_summary') fi]), end
    save([getnamedpath('gas_summary') fi],'-struct','d');
    
   

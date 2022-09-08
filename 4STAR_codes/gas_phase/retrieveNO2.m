@@ -185,6 +185,11 @@ end
    elseif mode==1
        % load reference spectrum
        % ref_spec = load([starpaths,'20160113NO2refspec.mat']);
+       st = dbstack;
+       if ~isfield(tmp,'no2scdref') && strcmp(st(2).name,'create_refSpec')
+           disp('*** Problem: No reference no2 field, using the value from starinfo - only valid when running create refspec ***')
+           tmp.no2scdref = s.NO2col*tmp.mean_m; 
+       end
        no2SCD = real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
        %no2SCD = real(ccoef_d(1,:) + ccoef_d(2,:))*Loschmidt + tmp.no2scdref;%ref_spec.no2col*ref_spec.mean_m;
        tplot = serial2Hh(s.t); %tplot(tplot<10) = tplot(tplot<10)+24;

@@ -97,7 +97,7 @@ switch instrumentname;
         
     otherwise % defaults to 4STAR(A) wavelengths 
         if t>=datenum([2012 7 3 0 0 0]) % new VIS spectrometer since July 3, 2012
-            if t>=datenum([2022 4 12 0 0 0]) %Using the updates from cal lab line lamps 2022-04-13
+            if t>=datenum([2018 1 12 0 0 0]) %Using the updates from cal lab line lamps 2022-04-13
                 C0=171.9711;
                 C1=0.8079;
                 C2=4.1508e-6;
