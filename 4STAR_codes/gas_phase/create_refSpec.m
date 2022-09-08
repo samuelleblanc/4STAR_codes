@@ -523,6 +523,16 @@ elseif strcmp(gas,'HCOH')
                  hcoh_3.hcohSCD(dat3.m_NO2<=4&dat3.m_NO2>=2)];
             y = real(y);   
             y(y<0) = NaN;  
+                elseif strcmp(daystr(1:6),'202205')
+        % these airmass values are for MLO May 2022
+            x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=2.5);
+                 dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=2.5);
+                 dat3.m_NO2(dat3.m_NO2<=5&dat3.m_NO2>=2.5)];
+            y = [hcoh_1.hcohSCD(dat1.m_NO2<=5&dat1.m_NO2>=2.5);
+                 hcoh_2.hcohSCD(dat2.m_NO2<=5&dat2.m_NO2>=2.5);
+                 hcoh_3.hcohSCD(dat3.m_NO2<=5&dat3.m_NO2>=2.5)];
+            y = real(y);   
+            y(y<0) = NaN;
         end
         
         binEdge = linspace(min(x),max(x),100);
