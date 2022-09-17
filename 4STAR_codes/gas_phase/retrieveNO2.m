@@ -52,7 +52,7 @@
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode,gxs)
 
-plotting = 0;
+plotting = 1;
 % load cross-sections
 loadCrossSections_global;
 
@@ -229,6 +229,28 @@ end
 %    
 
    if plotting
+   % plot some example figures of the retrieed values
+   figure;
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','orig'); 
+   dynamicDateTicks
+   hold on; 
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref*100.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*100');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*100.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*100');
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*65.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*65');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*65.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*65');
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*75.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*75');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*100.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*75');
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*85.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*85');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*85.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*85');
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*95.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*95');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*95.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*95');
+   plot(s.t,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*120.0)./s.m_NO2/Loschmidt*100.0,'.','DisplayName','no2ref*120');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*ccoef_d(1,:))))') + tmp.no2scdref.*120.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','smooth*120');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*(ccoef_d(1,:)+ccoef_d(2,:)))))') + tmp.no2scdref.*60.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','no2+no2diff *60');
+   plot(s.t,boxxfilt(tplot,(real((((Loschmidt*(ccoef_d(1,:)+ccoef_d(2,:)))))') + tmp.no2scdref.*100.0)./s.m_NO2/Loschmidt*100.0,xts),'.','DisplayName','no2+no2diff *100');
+
+   ylabel('NO2 [DU]')
+   %dbstop in retrieveNO2 at 254
    % plot fitted and "measured" no2 spectrum
          for i=1:50:length(s.t)
              figure(8882);

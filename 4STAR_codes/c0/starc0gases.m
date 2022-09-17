@@ -325,7 +325,7 @@ end;
                 elseif mode==1
                     % use ref_spec
                     
-                    tmp = load(which(['20220508O3refspec.mat']));
+                    tmp = load(which(['20220514O3refspec.mat']));
                     c0gases = tmp;%.o3refspec;
                 end
             elseif strcmp(gas,'NO2')
@@ -336,7 +336,7 @@ end;
                     c0gases = tmp.data(:,3);
                 elseif mode==1
                     % use ref_spec
-                    tmp = load(which(['20220508NO2refspec.mat']));
+                    tmp = load(which(['20220514NO2refspec.mat']));
                     c0gases = tmp;%.no2refspec;
                     
                     

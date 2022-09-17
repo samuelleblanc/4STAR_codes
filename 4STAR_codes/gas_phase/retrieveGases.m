@@ -1,4 +1,4 @@
-function [gas] = retrieveGases(s)
+ function [gas] = retrieveGases(s)
 % Syntax: gas = retrieveGases(s)
 %% Details of the function:
 % NAME:
@@ -69,7 +69,8 @@ try
  [gas.co2]  = retrieveCO2(s,1.555,1.630,gxs);
 catch
     disp('*** Error with CO2 retrievals ***')
-    gas.co2 = NaN;
+    gas.co2.co2OD = 0.0;
+    gas.co2.ch4OD = 0.0;    
 end
 %% retrieve O2
 %  TBD
