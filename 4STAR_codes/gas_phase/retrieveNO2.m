@@ -52,7 +52,7 @@
 %% function routine
 function [no2] = retrieveNO2(s,wstart,wend,mode,gxs)
 
-plotting = 1;
+plotting = 0;
 % load cross-sections
 loadCrossSections_global;
 
