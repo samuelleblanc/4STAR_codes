@@ -23,7 +23,9 @@ function star = starsky_scan(star)
 % 2021-03-19: v1.3, Connor, testing polyfit as well as  a-fit (aod basis), 
 % and xfit (aod basis with outlier rejection and capture). Also provides RMS
 % for each fit type and independent results to facilitate residuals
-version_set('1.3');
+% 2022-09-22: v1.4, Connor, fixing logic error distinguishing above_orb and
+% below_orb in PPL
+version_set('1.4');
 % minimum acceptable scattering angle. Aeronet 3.5, airborne maybe 4?
 if isfield(star.toggle,'sky_SA_min')
     SA_min = star.toggle.sky_SA_min;
@@ -334,9 +336,11 @@ if star.isPPL
         mean(star.Lon)),'Alt=',sprintf('%3.0f m, ',mean(star.Alt)),'SEL=',sprintf('%2.1f deg',90-mean(star.sza))];...
         ['Time: ', datestr(star.time(1),'yyyy-mm-dd HH:MM'),'-',datestr(star.time(end),'HH:MM UTC')] };
     sat = star.sat_ij(:,star.aeronetcols(end-1));
-    below_orb = (star.El_gnd < star.sunel)& (abs(star.Az_gnd-star.sunaz)<5);
-    above_orb = (star.El_gnd > star.sunel)|...
-        ((star.El_gnd < star.sunel)&(abs(star.Az_gnd-star.sunaz-180)<5));
+%     below_orb = (star.El_gnd < star.sunel)& (abs(star.Az_gnd-star.sunaz)<5); 
+    below_orb = (star.Zn<0)&(star.Str==2);
+%     above_orb = (star.El_gnd > star.sunel)|...
+%         ((star.El_gnd < star.sunel)&(abs(star.Az_gnd-star.sunaz-180)<5)); 
+    above_orb = (star.Zn>0)&(star.Str==2);
     
     rad_b4 = star.skyrad(zone&below_orb&~sat,star.aeronetcols(vis_pix(end)));
     SA_b4 = SA(zone&below_orb&~sat);
