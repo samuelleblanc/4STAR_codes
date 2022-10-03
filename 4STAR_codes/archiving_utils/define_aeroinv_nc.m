@@ -1,4 +1,4 @@
-function anc_aeroinv = define_aeroinv_nc(fname)
+function anc_inv = define_aeroinv_nc(fname)
 % anc_aeroinv = define_aeroinv_ncfname);
 % Loads a selected 4STAR skyscan *_SKY*.mat file (output from starsky_plus)
 % and the companion source "SKY" mat file.
@@ -10,7 +10,8 @@ function anc_aeroinv = define_aeroinv_nc(fname)
 % CJF: v1.0, 2019/09/05: initial version written for ORACLES 2016
 %                        metadata will require modification for other deployments
 % CJF: v1.1, 2019/09/06: added equivalent aeronet data level from filename
-version_set('1.0');
+% CJF: v1.2, 2022/09/22: catch cases with not enough good_sky values
+version_set('1.2');
 
 if ~isavar('fname')
    fname = getfullname('4STAR*SKY*.created_*lv*.mat','4STAR_skyoutmat','Select sky mat file');
@@ -527,14 +528,16 @@ if isfield(skyrad, sky)&&sum(skyrad.(sky))>5
    anc_inv.vdata.m_ray(t) = mean(skyrad.m_ray(skyrad.(sky)));
    anc_inv.vdata.PWV(t) = skyrad.PWV;
 end
-
-anc_inv = anc_timesync(anc_inv);
-fname = ['4STAR-aeroinv_P3_',datestr(anc_inv.time(1),'yyyymmdd.HHMMSS'),'_R0.nc'];
-anc_inv.fname = [getnamedpath('aeroinv_nc'),fname];
-anc_inv.clobber = true;anc_inv.verbose = false; anc_inv.quiet = true;
-anc_inv = anc_check(anc_inv); anc_inv = rmfield(anc_inv,'quiet');
-quiet = true; anc_save(anc_inv,[],quiet);
-
+if ~isempty(anc_inv.time)
+   anc_inv = anc_timesync(anc_inv);
+   fname = ['4STAR-aeroinv_P3_',datestr(anc_inv.time(1),'yyyymmdd.HHMMSS'),'_R0.nc'];
+   anc_inv.fname = [getnamedpath('aeroinv_nc'),fname];
+   anc_inv.clobber = true;anc_inv.verbose = false; anc_inv.quiet = true;
+   anc_inv = anc_check(anc_inv); anc_inv = rmfield(anc_inv,'quiet');
+   quiet = true; anc_save(anc_inv,[],quiet);
+else
+   warning('Netcdf file not generated, time field is empty.');
+end
 % anc_rad = anc_bundle_files(['4STAR-skyrad_P3_*_R0.nc'],'skyrad_nc');
 % anc_save(anc_rad)
 
