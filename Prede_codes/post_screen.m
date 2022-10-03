@@ -4,7 +4,7 @@ function [aero_2] =post_screen(time, tau, aero_1,window2,mad_thresh)
 % time is in units of day, so Matlab serial dates work as do jd.
 % If specified, window2 is in minutes
 % This routine attempts to recapture values failing the variability
-% test if not very different from in value from adjacing passing points. 
+% test if not very different in value from adjacing passing points. 
 
 % This routine is most efficient used day by day.  See aod_screen for day
 % chunking example.
@@ -44,7 +44,7 @@ if ~isempty(pos_tau)&&any(aero_1)
                 abs_dev(t) = abs(tau(t)-tau_bar);
 %                 aero_2(t) = (abs_dev(t)<(mad_thresh*mad(t)))||aero_1(t);% I think the 'or' is never true given pos_tau includes ~aero_1
 %                 aero_2(t) = (abs_dev(t)<(mad_thresh*mad(t)))||(tau(t)<tau_bar);% 
-                aero_2(t) = abs_dev(t)<(mad_thresh*mad(t));% 
+                aero_2(t) = abs_dev(t)<=(mad_thresh*mad(t));% 
                 %                 if (abs_dev(t)<(6*mad(t)))||aero_1(t)
 %                     aero_2(t) = 1;
 %                 end
