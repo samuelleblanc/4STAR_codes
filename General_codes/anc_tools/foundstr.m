@@ -6,10 +6,10 @@ result = strfind(strarr, str);
 if numel(result)==0
     found = false;
 else
-found = logical(zeros(size(result)));
+found = false(size(result));
 end
 if length(result)==1
-    found = true
+    found = true;
 else
     for n = 1:length(result)
         found(n) = ~isempty(result{n});

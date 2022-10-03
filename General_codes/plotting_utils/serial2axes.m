@@ -19,7 +19,7 @@ if length(serial_date)>1
         inthisyear = find((serial_date>=Jan1)&(serial_date<(Jan1_nextyear)));
         if any(inthisyear)
             doy0_thisyear = serial_date(inthisyear) - Jan1;
-            Yy_thisyear = thisyear + (doy0_thisyear)/days_in_year;
+            Yy_thisyear = thisyear + (doy0_thisyear)./days_in_year;
         end
         doy0 = [doy0, doy0_thisyear];
         Yy = [Yy, Yy_thisyear];
@@ -30,7 +30,7 @@ else
     Dec31 = datenum(thisyear+1,12,31);
     days_in_year = Dec31 + 1 - Jan1;
     doy0 = serial_date - Jan1;
-    Yy = thisyear + (doy0)/days_in_year;
+    Yy = thisyear + (doy0)./days_in_year;
 end;
 
 date_axes.Hh = Hh;

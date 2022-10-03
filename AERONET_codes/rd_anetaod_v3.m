@@ -66,6 +66,18 @@ if fid>0
         end
     end    
 fclose(fid);
+field = fieldnames(cimel);
+for f = 1:length(field)
+   fld = field{f};
+   try
+   if max(cimel.(fld))<0
+      cimel = rmfield(cimel,fld);
+   end
+   catch 
+      disp(['problem with:',fld])
+   end
+end
+
 end
 return;
 

@@ -12,7 +12,7 @@ function [outpath] = getpath(infile,pathfile,dialog);
 % 2016-07-28, CJF:
 
 % Create 'filepaths' directory within userpath.
-pname = strrep(userpath,';',filesep);
+pname = strrep(userpath,';',filesep); pname = strrep([pname, filesep], [filesep, filesep], filesep);
 pathdir = [pname, 'filepaths'];
 if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
