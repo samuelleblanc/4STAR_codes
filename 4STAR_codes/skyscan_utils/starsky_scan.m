@@ -334,9 +334,9 @@ if star.isPPL
         mean(star.Lon)),'Alt=',sprintf('%3.0f m, ',mean(star.Alt)),'SEL=',sprintf('%2.1f deg',90-mean(star.sza))];...
         ['Time: ', datestr(star.time(1),'yyyy-mm-dd HH:MM'),'-',datestr(star.time(end),'HH:MM UTC')] };
     sat = star.sat_ij(:,star.aeronetcols(end-1));
-    below_orb = (star.El_gnd < star.sunel)& (abs(star.Az_gnd-star.sunaz)<5);
+    below_orb = (star.El_gnd < star.sunel)& (abs(star.Az_gnd-star.sunaz)<5); below_orb = (star.Str==2&star.Zn<0);
     above_orb = (star.El_gnd > star.sunel)|...
-        ((star.El_gnd < star.sunel)&(abs(star.Az_gnd-star.sunaz-180)<5));
+        ((star.El_gnd < star.sunel)&(abs(star.Az_gnd-star.sunaz-180)<5)); above_orb = (star.Str==2&star.Zn>1);
     
     rad_b4 = star.skyrad(zone&below_orb&~sat,star.aeronetcols(vis_pix(end)));
     SA_b4 = SA(zone&below_orb&~sat);
