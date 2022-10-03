@@ -20,6 +20,9 @@ for i = order:-1:1
 end 
 % size(Y);
 % size(base_e);
+if size(Y,1)==size(base_e,2)
+   Y = Y';
+end
 K = Y/base_e;
 % Z = eval_eq(X,K,eq);
 %for i = 1:order
