@@ -9,5 +9,12 @@ end
 if ~all(size(serial_date))
     serial_date = [];
 end
-date_axes = serial2axes(serial_date);
-Hh = date_axes.Hh;
+if ~isrow(serial_date)
+   date_axes = serial2axes(serial_date');
+   Hh = date_axes.Hh';
+else
+   date_axes = serial2axes(serial_date);
+   Hh = date_axes.Hh;
+end
+
+end
