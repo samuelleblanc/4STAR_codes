@@ -161,5 +161,3 @@ save_fig(gcf,[fp 'rooftop' filesep 'Fall_2022' filesep 'plots' filesep instrumen
 
 
 
-
- 
