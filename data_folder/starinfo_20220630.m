@@ -17,15 +17,16 @@ s.sd_aero_crit=0.01;
 %s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
 % Ozone and other gases 
+DU_conv = 4.4615e-4; %mol/m^2
 s.O3h=21; %  
-s.O3col=0.297; %default guess
-s.NO2col=6.0e15; %default guess
-%Loschmidt= 2.686763e19; %molecules/cm2
-%s.NO2col=7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
+s.O3col=1.4437e-1/DU_conv/100.0; %From Pandora at Charles City, Virginia on same time of flight
+Loschmidt= 2.686763e19; %molecules/cm2
+s.NO2col=1.4802e-4/DU_conv*(Loschmidt/1000); %  3.3 DU from Pandora at Charles City, Virginia
 
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
+s.flagfilename = '20220630_starflag_man_created20221003_1248by_SB.mat';
 
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
