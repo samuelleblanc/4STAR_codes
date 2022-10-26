@@ -1,4 +1,4 @@
-% Checking some c0, and calculating the averages for ORACLES 2017
+% Checking some c0, and calculating the averages for MLO May 2022
 %close all
 clear all
 fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
