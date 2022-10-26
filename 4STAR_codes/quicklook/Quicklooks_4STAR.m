@@ -573,6 +573,20 @@ pptcontents0=[pptcontents0; {fig_names{end} 4}];
 if isequal(platform, 'flight');
     % flight track map
     figm = figure;
+    try
+        lon_min = nanmin(st.vis_sun.Lon) - 2.5;
+        lon_max = nanmax(st.vis_sun.Lon) + 2.5;
+        
+        lat_min = nanmin(st.vis_sun.Lat) - 2.5;
+        lat_max = nanmax(st.vis_sun.Lat) + 2.5;
+        
+        worldmap([lat_min,lat_max],[lon_min,lon_max])
+        load coastlines
+        geoshow(coastlat,coastlon,"DisplayType","polygon","FaceColor",[0.85 0.85 0.85])
+        
+    catch
+        disp('Mapping failed - disabled') 
+    end
     ss = scatter(st.vis_sun.Lon,st.vis_sun.Lat,4,st.vis_sun.t,'.'); plo = ss;
     leg = {'vis_sun'};
     hold on;
