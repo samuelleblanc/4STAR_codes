@@ -66,7 +66,7 @@ loadCrossSections_global;
  % select NO2 absorbing band to plot residuals for
  ires   = interp1(s.w(wln),[1:length(s.w(wln))],0.470  ,'nearest');
  
- [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode);
+ [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'NO2',mode,s.instrumentname);
   
   if mode==0
       % when mode==0 need to choose wln
