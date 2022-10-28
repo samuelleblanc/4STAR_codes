@@ -21,7 +21,7 @@ DU_conv = 4.4615e-4; %mol/m^2
 s.O3h=21; %  
 s.O3col=1.3899e-1/DU_conv/100.0; %From Pandora at Charles City, Virginia on same time of flight
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=9.8976e-5/DU_conv*(Loschmidt/1000); %  2.2 DU from Pandora at Charles City, Virginia
+s.NO2col=1.70e+15; % aura NO2 over WFF   %9.8976e-5/DU_conv*(Loschmidt/1000); %  2.2 DU from Pandora at Charles City, Virginia
 
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
