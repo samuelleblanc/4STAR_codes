@@ -68,6 +68,7 @@ if t(1)>=datenum([2016 1 1 0 0 0]);
         cross_sections.o4 = cross_sections.o4/Loschmidt/Loschmidt;
         cross_sections.co2 = cross_sections.co2/Loschmidt;
         cross_sections.ch4 = cross_sections.ch4/Loschmidt;
+        cross_sections.o3 = cross_sections.o3/10.0; %unit conversion error
     end
     fn=fieldnames(cross_sections);
     for ff=1:length(fn);
