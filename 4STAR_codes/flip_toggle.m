@@ -31,7 +31,9 @@ while ~done
             tog_str(t) = [];
          end
       else
-         if ischar(tog_val)
+         if isa(tog_val,'function_handle')
+            tog_str(t) = {[togs{t}, ': <@',char(tog_val),'>']};
+         elseif ischar(tog_val)
              tog_str(t) = {[togs{t}, ': <',tog_val,'>']}; 
          elseif ~islogical(tog_val)
             TF = num2str(tog_val);
