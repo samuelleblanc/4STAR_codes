@@ -332,7 +332,7 @@ anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var clear('va
 
 var = []; var.Lat = [];
 dims = {'time'};
-vatts.long_name = 'Lattitude'; vatts.units = 'degrees N';
+vatts.long_name = 'Latitude'; vatts.units = 'degrees N';
 anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 var = []; var.Lon = [];
