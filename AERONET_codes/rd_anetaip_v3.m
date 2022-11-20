@@ -23,7 +23,7 @@ if fid>0
         clear cimel; cimel = struct([]);
     else
         cimel.site = fgetl(fid);
-        while ~feof(fid)&&~(startsWith(tmp,'Site,')||startsWith(tmp,'AERONET_Site')||startsWith(tmp,'Date,'))
+        while ~feof(fid)&&~(startsWith(tmp,'Site,')||startsWith(tmp,'AERONET_Site')||startsWith(tmp,'Date'))
             tmp = fgetl(fid);
         end
         cimel.label_line = tmp;
