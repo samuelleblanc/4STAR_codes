@@ -12,10 +12,10 @@ function [fid, fname, pname] = getfile(fspec,pathfile);
 % 2009-01-08, CJF: Modified to discontinue use of getfile.  Using
 % getfullname_ instead.
 
-if ~exist('pathfile','var')||isempty(pathfile)
+if ~isavar('pathfile')||isempty(pathfile)
    pathfile = 'lastpath.mat';
 end
-if ~exist('fspec','var')||isempty(fspec)
+if ~isavar('fspec')||isempty(fspec)
    fspec = '*.*';
 end
 if isempty(fspec)
@@ -23,7 +23,7 @@ if isempty(fspec)
 end
 
 [fullname] = getfullname(fspec,pathfile);
-if ~isempty(fullname)&&exist(fullname,'file')
+if ~isempty(fullname)&&isafile(fullname)
    [pname, fstem,ext] = fileparts(fullname);
    pname = [pname, filesep];
    fname = [fstem,ext];
