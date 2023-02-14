@@ -579,6 +579,7 @@ else
     end
     
     if length(CW_Y)>1 && length(CW_neg_Y)>1  % then we have enough points to assess CW symmetry
+       [CW_Y,IA]= unique(CW_Y); CW_X = CW_X(IA);
         X_CW = interp1(CW_Y, CW_X, Ys,'pchip');
         [CW_neg_Y,IA]= unique(CW_neg_Y); CW_neg_X = CW_neg_X(IA);
         X_CW_neg = interp1(CW_neg_Y, CW_neg_X, Ys,'pchip');
