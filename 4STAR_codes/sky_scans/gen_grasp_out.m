@@ -71,11 +71,15 @@ inp.header(end+1,1) = {sprintf('%% rec_type: meaning for "rec_type" tag, type of
   inp.header(end+1,1) = {sprintf('%% rec_type=4: AOD_LOS, slant-path aerosol OD, subtracting Rayleigh and retrieved gases (= (TOD-ROD-GOD_retr) * airmass_aero)')};
   inp.header(end+1,1) = {sprintf('%% rec_type=5: AOD_LOS_fit, 3rd order polynomial fit of AOD_LOS')};
   inp.header(end+1,1) = {sprintf('%% rec_type=6: GOD_LOS, slant-path gas OD = TOD_LOS - ROD_LOS - AOD_LOS_fit ')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=7: DNR_LOS, slant-path Direct Normal Rate ')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=8: DNR_TOA, top-of-atmosphere Direct Normal Rate ')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-1: RAD, sky radiance [W/m2/nm/sr] (= s.skyrad./1000)')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-2: NRAD, normalized sky radiance [1/sr] (=pi*RAD/TOA)')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=-3: RESP, normalized sky radiance [cps/W/m2/nm/sr]')};
   
 inp.static_data(1,1) = {['wavelength(N_wavelengths)[nm]=[',sprintf('%3.1f',1000.*s.w(s.wl_ii(1))),sprintf(', %3.1f',1000.*s.w(s.wl_ii(2:end))),']']};
-% Add spectrometer FWHM
+% Add spectrometer FWHM (This I can do fairly easily even though it is not in "s")
+% 
 % Add uncertainty estimate for AOD, for skyrad
 %
 inp.static_data(end+1,1) = {['flight_level_albedo(N_wavelengths)[unitless]=[',sprintf('%0.3g',sfc_alb(s.wl_ii(1))),sprintf(', %0.3g',sfc_alb(s.wl_ii(2:end))),']']};
