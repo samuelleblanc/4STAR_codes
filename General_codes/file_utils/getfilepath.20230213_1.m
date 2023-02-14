@@ -7,7 +7,7 @@ function [fpath] = getfilepath(pathfile,dialog,reset);
 % interactively associated a path to a file or group of files 
 
 % Handle whether "reset" is provided or not
-if ~isavar('reset')
+if ~exist('reset','var')
     reset = false;
 end
 
@@ -18,7 +18,7 @@ if ~islogical(reset)
 end
 
 % Handle missing "dialog" argument
-if ~isavar('dialog')||isempty(dialog)
+if ~exist('dialog','var')||isempty(dialog)
    if exist('pathfile','var')&&~isempty(pathfile)
       dialog = ['Select a directory for ',pathfile,'.'];
    else
@@ -27,26 +27,21 @@ if ~isavar('dialog')||isempty(dialog)
 end
 
 % Handle missing pathfile argument
-if ~isavar('pathfile')||isempty(pathfile)
+if ~exist('pathfile','var')||isempty(pathfile)
    pathfile = 'lastpath.mat';
 end
 
-pname = strrep(userpath,';',filesep); 
-if ~ispc
-    pname = strrep(strrep(userpath,';',filesep),':',filesep);
-end
-pname = strrep([pname,filesep], [filesep, filesep], filesep);
-
+pname = strrep(strrep(userpath,';',filesep),':',filesep);
 pathdir = [pname, 'filepaths',filesep];
-if ~isadir(pathdir)
+if ~exist(pathdir,'dir')
     mkdir(pname, 'filepaths');
 end
 
 %
 %Handle whether pathfile is provided with .mat extension or not
-if ~isafile([pathdir,pathfile])&&isafile([pathdir,pathfile,'.mat'])
+if ~exist([pathdir,pathfile],'file')&&exist([pathdir,pathfile,'.mat'],'file')
    pathfile = [pathfile,'.mat'];
-elseif ~isafile([pathdir,pathfile])&&~isafile([pathdir,pathfile,'.mat'])
+elseif ~exist([pathdir,pathfile],'file')&&~exist([pathdir,pathfile,'.mat'],'file')
    if ~isempty(strfind(pathfile,'.mat'))
       newpathfile = pathfile;
    else
@@ -56,7 +51,7 @@ elseif ~isafile([pathdir,pathfile])&&~isafile([pathdir,pathfile,'.mat'])
 end
 
 % If the pathfile exists, then load it.
-if isafile([pathdir, pathfile])
+if exist([pathdir, pathfile],'file')
     pname = load([pathdir,pathfile]);
     if isstruct(pname)
         if isfield(pname,'pname')
@@ -68,7 +63,7 @@ if isafile([pathdir, pathfile])
 end
 
 % If the resulting path doesn't exist or if reset is true then use uigetdir to get a new one.
-if reset  || ~isadir(pname) || (isavar('newpathfile')&&~isafile(newpathfile))
+if reset || ~isadir(pname)
     pname = uigetdir(pname,dialog);
     if pname==0
         pname = [];
@@ -80,7 +75,7 @@ end
 fpath = pname;
 if isadir(fpath)
     save([pathdir,pathfile],'fpath');
-    if isavar('newpathfile')
+    if exist('newpathfile','var')
         save([pathdir,newpathfile],'fpath');
     end
 end

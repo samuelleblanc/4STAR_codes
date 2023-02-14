@@ -66,13 +66,8 @@ end
 
 if isafile([pathdir,pathfile])
     load([pathdir,pathfile]);
-    
     if ~isavar('pname')||isempty(pname)
-       if isavar('fpath')&&~isempty(fpath)&&isadir(fpath)
-          pname = fpath;
-       else
         pname = pwd;
-       end
     end
     if ~ischar(pname)||~isadir(pname)
         clear pname
