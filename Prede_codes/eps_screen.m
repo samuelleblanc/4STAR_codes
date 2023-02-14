@@ -5,13 +5,13 @@ function [aero, eps] = eps_screen(time, tau, window, eps_thresh, aot_base)
 % time is in units of day, so Matlab serial dates work as do jd.
 % If specified, window in minutes
 
-if ~exist('aot_base','var')
+if ~isavar('aot_base')||isempty(aot_base)
     aot_base = .2;
 end
-if ~exist('window','var')
+if ~isavar('window')||isempty(window)
     window = 5;
 end
-if ~exist('eps_thresh','var')
+if ~isavar('eps_thresh')||isempty(eps_thresh)
     eps_thresh = 1e-5;
 end
 %Compute tau prime, a renormalized tau
@@ -55,6 +55,15 @@ if length(pos_tau)>0
             eps(t) = 1 - exp(bar_log_tau_prime(t))./tau_prime_bar(t);
         end
     end
+    eps_i = interp1(time, eps, time -0.9.*window./(24*60), 'linear');
+    eps_nan = isnan(eps_i);
+    eps_i(eps_nan) = interp1(time(~eps_nan), eps(~eps_nan), time(eps_nan) - 0.9.*window./(24*60), 'nearest', 'extrap');
+    eps_j = interp1(time, eps, time +0.9.*window/(24*60), 'linear');
+    eps_nan = isnan(eps_j);
+    eps_j(eps_nan) = interp1(time(~eps_nan), eps(~eps_nan), time(eps_nan) + 0.9.* window./(24*60), 'nearest', 'extrap');
+
+    eps_min = min([eps_i;eps;eps_j]);%
+
     aero = (eps<eps_thresh); % Using empirical threshold of eps_thresh to flag cloud.
     aero = aero&(tau>0);
 end
