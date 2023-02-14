@@ -64,6 +64,7 @@ ncdef.dims = dims;
 anc_inv.ncdef = ncdef;
 anc_inv.time = [];
 
+% Most of this info came directly out of the ESPO ORACLES 4STAR ict files
 att.PI = 'Jens Redemann';
 anc_inv = anc_add_att(anc_inv,[], att); clear('att');
 att.Institution = 'NASA Ames Research Center';
@@ -102,7 +103,8 @@ att.R0 = 'Initial public archive of aerosol intensive properties from direct sun
 anc_inv = anc_add_att(anc_inv,[], att); clear('att');
 att.Processing_code_DOI = '10.5281/zenodo.1492911';
 anc_inv = anc_add_att(anc_inv,[], att); clear('att');
-%Now define vars, starting with time;
+
+%% Now define vars, starting with time;
 anc_inv.time = [mean(skyrad.t)];
 anc_inv = anc_timesync(anc_inv); anc_inv.time = [];
 
@@ -134,12 +136,12 @@ anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 var = []; var.sphericity = [];
 dims = {'time'};
-vatts.long_name = 'particle sphericity'; vatts.units = 'unitless';vatts.source = 'retrieval';
+vatts.long_name = 'particle sphericity'; vatts.units = 'percent';vatts.source = 'retrieval';
 anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 var = []; var.sphericity_err = [];
 dims = {'time'};
-vatts.long_name = 'particle sphericity error'; vatts.units = 'unitless';vatts.source = 'retrieval';
+vatts.long_name = 'particle sphericity error'; vatts.units = 'percent';vatts.source = 'retrieval';
 anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 var = [];var.PF_angle = [];
@@ -153,171 +155,124 @@ vatts.long_name = 'scattering angle for radiance'; vatts.units = 'degrees';
 anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 
+var = []; var.('n_real') = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['refractive index, real']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
 
-   var = []; var.('n_real') = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['refractive index, real']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.('n_imag') = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['refractive index, imaginary']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['SSA']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['single scattering albedo']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AOD_fit_total']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['extinction AOD from retrieval, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AOD_fit_fine']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['extinction AOD from retrieval, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AOD_fit_coarse']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['extinction AOD from retrieval, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AOD_meas']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['AOD from measurement']; vatts.units = 'unitless'; vatts.source = '4STAR';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AAOD']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['absorption AOD']; vatts.units = 'unitless'; vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['TOD_meas']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['total optical depth from direct measurement']; vatts.units = 'unitless';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['TOD_fit']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['total optical depth from retrieval']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['TOD_meas_minus_fit']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['Measured - Retrieved total OD']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['AGOD']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = 'column absorbing gas optical depth'; vatts.units = 'unitless';vatts.source = '4STAR';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+var = []; var.('n_imag') = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['refractive index, imaginary']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
 
-   var = []; var.(['sfc_alb']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = 'spectral surface albedo'; vatts.units = 'unitless';vatts.source = 'SSFR';
-   anc_inv = anc_add_var(anc_inv,var,dims, vatts); clear vatts dims var   
-   
-   var = []; var.(['g_total']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['asymmetry parameter, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['g_fine']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['asymmetry parameter, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['g_coarse']) = NaN;
-   dims = {'wavelength','time'};
-   vatts.long_name = ['asymmetry parameter, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['PF_total']) = NaN;
-   dims = {'PF_angle','wavelength','time'};
-   vatts.long_name = ['Phase function, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['PF_fine']) = NaN;
-   dims = {'PF_angle','wavelength','time'};
-   vatts.long_name = ['Phase function, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['PF_coarse']) = NaN;
-   dims = {'PF_angle','wavelength','time'};
-   vatts.long_name = ['Phase function, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-      
-   var = []; var.(['normalized_sky_radiance']) = NaN;
-   dims = {'SA','wavelength','time'};
-   vatts.long_name = ['sky radiance divded by TOA']; vatts.units = '1/sr';vatts.source = '4STAR';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['normalized_sky_radiance_fit']) = NaN;
-   dims = {'SA','wavelength','time'};
-   vatts.long_name = ['sky radiances divded by TOA from retrieval']; vatts.units = '1/sr';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-   
-   var = []; var.(['sky_radiance_fit_error']) = NaN;
-   dims = {'SA','wavelength','time'};
-   vatts.long_name = ['sky radiances meas - fit']; vatts.units = '%';vatts.source = 'retrieval';
-   anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
-      
+var = []; var.(['SSA']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['single scattering albedo']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
 
+var = []; var.(['AOD_fit_total']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['extinction AOD from retrieval, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
 
-for wl_ii = 1:length(skyrad.wl_ii)
-   w_ii= skyrad.wl_ii(wl_ii); wl = 1000.*(skyrad.w(w_ii));
-   wl_str = sprintf('_%2.0dnm',round(wl));wl_st = sprintf(' %2.0d nm',round(wl));
-   
-%    var = []; var.(['PF_total',wl_str]) = NaN;
-%    dims = {'PF_angle','time'};
-%    vatts.long_name = ['Phase function, total PSD',wl_st]; vatts.units = 'unitless';vatts.source = 'retrieval';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts);
-%    
-%    var = []; var.(['PF_fine',wl_str]) = NaN;
-%    dims = {'PF_angle','time'};
-%    vatts.long_name = ['Phase function, fine mode',wl_st]; vatts.units = 'unitless';vatts.source = 'retrieval';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts);
-%    
-%    var = []; var.(['PF_coarse',wl_str]) = NaN;
-%    dims = {'PF_angle','time'};
-%    vatts.long_name = ['Phase function, coarse mode',wl_st]; vatts.units = 'unitless';vatts.source = 'retrieval';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts);
-% 
-%       
-%    var = []; var.(['normalized_sky_radiance',wl_str]) = NaN;
-%    dims = {'SA','time'};
-%    vatts.long_name = ['sky radiance divded by TOA',wl_st]; vatts.units = '1/sr';vatts.source = '4STAR';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts);
-%    
-%    var = []; var.(['normalized_sky_radiance_fit',wl_str]) = NaN;
-%    dims = {'SA','time'};
-%    vatts.long_name = ['sky radiances divded by TOA from retrieval',wl_st]; vatts.units = '1/sr';vatts.source = 'retrieval';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts)
-%    
-%    var = []; var.(['sky_radiance_fit_error',wl_str]) = NaN;
-%    dims = {'SA','time'};
-%    vatts.long_name = ['sky radiances meas - fit',wl_st]; vatts.units = '%';vatts.source = 'retrieval';
-%    anc_inv = anc_add_var(anc_inv,var,dims,vatts)
-%       
+var = []; var.(['AOD_fit_fine']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['extinction AOD from retrieval, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
 
-   
-%    var = []; var.(['flux_dn',wl_str]) = NaN;
-%    dims = {'time'};
-%    vatts.long_name = 'downwelling flux'; vatts.units = 'W/m2';
-%    anc_inv = anc_add_var(anc_inv,var,dims, vatts);
-%    
-%    var = []; var.(['flux_up',wl_str]) = NaN;
-%    dims = {'time'};
-%    vatts.long_name = 'upwelling flux'; vatts.units = 'W/m2';
-%    anc_inv = anc_add_var(anc_inv,var,dims, vatts);
-%    
-%    var = []; var.(['flux_diff',wl_str]) = NaN;
-%    dims = {'time'};
-%    vatts.long_name = 'diffuse flux'; vatts.units = 'W/m2';
-%    anc_inv = anc_add_var(anc_inv,var,dims, vatts);
-end
+var = []; var.(['AOD_fit_coarse']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['extinction AOD from retrieval, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['AOD_meas']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['AOD from measurement']; vatts.units = 'unitless'; vatts.source = '4STAR';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['AAOD']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['absorption AOD']; vatts.units = 'unitless'; vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['TOD_meas']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['total optical depth from direct measurement']; vatts.units = 'unitless';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['TOD_fit']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['total optical depth from retrieval']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['TOD_meas_minus_fit']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['Measured - Retrieved total OD']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['AGOD']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = 'column absorbing gas optical depth'; vatts.units = 'unitless';vatts.source = '4STAR';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['sfc_alb']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = 'spectral surface albedo'; vatts.units = 'unitless';vatts.source = 'SSFR';
+anc_inv = anc_add_var(anc_inv,var,dims, vatts); clear vatts dims var
+
+var = []; var.(['g_total']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['asymmetry parameter, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['g_fine']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['asymmetry parameter, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['g_coarse']) = NaN;
+dims = {'wavelength','time'};
+vatts.long_name = ['asymmetry parameter, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['PF_total']) = NaN;
+dims = {'PF_angle','wavelength','time'};
+vatts.long_name = ['Phase function, total PSD']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['PF_fine']) = NaN;
+dims = {'PF_angle','wavelength','time'};
+vatts.long_name = ['Phase function, fine mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['PF_coarse']) = NaN;
+dims = {'PF_angle','wavelength','time'};
+vatts.long_name = ['Phase function, coarse mode']; vatts.units = 'unitless';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['normalized_sky_radiance']) = NaN;
+dims = {'SA','wavelength','time'};
+vatts.long_name = ['sky radiance divded by TOA']; vatts.units = '1/sr';vatts.source = '4STAR';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['normalized_sky_radiance_fit']) = NaN;
+dims = {'SA','wavelength','time'};
+vatts.long_name = ['sky radiances divded by TOA from retrieval']; vatts.units = '1/sr';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+var = []; var.(['sky_radiance_fit_error']) = NaN;
+dims = {'SA','wavelength','time'};
+vatts.long_name = ['sky radiances meas - fit']; vatts.units = '%';vatts.source = 'retrieval';
+anc_inv = anc_add_var(anc_inv,var,dims,vatts); clear vatts dims var
+
+% for wl_ii = 1:length(skyrad.wl_ii)
+%    w_ii= skyrad.wl_ii(wl_ii); wl = 1000.*(skyrad.w(w_ii));
+%    % CJF 2022-12-3: These two are subtlely different but not sure why they are different
+%    % also not sure why they are here at all.
+%    % I think these were being generated in anticipation of not having wl
+%    dimensioned output.  
+%    wl_str = sprintf('_%2.0dnm',round(wl));wl_st = sprintf(' %2.0d nm',round(wl));
+% end
 
 var = []; var.scan_tag = [];
 dims = {'time'};
@@ -332,7 +287,7 @@ anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var clear('va
 
 var = []; var.Lat = [];
 dims = {'time'};
-vatts.long_name = 'Lattitude'; vatts.units = 'degrees N';
+vatts.long_name = 'Latitude'; vatts.units = 'degrees N';
 anc_inv = anc_add_var(anc_inv, var, dims, vatts); clear vatts dims var
 
 var = []; var.Lon = [];
@@ -469,40 +424,21 @@ if isfield(skyrad, sky)&&sum(skyrad.(sky))>5
    anc_inv.vdata.(['PF_coarse'])(:,:,t) = aeroinv.PF_coarse;
    
    var.rads = NaN([60,size(aeroinv.Wavelength)]);
-   rads = aeroinv.sky_radiances_measured; var.rads(1:length(rads),:)=rads;
+   rads = aeroinv.sky_radiances_measured; var.rads(1:size(rads,1),:)=rads;
    anc_inv.vdata.(['normalized_sky_radiance'])(:,:,t) = var.rads; var = [];
    var.rads = NaN([60,size(aeroinv.Wavelength)]);
-   rads = aeroinv.sky_radiances_fit(:,wl_ii); var.rads(1:length(rads))=rads;
+   rads = aeroinv.sky_radiances_fit; var.rads(1:size(rads,1))=rads;
    anc_inv.vdata.(['normalized_sky_radiance_fit'])(:,:,t) = var.rads; var = [];
    var.rads = NaN([60,size(aeroinv.Wavelength)]);
-   rads = aeroinv.sky_radiances_pct_diff(:,wl_ii); var.rads(1:length(rads))=rads;
+   rads = aeroinv.sky_radiances_pct_diff; var.rads(1:size(rads,1))=rads;
    anc_inv.vdata.(['sky_radiance_fit_error'])(:,:,t) = var.rads; var = [];
 
-   
+
    for wl_ii = 1:length(skyrad.wl_ii)
       w_ii= skyrad.wl_ii(wl_ii); wl = 1000.*(skyrad.w(w_ii));
       wl_str = sprintf('_%2.0dnm',round(wl));wl_st = sprintf(' %2.0d nm',round(wl));
-
-%       anc_inv.vdata.(['PF_total',wl_str])(:,t) = aeroinv.PF_total(:,wl_ii);
-%       anc_inv.vdata.(['PF_fine',wl_str])(:,t) = aeroinv.PF_fine(:,wl_ii);
-%       anc_inv.vdata.(['PF_coarse',wl_str])(:,t) = aeroinv.PF_coarse(:,wl_ii);
-% 
-%       var.rads = NaN([60,1]);
-%       rads = aeroinv.sky_radiances_measured(:,wl_ii); var.rads(1:length(rads))=rads;
-%       anc_inv.vdata.(['normalized_sky_radiance',wl_str])(:,t) = var.rads; var = [];
-%       var.rads = NaN([60,1]);
-%       rads = aeroinv.sky_radiances_fit(:,wl_ii); var.rads(1:length(rads))=rads; 
-%       anc_inv.vdata.(['normalized_sky_radiance_fit',wl_str])(:,t) = var.rads; var = [];
-%       var.rads = NaN([60,1]);
-%       rads = aeroinv.sky_radiances_pct_diff(:,wl_ii); var.rads(1:length(rads))=rads; 
-%       anc_inv.vdata.(['sky_radiance_fit_error',wl_str])(:,t) = var.rads; var = [];
-
-%       anc_inv.vdata.(['flux_dn',wl_str])(t) = aeroinv.flux_dn(wl_ii);
-%       anc_inv.vdata.(['flux_up',wl_str])(t) = aeroinv.flux_up(wl_ii);
-%       anc_inv.vdata.(['flux_diff',wl_str])(t) = aeroinv.flux_diffuse(wl_ii);
    end
-   
-   
+      
    var.scan_tag = sscanf(skyrad.filen,'%d');
    anc_inv.vdata.scan_tag(t) = var.scan_tag; var = [];
    var.scan_type = double(skyrad.isALM) + 3.*double(skyrad.isPPL);

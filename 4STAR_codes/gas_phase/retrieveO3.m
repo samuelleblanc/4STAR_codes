@@ -118,7 +118,11 @@ end
 % apply MLO Jan-2016 c0 - need to do that since AOD is using different c0
 % c0_ = importdata([starpaths,'20160109_VIS_C0_refined_Langley_at_MLO_screened_2.0std_averagethru20160113.dat']);
 % c0  = c0_.data(wln,3);
-
+ if length(c0)>length(wln)
+     c0 = c0(1:length(wln));
+ elseif length(c0)<length(wln)
+    wln = wln(1:length(c0));
+ end
 if     s.t(1) < datenum([2016 5 06 0 0 0]) || (s.t(1) > datenum([2016 6 02 0 0 0])  && s.t(1) < datenum([2016 8 26 0 0 0])) || (s.t(1) >= datenum([2016 10 26 0 0 0]) && s.t(1) < datenum([2017 1 01 0 0 0]));
    % pre-ORACLES - and some KORUS flights with low RH
    % fixed
@@ -172,8 +176,7 @@ elseif s.t(1) > datenum([2017 01 01 0 0 0]) && s.t(1) < datenum([2018 01 01 0 0 
   
 elseif s.t(1) > datenum([2018 01 01 0 0 0])
    % this is for ORACLES 2018 and MLO campaigns
-   rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
-   
+   rate = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);   
      basis=[o3coef(wln), o4coef(wln), no2coef(wln) h2ocoef(wln)...
       ones(length(wln),1) s.w(wln)'.*ones(length(wln),1),((s.w(wln)').^2).*ones(length(wln),1),((s.w(wln)').^3).*ones(length(wln),1)];%
 end

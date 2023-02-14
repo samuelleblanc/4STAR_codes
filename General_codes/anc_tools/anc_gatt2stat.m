@@ -1,25 +1,33 @@
-function var = anc_gatt2stat(att, name);
-% var = anc_gatt2stat(att, name);
+function [anc] = anc_gatt2stat(anc, gatt_name, long_name);
+% anc = anc_gatt2stat(anc, gatt, long_name);
 % Attempts to convert a global attribute to static field
 % Parses data element of attribute with textscan(str,'%f %s')
-% Attributes initial numeric value as data, trailing string a units.
+% Attributes initial numeric value as data, trailing string as units.
+if ~isavar('long_name') 
+   long_name = gatt_name;
+end
 
-CC = textscan(att.data,'%f %s');
-if ~isempty(CC{1})
-    var.data = CC{1};
-    var.atts.long_name.id = 0;
-    var.atts.long_name.datatype = 2;
-    var.atts.long_name.data = char(name);
-    var.atts.units.id = 1;
-    var.atts.units.datatype = 2;
+CC = textscan(anc.gatts.(gatt_name),'%f %s');
+
     if ~isempty(CC{2})
-    var.atts.units.data = CC{2};
+       units = CC{2};
     else
-        var.atts.units.data = 'unitless';
+        units = '1';
     end
-    var.dims = {''};
-else
-    var = [];
+
+if ~isempty(CC{1})
+    anc.vdata.(gatt_name) = CC{1};
+
+    anc.vatts.(gatt_name).long_name = long_name;
+    anc.vatts.(gatt_name).units = units;
+
+    anc.ncdef.vars.(gatt_name).datatype = 5;
+    anc.ncdef.vars.(gatt_name).dims = {''};
+
+    anc.ncdef.vars.(gatt_name).atts.long_name.datatype = 2;
+    anc.ncdef.vars.(gatt_name).atts.units.datatype = 2;
+
+anc = anc_check(anc);
 end
     
 end

@@ -76,8 +76,11 @@ loadCrossSections_global;
       c0 = tmp.no2refspec;
       %c0  = repmat(c0_,length(s.t),1);
   end
-  
- 
+ if length(c0)>length(wln)
+     c0 = c0(1:length(wln));
+ elseif length(c0)<length(wln)
+    wln = wln(1:length(c0));
+ end
  % calculate residual spectrum (Rayleigh subtracted)
   eta = repmat(log(c0),length(s.t),1) - log(s.rateslant(:,wln)) - repmat(s.m_ray,1,length(wln)).*s.tau_ray(:,wln);
   eta_residual = NaN(size(eta));
