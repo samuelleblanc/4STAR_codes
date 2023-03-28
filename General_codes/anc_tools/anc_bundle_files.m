@@ -30,7 +30,7 @@ else
         end
         pause(0.01);
         [pname, fname, ext] = fileparts(filelist{i}); 
-        disp(['Processing ', fname, ext,' : ', num2str(i), ' of ', num2str(length(filelist))]);
+        disp(['Loading ', fname, ext,' : ', num2str(i), ' of ', num2str(length(filelist))]);
         %    do_somethin_to_it([pname dirlist(i).name], [outdir dirlist(i).name]);
         if mod(i,N)~=0
             nc_ = anc_cat(nc_,anc_load(filelist{i}));
@@ -41,8 +41,7 @@ else
                 nc = anc_cat(nc, nc_);
             end
             nc_ = anc_load(filelist{i});
-        end       
-        disp(['Done processing ', fname,ext]);        
+        end             
     end
     if ~isavar('nc')
         nc = nc_;
