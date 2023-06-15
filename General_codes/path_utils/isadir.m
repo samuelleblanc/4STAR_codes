@@ -14,8 +14,8 @@ if ~isempty(dirpath)
     if iscell(dirpath)
         if length(dirpath)==1
             result = isadir(dirpath{1});
-        else
-            result = [isadir(dirpath{1}), isadir(dirpath(2:end))];
+%         else
+%             result = [isadir(dirpath{1}), isadir(dirpath(2:end))];
         end
     else
         result = isempty(findstr(dirpath,'*'))&&isempty(findstr(dirpath,'?'))&&length(dir(dirpath))>=2;
