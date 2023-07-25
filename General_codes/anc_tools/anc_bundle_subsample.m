@@ -24,9 +24,8 @@ else
         disp(['Processing ', fname, ext,' : ', num2str(i), ' of ', num2str(length(filelist))]);
         %    do_somethin_to_it([pname dirlist(i).name], [outdir dirlist(i).name]);
         nc = anc_cat(nc,anc_downsample_nomiss(anc_load(filelist{i}),N));
-        disp(['Done processing ', fname,ext]);
-        
-    end;
+        disp(['Done processing ', fname,ext]);        
+    end
     disp(' ')
     disp(['Finished processing selected files in ' pname])
     disp(' ')
