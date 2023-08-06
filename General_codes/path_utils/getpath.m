@@ -44,7 +44,7 @@ if exist('infile','var')&&~isempty(infile)
         if ~isempty(pname)&&exist(pname, 'dir')
             outpath = [pname, filesep];
         else
-            disp(['Supplied filename "',infile,'" does not exist on the path.  Select target directory.'])
+            % disp(['Supplied filename "',infile,'" does not exist on the path.  Select target directory.'])
             outpath = getnamedpath(pathfile,dialog);
         end
     end
