@@ -55,7 +55,7 @@ if fid>0
    fmt_str = '%s %s %s'; % Two strings in a row for date, time
    for L = 4:length(label)
       bloop = textscan(first_line,[fmt_str, ' %f *[^\n]'],'delimiter',',');
-      if isempty(bloop{end})
+      if isempty(bloop{end}) || ~isempty(findstr(label{L},'Date')) ||  ~isempty(findstr(label{L},'Time'))
          fmt_str = [fmt_str, ' %s'];
       else
          fmt_str = [fmt_str, ' %f'];
@@ -91,7 +91,7 @@ if fid>0
             if isnumeric(txt{1})&&~all(isNaN(txt{1}))
                cimel.(label{1}) = txt{1};
             elseif ~isempty(findstr(lower(label{1}),'date'))
-               cimel.(label{1}) = datenum(txt{1},'dd/mm/yyyy');
+               cimel.(label{1}) = datenum(txt{1},'dd:mm:yyyy');
                %             elseif isempty(findstr(lower(label{1}),'data_type'))
                %                cimel.(label{1}) = txt{1};
                %             else
@@ -125,6 +125,7 @@ newname = strrep(newname,'{','_');
 newname = strrep(newname,'}','_');
 newname = strrep(newname,' ','_');
 newname = strrep(newname,'-','_');
+newname = strrep(newname,':','_');
 newname = strrep(newname,'/','_');
 newname = strrep(newname,'+','_');
 newname = strrep(newname,'>=','_gte_');
