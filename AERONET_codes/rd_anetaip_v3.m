@@ -28,7 +28,7 @@ if fid>0
         end
         cimel.label_line = tmp;
         labels = textscan(cimel.label_line,'%s','delimiter',',');
-        labels_ = labels{:};
+        labels_ = unique(labels{:},'rows','stable');
         for lab = length(labels_):-1:1
             tmp = labels_{lab};
             tmp_ = sscanf(tmp,'%f');
