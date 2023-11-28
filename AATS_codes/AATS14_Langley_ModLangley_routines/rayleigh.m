@@ -1,6 +1,6 @@
 function tau_r=rayleigh(lambda,idx_model_atm)
 
-%function tau_r=rayleigh(lambda,press,idx_model_atm)
+%function tau_r=rayleigh(lambda,idx_model_atm)
 %Computes Rayleigh Scattering according to Bucholtz A., 1995: Appl. Optics., Vol. 34, No. 15 2765-2773
 %lambda has to be in microns, pressure in hPa
 %
