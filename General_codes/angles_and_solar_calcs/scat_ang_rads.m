@@ -13,7 +13,7 @@ function SA = scat_ang_rads(sza, saz, za, az)
 %    za = za *pi/180;
 %    az = az *pi/180;   
 % end
-if size(sza,1)==1
+if size(za,1)==1
 sun_xyz  = [sin(sza) .* sin(saz); sin(sza) .* cos(saz); cos(sza)];
 sky_xyz  = [sin(za) .* sin(az); sin(za) .* cos(az); cos(za)];
 comps = sun_xyz .* sky_xyz;
