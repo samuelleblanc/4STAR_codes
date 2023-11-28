@@ -35,9 +35,11 @@ while ~done
             tog_str(t) = {[togs{t}, ': <@',char(tog_val),'>']};
          elseif ischar(tog_val)
              tog_str(t) = {[togs{t}, ': <',tog_val,'>']}; 
-         elseif ~islogical(tog_val)
+         elseif ~islogical(tog_val)&&isnumeric(tog_val)
             TF = num2str(tog_val);
             tog_str(t) = {[tog, ': <',TF,'>']};
+         elseif isgraphics(tog_val)
+            tog_str(t) = {[tog, ': <',num2str(tog_val.Number),'>']};
          else
             if toggle.(tog)
                TF = 'true';
