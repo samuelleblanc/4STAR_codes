@@ -1,4 +1,4 @@
-function fig_paths = compare_star_2_aeronet(fname_starsun);
+function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparison);
 %% PURPOSE:
 %   Compare the 4STAR aod values to a cimel aeronet v1.5 ground site. 
 %
@@ -29,10 +29,12 @@ function fig_paths = compare_star_2_aeronet(fname_starsun);
 %                  Added supprot for AERONET v3 diret beam files
 % Modified (v1.3): Samuel LeBlanc, Santa Cruz, CA, 2022-04-29
 %                  Added plotting vs. Azimuth Angle
+% Modified (v1.4): Samuel LeBlanc, Santa Cruz, CA, 2021-01-31
+%                  Added a toogle for a loose aeronet comparison
 % -------------------------------------------------------------------------
 
 %% start of function
-version_set('1.3')
+version_set('1.4')
 
 %% load the file
 fp = getnamedpath('starsun');
@@ -46,8 +48,17 @@ if nargin<1;
 end
 disp(['Loading the matlab file: ' fname_starsun])
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_starsun});
-max_alt_diff = 200.0;
-max_seconds_diff = 360.0;
+
+if nargin<2 % no loose aeronet comparison set, assume false
+    loose_aeronet_comparison = 0;
+end
+if ~loose_aeronet_comparison
+    max_alt_diff = 200.0;
+    max_seconds_diff = 360.0;
+else
+    max_alt_diff = 300.0;
+    max_seconds_diff = 600.0;
+end
 
 try; 
     load(fname_starsun,'t','tau_aero_noscreening','w','m_aero','rawrelstd','Alt','rateaero','c0','note','Az_deg');
@@ -57,6 +68,9 @@ end;
 
 fp = getnamedpath('aeronet');
 dis = dir([fp daystr(3:end) '*.lev*']);
+if length(dis) < 1
+	dis = dir([fp daystr '*.lev*']);
+end
 if length(dis) ~= 1
     if usejava('desktop')
     try
@@ -83,8 +97,11 @@ end
 a = aeronet_read_lev_v3([apname afile]);
 
 %% filter out the bad aod 4STAR
-i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
-
+if ~loose_aeronet_comparison
+    i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
+else
+    i = (~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
+end
 %% knnsearch to find the closest times to compare aeronet and 4STAR data
 % make sure to only have unique valuesSL331125766198
 

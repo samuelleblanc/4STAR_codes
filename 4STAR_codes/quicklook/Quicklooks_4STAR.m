@@ -194,7 +194,7 @@ end
 
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
 %% call the gas 'gas'/'cwv' if does not exist in starsun
-if isfield(s,'gas')
+if isfield(s,'gas') && isfield(s,'cwv')
     cwv2plot  =s.cwv.cwv940m1;
     o32plot   =s.gas.o3.o3DU;
     no22plot  =s.gas.no2.no2_molec_cm2;
@@ -1821,7 +1821,10 @@ end
 
 %% Compare to AERONET
 try
-    aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun);
+    if ~isfield(s,'loose_aeronet_comparison')
+        s.loose_aeronet_comparison = false;
+    end
+    aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun,s.loose_aeronet_comparison);
 catch e
     disp(['Error making plots for AERONET files: ' e.identifier e.message])
     aeronet_fig_paths = [];

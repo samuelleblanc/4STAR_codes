@@ -246,6 +246,13 @@ end
 dates=num2str(M(1:aero.ntimes,jini),'%08d'); dates(dates==' ')='0';
 times=num2str(M(1:aero.ntimes,jini+1),'%06d'); times(times==' ')='0';
 aero.jd(1:aero.ntimes,1)=datenum([dates times],'ddmmyyyyHHMMSS');
+d0 = datevec(aero.jd(1));
+if d0(1) < 2000
+    % bad format, try alternative with dd:mm:yyyy
+    dates=num2str(M(1:aero.ntimes,jini-1),'%08d'); dates(dates==' ')='0';
+    times=num2str(M(1:aero.ntimes,jini),'%06d'); times(times==' ')='0';
+    aero.jd(1:aero.ntimes,1)=datenum([dates times],'ddmmyyyyHHMMSS');
+end
 jini=jini+2;
 % Day of year
 jini=jini+1;
