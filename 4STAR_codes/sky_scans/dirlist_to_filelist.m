@@ -3,10 +3,10 @@ function [fulllist,flist] = dirlist_to_filelist(dlist,pname);
 % array of char with full path spec.
 if ~isavar('pname')
    if isfield(dlist,'folder')
-      pname = [dlist.folder,filesep]; pname = strrep(pname, [filesep filesep], filesep);
+      pname = [dlist.folder,filesep]; 
    end
 end
-% flist = string;fulllist = {};
+pname = [pname, filesep]; pname = strrep(pname, [filesep filesep], filesep); % flist = string;fulllist = {};
 if isempty(dlist)
     fulllist(1) = {[]};
     flist = string([]);
