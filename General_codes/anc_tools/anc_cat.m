@@ -68,6 +68,9 @@ for v = 1:length(varnames)
         if (isfield(nc2.vdata, varnames{v}))
             v2 = nc2.vdata.(varnames{v});
             ndims = max(numel(size(v1)),numel(size(v2)));
+            if ~isfield(nc1.ncdef,'recdim') && isfield(nc1.ncdef.dims,'time')
+               nc1.ncdef.recdim.name = 'time';
+            end
             catdim = find(strcmp(nc1.ncdef.vars.(varnames{v}).dims,nc1.ncdef.recdim.name));
             % In the netcdf file, the recdim should be the last dim but if
             % it is of length one it may be suppressed, so to prevent this

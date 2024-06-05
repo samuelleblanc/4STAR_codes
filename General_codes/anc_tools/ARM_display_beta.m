@@ -646,10 +646,7 @@ traces = length(legend(ax));
 if traces>0 && strcmp(get(ax,'NextPlot'),'add')
    plt = adjust_plot_settings(plt);
 end
-
-
 if isfield(anc.vdata,field)
-
    status = 1;
    [~,fname,ext] = fileparts(anc.fname); fname = [fname,ext];
    
@@ -672,7 +669,8 @@ if isfield(anc.vdata,field)
             anc.vatts.(qc_field).('bit_1_assessment') = 'Bad';
          end
          % check if already a summary qc field
-         if ~isempty(strfind(anc.gatts.datastream,'.s1')>0)||...
+         % if ~isafield(anc.gatts,'datastream')
+         if ~isempty(strfind(anc.gatts.data_level,'s1')>0)||...
                (isfield(anc.vatts, qc_field) && isfield(anc.vatts.(qc_field),'description')...
                &&(~isempty(findstr('0 = Good',anc.vatts.(qc_field).description)))...
                &&(~isempty(findstr('1 = Indeterminate',anc.vatts.(qc_field).description)))...

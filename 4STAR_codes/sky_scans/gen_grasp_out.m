@@ -5,18 +5,19 @@ function [fname_mat, fname_csv] = gen_grasp_out(s)
 % Accepts a 4STAR "s" struct as input which should have been processed
 % through starsky_2 
 
-% Connor, v0.1, 2020/05/02, Beta-version before iteration with Oleg & David Fuertes
+% Connor, v0.2, 2020/05/02, Beta-version before iteration with Oleg & David Fuertes
 %               Considering producing row-ordered (each named variable of
 %               N-length on separate row), column-ordered but with a header
 %               of elements before the time series columns, and a mat file
 %               with equivalent content
+% Connor, v0.3, 2023/12/15, place holder record types for responsivity, FWHM, and unc
 if ~isavar('s')
     s = load(getfullname('*STAR*sky*.mat','starsky','Select a starsky mat file:'));
     if isfield(s,'s'); s= s.s; 
     elseif isfield(s,'star'); s = s.star; 
     end
 end
-v_str = '0.2';
+v_str = '0.3';
 version_set(v_str);
 % Critical elements: time, lat, lon, alt, wavelength, dW, SFA,
 % TOD, ROD, AGOD, RAD, TOA
@@ -73,9 +74,12 @@ inp.header(end+1,1) = {sprintf('%% rec_type: meaning for "rec_type" tag, type of
   inp.header(end+1,1) = {sprintf('%% rec_type=6: GOD_LOS, slant-path gas OD = TOD_LOS - ROD_LOS - AOD_LOS_fit ')};
   inp.header(end+1,1) = {sprintf('%% rec_type=7: DNR_LOS, slant-path Direct Normal Rate ')};
   inp.header(end+1,1) = {sprintf('%% rec_type=8: DNR_TOA, top-of-atmosphere Direct Normal Rate ')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=9: DNR_RESP, spectral responsivity for direct normal [cps/W/m2/nm]')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=10: DN_UNC, Direct Normal relative Uncertainty [unitless]')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-1: RAD, sky radiance [W/m2/nm/sr] (= s.skyrad./1000)')};
   inp.header(end+1,1) = {sprintf('%% rec_type=-2: NRAD, normalized sky radiance [1/sr] (=pi*RAD/TOA)')};
-  inp.header(end+1,1) = {sprintf('%% rec_type=-3: RESP, normalized sky radiance [cps/W/m2/nm/sr]')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=-3: RESP, spectral responsivity for sky radiance [cps/W/m2/nm/sr]')};
+  inp.header(end+1,1) = {sprintf('%% rec_type=-4: RAD_UNC, sky radiance relative Uncertainty [unitless]')};
   
 inp.static_data(1,1) = {['wavelength(N_wavelengths)[nm]=[',sprintf('%3.1f',1000.*s.w(s.wl_ii(1))),sprintf(', %3.1f',1000.*s.w(s.wl_ii(2:end))),']']};
 % Add spectrometer FWHM (This I can do fairly easily even though it is not in "s")
