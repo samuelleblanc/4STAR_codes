@@ -185,7 +185,7 @@ else
         geom.WAVE_(w).albedo = fill_albedo(geom.WAVE(w),star.brdf);
         %     geom.WAVE_(w).UO3 = interp1(star.w, star.cross_sections.o3, geom.WAVE(w),'pchip','extrap');
         %     wi = interp1(star.w,[1:length(star.w)],geom.WAVE(w),'nearest');
-        geom.WAVE_(w).UO3 = agod(w); %Not crosss section, ozone OD s.O3col
+        geom.WAVE_(w).UO3 = agod(w); %Not crosss section, absorbing gas OD
         geom.WAVE_(w).DU = star.O3col*1000;
         geom.WAVE_(w).PWV = star.PWV;
         

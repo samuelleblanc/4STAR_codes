@@ -97,16 +97,23 @@ for i = 1:length(mask)
       list = [list;dir([mask_i])];
    end
 end
-L = 1;
-while L<(length(list)-1)
-    top = list(L);
-    for LL = length(list):-1:2
-        if strcmp(top.folder,list(LL).folder) && strcmp(top.name,list(LL).name)
-            list(LL) = [];
-        end
-    end
-    L = L+1;
+these = {};
+for L = length(list):-1:1
+   these(L) = {[list(L).folder, filesep, list(L).name]};
 end
+[~,ij] = unique(these);
+list = list(ij);
+% L = 1;
+% while L<(length(list)-1)
+%     top = list(L);
+%     for LL = length(list):-1:2
+%         if strcmp(top.folder,list(LL).folder) && strcmp(top.name,list(LL).name)
+%             list(LL) = [];
+%         end
+%     end
+%     L = L+1;
+% end
+
 if isempty(pname) || isempty(list)
     pname = [];
 else

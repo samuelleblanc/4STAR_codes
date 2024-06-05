@@ -216,9 +216,15 @@ plot(wl(ii), tau_abs_gas_fit(ii),'-',wl(ii), tau_abs_gas(ii),'-',wl(ii), tau_abs
     wl(star.aeronetcols), tau_abs_gas_fit(star.aeronetcols),'*',...
     wl(star.aeronetcols), tau_abs_gas(star.aeronetcols),'ro'...
     ); logx;
+lg = legend('AGOD (tau_noray_vert-aod_fit)','tau_noray_vert - tau_aero_subtract_all','(tot-aod_pfit)','AGOD fit pixels','tau noray - aero'); set(lg,'interp','none', 'location','northwest')
+title({sprintf('Lat=%2.4f, Lon=%2.4f, Alt=%1.0f m, Az=%1.0f deg',star.Lat(sun_ii), ...
+    star.Lon(sun_ii), star.Alt(sun_ii), acosd(cosd(star.Az_deg(sun_ii))));sprintf('Fin = %0.3f',fin_max)});
+
+% Remove pixels and plot difference 2024-02-19
+plot(wl(ii), tau_abs_gas(ii),'-',wl(ii), tau_abs_gas_pfit(ii),'-k'); logx;
 xlabel('wavelength [um]');
 ylabel('Gas OD'); ylim([-.02,.28])
-lg = legend('AGOD (tot-aod_fit)','tot - tau_aero_subtract_all','(tot-aod_pfit)','AGOD fit pixels','tau noray - aero'); set(lg,'interp','none', 'location','northwest')
+lg = legend('tau - Rayleigh - ret gas - AOD fit'); set(lg,'interp','none', 'location','northwest')
 title({sprintf('Lat=%2.4f, Lon=%2.4f, Alt=%1.0f m, Az=%1.0f deg',star.Lat(sun_ii), ...
     star.Lon(sun_ii), star.Alt(sun_ii), acosd(cosd(star.Az_deg(sun_ii))));sprintf('Fin = %0.3f',fin_max)});
 
@@ -853,6 +859,9 @@ elseif star.isALM
     else
         figure_(fog);
     end
+    % almA = CCW
+    % almB = CW
+
     semilogy(abs(star.SA(good_almB)), ...
         star.skyrad(good_almB,star.aeronetcols(vis_pix)),'k-'); hold('on')
     if ~rain

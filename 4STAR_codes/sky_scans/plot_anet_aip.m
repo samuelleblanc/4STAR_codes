@@ -222,7 +222,7 @@ plot(anetaip.Wavelength,abs(anetaip.input.extras.aod_meas- anetaip.input.extras.
 end
 
 if ~isempty(anetaip.input.extras.aod_fit)
-   h = legend('AAOD','abs(TOD input-TOD retr)','abs(AOD meas - AOD fit)');
+   h = legend('AAOD','|(TOD input-retr)|','|(AOD meas-fit)|');
 else
     h = legend('AAOD','abs(TOD input-TOD retr)');
 end
