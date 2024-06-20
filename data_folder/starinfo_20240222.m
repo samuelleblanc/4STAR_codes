@@ -9,9 +9,9 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.ground = [datenum(2024,01,25,21,01,00) datenum(2024,01,26,00,58,00)];
+s.ground = [datenum(2024,02,22,17,55,41) datenum(2024,02,23,00,37,51)];
 s.loose_aeronet_comparison = true;
-s.langley = [datenum(2024,01,25,22,30,00) datenum(2024,01,26,00,44,0)];
+%s.langley = [datenum(2022,05,09,15,58,00) datenum(2022,05,09,19,40,0)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 s.sd_aero_crit=0.01;  
