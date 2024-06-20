@@ -133,6 +133,9 @@ ic = find(tracking);
 icenter = ic(ceil(end/2));
 rec = [1:length(tracking)]';
 if any(tracking)
+	ic = find(tracking);
+	icenter = ic(ceil(end/2));
+	rec = [1:length(tracking)]';
     if ~strcmp(instrumentname,'2STAR');
         scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
     else;
@@ -140,6 +143,9 @@ if any(tracking)
     end;
    % scan(icenter) = true;
 else
+	ic = [1];
+	icenter = [1];
+	rec = [1:length(tracking)]';
     scan = true(size(tracking));
     scan([1:3 end-2:end]) = false;
 end
