@@ -82,6 +82,16 @@ else
     disp('Using default cal folder:')
     pname = ['C:\Users\sleblan2\Research\4STAR\cal\' date]
 end
+
+%% Get instrument used from the available files
+file_list = dir([pname filesep '*.dat']);
+[sourcefile, ext, daystr,filen,instrumentname]=starsource([file_list(1).folder filesep file_list(1).name]);
+if ~strcmp(date,daystr) 
+    disp(['***Date string(' date ') does not match folder (' daystr '), using folder values ***'])
+    date=daystr
+end
+
+%% get sphere radiance file
 if date(1:4)=='2014'|date(1:4)=='2015';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20140606091700HISS.txt');
 elseif date(1:4)=='2013';
@@ -97,14 +107,6 @@ lamps = [12,11,10,9,6,3,2,1];
 vis_mean = []; vis_std = []; nir_mean = []; nir_std = [];
 M_vis = []; S_vis = 0; M_nir = []; S_nir = 0;
 k = 0;
-
-%% Get instrument used from the available files
-file_list = dir([pname filesep '*.dat']);
-[sourcefile, ext, daystr,filen,instrumentname]=starsource([file_list(1).folder filesep file_list(1).name]);
-if ~strcmp(date,daystr) 
-    disp(['***Date string(' date ') does not match folder (' daystr '), using folder values'])
-    date=daystr
-end
 
 
 %% Loop through each lamps
