@@ -1,4 +1,4 @@
-function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparison);
+function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparison,valid_time);
 %% PURPOSE:
 %   Compare the 4STAR aod values to a cimel aeronet v1.5 ground site. 
 %
@@ -31,10 +31,13 @@ function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparis
 %                  Added plotting vs. Azimuth Angle
 % Modified (v1.4): Samuel LeBlanc, Santa Cruz, CA, 2021-01-31
 %                  Added a toogle for a loose aeronet comparison
+% Modified (v1.5): Samuel LeBlanc, Santa Cruz, CA, 2024-06-24
+%                  Added a valid_time for only comparing to AERONET for a
+%                  specific time range.
 % -------------------------------------------------------------------------
 
 %% start of function
-version_set('1.4')
+version_set('1.5')
 
 %% load the file
 fp = getnamedpath('starsun');
@@ -49,8 +52,24 @@ end
 disp(['Loading the matlab file: ' fname_starsun])
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_starsun});
 
+% load info file
+infofile_ = ['starinfo_' daystr '.m'];
+infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+s.dummy = [0];
+try
+    s = infofnt(s);
+catch
+    eval([infofile_(1:end-2),'(s);']);
+end
+
+
 if nargin<2 % no loose aeronet comparison set, assume false
-    loose_aeronet_comparison = 0;
+    if isfield(s,'loose_aeronet_comparison')
+        loose_aeronet_comparison = s.loose_aeronet_comparison;
+    else
+        loose_aeronet_comparison = 0;
+
+    end
 end
 if ~loose_aeronet_comparison
     max_alt_diff = 200.0;
@@ -66,6 +85,14 @@ catch;
     load(fname_starsun);
 end;
 
+if nargin<3 %no valid_time set, use all
+    if isfield(s,'valid_time')
+        valid_time = s.valid_time;
+    else
+        valid_time = [t(1)+0.0417 t(end)]; 
+        disp('AERONET comparison: valid time not set, using 1 hour after first time point')
+    end
+end
 fp = getnamedpath('aeronet');
 dis = dir([fp daystr(3:end) '*.lev*']);
 if length(dis) < 1
@@ -98,9 +125,11 @@ a = aeronet_read_lev_v3([apname afile]);
 
 %% filter out the bad aod 4STAR
 if ~loose_aeronet_comparison
-    i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
+    i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)& ...
+    (Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
 else
-    i = (~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff));
+    i = (~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))& ...
+        (Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
 end
 %% knnsearch to find the closest times to compare aeronet and 4STAR data
 % make sure to only have unique valuesSL331125766198
@@ -233,8 +262,8 @@ ylabel(['AOD difference (' instrumentname '-AERONET)']);
 xlabel('UTC from start of day [hours]'); xlim([new_time(1)*0.95,new_time(end)*1.02]);
 grid on;
 dtv = datevec(t(ii(1)));
-[azi,sza,r] = sun(a.long, a.lat,dtv(3), dtv(2), dtv(1), [0:0.1:24.0],[0:0.1:24.0].*0+288.15,[0:0.1:24.0].*0+950.0);
-[ax,h1,h2] = plotyy([0],[0.001],[0:0.1:24.0],sza); 
+[azi,sza,r] = sun(a.long, a.lat,dtv(3), dtv(2), dtv(1), new_time,new_time.*0+288.15,new_time.*0+950.0);
+[ax,h1,h2] = plotyy([0],[0.001],new_time,sza); 
 xlim([new_time(1)*0.95,new_time(end)*1.02]);
 ylabel(ax(2), 'SZA [^{\circ}]')
 hold off;

@@ -1824,7 +1824,11 @@ try
     if ~isfield(s,'loose_aeronet_comparison')
         s.loose_aeronet_comparison = false;
     end
-    aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun,s.loose_aeronet_comparison);
+    if isfield(s,'aeronet_valid_time')
+        aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun,s.loose_aeronet_comparison,s.aeronet_valid_time);
+    else
+        aeronet_fig_paths = compare_star_2_aeronet(fname_4starsun,s.loose_aeronet_comparison);
+    end
 catch e
     disp(['Error making plots for AERONET files: ' e.identifier e.message])
     aeronet_fig_paths = [];
@@ -1895,6 +1899,7 @@ return
 %% simplifying fuctions
 function pptcontents0 = plot_langleys(s,p1,pptcontents0,platform)
 
+disp('... Plotting langleys')
 % load info file
 infofile_ = ['starinfo_' s.daystr '.m'];
 infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility

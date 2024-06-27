@@ -410,7 +410,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>datenum([2022 5 6 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
+        if t>datenum([2024 2 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)
+                daystr = '20240621';
+                filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';
+        elseif t>datenum([2022 5 6 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
                 daystr = '20220515';
                 filesuffix = '4STARB_refined_averaged_good_MLO_May2022';
         elseif t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix

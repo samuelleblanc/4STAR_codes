@@ -441,6 +441,7 @@ end;
 visfilename=fullfile(starpaths, [daystr, '_VIS_C0_' s.instrumentname filesuffix '.dat']);
 try;
     starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
+    disp(['c0 file being saved: ' visfilename])
 catch
     warning(['c0 file :' visfilename ' already exists'])
 end;

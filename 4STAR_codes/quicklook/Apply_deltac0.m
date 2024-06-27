@@ -100,14 +100,14 @@ setappdata(gcf, 'SubplotDefaultAxesLocation', [0, 0, 1, 1]);
 ax1 = subplot(7,1,1);
 plot(ax1,t(i),aod_380nm(i),'.','color',cm(1,:).*0.5);
 title([instrumentname ' - ' tit ' AODs: ' file],'Interpreter','none');
-hold on;grid on; ylabel(['AOD ' leg{1} ' nm']);ylim([-0.02,0.08]);
+hold on;grid on; ylabel(['AOD ' leg{1} ' nm']);%ylim([-0.02,0.08]);
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(1/7-0.01) .92 1/7-0.03]);
 set(gca,'XTickLabel','');
 
 ax2 = subplot(7,1,2);
 plot(ax2,t(i),aod_452nm(i),'.','color',cm(2,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{2} ' nm']);ylim([-0.02,0.08]);
+hold on;grid on; ylabel(['AOD ' leg{2} ' nm']);%ylim([-0.02,0.08]);
 plot(t(i),t(i).*0,'-k');datetick;
 title(['Current c0: ' note{6}],'Interpreter','none')
 set(gca,'Position',[0.07 1-(2/7-0.01) .92 1/7-0.03]);
@@ -115,7 +115,7 @@ set(gca,'XTickLabel','');
 
 ax3 = subplot(7,1,3);
 plot(ax3,t(i),aod_500nm(i),'.','color',cm(3,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{3} ' nm']);ylim([-0.02,0.08]);
+hold on;grid on; ylabel(['AOD ' leg{3} ' nm']);%ylim([-0.02,0.08]);
 if length(find(aod_500nm(i)<0.08))==0
     text(ax3,nanmin(t(i))+0.2*(nanmax(t(i))-nanmin(t(i))),0.02,'No Low AOD data for testing calibration','color','r','fontweight','bold','fontsize',16);
 end
@@ -125,25 +125,25 @@ title(['delta c0 + ' num2str(deltac0_percent,'%3.1f') '%'],'Interpreter','none')
 
 ax4 = subplot(7,1,4);
 plot(ax4,t(i),aod_620nm(i),'.','color',cm(3,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{4} ' nm']);ylim([-0.02,0.06]);
+hold on;grid on; ylabel(['AOD ' leg{4} ' nm']);%ylim([-0.02,0.06]);
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(4/7-0.01) .92 1/7-0.02])
 
 ax5 = subplot(7,1,5);
 plot(ax5,t(i),aod_865nm(i),'.','color',cm(4,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{5} ' nm']);ylim([-0.02,0.06]);
+hold on;grid on; ylabel(['AOD ' leg{5} ' nm']);%ylim([-0.02,0.06]);
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(5/7-0.01) .92 1/7-0.02])
 
 ax6 = subplot(7,1,6);
 plot(ax6,t(i),aod_1040nm(i),'.','color',cm(5,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{6} ' nm']);ylim([-0.02,0.06]);
+hold on;grid on; ylabel(['AOD ' leg{6} ' nm']);%ylim([-0.02,0.06]);
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(6/7-0.01) .92 1/7-0.02])
 
 ax7 = subplot(7,1,7);
 u = plot(ax7,t(i),aod_1215nm(i),'.','color',cm(6,:).*0.5);
-hold on;grid on; ylabel(['AOD ' leg{7} ' nm']);ylim([-0.02,0.06]);
+hold on;grid on; ylabel(['AOD ' leg{7} ' nm']);%ylim([-0.02,0.06]);
 plot(t(i),t(i).*0,'-k');datetick;
 set(gca,'Position',[0.07 1-(7/7-0.01) .92 1/7-0.02])
 
@@ -268,7 +268,7 @@ if load_sp;
     for j=1:sp_num;
         plot(s.w.*1000.0,calc_new_aod(s.tau_aero_noscreening(ii(inum(j)),:),s.m_aero(ii(inum(j))),s.c0,newc0),'-','color',cm(j,:));
     end;
-    xlim([300,1700]); ylim([0.001,0.2]);
+    xlim([300,1700]); %ylim([0.001,0.2]);
     set(gca,'xscale','log','yscale','log');
     set(gca,'XTick',[300 400 500 600 700 800 900 1000, 1100 1400 1600]);
     hold on;labels = {datestr(s.t(ii(inum(1))),'HH:MM:SS')};
