@@ -120,7 +120,7 @@ for ll = lamps
     
     nir.fname = [instrumentname '_' date,'_',fnum,'_NIR_',pp,'.dat'];
     vis.fname = [instrumentname '_' date,'_',fnum,'_VIS_',pp,'.dat'];
-    if exist([pname,filesep,lamp_str], 'dir')
+    if exist([pname,filesep,lamp_str], 'dir')ana
         fnames = {[pname,filesep,lamp_str,filesep,nir.fname];[pname,filesep,lamp_str,filesep,vis.fname]};
     else
         fnames = {[pname,filesep,nir.fname];[pname,filesep,vis.fname]};
