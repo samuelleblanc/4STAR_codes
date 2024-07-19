@@ -33,7 +33,7 @@ pix_630 = interp1(forj_vis.nm, [1:length(forj_vis.nm)],630,'nearest');
 dark = forj_vis.t.shutter==0 & forj_vis.spectra(:,pix_630)<310;
 if ~any(dark)
     warning('Did not find any darks with regular testing - Trying with higher count threshold (710 instead of 310 at 630 nm) - Likely Dark problems');
-    dark = forj_vis.t.shutter==0 & forj_vis.spectra(:,pix_630)<710;
+    dark = forj_vis.t.shutter==0 & forj_vis.spectra(:,pix_630)<810;
 end
 darks_vis = mean(forj_vis.spectra(dark,:));
 % darks_nir = mean(forj_nir.spectra(dark,:))
