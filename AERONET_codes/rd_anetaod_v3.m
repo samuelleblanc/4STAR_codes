@@ -1,4 +1,4 @@
-function cimel = rd_anetaip_v3(filename);
+function cimel = rd_anetaod_v3(filename);
 % cimel = rd_anetaip_v3(filename);
 %This should read Aeronet v3 AOD files.  
 if ~exist('filename', 'var')
@@ -31,6 +31,11 @@ if fid>0
         labels_ = labels{:};
         for lab = length(labels_):-1:1
             tmp = labels_{lab};
+            if ~isempty(findstr(tmp,'ngstrom'))
+               tmp = strrep(tmp,'_Angstrom_Exponent','');
+               tmp = strrep(tmp,'-','_');
+               tmp = ['AE_',tmp];
+            end
             tmp_ = sscanf(tmp,'%f');
             if ~isempty(tmp_)
                 tmp = sprintf('%g',tmp_);
