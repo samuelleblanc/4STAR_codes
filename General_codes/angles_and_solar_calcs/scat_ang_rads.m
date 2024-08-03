@@ -13,16 +13,29 @@ function SA = scat_ang_rads(sza, saz, za, az)
 %    za = za *pi/180;
 %    az = az *pi/180;   
 % end
-if size(za,1)==1
-sun_xyz  = [sin(sza) .* sin(saz); sin(sza) .* cos(saz); cos(sza)];
-sky_xyz  = [sin(za) .* sin(az); sin(za) .* cos(az); cos(za)];
-comps = sun_xyz .* sky_xyz;
-dot = sum(comps,1);
-else
-sun_xyz  = [sin(sza) .* sin(saz), sin(sza) .* cos(saz), cos(sza)];
-sky_xyz  = [sin(za) .* sin(az), sin(za) .* cos(az), cos(za)];
-comps = sun_xyz .* sky_xyz;
-dot = sum(comps,2);
+% try
+   % And let's also try this from Kaufman 2002
+   % tic
+   cosSA_ = cos(sza).*cos(za)+sin(sza).*sin(za).*cos(abs(saz-az));
+   SA = acos(cosSA_); 
+   % toc
+%    tic
+% % catch
+%    if size(za,1)==1
+%       sun_xyz  = [sin(sza) .* sin(saz); sin(sza) .* cos(saz); cos(sza)];
+%       sky_xyz  = [sin(za) .* sin(az); sin(za) .* cos(az); cos(za)];
+%       comps = sun_xyz .* sky_xyz;
+%       dot = sum(comps,1);
+%    else
+%       sun_xyz  = [sin(sza) .* sin(saz), sin(sza) .* cos(saz), cos(sza)];
+%       sky_xyz  = [sin(za) .* sin(az), sin(za) .* cos(az), cos(za)];
+%       comps = sun_xyz .* sky_xyz;
+%       dot = sum(comps,2);
+% 
+%    end
+%    SA = acos(dot);
+%    toc
+% end
 
-end
-SA = acos(dot);
+
+return
