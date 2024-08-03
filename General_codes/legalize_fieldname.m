@@ -7,6 +7,7 @@ end
 newname = strrep(newname,' ','');
 newname = strrep(newname,'.','');
 newname = strrep(newname,',','');
+newname = strrep(newname,':','');
 newname = strrep(newname,'<=','le_');
 newname = strrep(newname,'>=','ge_');
 newname = strrep(newname,'<','lt_');
