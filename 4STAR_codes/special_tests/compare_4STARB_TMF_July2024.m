@@ -2,7 +2,7 @@
 %close all
 clear all
 fp = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
-instrumentname = '4STAR';
+instrumentname = '4STARB';
 if ~isunix
 fp_out = 'C:\Users\sleblan2\Research\TMF\';
 else
@@ -125,9 +125,13 @@ for i=1:n
     
 end
 for j=flip(rm_i)
-   p(j) = [];
-   leg(j) = [];
-   p2(j) = [];
+   try
+    p(j) = [];
+    leg(j) = [];
+    p2(j) = [];
+   catch
+      disp(['issue with index: ',num2str(j)]) 
+   end
 end
 figure(fig);
 legend(p,leg);
