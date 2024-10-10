@@ -1185,7 +1185,9 @@ if isavar('tau_aero')
     decimal = 4;
     if length(ji)>0
         for i=2:nl
-            ik = ji(floor(length(ji)./nl.*i));
+            jii = floor(length(ji)./nl.*i);
+	    if jii<1, break, end
+	    ik = ji(jii);
             loglog(s.w.*1000.0,s.tau_aero(ik,:),'.');
             labels{i} = datestr(s.t(ik),'HH:MM');
             if max_aod<s.tau_aero(ik,250), max_aod = ceil(s.tau_aero(ik,250)); end;
@@ -1204,7 +1206,9 @@ if isavar('tau_aero')
         title([daystr ' - Spectra of AOD'])
         grid;
         colormap(cm)
-        lcolorbar(labels,'TitleString','UTC [H]')
+        if length(labels)>1
+		lcolorbar(labels,'TitleString','UTC [H]')
+	end
         fname = fullfile(p1,[instrumentname '_' daystr '_spectra_aod']);
         fig_names = [fig_names,{[fname '.png']}];
         save_fig(fspaod,fname,0);
