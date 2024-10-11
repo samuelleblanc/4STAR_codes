@@ -65,8 +65,12 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
-%s.AODuncert_constant_extra = 0.2;
+%s.AODuncert_constant_extra = 0.02;
   
+% load ict MetNav data from Twin Otter ict
+s.NavMetfile = 'AirSHARP-MetNav_CIRPAS-TO_20241007_RA.ict';
+s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+
 if isfield(s, 'Pst') 
     s.Pst(find(s.Pst<10))=1003; %for Marina Airport
 end
@@ -82,6 +86,9 @@ end
 % notes 
 if isfield(s, 'note') 
     s.note(end+1,1) = {['See ' mfilename '.m for additional info. ']}; 
+    if isfield(s,'NavMetfile') 
+        s.note(end+1,1) = {['Using the Met Nav data from  ' s.NavMetfile ' .']}; 
+    end
 end 
 %push variable to caller
 % Bad coding practice to blind-push variables to the caller.  
