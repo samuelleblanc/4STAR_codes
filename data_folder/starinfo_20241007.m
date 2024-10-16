@@ -16,14 +16,14 @@ s.flight = [datenum(2024,10,07,22,38,00) datenum(2024,10,07,23,30,27)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 %s.aeronet_valid_time = [datenum(2024,06,21,22,00,00) datenum(2024,06,21,23,20,0)];
-s.sd_aero_crit=0.01;  
+s.sd_aero_crit=0.005;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.285; %From SUOMI NPP / OMPS over Ames
+s.O3col=0.265; %From TEMPO Beta Ozone column over Monterey Bay
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=0.043546 % from AURA OMI in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
+s.NO2col=0.06625 % from TEMPO converted to DU %7.134e-2*(Loschmidt/1000);
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 % s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
@@ -57,7 +57,7 @@ if isfield(s,'instrumentname')
      %   s.langley1 = [datenum(2019,09,27,13,30,30) datenum(2019,09,27,17,10,30)];
     %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
     %             % flags
-    %             s.flagfilename     = '20170831_starflag_man_created20180512_1333by_KP.mat'; 
+                 s.flagfilename     = '20241007_starflag_auto_created_20241016_1148.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
@@ -69,14 +69,19 @@ end
   
 % load ict MetNav data from Twin Otter ict
 s.NavMetfile = 'AirSHARP-MetNav_CIRPAS-TO_20241007_RA.ict';
-s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+%s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
 
 if isfield(s, 'Pst') 
+    s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
     s.Pst(find(s.Pst<10))=1003; %for Marina Airport
 end
 % other tweaks 
 if isfield(s, 'Lon') & isfield(s, 'Lat') 
-    s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
+    lon_east = find(s.Lon>0)
+    if length(lon_east)>0
+        s.Lon(s.Lon>0) = s.Lon*-1.0;
+    end
+    	s.Lon(s.Lon==0 & s.Lat==0)=NaN; 
     s.Lat(s.Lon==0 & s.Lat==0)=NaN; 
 end 
 if isfield(s, 'AZstep') & isfield(s, 'AZ_deg') 
