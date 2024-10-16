@@ -14,13 +14,13 @@ if isfield(flag,'manual_flags');
     end
 elseif isfield(flag,'flags');
     qual_flag = bitor(flag.flags.before_or_after_flight,flag.flags.bad_aod);
-    if isfield(flag.flags,'cirrus'); 
+    if isfield(flag.flags,'cirrus') & size(flag.flags.cirrus)>1; 
         qual_flag = bitor(qual_flag,flag.flags.cirrus); 
         cirrus = flag.flags.cirrus;
     end;
-    if isfield(flag.flags,'frost'); qual_flag = bitor(qual_flag,flag.flags.frost); end;
-    if isfield(flag.flags,'low_cloud'); qual_flag = bitor(qual_flag,flag.flags.low_cloud); end;
-    if isfield(flag.flags,'unspecified_clouds'); qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds); end;
+    if isfield(flag.flags,'frost') & size(flag.flags.frost)>1; qual_flag = bitor(qual_flag,flag.flags.frost); end;
+    if isfield(flag.flags,'low_cloud') & size(flag.flags.low_cloud)>1; qual_flag = bitor(qual_flag,flag.flags.low_cloud); end;
+    if isfield(flag.flags,'unspecified_clouds') & size(flag.flags.unspecified_clouds)>1; qual_flag = bitor(qual_flag,flag.flags.unspecified_clouds); end;
 elseif isfield(flag,'before_or_after_flight');
     % only for automatic flagging
     if length(flag.before_or_after_flight) <1;
