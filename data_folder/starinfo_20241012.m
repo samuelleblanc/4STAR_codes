@@ -16,7 +16,7 @@ s.flight = [datenum(2024,10,12,18,05,00) datenum(2024,10,12,19,38,16)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 %s.aeronet_valid_time = [datenum(2024,06,21,22,00,00) datenum(2024,06,21,23,20,0)];
-s.sd_aero_crit=0.005;  
+s.sd_aero_crit=0.008;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
 % Ozone and other gases 
@@ -65,9 +65,9 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
-s.AODuncert_constant_extra = 0.02;
+%s.AODuncert_constant_extra = 0.02;
 % load ict MetNav data from Twin Otter ict
-s.NavMetfile = 'AirSHARP-MetNav_CIRPAS-TO_20241008_RA.ict';
+s.NavMetfile = 'AirSHARP-MetNav_CIRPAS-TO_20241012_RA.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
 if isfield(s, 'Pst') 
     s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
