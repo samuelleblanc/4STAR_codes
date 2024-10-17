@@ -42,8 +42,10 @@ version_set('v1.0')
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
 starsun_path = getnamedpath('AirSHARP2024')
 ncdir = getnamedpath('AirSHARP2024_AOD_nc')
+instrumentname = '4STARB';
 
-prefix='4STARB-AOD'; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+
+prefix=[instrumentname '-AOD']; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
 rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
 platform = 'TwinOtter';
 
@@ -63,13 +65,13 @@ HeaderInfo.STIPULATIONS_ON_USE = 'This is the initial public release of the 4STA
 HeaderInfo.RA_comments = 'Initial field release of the 4STGAR-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
 %% Prepare the information/attributes for each saved variable
 info.Latitude.units  = 'deg N';
-info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time';
+info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time, from the MetNAV ict file';
 
 info.Longitude.units = 'deg E';
-info.Longitude.long_name = 'Aircraft longitude (deg) at the indicated time';
+info.Longitude.long_name = 'Aircraft longitude (deg) at the indicated time, from the MetNAV ict file';
 
 info.GPS_Alt.units = 'm';
-info.GPS_Alt.long_name = 'Aircraft GPS geometric altitude above sea level (m) at the indicated time';
+info.GPS_Alt.long_name = 'Aircraft GPS geometric altitude above sea level (m) at the indicated time, from the MetNAV ict file';
 
 info.wavelength.units = 'nm';
 info.wavelength.long_name = 'Wavelength of measured radiance.';
@@ -135,7 +137,7 @@ for i=idx_file_proc
     end
     
     %% read file to be saved
-    starfile = fullfile(starsun_path, ['4STARB_' daystr 'starsun.mat']);
+    starfile = fullfile(starsun_path, [instrumentname '_' daystr 'starsun.mat']);
     disp(['loading the starsun file: ' starfile])
     s = load(starfile, 't','tau_aero','tau_aero_noscreening','tau_aero_err','w','tau_aero_polynomial','Lat','Lon','Alt','note','flags','m_aero');
     s.w = s.w.*1000.0;
@@ -143,10 +145,13 @@ for i=idx_file_proc
     [nul,iw2] = min(abs(s.w-wvls_angs(2)));
     iwvls_angs = [iw1,iw2];
     
+    %% get the wavelengths to archive
+    [iwvl,save_wvls,iwvl_archive] = get_wvl_subset(s.t(1),instrumentname);
+    
     %% read starinfo
     infofile_ = ['starinfo_' daystr '.m'];
     infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
-    s.dummy = '';s.instrumentname = '4STARB';
+    s.dummy = '';s.instrumentname = instrumentname;
     try
         s = infofnt(s);
     catch
@@ -157,34 +162,54 @@ for i=idx_file_proc
     
     %% Combine the flag values
     disp('...Setting the flags')
-    [qual_flag,flag] = convert_flags_to_qual_flag(s.flags,s.t,s.flight);
+    if isfield(s.flags,'flagfile') & ~isfield(s.flags,'t')
+        flags = load(which(s.flags.flagfile));
+    else
+       flags = s.flags; 
+    end
+    [qual_flag,flag] = convert_flags_to_qual_flag(flags,s.t,s.flight);
     data.qual_flag = s.t*0+1; % sets the default to 1
     % tweak for different flag files
-    flag.utc = t2utch(s.flags.t);
+    flag.utc = t2utch(flags.t);
     [ii,dt] = knnsearch(flag.utc,t2utch(s.t));
     idd = dt<1.0/3600.0; % Distance no greater than one second.
     data.qual_flag(idd) = qual_flag(ii(idd));
+    data.qual_flag = cast(data.qual_flag,'int8');
     
     %% Get the polyfit Fine Mode Fraction from O'Neill Spectral Deconvolution Algorithm
-    [FMF, Afl, Al, Apl]=polyfit2FMF(0.5,s.tau_aero_polynomial(1,:),s.tau_aero_polynomial(2,:));
+    [FMF, Afl, Al, Apl]=polyfit2FMF(0.5,s.tau_aero_polynomial(:,1),s.tau_aero_polynomial(:,2));
+    FMF = real(FMF);
+    FMF(FMF>1.0) = NaN; %set the FMF to bad.
+    FMF(FMF<0.001) = NaN; %set the FMF to bad.
+    
+    %% Get the Angstrom exponent
+    ae = real(sca2angstrom(s.tau_aero_noscreening(:,iwvls_angs), s.w(iwvls_angs)));
+    ae(ae<=-0.5) = NaN;
+    ae(ae>3.0) = NaN;
     
     %% Fill out the data to be saved
     data.Latitude = s.Lat;
     data.Longitude = s.Lon;
     data.GPS_Alt = s.Alt;
-    data.wavelength = s.w(:);
+    data.wavelength = s.w(iwvl_archive);
     data.day_of_year = day(datetime(s.t(:),'ConvertFrom','datenum'),'dayofyear')+t2utch(s.t(:))./24.0;
     data.UTC_time = t2utch(s.t(:)).*3600.0;
-    data.AOD = s.tau_aero_noscreening;
-    data.AOD_UNCERT = s.tau_aero_err;
+    data.AOD = s.tau_aero_noscreening(:,iwvl_archive);
+    data.AOD_UNCERT = s.tau_aero_err(:,iwvl_archive);
     data.m_aero = s.m_aero;
-    data.AOD_angstrom_470_865 = sca2angstrom(data.AOD(:,iwvls_angs), s.w(iwvls_angs));
+    data.AOD_angstrom_470_865 = ae;
     data.FMF = FMF;
     
+    %% check for exta uncertainty
+    if isfield(s,'AODuncert_constant_extra')
+        data.AOD_UNCERT = data.AOD_UNCERT +s.AODuncert_constant_extra;
+    end
+    
     %% NaN out any zenith radiances before or after the flight
-    flt = or(s.t>s.flight(2),s.t<s.flight(1));
-    data.AOD(flt) = NaN;
-    data.FMF(flt) = NaN;
+    %flt = or(s.t>s.flight(2),s.t<s.flight(1));
+    %data.AOD(flt) = NaN;
+    %data.FMF(flt) = NaN;
+    
     
     %% extract special comments about response functions from note
     calComments = {};
@@ -197,7 +222,6 @@ for i=idx_file_proc
     end
     
     info.AOD.Calibration_file = sprintf('%s ',calComments{:});
-    
     
     %% Now print the data to netcdf file
     disp('Printing to file')

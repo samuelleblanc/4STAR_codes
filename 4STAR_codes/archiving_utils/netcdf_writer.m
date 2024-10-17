@@ -156,6 +156,10 @@ for j=1:numvar
     end
     if strcmp(upper(class(data.(names{j}))),'SINGLE')
         cla = 'Float';
+    elseif strcmp(upper(class(data.(names{j}))),'UINT8')
+        cla = 'ubyte';
+    elseif strcmp(upper(class(data.(names{j}))),'INT8')
+        cla = 'byte';
     else
         cla =  class(data.(names{j}));
     end
