@@ -127,6 +127,9 @@ a = aeronet_read_lev_v3([apname afile]);
 if ~loose_aeronet_comparison
     i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)& ...
     (Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
+elseif loose_aeronet_comparison>1
+    i = (rawrelstd(:,1) < 0.008)&(~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))& ...
+        (Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
 else
     i = (~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))& ...
         (Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
@@ -398,10 +401,17 @@ additionalnotes={['Data C0 built to match AOD from ' instrumentname ' to AERONET
     ' Using the AERONET file: ' afile ' as input for this comparison. Date of creation: ' datestr(now)]};
 w_vis = w(1:1044);
 w_nir = w(1045:end);
-vis_c0 = nanmean(c0_A(:,1:1044));
-nir_c0 = nanmean(c0_A(:,1045:end));
-vis_c0_std = nanstd(c0_A(:,1:1044));
-nir_c0_std = nanstd(c0_A(:,1045:end));
+if isvector(c0_A)
+    vis_c0 = c0_A(:,1:1044);
+    nir_c0 = c0_A(:,1045:end);
+    vis_c0_std = c0_A(:,1:1044).*0.025;
+    nir_c0_std = c0_A(:,1045:end).*0.025;
+else
+    vis_c0 = nanmean(c0_A(:,1:1044));
+    nir_c0 = nanmean(c0_A(:,1045:end));
+    vis_c0_std = nanstd(c0_A(:,1:1044));
+    nir_c0_std = nanstd(c0_A(:,1045:end));
+end
 
 visfilename=[daystr '_VIS_C0_' filesuffix '.dat'];
 nirfilename=[daystr '_NIR_C0_' filesuffix '.dat'];

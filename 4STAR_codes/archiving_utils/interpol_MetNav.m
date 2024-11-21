@@ -2,7 +2,12 @@ function s = interpol_MetNav(s,filename);
 %% Function to read out the met nav ict files and interpolate to the star structure.
 
 if ~exist(filename)
-    filename = uiopen('*.ict')
+    [file pname fi]=uigetfile2('*.ict','Find MetNAV data in ict format for interpolation');
+    if file==0
+        error('no MetNAV ict file selected') 
+    else
+        filename = [pname file];
+    end
 end
 out = ictread(filename);
 dv = datevec(s.t(1));
