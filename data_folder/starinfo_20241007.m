@@ -21,7 +21,7 @@ s.sd_aero_crit=0.005;
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.265; %From TEMPO Beta Ozone column over Monterey Bay
+s.O3col=0.289; %From Suomi NPP Ozone column over Monterey Bay
 Loschmidt= 2.686763e19; %molecules/cm2
 s.NO2col=0.06625 % from TEMPO converted to DU %7.134e-2*(Loschmidt/1000);
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];

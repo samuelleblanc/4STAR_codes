@@ -21,7 +21,7 @@ s.sd_aero_crit=0.008;
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.276; %From SUOMI NPP / OMPS over Ames
+s.O3col=0.281; %From SUOMI NPP / OMPS over Monterey Bay
 Loschmidt= 2.686763e19; %molecules/cm2
 s.NO2col=0.102 % from TEMPO tropospheric NO2 in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];

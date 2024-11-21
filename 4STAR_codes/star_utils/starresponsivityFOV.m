@@ -48,7 +48,11 @@ elseif t>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking e
     fovp_filen=17; % file number for principal plane FOV
 end;
     case {'4STARB'}
-        if t>datenum([2022 4 18 0 0 0]); %SaSa
+        if t>datenum([2024 6 27 0 0 0]); %AirSHARP post fiber clamping
+            daystr = '20240627';
+            fova_filen=1; % filenumber of 09
+            fovp_filen=1; % filenumber of 08
+        elseif t>datenum([2022 4 18 0 0 0]); %SaSa
             daystr = '20220418';
             fova_filen=1; % filenumber of 05
             fovp_filen=2; % filenumber of 04

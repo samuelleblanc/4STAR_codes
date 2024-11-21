@@ -62,7 +62,7 @@ HeaderInfo.DM_Contact_info = 'Samuel LeBlanc, samuel.leblanc@nasa.gov';
 HeaderInfo.Project_info = 'AirSHARP 2024 deployment for PACE validation; October 2024; Based out of Marina, CA';
 HeaderInfo.STIPULATIONS_ON_USE = 'This is the initial public release of the 4STAR-AOD data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
 %HeaderInfo.R0_comments = 'Final calibrations, the data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. Potential of higher uncertainty at wavelengths between 390 nm - 430 nm.';
-HeaderInfo.RA_comments = 'Initial field release of the 4STGAR-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
+HeaderInfo.RA_comments = 'Initial field release of the 4STAR-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
 %% Prepare the information/attributes for each saved variable
 info.Latitude.units  = 'deg N';
 info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time, from the MetNAV ict file';
@@ -134,6 +134,8 @@ for i=idx_file_proc
     switch daystr
         case '20241007'
             HeaderInfo.Special_comments = 'Twin Otter Check flight.';
+        otherwise
+            HeaderInfo.Special_comments = '';
     end
     
     %% read file to be saved

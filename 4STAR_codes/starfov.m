@@ -126,16 +126,27 @@ for ff=1:length(contents0);
             % store the updated element of the structure
             s.note=['Processed on ' datestr(now,31) ' with starfov.m. ' s.note{1,:}];
             s1(i)=s;
-        end;
-    end;
+        end
+    end
+    %% run through and clear out unnessecary variables for the FOV then save
+    fields_to_keep = {'t';'w';'raw';'AZstep';'Elstep';'AZ_deg';'El_deg';'QdVlr';...
+                       'QdVtb';'QdVtot';'AZcorr';'ELcorr';'row_labels';'AVG';...
+                       'header';'filename';'filen';'note';'daystr';'datatype';'instrumentname';...
+                       'sunrate';'nrate';'saz' ;'sel';'ratetot';'vsa';'Az_deg';'Az_sky';'El_sky'};
+    flds = fields(s1);
+    for fc= 1:length(flds)
+        if ~any(strcmp(flds(fc),fields_to_keep))
+            s1 = rmfield(s1,flds{fc});
+        end
+    end
     eval([contents0{ff} '=s1;']);
     clear s1;
-    if ~exist(savematfile);
+    if ~exist(savematfile)
         save(savematfile, contents0{ff}, '-mat', '-v7.3');
     else
         save(savematfile, contents0{ff}, '-mat', '-v7.3', '-append');
-    end;
+    end
     contents=[contents; contents0(ff)];
     eval(['clear ' contents0{ff}]); % clear the variable just saved
-end;
+end
 clear i s ff viplist
