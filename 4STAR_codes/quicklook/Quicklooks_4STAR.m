@@ -1837,7 +1837,7 @@ catch e
     disp(['Error making plots for AERONET files: ' e.identifier e.message])
     aeronet_fig_paths = [];
 end
-if length(aeronet_fig_paths)>0p
+if length(aeronet_fig_paths)>0
     pptcontents0=[pptcontents0; {aeronet_fig_paths{1} 1}];
     pptcontents0=[pptcontents0; {aeronet_fig_paths{2} 4}];
     pptcontents0=[pptcontents0; {aeronet_fig_paths{3} 4}];

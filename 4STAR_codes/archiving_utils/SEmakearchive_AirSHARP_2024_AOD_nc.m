@@ -217,7 +217,7 @@ for i=idx_file_proc
     [nul,iw500] = min(abs(s.w(iwvl_archive)-500.0));
     ihigh_uncert = data.AOD_uncertainty(:,iw500)>0.06;
     if any(ihigh_uncert)
-        data.qual_flag = bitor(data.qual_flag,ihigh_uncert);
+        data.qual_flag = bitor(data.qual_flag,cast(ihigh_uncert,'int8'));
     end
     
     %% extract special comments about response functions from note

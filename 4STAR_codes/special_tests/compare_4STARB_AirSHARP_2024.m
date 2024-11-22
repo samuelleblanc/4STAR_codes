@@ -9,7 +9,7 @@ else
 fp_out = '/nobackup/sleblan2/ORACLES/plot/';
 end
 asktosave = 1; %set if ask to save the figures
-i_avg = [1,2,3,4,5,6,7,8,9];
+i_avg = [1,3,4,5,6,7,8,9];
 filesuffix = [instrumentname '_refined_averaged_good_AirSHARP_2024'];
 label_daystr = '20241030';
 fignames = [instrumentname '_AirSHARP2024'];
