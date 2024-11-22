@@ -62,7 +62,7 @@ HeaderInfo.DM_Contact_info = 'Samuel LeBlanc, samuel.leblanc@nasa.gov';
 HeaderInfo.Project_info = 'AirSHARP 2024 deployment for PACE validation; October 2024; Based out of Marina, CA';
 HeaderInfo.STIPULATIONS_ON_USE = 'This is the initial public release of the 4STAR-AOD data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
 %HeaderInfo.R0_comments = 'Final calibrations, the data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. Potential of higher uncertainty at wavelengths between 390 nm - 430 nm.';
-HeaderInfo.RA_comments = 'Initial field release of the 4STAR-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
+HeaderInfo.RA_comments = 'Initial field release of the 4STARB-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
 %% Prepare the information/attributes for each saved variable
 info.Latitude.units  = 'deg N';
 info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time, from the MetNAV ict file';
@@ -74,10 +74,10 @@ info.GPS_Alt.units = 'm';
 info.GPS_Alt.long_name = 'Aircraft GPS geometric altitude above sea level (m) at the indicated time, from the MetNAV ict file';
 
 info.wavelength.units = 'nm';
-info.wavelength.long_name = 'Wavelength of measured radiance.';
+info.wavelength.long_name = 'Wavelength of measured AOD.';
 
 info.day_of_year.units = 'day';
-info.day_of_year.long_name = 'Number of days since January 1, fractions of integer rerpesent the partial day';
+info.day_of_year.long_name = 'Fractional day of year, Number of days since January 1';
 
 info.UTC_time.units = 'seconds';
 info.UTC_time.long_name = 'Seconds since midnight UTC';
@@ -86,8 +86,8 @@ info.AOD.units = 'unitless';
 info.AOD.long_name = 'Aerosol optical depth of the column above the aircraft.';
 %info.AOD.UNCERTAINTY = 'Nominal uncertainty at 1.2%-1.5% accross the spectra.';
 
-info.AOD_UNCERT.units = 'unitless';
-info.AOD_UNCERT.long_name = 'Uncertainty of the aerosol optical depth of the column above the aircraft.';
+info.AOD_uncertainty.units = 'unitless';
+info.AOD_uncertainty.long_name = 'Uncertainty of the aerosol optical depth of the column above the aircraft based on calibration coefficient variance, tracking uncertainty, trace gas optical depth contamination, and window deposition, see LeBlanc et al. 2020 for some details.';
 
 info.qual_flag.units = 'unitless';
 info.qual_flag.long_name = 'Quality flag for AOD values, if 0=good or 1=poor; due to clouds, tracking errors, or instrument stability.';
@@ -99,7 +99,7 @@ info.FMF.units = 'unitless';
 info.FMF.long_name = 'Aerosol optical Fine Mode Fraction following Spectral Deconvolution Algorithm ONeill et al., 2001';
 
 info.AOD_angstrom_470_865.units = 'unitless';
-info.AOD_angstrom_470_865.long_name = 'Angstrom exponent calculated from the AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
+info.AOD_angstrom_470_865.long_name = 'Angstrom exponent calculated from the ratio of AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
 wvls_angs = [470.0,865.0];
 
 
@@ -111,16 +111,16 @@ dims.wavelength = {};
 dims.day_of_year = {'UTC_time'};
 dims.UTC_time = {};
 dims.AOD = {'UTC_time';'wavelength'};
-dims.AOD_UNCERT = {'UTC_time';'wavelength'};
+dims.AOD_uncertainty = {'UTC_time';'wavelength'};
 dims.qual_flag = {'UTC_time'};
 dims.m_aero = {'UTC_time'};
 dims.AOD_angstrom_470_865 = {'UTC_time'};
 dims.FMF = {'UTC_time'};
 
 %% prepare list of details for each flight
-dslist={'20241007' '20241008' '20241012'} ; %put one day string
+dslist={'20241007' '20241008' '20241012' '20241018' '20241019' '20241020'} ; %put one day string
 %Values of jproc: 1=archive 0=do not archive
-jproc=[         1          1          1          ] ;
+jproc=[         1          1          1          1          1           1] ;
 
 %% run through each flight, load and process
 idx_file_proc=find(jproc==1);
@@ -169,7 +169,8 @@ for i=idx_file_proc
     else
        flags = s.flags; 
     end
-    [qual_flag,flag] = convert_flags_to_qual_flag(flags,s.t,s.flight);
+    s.valid_time = [min(s.t)+1.0/12,max(s.t)];% set flight time to start and end of data, not total flight
+    [qual_flag,flag] = convert_flags_to_qual_flag(flags,s.t,s.valid_time); 
     data.qual_flag = s.t*0+1; % sets the default to 1
     % tweak for different flag files
     flag.utc = t2utch(flags.t);
@@ -197,14 +198,14 @@ for i=idx_file_proc
     data.day_of_year = day(datetime(s.t(:),'ConvertFrom','datenum'),'dayofyear')+t2utch(s.t(:))./24.0;
     data.UTC_time = t2utch(s.t(:)).*3600.0;
     data.AOD = s.tau_aero_noscreening(:,iwvl_archive);
-    data.AOD_UNCERT = s.tau_aero_err(:,iwvl_archive);
+    data.AOD_uncertainty = s.tau_aero_err(:,iwvl_archive);
     data.m_aero = s.m_aero;
     data.AOD_angstrom_470_865 = ae;
     data.FMF = FMF;
     
     %% check for exta uncertainty
     if isfield(s,'AODuncert_constant_extra')
-        data.AOD_UNCERT = data.AOD_UNCERT +s.AODuncert_constant_extra;
+        data.AOD_uncertainty = data.AOD_uncertainty +s.AODuncert_constant_extra;
     end
     
     %% NaN out any zenith radiances before or after the flight
@@ -212,6 +213,12 @@ for i=idx_file_proc
     %data.AOD(flt) = NaN;
     %data.FMF(flt) = NaN;
     
+    %% Set the flag to bad if uncertainty is too large (greater than 0.06)
+    [nul,iw500] = min(abs(s.w(iwvl_archive)-500.0));
+    ihigh_uncert = data.AOD_uncertainty(:,iw500)>0.06;
+    if any(ihigh_uncert)
+        data.qual_flag = bitor(data.qual_flag,ihigh_uncert);
+    end
     
     %% extract special comments about response functions from note
     calComments = {};

@@ -67,7 +67,7 @@ end
 % window deposition
 %s.AODuncert_constant_extra = 0.02;
 % load ict MetNav data from Twin Otter ict
-s.NavMetfile = 'AirSHARP-MetNav_1Hz_CIRPAS-TO_20241012_RA.ict';
+s.NavMetfile = 'AirSHARP-MetNav_1Hz_CIRPAS-TO_20241018_RA.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
 if isfield(s, 'Pst') 
     s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);

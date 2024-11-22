@@ -410,7 +410,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>datenum([2024 7 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)
+        if t>datenum([2024 9 30 0 0 0]) % for AirSHARP 2024
+                daystr = '20241030';
+                filesuffix = '4STARB_refined_averaged_good_AirSHARP_2024';
+        elseif t>datenum([2024 7 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)
                 daystr = '20240716';
                 filesuffix = '4STARB_refined_averaged_good_TMF_July2024';
         elseif t>datenum([2024 2 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)

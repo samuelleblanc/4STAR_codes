@@ -11,10 +11,10 @@ else
 end
 s.ground = [datenum(2024,07,19,22,56,40) datenum(2024,07,20,00,08,00)];
 s.loose_aeronet_comparison = true;
-s.langley1 = [datenum(2024,07,19,22,56,40) datenum(2024,07,20,00,08,00)];
+%s.langley1 = [datenum(2024,07,19,22,56,40) datenum(2024,07,20,00,08,00)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-%s.aeronet_valid_time = [datenum(2024,06,21,22,00,00) datenum(2024,06,21,23,20,0)];
+s.aeronet_valid_time = [datenum(2024,7,19,23,13,30) datenum(2024,7,19,23,39,15)];
 s.sd_aero_crit=0.01;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
@@ -67,7 +67,7 @@ end
 %s.AODuncert_constant_extra = 0.2;
   
 if isfield(s, 'Pst') 
-    s.Pst(find(s.Pst<10))=779.88; %Table Mountain Facility (JPL) pressure https://tmf.jpl.nasa.gov/tmf-weather/
+    s.Pst(find(s.Pst<10))=1013; %Table Mountain Facility (JPL) pressure https://tmf.jpl.nasa.gov/tmf-weather/
 end
 % other tweaks 
 if isfield(s, 'Lon') & isfield(s, 'Lat') 

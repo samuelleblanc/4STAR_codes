@@ -15,7 +15,7 @@ s.flight = [datenum(2024,10,07,22,38,00) datenum(2024,10,07,23,30,27)];
 %s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-%s.aeronet_valid_time = [datenum(2024,06,21,22,00,00) datenum(2024,06,21,23,20,0)];
+s.aeronet_valid_time = [datenum(2024,10,7,21,30,00) datenum(2024,10,7,22,18,45)];
 s.sd_aero_crit=0.005;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
