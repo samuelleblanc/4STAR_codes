@@ -45,9 +45,9 @@ ncdir = getnamedpath('AirSHARP2024_AOD_nc')
 instrumentname = '4STARB';
 
 
-prefix=[instrumentname '-AOD']; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
-rev='A'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
-platform = 'TwinOtter';
+prefix=['AirSHARP-' instrumentname '-AOD']; %'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-SKYSCAN'; % 'SEAC4RS-4STAR-AOD'; % 'SEAC4RS-4STAR-WV';
+rev='0'; % A; %0 % revision number; if 0 or a string, no uncertainty will be saved.
+platform = 'AirSHARP-TO';
 
 %% Prepare General header for each file
 HeaderInfo.PI =  'Samuel LeBlanc';                           % PI name
@@ -62,44 +62,48 @@ HeaderInfo.DM_Contact_info = 'Samuel LeBlanc, samuel.leblanc@nasa.gov';
 HeaderInfo.Project_info = 'AirSHARP 2024 deployment for PACE validation; October 2024; Based out of Marina, CA';
 HeaderInfo.STIPULATIONS_ON_USE = 'This is the initial public release of the 4STAR-AOD data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
 %HeaderInfo.R0_comments = 'Final calibrations, the data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. Potential of higher uncertainty at wavelengths between 390 nm - 430 nm.';
-HeaderInfo.RA_comments = 'Initial field release of the 4STARB-AOD data. The data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. See included uncertainties.';
+HeaderInfo.RA_comments = 'Initial field release of the 4STARB-AOD data. The data is subject to uncertainties associated with cloud screening and deposition on the front windows, beyond what is reported in the uncertainties. Included here is a subset of the measured wavelenghts that area least impacted by probable uncertainties. Please contact for other wavelengths in the range of 355 - 1650 nm.';
+HeaderInfo.R0_comments = 'Initial public release of the 4STARB-AOD data. Using the MetNAV R0 files. Uncertainty comments from RA remains.';
+HeaderInfo.Data_uncertainty = 'AOD uncertainty included in file is based on calibration coefficient variance, airmass factor changes and uncertainty, tracking uncertainty, trace gas optical depth contamination, and window deposition, see LeBlanc et al. 2020 for some details';
+
 %% Prepare the information/attributes for each saved variable
-info.Latitude.units  = 'deg N';
-info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time, from the MetNAV ict file';
+info.Latitude.units  = 'deg North';
+info.Latitude.long_name = 'Aircraft latitude (deg) at the indicated time, from the 1Hz MetNAV ict file';
 
-info.Longitude.units = 'deg E';
-info.Longitude.long_name = 'Aircraft longitude (deg) at the indicated time, from the MetNAV ict file';
+info.Longitude.units = 'deg East';
+info.Longitude.long_name = 'Aircraft longitude (deg) at the indicated time, from the 1Hz MetNAV ict file';
 
-info.GPS_Alt.units = 'm';
+info.GPS_Alt.units = 'meter';
 info.GPS_Alt.long_name = 'Aircraft GPS geometric altitude above sea level (m) at the indicated time, from the MetNAV ict file';
 
 info.wavelength.units = 'nm';
-info.wavelength.long_name = 'Wavelength of measured AOD.';
+info.wavelength.long_name = 'Wavelength of measured AOD';
 
 info.day_of_year.units = 'day';
-info.day_of_year.long_name = 'Fractional day of year, Number of days since January 1';
+info.day_of_year.long_name = 'Fractional day of year since January 1, 00Z';
 
 info.UTC_time.units = 'seconds';
 info.UTC_time.long_name = 'Seconds since midnight UTC';
 
 info.AOD.units = 'unitless';
-info.AOD.long_name = 'Aerosol optical depth of the column above the aircraft.';
+info.AOD.long_name = 'Aerosol optical depth of the column above the aircraft';
 %info.AOD.UNCERTAINTY = 'Nominal uncertainty at 1.2%-1.5% accross the spectra.';
 
 info.AOD_uncertainty.units = 'unitless';
-info.AOD_uncertainty.long_name = 'Uncertainty of the aerosol optical depth of the column above the aircraft based on calibration coefficient variance, tracking uncertainty, trace gas optical depth contamination, and window deposition, see LeBlanc et al. 2020 for some details.';
+info.AOD_uncertainty.long_name = 'Uncertainty of the aerosol optical depth of the column above the aircraft';
 
 info.qual_flag.units = 'unitless';
-info.qual_flag.long_name = 'Quality flag for AOD values, if 0=good or 1=poor; due to clouds, tracking errors, or instrument stability.';
+info.qual_flag.long_name = 'Quality flag for AOD values, if 0=good or 1=poor; due to clouds, tracking errors, or instrument stability';
 
 info.m_aero.units = 'unitless';
 info.m_aero.long_name = 'aerosol optical airmass factor';
 
 info.FMF.units = 'unitless';
-info.FMF.long_name = 'Aerosol optical Fine Mode Fraction following Spectral Deconvolution Algorithm ONeill et al., 2001';
+info.FMF.long_name = 'Aerosol optical Fine Mode Fraction following the Spectral Deconvolution Algorithm described in ONeill et al., 2001';
 
 info.AOD_angstrom_470_865.units = 'unitless';
-info.AOD_angstrom_470_865.long_name = 'Angstrom exponent calculated from the ratio of AOD at 470 nm and 865 nm, is equivalent to the inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)';
+info.AOD_angstrom_470_865.long_name = 'Angstrom exponent calculated from the ratio of AOD at 470 nm and 865 nm';
+info.AOD_angstrom_470_865.method = 'The inverse of the slope of the log(AOD) at these 2 wavelengths, -dlog(AOD)/dlog(wavelength)'; 
 wvls_angs = [470.0,865.0];
 
 
@@ -161,10 +165,14 @@ for i=idx_file_proc
     end
     UTCflight=t2utch(s.flight);
     %HeaderInfo.Date = daystr;
+    HeaderInfo.Flight_takeoff = ['Twin Otter take-off time: ' datestr(s.flight(1)) ' UTC'];
+    HeaderInfo.Flight_landing = ['Twin Otter landing time: ' datestr(s.flight(2)) ' UTC'];
     
     %% Combine the flag values
     disp('...Setting the flags')
-    if isfield(s.flags,'flagfile') & ~isfield(s.flags,'t')
+    if isfield(s,'flagfilename')
+        flags = load(which(s.flagfilename));
+    elseif isfield(s.flags,'flagfile') & ~isfield(s.flags,'t')
         flags = load(which(s.flags.flagfile));
     else
        flags = s.flags; 
@@ -208,16 +216,26 @@ for i=idx_file_proc
         data.AOD_uncertainty = data.AOD_uncertainty +s.AODuncert_constant_extra;
     end
     
-    %% NaN out any zenith radiances before or after the flight
-    %flt = or(s.t>s.flight(2),s.t<s.flight(1));
-    %data.AOD(flt) = NaN;
+    %% NaN out bad data
+    flt = data.GPS_Alt<0; % or(s.t>s.flight(2),s.t<s.flight(1));
+    data.GPS_Alt(flt) = NaN;
     %data.FMF(flt) = NaN;
     
     %% Set the flag to bad if uncertainty is too large (greater than 0.06)
     [nul,iw500] = min(abs(s.w(iwvl_archive)-500.0));
+    [nul,iw1040] = min(abs(s.w(iwvl_archive)-1040.0));
     ihigh_uncert = data.AOD_uncertainty(:,iw500)>0.06;
     if any(ihigh_uncert)
         data.qual_flag = bitor(data.qual_flag,cast(ihigh_uncert,'int8'));
+    end
+    ihigh_aod = data.AOD(:,iw500)>1.5;
+    if any(ihigh_aod)
+        data.qual_flag = bitor(data.qual_flag,cast(ihigh_aod,'int8'));
+    end
+    
+    ilow_aod = data.AOD(:,iw1040)<-0.01;
+    if any(ilow_aod)
+        data.qual_flag = bitor(data.qual_flag,cast(ilow_aod,'int8'));
     end
     
     %% extract special comments about response functions from note
@@ -230,7 +248,7 @@ for i=idx_file_proc
         end
     end
     
-    info.AOD.Calibration_file = sprintf('%s ',calComments{:});
+    HeaderInfo.AOD_Calibration_file = sprintf('%s ',calComments{:});
     
     %% Now print the data to netcdf file
     disp('Printing to file')
