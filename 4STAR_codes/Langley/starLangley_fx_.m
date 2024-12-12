@@ -1,4 +1,4 @@
-function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_to_previous)
+function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_to_previous,langley_am)
 %% Details of the program:
 % NAME:
 %   starLangley_fx
@@ -12,6 +12,8 @@ function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_
 %  save_figure: boolean (optional defaults true) if true saves the figures
 %  fig_path: path to save the figures
 %  c0_filesuffix: string to be used as the suffix for the c0 file saving
+%  compare_to_previous: boolean, if true, will plot the created C0 to the currently used C0
+%  langley_am: boolena, if true (default), will use the morning langley (if false will do the pm)
 %
 % OUTPUT:
 %  fig_names: full file path of the figures 
@@ -36,10 +38,12 @@ function fig_names = starLangley_fx(s,savefigure,fig_path,c0_filesuffix,compare_
 % Modified (v1.1):Samuel LeBlanc, Moncton, NB, 2017-12-19
 %                 added colsub, for shortened airmass regression at shorter
 %                 wavelengths
+% Modified (v1.2):Samuel LeBlanc, Santa Cruz, CA, 2022-04-25
+%                 added error handling for automated processing 
 % -------------------------------------------------------------------------
 
 %% function start
-version_set('1.1');
+version_set('1.2');
 
 %********************
 %% set parameters and santize inputs
@@ -50,16 +54,21 @@ col=408; % for screening. this should actually be plural - code to be developed
 if nargin<2
     savefigure=1;
     compare_to_previous = 0;
+    langley_am = true;
 end
 
 if nargin<3
     fig_path = getnamedpath('starfig');
     compare_to_previous = 0;
+    langley_am = true;
 end
 
 if nargin==3; 
     compare_to_previous = 0;
+    langley_am = true;
 end
+
+if nargin<5; langley_am = true; end
 
 filesuffix = ['_refined'];
 if nargin>3
@@ -99,42 +108,53 @@ end;
 % s.dummy = '';
 % infofnt = str2func(starinfofile);
 % s = infofnt(s);
-if isfield(s,'langley2');
-    ans = menu('Which langley to choose?','am','pm');
-    if ans==1;
+if isfield(s,'langley2')
+    if langley_am
         langley = s.langley1;
         xtra = '_am';
-    else;
+    else
         langley = s.langley2;
         xtra = '_pm';
-    end;
+    end
+%     
+%     ans = menu('Which langley to choose?','am','pm');
+%     if ans==1;
+%         langley = s.langley1;
+%         xtra = '_am';
+%     else;
+%         langley = s.langley2;
+%         xtra = '_pm';
+%     end;
 elseif  isfield(s,'langley1');
     langley = s.langley1;
     xtra = '_am';
-else;
+else
     langley = s.langley;
     ans = menu('Which langley to choose?','am','pm');
-    if ans==1;
-        xtra = '_am';
-    else;
-        xtra = '_pm';
-    end;
-end;
-langley_ii = interp1(s.t, [1:length(s.t)],langley,'nearest','extrap'); langley = s.t(langley_ii)';
-if isfield(s,'xtra_langleyfilesuffix');
+    if ans==1, xtra = '_am'; else, xtra = '_pm'; end
+end
+tu = unique(s.t);
+langley_ii = interp1(tu, [1:length(tu)],langley,'nearest','extrap'); langley = tu(langley_ii)';
+if isfield(s,'xtra_langleyfilesuffix')
     xtra = [xtra s.xtra_langleyfilesuffix];
-end;
+end
 filesuffix = [filesuffix xtra];
 ok=incl(t,langley);
 %% QA filtering
-if strcmp(instrumentname,'2STAR');
+if strcmp(instrumentname,'2STAR')
     ok = ok(m_aero(ok)<=50);
-else;
+else
     ok = ok((m_aero(ok)<=50)&(Str(ok)==1)); % ony take the data with shutter open to sun
-end;
-if length(ok)==0;
-    error('No valid airmass found within the Langley ends')
-end;
+end
+if length(ok)==0
+    if usejava('desktop')
+        error('No valid airmass found within the Langley ends')
+    else
+        disp('* Error no valid airmass for langley *')
+        fig_names = {};
+        return
+    end
+end
 %********************
 % generate a new cal
 %********************
@@ -142,27 +162,32 @@ fig_names = {};
 %% Plot lanlgy with various stddevs on the figure
 [data0, od0, residual]=Langley(m_aero(ok),s.rateaero(ok,col),stdev_mult,1);
 
-if savefigure;
+if savefigure
     ylabel(['Count Rate (/ms) for Aerosols, ' num2str(w(col)*1000, '%4.1f') ' nm']);
     tl = title([instrumentname ' - ' daystr xtra info_title]); set(tl, 'interp','none');
+    set(gcf,'Position',[200,400,750,700]);
     starsas([instrumentname '_' daystr xtra '_Langleyplot_stdevs_zoom.fig, starLangley_fx.m'],u,fig_path);
     fig_names = [fig_names;{fullfile(fig_path, [instrumentname '_' daystr xtra '_Langleyplot_stdevs_zoom.png'])}];
     xlim([0,20]);
-    if strcmp(instrumentname,'4STAR');
-        ylim([520,740]);
-    elseif strcmp(instrumentname,'2STAR');
+    if strcmp(instrumentname,'4STAR')
+        if langley(1)>datenum([2022,4,1,1,0,0])
+            ylim([450,630]);
+        else
+            ylim([520,740]);
+        end
+    elseif strcmp(instrumentname,'2STAR')
         ylim([950,1250]);
-    end;
+    end
     figname = [instrumentname '_' daystr xtra '_Langleyplot_stdevs.fig'];
     starsas([figname,', starLangley_fx.m'],u,fig_path);
     fig_names = [fig_names;{fullfile(fig_path, strrep(figname,'.fig','.png'))}];
-end;
+end
 
 % redo analysis for colsub (shorter wavelengths without plotting
 [data0s, od0s, residuals]=Langley(m_aero(ok),s.rateaero(ok,colsub),stdev_mult);
 
 %% Plot the one langley for each stdev on seperate figures
-for k=1:numel(stdev_mult);
+for k=1:numel(stdev_mult)
 %     ok2s=ok((isfinite(residuals(:,k))==1)&(m_aero(ok)<=3.0));
 %     [c0news(k,:), ods(k,:), residual2s, h]=Langley(m_aero(ok2s),s.rateaero(ok2s,1:colsplit), []);
     ok2=ok(isfinite(residual(:,k))==1);
@@ -315,9 +340,9 @@ for k=1;
     end;
 end;
 % plot 500 nm count rate with Tst
-for k=1;
+for k=1
     figure;
-    h2=scatter(s.m_aero(ok),s.rateaero(ok,cols(4)),6,Tst(ok),'filled');
+    h2=scatter(real(s.m_aero(ok)),real(s.rateaero(ok,cols(4))),6,real(Tst(ok)),'filled');
     colorbar;
     ch=colorbarlabeled('Tst');
     xlabel('aerosol Airmass','FontSize',14);
@@ -329,15 +354,15 @@ for k=1;
     grid on;
     tl = title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     set(tl,'interp','none');
-    if savefigure;
+    if savefigure
         starsas([instrumentname '_' daystr xtra '_rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname '_' daystr xtra '_rateaerovairmass_tst' num2str(stdev_mult(k), '%0.1f') 'xSTD.png'])}];
-    end;
-end;
+    end
+end
 % plot 500 nm count rate with Az_deg
-for k=1;
+for k=1
     figure;
-    h1=scatter(m_aero(ok),real(s.rateaero(ok,cols(4))),6,s.AZ_deg(ok),'filled');
+    h1=scatter(real(m_aero(ok)),real(s.rateaero(ok,cols(4))),6,s.AZ_deg(ok),'filled');
     colorbar;
     ch=colorbarlabeled('AZdeg');
     xlabel('aerosol Airmass','FontSize',14);
@@ -351,11 +376,11 @@ for k=1;
     grid on;
     tl = title([instrumentname ' ' starttstr ' - ' stoptstr xtra ', Screened STDx' num2str(stdev_mult(k), '%0.1f')]);
     set(tl,'interp','none');
-    if savefigure;
+    if savefigure
         starsas([instrumentname '_' daystr xtra '_rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.fig, starLangley_fx.m'],u,fig_path);
         fig_names = [fig_names;{fullfile(fig_path, [instrumentname '_' daystr xtra '_rateaerovairmass_az' num2str(stdev_mult(k), '%0.1f') 'xSTD.png'])}];
-    end;
-end;
+    end
+end
 
 %********************
 % estimate unc
@@ -366,13 +391,13 @@ c0unc=c0new.*unc';
 %********************
 % save new c0
 %********************
-if ~strcmp(instrumentname, '2STAR');
+if ~strcmp(instrumentname, '2STAR')
     viscols=(1:1044)';
     nircols=1044+(1:512)';
-else;
+else
     viscols=(1:256)';
     nircols=(256:256)';
-end;
+end
 
 %% plot out the c0 spectra
 figure;
@@ -381,6 +406,7 @@ ylabel('C0');
 xlabel('Wavelength [\mum]');
 set(gca,'FontSize',14);
 grid on;
+ylim([0.0,c0new(1,400).*1.05]);
 tl = title([instrumentname ' derived C0: ' starttstr ' - ' stoptstr xtra]);
 set(tl,'interp','none');
 if savefigure;
@@ -415,6 +441,7 @@ end;
 visfilename=fullfile(starpaths, [daystr, '_VIS_C0_' s.instrumentname filesuffix '.dat']);
 try;
     starsavec0(visfilename, source, additionalnotes, w(viscols), c0new(k,viscols), c0unc(:,viscols));
+    disp(['c0 file being saved: ' visfilename])
 catch
     warning(['c0 file :' visfilename ' already exists'])
 end;
@@ -428,6 +455,17 @@ if ~strcmp(instrumentname,'2STAR');
 end;
 
 
-%if compare_to_previous
+if compare_to_previous
 % be sure to modify starc0.m so that starsun.m will read the new c0 files.
+    try
+       % get used c0 filename
+       for i=1:length(s.note); if contains(s.note{i},'VIS_C0'); cofiles = strsplit(s.note{i}); end; end;
+       fig_names_co = compare_Co_fx({which(cofiles{end}(1:end-1));visfilename},1);
+       for n=1:length(fig_names_co)
+           fig_names = [fig_names; fig_names_co{n}];
+       end
+    catch
+        disp('Problem comparing the new C0s')
+    end
+end
 return

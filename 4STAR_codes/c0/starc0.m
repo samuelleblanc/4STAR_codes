@@ -54,7 +54,16 @@ switch instrumentname;
     case {'4STAR'}
         % select a source file
         if isnumeric(t); % time of the measurement is given; return the C0 of the time.
-            if t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
+            if t>datenum([2022 5 6 0 0 0]) % MLO May 2022
+                daystr = '20220514';
+                filesuffix = '4STAR_refined_averaged_good_MLO_May2022';
+            elseif t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STAR fiber break and fix
+                daystr = '20220429';
+                filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
+            elseif t>=datenum([2021 11 1 0 0 0]) % for after rebuild of spectrobox heat sinks and wind maker
+                daystr = '20220406'; % using the match to AERONET until MLO 20220406_NIR_C0_4STAR_AODmatch_toAERONET_fromNASA_Ames.dat
+                filesuffix = '4STAR_AODmatch_toAERONET_fromNASA_Ames';
+            elseif t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
                 daystr = '20200701';
                 filesuffix = '4STAR_average_from_AERONET_NASA_AMES_SummerFall2020';
             elseif t>=datenum([2018 8 1 0 0 0]); %for ORACLES 2018
@@ -207,6 +216,8 @@ switch instrumentname;
                     
                     daystr='20160707';
                     filesuffix='Langley_MLO_June2016_mean';
+                    daystr='20160702';
+                    filesuffix = '4STAR_refined_ground_langley_am';
                     
                 elseif now>=datenum([2016 1 19 0 0 0]);
                     %daystr='20160109';
@@ -399,7 +410,25 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
+        if t>datenum([2024 9 30 0 0 0]) % for AirSHARP 2024
+                daystr = '20241030';
+                filesuffix = '4STARB_refined_averaged_good_AirSHARP_2024';
+        elseif t>datenum([2024 7 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)
+                daystr = '20240716';
+                filesuffix = '4STARB_refined_averaged_good_TMF_July2024';
+        elseif t>datenum([2024 2 1 0 0 0]) % for getting ready for TMF calibration pre-AirSHARP 2024 (after fiber connector clamp made)
+                daystr = '20240621';
+                filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';
+        elseif t>datenum([2022 5 6 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
+                daystr = '20220515';
+                filesuffix = '4STARB_refined_averaged_good_MLO_May2022';
+        elseif t>datenum([2022 4 29 0 0 0]) % for comparing to nearest AERONET from Ames comparison after 4STARB AZI fiber break and fix
+                daystr = '20220429';
+                filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';
+        elseif t>=datenum([2022 4 1 0 0 0]) % for after rebuild and adding spare azimutt clockspring fiber
+                daystr = '20220406';
+                filesuffix = '4STARB_AODmatch_toAERONET_fromNASA_Ames';
+        elseif t>=datenum([2020 1 1 0 0 0]) % for after ORACLES, summer 2020 and beyond
                 daystr = '20200701';
                 filesuffix = '4STARB_average_from_AERONET_NASA_AMES_SummerFall2020';
         elseif t>=datenum([2019 5 1  0 0 0]); % for FIREX-AQ 2019 and on, from Table Mountain, single day
@@ -444,7 +473,10 @@ if ~exist('visc0')
         orientation='vertical'; % coordinate with starLangley.m.
         if isequal(orientation,'vertical');
             try;
-                a=importdata(which(visfilename));
+                fid = fopen(which(visfilename));
+                n = 1; while regexp((fgetl(fid)),'%') == 1, n=n+1; end
+                fclose(fid);
+                a=importdata(which(visfilename),' ',n);
             catch;
                 error(['Cant open file: ' visfilename])
             end;
@@ -471,7 +503,10 @@ if ~exist('visc0')
         if ~strcmp(instrumentname, '2STAR');
             nirfilename=[daystr{i} '_NIR_C0_' filesuffix{i} '.dat'];
             if isequal(orientation,'vertical');
-                a=importdata(which(nirfilename));
+                fid = fopen(which(nirfilename));
+                n = 1; while regexp((fgetl(fid)),'%') == 1, n=n+1; end
+                fclose(fid);
+                a=importdata(which(nirfilename),' ',n);
                 nirc0(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0'))';
                 if sum(strcmp(lower(a.colheaders), 'c0err'))>0;
                     nirc0err(i,:)=a.data(:,strcmp(lower(a.colheaders), 'c0err'))';
@@ -579,4 +614,3 @@ end;
 % visc0=visc0*NaN;nirc0=nirc0*NaN;
 % visnotec0='VIS C0 turned off';
 % nirnotec0='NIR C0 turned off';
-

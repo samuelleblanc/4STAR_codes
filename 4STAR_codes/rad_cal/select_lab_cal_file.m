@@ -30,10 +30,16 @@
 %                  - update to match the lab cals from 20150915 
 % Modified (v1.2): by Samuel LeBlanc, NASA Ames, 2016-09-29
 %                  - update to pre-KORUS lab cals from 20160330
+% Modified (v1.3): by Samuel LeBlanc, Santa Cruz, 2024-06-20
+%                  - update to 2024 pre AirSHARP, and including instrument
+%                  name handling for 4STAR and 4STARB
 % -------------------------------------------------------------------------
 
-function [date fnum pp] = select_lab_cal_file(date,ll)
-version_set('v1.2');
+function [date fnum pp] = select_lab_cal_file(date,ll,instrumentname)
+version_set('v1.3');
+if nargin<3
+    instrumentname = '4STAR';
+end
 if date=='20131121' | date=='20131120'
     switch ll %% make sure that the file number is correctly set for each lamp setting, dependent on the day of calibration.
         case 12
@@ -178,8 +184,31 @@ elseif date=='20160330'|date=='20160329';
         end
         pp='ZEN';
         date='20160330';
+elseif strcmp(date,'20240521') && strcmp(instrumentname,'4STARB');
+        switch ll
+            case 12
+                fnum = '007';
+            case 11
+                fnum = '008';
+            case 10
+                fnum = '009';
+            case 9
+                fnum = '010';
+            case 6
+                fnum = '011';
+            case 3
+                fnum = '012';
+            case 2
+                fnum = '013';
+            case 1
+                fnum = '014';
+            case 0
+                fnum = '015';
+        end
+        pp='ZEN';
+        date='20240521';
 else
-    disp('problem! date not recongnised')
+    disp('problem! date not recongnised *** Update select_lab_cal_file ***')
 end
 
 return

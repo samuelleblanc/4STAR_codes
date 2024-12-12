@@ -21,7 +21,7 @@ if ~isempty(dirpath)
             result = [isadir(dirpath{1}), isadir(dirpath(2:end))];
         end
     else
-        result = length(dir(dirpath))>=2;
+        result = isempty(findstr(dirpath,'*'))&&isempty(findstr(dirpath,'?'))&&length(dir(dirpath))>=2;
     end
 end
     % result = exist(dirpath,'dir') == 7;

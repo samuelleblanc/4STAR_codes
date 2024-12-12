@@ -3,8 +3,8 @@
 % not meant for creating new c0s
 close all
 clear all
-fp = 'C:\Users\sleblanc\Research\4STAR_codes\data_folder\';
-fp_out = 'C:\Users\sleblanc\Research\ORACLES\plot\';
+fp = 'C:\Users\lebla\Research\4STAR_codes\data_folder\';
+fp_out = 'C:\Users\lebla\Research\ORACLES\plot\';
 
 i_avg = [2 3 4 5 6 7];
 

@@ -10,7 +10,8 @@ function [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(t,inst
 % instruments, namely here for 2STAR
 % Samuel, v1.2, 2017/06/01, updated 2STAR coefficients from zeiss documents
 % Samuel, v1.3, 2017/09/18, updated with proper 4STARB values.
-version_set('1.3');
+% Samuel, v1.4, 2022/05/07, updated from values calculated using Hg(AR) and Kr lamps in the cal lab from 20220413/20220414.
+version_set('1.4');
 
 % development
 % Values change with renewed calibration and assessment. Update this file
@@ -43,7 +44,30 @@ switch instrumentname;
             visfwhm = [];nirfwhm= [];
         end;
     case {'4STARB'}
-        if t(1)>datenum([2015 1 1 1 0 0 0]);
+        if t(1)>datenum([2022 4 10 1 0 0 0])
+            C0 = 171.2301;
+            C1 = 0.81264;
+            C2 = -1.5555e-6;
+            C3 = -1.5922e-8;
+            p = 0:1043;
+            visw=C0+C1*p+C2*p.^2+C3*p.^3;
+            visw=visw/1000;
+            visnote='Wavelengths from Hg(Ar) and Kr line lamp matching from 2022-04-13, see 20220413_4STARB_LineLamps.ppt';
+            
+            Cn = [1700.28, -1.17334, -0.000655055, 7.06199E-07,-1.14153E-09];
+            pn = [0:511];
+            nirw = polyval(flip(Cn),pn);
+            nirw=flip(nirw)/1000;
+            nirnote='Wavelengths from Zeiss the manufacturer; see 88880_Y585_136823_test-cert_20130911-130744.pdf';
+            
+            fwhmfile='4STARB_FWHM_combinedlinelamps_20220507.mat';
+            load(which(fwhmfile));
+            visfwhm=interp1(vis_nm./1000.0, fwhm_vis, visw);
+            visnote=[visnote ' FWHM from ' fwhmfile '.'];
+            nirfwhm=interp1(nir_nm./1000.0, fwhm_nir, nirw);
+            nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
+            %warning('Update the FWHM for 4STARB using the 4STAR values');
+        elseif t(1)>datenum([2015 1 1 1 0 0 0]);
             C0 = 171.7;
             C1 = 0.81254;
             C2 = -1.55568e-6;
@@ -67,12 +91,32 @@ switch instrumentname;
             nirnote=[nirnote ' FWHM from ' fwhmfile '.'];
             warning('Update the FWHM for 4STARB using the 4STAR values');
             
-        end;
-        %error('4STARB wavelengths not yet implemented')
+        else
+            error('4STARB wavelengths not yet implemented')
+        end
         
-    otherwise % defaults to 4STAR(A) wavelengths
-        if t>=datenum([2012 7 3 0 0 0]); % new VIS spectrometer since July 3, 2012
-            if now>=datenum([2013 6 5 0 0 0]); % update for VIS spectrometer
+    otherwise % defaults to 4STAR(A) wavelengths 
+        if t>=datenum([2012 7 3 0 0 0]) % new VIS spectrometer since July 3, 2012
+            if t>=datenum([2018 1 12 0 0 0]) %Using the updates from cal lab line lamps 2022-04-13
+                C0=171.9711;
+                C1=0.8079;
+                C2=4.1508e-6;
+                C3=-1.8816e-8;
+                p=0:1043;
+                visw=C0+C1*p+C2*p.^2+C3*p.^3;
+                visw=visw/1000;
+                
+                
+                s=importdata(which( 'wl_20130605.txt'), ' ', 7);
+                %visw=s.data(:,5)';
+                visfwhm=s.data(:,6)'/1000;
+                clear s;
+                visnote='Wavelengths from Hg(Ar) and Kr line lamp fitting from cal lab, see 20220414_4STAR_LineLamps.ppt. FWHM currently still from GSFC in 2013; see wl_20130605.txt.';               
+                
+                nirw=fliplr(lambda_swir(1:512))/1000;
+                nirnote='Wavelengths from Lambda the manufacturer.';
+                
+            elseif t>=datenum([2013 6 5 0 0 0]) % update for VIS spectrometer
                 s=importdata(which( 'wl_20130605.txt'), ' ', 7);
                 visw=s.data(:,5)';
                 visfwhm=s.data(:,6)'/1000;

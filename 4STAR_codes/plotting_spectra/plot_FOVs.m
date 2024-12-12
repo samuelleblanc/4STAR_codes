@@ -70,8 +70,12 @@ if a(1)
     disp('doing the vis_fova')
   for i=1:length(s.vis_fova)
       disp(['..on file:' num2str(i)])
+      try
       ins=FOV_scan(s.vis_fova(i),instrumentname);
       fig_names = [fig_names; ins.fig_name];
+      catch
+	      disp(['..ERROR on file:' num2str(i)])
+      end
   end;
 end
 
@@ -79,24 +83,36 @@ if a(2)
     disp('doing the nir_fova')
   for i=1:length(s.nir_fova)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.nir_fova(i),instrumentname);
+      try
+	      ins=FOV_scan(s.nir_fova(i),instrumentname);
       fig_names = [fig_names; ins.fig_name];
+      catch
+	      disp(['..ERROR on file:' num2str(i)])
+	     end
   end;
 end
 if p(1)
     disp('doing the vis_fovp')
   for i=1:length(s.vis_fovp)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.vis_fovp(i),instrumentname);
-      fig_names = [fig_names; ins.fig_name];
-  end;
+      try
+      	ins=FOV_scan(s.vis_fovp(i),instrumentname);
+      	fig_names = [fig_names; ins.fig_name];
+      catch
+	disp(['..ERROR on file:' num2str(i)])
+      end
+  end
 end
 if p(2)
     disp('doing the nir_fovp')
   for i=1:length(s.nir_fovp)
       disp(['..on file:' num2str(i)])
-      ins=FOV_scan(s.nir_fovp(i),instrumentname);
-      fig_names = [fig_names; ins.fig_name];
+      try
+        ins=FOV_scan(s.nir_fovp(i),instrumentname);
+        fig_names = [fig_names; ins.fig_name];
+      catch
+	disp(['..ERROR on file:' num2str(i)])
+      end
   end;
 end
 

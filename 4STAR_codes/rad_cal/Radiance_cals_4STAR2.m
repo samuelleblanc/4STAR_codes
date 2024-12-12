@@ -82,6 +82,16 @@ else
     disp('Using default cal folder:')
     pname = ['C:\Users\sleblan2\Research\4STAR\cal\' date]
 end
+
+%% Get instrument used from the available files
+file_list = dir([pname filesep '*.dat']);
+[sourcefile, ext, daystr,filen,instrumentname]=starsource([file_list(1).folder filesep file_list(1).name]);
+if ~strcmp(date,daystr) 
+    disp(['***Date string(' date ') does not match folder (' daystr '), using folder values ***'])
+    date=daystr
+end
+
+%% get sphere radiance file
 if date(1:4)=='2014'|date(1:4)=='2015';
     hiss = get_hiss('C:\Users\sleblan2\Research\4STAR\cal\spheres\HISS\20140606091700HISS.txt');
 elseif date(1:4)=='2013';
@@ -93,23 +103,28 @@ else
 end;
 
 %% Setup variables
-lamps = [12,9,6,3,2,1];
+lamps = [12,11,10,9,6,3,2,1];
 vis_mean = []; vis_std = []; nir_mean = []; nir_std = [];
 M_vis = []; S_vis = 0; M_nir = []; S_nir = 0;
 k = 0;
+
 
 %% Loop through each lamps
 for ll = lamps
     k = k+1;
     lamp_str = ['Lamps_',sprintf('%d',ll)];
-    [date fnum pp] = select_lab_cal_file(date,ll);
+    [date fnum pp] = select_lab_cal_file(date,ll,instrumentname);
     
     %% load the files
     disp(strcat('Getting lamp #',num2str(ll)))
     
-    nir.fname = [date,'_',fnum,'_NIR_',pp,'.dat'];
-    vis.fname = [date,'_',fnum,'_VIS_',pp,'.dat'];
-    fnames = {[pname,filesep,lamp_str,filesep,nir.fname];[pname,filesep,lamp_str,filesep,vis.fname]};
+    nir.fname = [instrumentname '_' date,'_',fnum,'_NIR_',pp,'.dat'];
+    vis.fname = [instrumentname '_' date,'_',fnum,'_VIS_',pp,'.dat'];
+    if exist([pname,filesep,lamp_str], 'dir')ana
+        fnames = {[pname,filesep,lamp_str,filesep,nir.fname];[pname,filesep,lamp_str,filesep,vis.fname]};
+    else
+        fnames = {[pname,filesep,nir.fname];[pname,filesep,vis.fname]};
+    end
     [sourcefile, contents0, savematfile]=startupbusiness('', fnames,['.' filesep 'tempmatdata.mat']);
     load(sourcefile,contents0{:},'program_version');
     if exist('vis_zen')>0;
@@ -135,7 +150,7 @@ for ll = lamps
     sky(2:end) = sky(1:end-1)&sky(2:end); sky(1:end-1) = sky(1:end-1)&sky(2:end);
     
     %% start plotting of time traces of counts
-    figure(5);
+    figure(5);clf;
     set(5,'Position',[50 200 1400 800])
     sb(1) = subplot(2,1,1);
     plot(s.utc(shut), sum(s.dark(shut,1:1044)./repmat(s.visTint(shut),[1,1044]),2), 'kx')
@@ -148,7 +163,7 @@ for ll = lamps
     hold off
     ylabel('sum(rate)')
     legend('VIS shutter','NIR shutter*10','VIS sun','NIR sun*10','VIS sky','NIR sky*10')
-    title([lamp_str, ': ',vis.fname],'interp','none');
+    title([instrumentname ' ' lamp_str, ': ',vis.fname],'interp','none');
     sb(2) = subplot(2,1,2);
     plot(s.utc(shut), s.visTint(shut), 'kx')
     hold all;
@@ -163,7 +178,7 @@ for ll = lamps
     legend('VIS shutter','NIR shutter/10','VIS sun','NIR sun/10','VIS sky','NIR sky/10')
     linkaxes(sb,'x')
     
-    ff=[pname filesep date '_counts_' lamp_str];
+    ff=[pname filesep instrumentname '_' date '_counts_' lamp_str];
     save_fig(5,ff,false);
     
     %% prepare response functions for plotting
@@ -231,12 +246,12 @@ for ll = lamps
     end
     
     %% plot of response functions
-    figure(6);
+    figure(6);clf;
     set(6,'Position',[50 200 1400 800])
     linkaxes(sb,'off');
     subplot(3,1,1);
     plot(vis.nm, cal.(lamp_str).vis.resp,'-');
-    title([lamp_str, ': ',vis.fname],'interp','none');
+    title([instrumentname ' ' lamp_str, ': ',vis.fname],'interp','none');
     ylabel('resp');
     xlabel('wavelength [nm]')
     legend(num2str(vis_tints,' %d ms'), 'location','northwest');
@@ -250,19 +265,19 @@ for ll = lamps
     hold('on');
     plot(nir.nm, cal.(lamp_str).nir.mean_resp, '.k-');
     hold('off');
-    title([lamp_str, ': ',nir.fname],'interp','none');
+    title([instrumentname ' ' lamp_str, ': ',nir.fname],'interp','none');
     ylabel('resp');
     
     subplot(3,1,3);
     plot(vis.nm, 100.*cal.(lamp_str).vis.std_resp./cal.(lamp_str).vis.mean_resp,'b-',...
         nir.nm, 100.*cal.(lamp_str).nir.std_resp./cal.(lamp_str).nir.mean_resp,'r-')
-    title(['Relative STD of responsivity: ',lamp_str],'interp','none');
+    title([instrumentname ' Relative STD of responsivity: ',lamp_str],'interp','none');
     ylim([0,5]);
     ylabel('%');
     grid;
     xlabel('wavelength [nm]')
     
-    ff=[pname filesep date '_responses_' lamp_str];
+    ff=[pname filesep instrumentname '_'  date '_responses_' lamp_str];
     save_fig(6,ff,false);
     
 end
@@ -290,8 +305,12 @@ lines= plot(vis.nm, cal.Lamps_12.vis.mean_resp, ...
     vis.nm, cal.Lamps_2.vis.mean_resp, ...
     vis.nm, cal.Lamps_1.vis.mean_resp,'-');
 %colorbar;
-recolor(lines,[12,9,6,3,2,1]);
-title([lamp_str, ': ',vis.fname],'interp','none');
+try
+    recolor(lines,[12,9,6,3,2,1]);
+catch
+    disp('error in recolor of lines')    
+end
+title([instrumentname ' ' lamp_str, ': ',vis.fname],'interp','none');
 ylabel('resp');
 xlabel('wavelength [nm]')
 legend(num2str(lamps',' %d lamps'), 'location','northwest');
@@ -309,16 +328,20 @@ lines= plot(nir.nm, cal.Lamps_12.nir.mean_resp, ...
     nir.nm, cal.Lamps_2.nir.mean_resp, ...
     nir.nm, cal.Lamps_1.nir.mean_resp,'-');
 %colorbar;
-recolor(lines,[12,9,6,3,2,1]);
+try
+    recolor(lines,[12,9,6,3,2,1]);
+catch
+    disp('error in recolor of nir lines')
+end
 legend(num2str(lamps',' %d lamps'), 'location','northwest');
 hold('on');
 plot(nir.nm, nir_mean, '.');
 hold('off');
-title([lamp_str, ': ',nir.fname],'interp','none');
+title([instrumentname ' ' lamp_str, ': ',nir.fname],'interp','none');
 ylabel('resp');
 xlabel('wavelength [nm]')
 
-ff=[pname filesep date '_responses'];
+ff=[pname filesep instrumentname '_' date '_responses'];
 save_fig(10,ff,true);
 
 %% prepare for saving
@@ -328,7 +351,7 @@ else
     corstr='';
 end
 
-fname=[pname filesep date '_rad_cal' corstr];
+fname=[pname filesep instrumentname '_' date '_rad_cal' corstr];
 save(fname)
 disp(['saved to ' fname '.mat'])
 disp('Now stopping program')

@@ -154,7 +154,16 @@ for j=1:numvar
             dm_array = [dm_array id_dim.(dims.(names{j}){q})];
         end        
     end
-    id_data.(names{j}) = netcdf.defVar(ncid,names{j},class(data.(names{j})),dm_array);
+    if strcmp(upper(class(data.(names{j}))),'SINGLE')
+        cla = 'Float';
+    elseif strcmp(upper(class(data.(names{j}))),'UINT8')
+        cla = 'ubyte';
+    elseif strcmp(upper(class(data.(names{j}))),'INT8')
+        cla = 'byte';
+    else
+        cla =  class(data.(names{j}));
+    end
+    id_data.(names{j}) = netcdf.defVar(ncid,names{j},cla,dm_array);
     dat_att = fieldnames(varinfo.(names{j}));
     for a=1:length(dat_att)
         netcdf.putAtt(ncid,id_data.(names{j}),dat_att{a},varinfo.(names{j}).(dat_att{a}));

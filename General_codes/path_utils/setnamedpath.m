@@ -10,8 +10,10 @@ function [fullpath] = setnamedpath(pathfile,fspec,dialog)
 % 'dialog' is a string that will be provided to the user to prompt for the
 % selection of an appropriate path if the supplied pathfile isn't found or
 % doesn't map to an existing directory.
+%
+% 2022-10-27, SL: Added handling of paths for network connected folders
 
-version_set('1.0');
+version_set('1.1');
 
 % Handle missing "pathfile" argument. If 'pathfile' wasn't provided or is
 % empty then default to lastpath.mat
@@ -123,7 +125,10 @@ else
                 [fname,pname] = uigetfile([pname,fstem],dialog);
             end
         end
-        pname = [pname, filesep]; pname = strrep(pname,[filesep filesep], filesep);        
+        pname = [pname, filesep]; 
+        ifileseps = strfind(pname,[filesep filesep]); 
+        pname = strrep(pname,[filesep filesep], filesep);
+        if any(ifileseps<2), pname = [filesep, pname]; end %for any leading double // for network attached drives
         if ~isempty(pname)&&isadir(pname)
             save([pathdir,'lastpath.mat'],'pname');
         end

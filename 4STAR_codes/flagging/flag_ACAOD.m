@@ -50,7 +50,11 @@ if merge_read
         try
             alt = ncread([pa fa],'Sys_GPSAlt');
         catch
-            alt = ncread([pa fa],'MSL_GPS_Altitude');
+            try
+                alt = ncread([pa fa],'MSL_GPS_Altitude');
+            catch
+                alt = ncread([pa fa],'GPS_Altitude');
+            end
         end
     end
     
