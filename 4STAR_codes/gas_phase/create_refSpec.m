@@ -46,11 +46,14 @@
 % MS, 2018-09-12, updated refSpec for MLO Aug-2018
 % MS, 2018-10-02, updated O3 reference amount to MLO DB value
 % MS, 2018-11-07, updated refSpec for MLO Feb-2018
+% SL, 2022-05-08, MLO, updated reSpec for MLO May-2022
+% SL, 2022-10-26, MLO, added 4STARB analysis (and instrumentname to the call)
 % -------------------------------------------------------------------------
 %% function routine
 
-function ref_spec = create_refSpec(daystr,gas)
+function ref_spec = create_refSpec(daystr,gas,instrumentname)
 %-----------------------------------------------
+if ~exist('instrumentname'), instrumentname = '4STAR'; end
 
 %% load starsun
 if strcmp(daystr,'20170605')
@@ -70,11 +73,22 @@ elseif strcmp(daystr,'20180811')||strcmp(daystr,'20180812')||strcmp(daystr,'2018
      s = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_', daystr, 'starsun.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
     
 elseif strcmp(daystr,'20180209')||strcmp(daystr,'20180210')||strcmp(daystr,'20180212')
-    
-     s = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_', daystr, 'starsun_nogases.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
-    
+    if exist(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_', daystr, 'starsun_nogases.mat'])
+        fname = ['C:\Users\msegalro\campaigns\MLO\Feb_get 2018\','4STAR_', daystr, 'starsun_nogases.mat'];
+    else
+        fname = getfullname(['4STAR_', daystr, 'starsun*.mat']);    
+    end
+    s = load(fname,'t','w','rateslant','m_aero','m_O3','m_NO2');
 else
-    s = load([starpaths,daystr,'starsun.mat'],'t','w','rateslant','m_aero','m_O3','m_NO2');
+    if exist([starpaths,daystr,'starsun.mat'])
+        fname = [starpaths,daystr,'starsun.mat']
+    else
+        fname = getfullname([instrumentname '_', daystr, 'starsun*.mat']);
+    end
+    s = load(fname,'t','w','rateslant','m_aero','m_O3','m_NO2');
+    [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(s.t);
+    s.w = [visw,nirw];
+    s.instrumentname = instrumentname;
 end
 
 % test figure;
@@ -109,9 +123,19 @@ if strcmp(gas,'O3')
         ref_spec.o3scdref = 275*ref_spec.mean_m;  % in [DU] this is from DB in MLO
     elseif strcmp(daystr,'20180209') || strcmp(daystr,'20180210')|| strcmp(daystr,'20180212')
         ref_spec.o3scdref = 262*ref_spec.mean_m;  % in [DU] this is from DB in MLO
+    elseif strcmp(daystr,'20220508')
+        ref_spec.o3scdref = 269.4*ref_spec.mean_m;  % in [DU] this is from pandora in MLO
+    elseif strcmp(daystr,'20220511')
+        ref_spec.o3scdref = 265.3*ref_spec.mean_m;  % in [DU] this is from pandora in MLO
+    elseif strcmp(daystr,'20220514')
+        ref_spec.o3scdref = 283.84*ref_spec.mean_m;  % in [DU] this is from pandora in MLO
     end
-    save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
     
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'O3refspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
+    end
 elseif strcmp(gas,'NO2')
     
     %wind   = [0.450 0.490];
@@ -135,9 +159,22 @@ elseif strcmp(gas,'NO2')
     elseif strcmp(daystr,'20180811') || strcmp(daystr,'20180812') || strcmp(daystr,'20180813')
         ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
     elseif strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212')
-        ref_spec.no2scdref = 2.0e15*ref_spec.mean_m;% defualt
+        ref_spec.no2scdref = 1.8452e+15*ref_spec.mean_m;% from OMI overpass on 20180212
+    elseif strcmp(daystr,'20220508')
+        Loschmidt= 2.686763e19; %molecules/cm2
+        ref_spec.no2scdref = 8.266e-2*(Loschmidt/1000.0)*ref_spec.mean_m;% From MLO May 2022, based on pandora measurements
+    elseif strcmp(daystr,'20220511')
+        Loschmidt= 2.686763e19; %molecules/cm2
+        ref_spec.no2scdref = 7.25617e-2*(Loschmidt/1000.0)*ref_spec.mean_m;% From MLO May 2022, based on pandora measurements
+    elseif strcmp(daystr,'20220514')
+        Loschmidt= 2.686763e19; %molecules/cm2
+        ref_spec.no2scdref = 7.8792e-2*(Loschmidt/1000.0)*ref_spec.mean_m;% From MLO May 2022, based on pandora measurements
     end
-    save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    end
     
 elseif strcmp(gas,'HCOH')
     
@@ -149,8 +186,15 @@ elseif strcmp(gas,'HCOH')
     % from OMI station overpass at MLO [molec/cm2]
     ref_spec.hcohscdref = 0;%2.64e15*ref_spec.mean_m;%this is total column; tropo is -0.1e15;MLO 20160113
     %ref_spec.no2scdref = 8.43e15;%this is derived from MLE method
-    save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');    
-    
+    if strcmp(daystr,'20220508')
+        ref_spec.hcohscdref = 9.4518e+14*ref_spec.mean_m;
+    end
+  
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    end
 end
 
 % compute and plot reference spectrum
@@ -168,7 +212,7 @@ end
     plot(s.w(wln),meanspec+3*stdspec,':k','linewidth',1);hold on;
     plot(s.w(wln),meanspec-3*stdspec,':k','linewidth',1);hold on;
     legend('mean ref spectrum','ref spec +- stdx3');
-    ylabel('count rate (slant total)');title(strcat(gas, 'reference spectrum from ',daystr));
+    ylabel('count rate (slant total)');title(strcat(gas, 'reference spectrum from ',daystr,' ',instrumentname));
     subplot(212);
     plot(s.w(wln),stdspec,'-k','linewidth',2);
     legend('ref spec std');
@@ -201,16 +245,33 @@ end
 % dat3 = load(['C:\Users\msegalro\campaigns\MLO\Aug_2018\','4STAR_20180813starsun.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
 
 % MLO Feb-2018
-dat1 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180209starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
-dat2 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180210starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
-dat3 = load(['C:\Users\msegalro\campaigns\MLO\Feb_2018\','4STAR_20180212starsun_nogases.mat'],'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col');
-
-
+if strcmp(daystr(1:6),'201802')
+    
+dat1 = load(fname,'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+dat2 = load(strrep(fname,daystr,'20180210'),'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+dat3 = load(strrep(fname,daystr,'20180212'),'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+elseif strcmp(daystr(1:6),'202205')
+% MLO May 2022
+    dat1 = load(fname,'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+    dat2 = load(strrep(fname,daystr,'20220511'),'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+    dat3 = load(strrep(fname,daystr,'20220514'),'t','w','m_aero','rateslant','m_O3','tau_tot_slant','toggle','m_ray','m_NO2','m_H2O','tau_ray','QdVlr','QdVtot','NO2col','Str','Zn','instrumentname');
+    [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(dat1.t);
+    dat1.w = [visw,nirw];
+    [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(dat2.t);
+    dat2.w = [visw,nirw];
+    [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(dat3.t);
+    dat3.w = [visw,nirw];
+end
 
 if strcmp(gas,'O3')
     ref_spec.o3refspec = meanspec;
     ref_spec.o3wln     = s.w(wln);
-    save([starpaths, daystr,'O3refspec.mat'],'-struct','ref_spec');
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'O3refspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
+    end
+    %save([starpaths, daystr,'O3refspec.mat'],'-struct','ref_spec');
     % retrieve O3
     [o3_1] = retrieveO3(dat1,wind(1),wind(2),1);
     [o3_2] = retrieveO3(dat2,wind(1),wind(2),1);
@@ -219,7 +280,12 @@ if strcmp(gas,'O3')
 elseif strcmp(gas,'NO2')
     ref_spec.no2refspec = meanspec;
     ref_spec.no2wln     = s.w(wln);
-    save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    end
+    %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
     % retrieve NO2
     [no2_1] = retrieveNO2(dat1,wind(1),wind(2),1);
     [no2_2] = retrieveNO2(dat2,wind(1),wind(2),1);
@@ -227,7 +293,12 @@ elseif strcmp(gas,'NO2')
 elseif strcmp(gas,'HCOH')
     ref_spec.hcohrefspec = meanspec;
     ref_spec.hcohwln     = s.w(wln);
-    save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    if strcmp(instrumentname, '4STARB')
+        save([starpaths,instrumentname,'_',daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    else
+        save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
+    end
+    %save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');
     % retrieve HCOH
     [hcoh_1] = retrieveHCOH(dat1,wind(1),wind(2),1);
     [hcoh_2] = retrieveHCOH(dat2,wind(1),wind(2),1);
@@ -317,6 +388,16 @@ if strcmp(gas,'O3')
                  o3_3.o3SCD(dat3.m_O3<=4&dat3.m_O3>=1.5)];
             y = real(y); 
             
+        elseif strcmp(daystr(1:6),'202205') 
+        % these airmass values are for MLO May 2022
+            x = [dat1.m_O3(dat1.m_O3<=4&dat1.m_O3>=1.2);
+                 dat2.m_O3(dat2.m_O3<=4&dat2.m_O3>=1.2);
+                 dat3.m_O3(dat3.m_O3<=4&dat3.m_O3>=1.2)];
+            y = [o3_1.o3SCD(dat1.m_O3<=4&dat1.m_O3>=1.2);
+                 o3_2.o3SCD(dat2.m_O3<=4&dat2.m_O3>=1.2);
+                 o3_3.o3SCD(dat3.m_O3<=4&dat3.m_O3>=1.2)];
+            y = real(y); 
+            
         end 
         binEdge = linspace(min(x),max(x),100);
         [n,bin] = histc(x,binEdge);
@@ -392,6 +473,16 @@ elseif strcmp(gas,'NO2')
                  no2_3.no2SCD(dat3.m_NO2<=5&dat3.m_NO2>=3)];
             y = real(y);   
             y(y<0) = NaN;
+        elseif strcmp(daystr(1:6),'202205')
+        % these airmass values are for MLO May 2022
+            x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=1);
+                 dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=1);
+                 dat3.m_NO2(dat3.m_NO2<=5&dat3.m_NO2>=1)];
+            y = [no2_1.no2SCD(dat1.m_NO2<=5&dat1.m_NO2>=1);
+                 no2_2.no2SCD(dat2.m_NO2<=5&dat2.m_NO2>=1);
+                 no2_3.no2SCD(dat3.m_NO2<=5&dat3.m_NO2>=1)];
+            y = real(y);   
+            y(y<0) = NaN;
         end
         
         binEdge = linspace(min(x),max(x),100);
@@ -461,6 +552,16 @@ elseif strcmp(gas,'HCOH')
                  hcoh_3.hcohSCD(dat3.m_NO2<=4&dat3.m_NO2>=2)];
             y = real(y);   
             y(y<0) = NaN;  
+                elseif strcmp(daystr(1:6),'202205')
+        % these airmass values are for MLO May 2022
+            x = [dat1.m_NO2(dat1.m_NO2<=5&dat1.m_NO2>=2.5);
+                 dat2.m_NO2(dat2.m_NO2<=5&dat2.m_NO2>=2.5);
+                 dat3.m_NO2(dat3.m_NO2<=5&dat3.m_NO2>=2.5)];
+            y = [hcoh_1.hcohSCD(dat1.m_NO2<=5&dat1.m_NO2>=2.5);
+                 hcoh_2.hcohSCD(dat2.m_NO2<=5&dat2.m_NO2>=2.5);
+                 hcoh_3.hcohSCD(dat3.m_NO2<=5&dat3.m_NO2>=2.5)];
+            y = real(y);   
+            y(y<0) = NaN;
         end
         
         binEdge = linspace(min(x),max(x),100);
@@ -507,7 +608,7 @@ elseif strcmp(gas,'O3') && (strcmp(daystr,'20180812') || strcmp(daystr,'20180813
 elseif strcmp(gas,'O3') && (strcmp(daystr,'20180209') || strcmp(daystr,'20180210') || strcmp(daystr,'20180212'))
     ref_spec.o3scdref = abs(Sf(2));%20180209 deduced 342 vs. 315 of DB, 20180210 353, 20180212 342
     %save([starpaths,daystr,'O3refspec.mat'],'-struct','ref_spec');
-    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'O3refspec.mat'],'-struct','ref_spec');
+    save([getnamedpath('data_folder'),daystr,'O3refspec.mat'],'-struct','ref_spec');
 elseif strcmp(gas,'NO2') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.no2scdref = abs(Sf(2));%7.795e15;%this is median8.43e15;%this is derived from MLE method 2%
     %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
@@ -523,7 +624,15 @@ elseif strcmp(gas,'NO2') && (strcmp(daystr,'20180811')||strcmp(daystr,'20180812'
 elseif strcmp(gas,'NO2') && (strcmp(daystr,'20180209')||strcmp(daystr,'20180210') ||strcmp(daystr,'20180212'))
     ref_spec.no2scdref = 2.4e15; % since MLE seem too high (~4.7e16 for 20180212)
     %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
-    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    save([getnamedpath('data_folder'),daystr,'NO2refspec.mat'],'-struct','ref_spec');
+elseif strcmp(gas,'NO2') && (strcmp(daystr(1:6),'202205'))
+    ref_spec.no2scdref = 2.2225e15; % since MLE seem too high (~4.7e16 for 20180212)
+    %save([starpaths,daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    if strcmp(instrumentname,'4STARB')
+        save([getnamedpath('data_folder'),instrumentname,'_',daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    else
+        save([getnamedpath('data_folder'),daystr,'NO2refspec.mat'],'-struct','ref_spec');
+    end
 elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20160113')||strcmp(daystr,'20160702'))
     ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline? -24 from MLO 2017
     save([starpaths,daystr,'HCOHrefspec.mat'],'-struct','ref_spec');   
@@ -532,5 +641,5 @@ elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20180812')||strcmp(daystr,'20180813
     save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'HCOHrefspec.mat'],'-struct','ref_spec'); 
 elseif strcmp(gas,'HCOH') && (strcmp(daystr,'20180209')||strcmp(daystr,'20180210') ||strcmp(daystr,'20180212'))
     ref_spec.hcohscdref = 0;%abs(Sf(2));% MLO supposed to be 0 or not? check. -137 from MLO; seem to be correcting the baseline? -24 from MLO 2017
-    save(['C:\Users\msegalro\matlab\4STAR_codes\data_folder\',daystr,'HCOHrefspec.mat'],'-struct','ref_spec');  
+    save([getnamedpath('data_folder'),daystr,'HCOHrefspec.mat'],'-struct','ref_spec');  
 end

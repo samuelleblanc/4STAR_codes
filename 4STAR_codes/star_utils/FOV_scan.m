@@ -58,9 +58,17 @@ if nargin<2;
     instrumentname = '4STAR';
 end;
 
+asktopause = usejava('desktop');
 if strcmp(instrumentname,'2STAR');
     error('Not yet implemented for 2STAR')
 end;
+daystr = datestr(ins.t(1),'yyyymmdd');
+if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
+    mkdir([apname instrumentname '_' daystr]);
+else
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
+end
 %% legacy code
 % 
 % if ~exist('infile','var')
@@ -125,6 +133,9 @@ ic = find(tracking);
 icenter = ic(ceil(end/2));
 rec = [1:length(tracking)]';
 if any(tracking)
+	ic = find(tracking);
+	icenter = ic(ceil(end/2));
+	rec = [1:length(tracking)]';
     if ~strcmp(instrumentname,'2STAR');
         scan = ~tracking & (rec>min(rec(tracking)))&(rec<max(rec(tracking)))&ins.Str~=0;
     else;
@@ -132,6 +143,9 @@ if any(tracking)
     end;
    % scan(icenter) = true;
 else
+	ic = [1];
+	icenter = [1];
+	rec = [1:length(tracking)]';
     scan = true(size(tracking));
     scan([1:3 end-2:end]) = false;
 end
@@ -231,14 +245,14 @@ if ~isfield(ins,'sunel');
     v = datevec(ins.t(1));
     [ins.sunaz, ins.sunel, refract]=sun(ins.Lon, ins.Lat,v(3), v(2), v(1), rem(ins.t,1)*24,ins.t*0.0+298.15,ins.t*0.0+1013.15);
 end;
-dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter))
-sza = (90-abs(ins.sunel)) + dza
+dza = (90-abs(ins.El_deg(icenter))) - (90-ins.sunel(icenter));
+sza = (90-abs(ins.sunel)) + dza;
 %saz = abs(ins.AZ_deg(icenter)).*ones(size(ins.AZ_deg));
 %saz = interp1(ins.t(tracking),abs(ins.AZ_deg(tracking)),ins.t,'linear','extrap')
-daz = ins.AZ_deg(icenter) - ins.sunaz(icenter)
-saz = ins.sunaz + daz
+daz = ins.AZ_deg(icenter) - ins.sunaz(icenter);
+saz = ins.sunaz + daz;
 
-ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg)
+ins.SA = scat_ang_degs(sza,saz,90.0-abs(ins.El_deg),ins.AZ_deg);
    
  % Old code  
  %  ins.SA = scat_ang_degs(90-mean(abs(ins.El_deg)).*ones(size(ins.AZ_deg)), ins.AZ_deg,...
@@ -305,10 +319,10 @@ ylim([.94,1.08]);
 xlim([-1.5,1.5]);
 ax(2) = gca;
 v = axis;
-save_fig(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV']);
+save_fig(fig2,[apname, ins.fname(1:end-4),'.line_FOV'],asktopause);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.fig']);
 %saveas(fig2,[ins.pname, ins.fname(1:end-4),'.line_FOV.png']);
-ins.fig_name = {[ins.pname, ins.fname(1:end-4),'.line_FOV.png']};
+ins.fig_name = {[apname, ins.fname(1:end-4),'.line_FOV.png']};
 %%
 % ./(ones(size(ins.time))*ins.rangeCCD);
 % fig7 = figure; 
@@ -338,18 +352,18 @@ ylabel('Quad V_x/V_t_o_t');
 figure(fig2);
 ylim([.98,1.02]);
 xlim([-1.5,1.5]);
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.fig']);
-saveas(fig2,[ins.pname, ins.fname(1:end-4),'.selected_lines.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.selected_lines.png']}];
+saveas(fig2,[apname, ins.fname(1:end-4),'.selected_lines.fig']);
+saveas(fig2,[apname, ins.fname(1:end-4),'.selected_lines.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.selected_lines.png']}];
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
 % saveas(fig1,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
-saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.fig']);
-saveas(fig3,[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.quad_sigs.png']}];
+saveas(fig3,[apname, ins.fname(1:end-4),'.quad_sigs.fig']);
+saveas(fig3,[apname, ins.fname(1:end-4),'.quad_sigs.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.quad_sigs.png']}];
 
 %%
 %ins.SA(3:end-2), ins.CCD_norm(3:end-2,good_pix)
-midSA = icenter %ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
+midSA = icenter; %ins.SA>-.35 & ins.SA<.35 &ins.Str==1 & scan;
 %for ix = length(ins.nm):-1:1
 %    P{ix} = polyfit(ins.SA(midSA),ins.CCD_norm(midSA,ix),1);
 %    midv = polyval(P{ix},0);
@@ -374,9 +388,9 @@ ax(4) = gca;
 linkaxes(ax,'x');
 axis(ax(2),v);
 
-saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.fig']);
-saveas(fig4,[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']);
-ins.fig_name = [ins.fig_name; {[ins.pname, ins.fname(1:end-4),'.spectral_FOV.png']}];
+saveas(fig4,[apname, ins.fname(1:end-4),'.spectral_FOV.fig']);
+saveas(fig4,[apname, ins.fname(1:end-4),'.spectral_FOV.png']);
+ins.fig_name = [ins.fig_name; {[apname, ins.fname(1:end-4),'.spectral_FOV.png']}];
 %%
 return
 %

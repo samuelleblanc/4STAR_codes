@@ -51,6 +51,7 @@ function [o3] = retrieveO3(s,wstart,wend,mode,gxs)
 % MS, 2016-10-27, tweaked processing to match RH signals in spectrometer
 % MS, 2016-12-31, assigned specific processing for KORUS high RH days
 % MS, 2018-11-07, ommiting gxs (gas cross section input, which is not used)
+% SL, 2022-10-26, adding handling for 4STARB
 % -------------------------------------------------------------------------
 %% function routine
 
@@ -80,7 +81,7 @@ wln = find(s.w<=s.w(iend)&s.w>=s.w(istart));
 % decide which c0 to use
 % mode = 1;%0-MLO c0; 1-MLO ref spec
 
-[tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode);
+[tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'O3',mode,s.instrumentname);
 
 if mode==0
    % when mode==0 need to choose wln
@@ -300,7 +301,7 @@ if plotting
    subplot(212);plot(tplot,RMSres,'.r');hold on;
    axis([tplot(1) tplot(end) 0 5]);
    xlabel('time');ylabel('o3 RMSE [DU]');
-   title([datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
+   title([s.instrumentname,' ',datestr(s.t(1),'yyyy-mm-dd'), 'linear inversion']);
 end
 %    tau_OD = log(repmat(c0,length(s.t),1)./rate);
 % prepare to plot spectrum OD and o3 cross section

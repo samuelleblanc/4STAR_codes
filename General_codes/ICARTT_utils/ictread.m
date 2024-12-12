@@ -46,35 +46,35 @@ l=fgetl(fid);
 % d=strread(l, '', 'delimiter', delimiter);
 [yyyy1, mm1, dd1, yyyy2, mm2, dd2] =strread(l, '%u, %u, %u, %u, %u, %u');
 out.misc.date_when_data_begin=datestr(datenum([yyyy1 mm1 dd1 0 0 0]), 29);
-out.year=str2num(out.misc.date_when_data_begin(1:4));
+out.year=str2num_nocomm(out.misc.date_when_data_begin(1:4));
 out.misc.date_when_data_begin(findstr(out.misc.date_when_data_begin, '-'))=' ';
 out.misc.date_of_data_reduction_or_revision=datestr(datenum([yyyy1 mm1 dd1 0 0 0]), 29);
 out.misc.date_of_data_reduction_or_revision(findstr(out.misc.date_of_data_reduction_or_revision, '-'))=' ';
 clear d;
-out.misc.datainterval=str2num(fgetl(fid));
+out.misc.datainterval=str2num_nocomm(fgetl(fid));
 if out.misc.datainterval~=0;
     disp(['Time interval is ' num2str(out.misc.datainterval) ' second(s).']);
 end;
 out.misc.independent_variable=fgetl(fid);
-out.misc.number_of_variables=str2num(fgetl(fid));
-out.misc.scale_factors=str2num(fgetl(fid));
+out.misc.number_of_variables=str2num_nocomm(fgetl(fid));
+out.misc.scale_factors=str2num_nocomm(fgetl(fid));
 if any(out.misc.scale_factors-1);
     warning('Scale factor is not 1 for some/all of the data.');
 end;
 out.misc.missing_data_indicator=[];   
 while length(out.misc.missing_data_indicator)<out.misc.number_of_variables
-    out.misc.missing_data_indicator=[out.misc.missing_data_indicator str2num(fgetl(fid))];
+    out.misc.missing_data_indicator=[out.misc.missing_data_indicator str2num_nocomm(fgetl(fid))];
 end;
 for i=1:out.misc.number_of_variables
     out.misc.variable_names(i)={fgetl(fid)};
 end;
-out.misc.number_of_special_comment_lines=str2num(fgetl(fid));
+out.misc.number_of_special_comment_lines=str2num_nocomm(fgetl(fid));
 out.misc.number_of_special_comment_lines=out.misc.number_of_special_comment_lines+adj_lines(2);
 out.misc.special_comments={};
 for i=1:out.misc.number_of_special_comment_lines;
     out.misc.special_comments(i)={fgetl(fid)};
 end;
-out.misc.number_of_normal_comment_lines=str2num(fgetl(fid));
+out.misc.number_of_normal_comment_lines=str2num_nocomm(fgetl(fid));
 out.misc.number_of_normal_comment_lines=out.misc.number_of_normal_comment_lines+adj_lines(3);
 out.misc.normal_comments={};
 out.misc.ulod_flag=NaN;
@@ -84,12 +84,12 @@ for i=1:out.misc.number_of_normal_comment_lines;
     out.misc.normal_comments(i)={l};
     if length(l)>=9;
         if strcmpi(l(1:9), 'ulod_flag')
-            out.misc.ulod_flag=str2num(l(12:end));
+            out.misc.ulod_flag=str2num_nocomm(l(12:end));
             if all(out.misc.ulod_flag==-7777); 
                 out.misc.ulod_flag=-7777;
             end;
         elseif strcmpi(l(1:9), 'llod_flag')
-            out.misc.llod_flag=str2num(l(12:end));
+            out.misc.llod_flag=str2num_nocomm(l(12:end));
             if all(out.misc.llod_flag==-8888)
                 out.misc.llod_flag=-8888;
             end;
@@ -116,8 +116,8 @@ for i=1:out.misc.number_of_variables+1
         data1=[];
     end
     if i==1;
-        doy=datenum([str2num(out.misc.date_when_data_begin(1:4)) str2num(out.misc.date_when_data_begin(6:7)) str2num(out.misc.date_when_data_begin(9:10))]);
-        doy=doy-datenum([str2num(out.misc.date_when_data_begin(1:4))-1 12 31 0 0 0]);
+        doy=datenum([str2num_nocomm(out.misc.date_when_data_begin(1:4)) str2num_nocomm(out.misc.date_when_data_begin(6:7)) str2num_nocomm(out.misc.date_when_data_begin(9:10))]);
+        doy=doy-datenum([str2num_nocomm(out.misc.date_when_data_begin(1:4))-1 12 31 0 0 0]);
         out.t=doy+data1/86400;
         firstdata=data1;
     elseif i>1;
@@ -157,3 +157,8 @@ end;
 fclose(fid);
 out=orderfields(out, [3:length(fieldnames(out)) 2 1]);
 out.note=['Data taken from ' filename ' using ictread.m on ' datestr(now,31) '.  The header lines are given in the "misc" field.'];
+
+
+function sout = str2num_nocomm(s)
+ss = split(s,';');
+sout = str2num(ss{1});

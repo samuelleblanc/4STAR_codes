@@ -7,21 +7,31 @@ function create_all_forj(create_ppt)
 % MS, 2016-05-19, modified to add to forj_all.mat under data_folder and not
 % under individual folders
 % MS, 2016-10-20, saving more plots
-% SL, v2.0, Adding extra verbose to describe what it does and creation of a
-% ppt file
+% SL, v2.0, Adding extra verbose to describe what it does and creation of a ppt file
+% SL, v2.1, Adding handling of 4STARB FORJ, makes it not save to the forj_all.mat file, but does keep the figures up
 %--------------------------------------------------------------------------
 
-version_set('v2.0')
+version_set('v2.1')
 
 vis = getfullname('*_VIS_FORJ*.dat','Select Forj Az dat file.');
 nir = getfullname('*_NIR_FORJ*.dat','Select Forj Az dat file.');
+
+% check the 4STAR version
+[daystr, filen, datatype, instrumentname]=starfilenames2daystr({vis});
+if strcmp(instrumentname,'4STARB')
+    save_mat_file = false;
+elseif strcmp(instrumentname,'4STAR')
+    save_mat_file = true;
+else
+   error('Not 4STAR or 4STARB file!') 
+end
 
 if ~exist('create_ppt','var')||isempty(dialog)
     create_ppt = true;
 end
 
 if create_ppt
-    ppt_fname = fullfile([getnamedpath('starppt') filesep 'FORJ_created_on' datestr(now,'yyyymmdd_HHMMSS') '.ppt']); 
+    ppt_fname = fullfile([getnamedpath('starppt') filesep instrumentname '_FORJ_created_on' datestr(now,'yyyymmdd_HHMMSS') '.ppt']); 
     pptcontents={}; % pairs of a figure file name and the number of figures per slide
     pptcontents0={};
 end
@@ -59,48 +69,57 @@ for f = 1:length(files)
     
     vis = [pname_, filesep, files(f).name];
     
-    try
+ %   try
         [forj_out_,forj_vis_out,forj_fig_path] = TCAPII_forj_az_v2(vis);
-        if ~isempty(forj_out_)
-            if ~exist('forj_out','var')
-                forj_out = forj_out_;
-            else
-                [forj_out.time, ij] = unique([forj_out.time, forj_out_.time]);
-                flds = fieldnames(forj_out);
-                for fld = 1:length(flds)
-                    if ~strcmp(flds{fld},'meas')&&~strcmp(flds{fld},'time')&&~strcmp(flds{fld},'Az_deg')
-                        tmp = [forj_out.(flds{fld}); forj_out_.(flds{fld})];
-                        forj_out.(flds{fld}) = tmp(ij,:);
-                    end
+ %   catch
+        %%
+ %       [pn,fname,ext] = fileparts(vis);
+        
+ %       disp(['Bad file? ', [fname, ext]])
+ %   end
+    if ~isempty(forj_out_)
+        if ~exist('forj_out','var')
+            forj_out = forj_out_;
+        else
+            [forj_out.time, ij] = unique([forj_out.time, forj_out_.time]);
+            flds = fieldnames(forj_out);
+            for fld = 1:length(flds)
+                if ~strcmp(flds{fld},'meas')&&~strcmp(flds{fld},'time')&&~strcmp(flds{fld},'Az_deg')
+                    tmp = [forj_out.(flds{fld}); forj_out_.(flds{fld})];
+                    forj_out.(flds{fld}) = tmp(ij,:);
                 end
+            end
+            try
                 forj_out.meas(end+1) = forj_out_.meas;
-                forj_out.meas = forj_out.meas(ij);
+            catch
+               bad_fields = {'corr_CW_shortwl','corr_CCW_shortwl'}; 
+               forj_out_.meas = rmfield(forj_out_.meas,bad_fields);
+               forj_out.meas(end+1) = forj_out_.meas;
+            end
+            forj_out.meas = forj_out.meas(ij);
+            if save_mat_file
                 if save_to_mat_instead
                     save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
                 else
                     save([starpaths,'forj_all.mat'],'-struct','forj_out');
                 end
-                % save some more figures
-                %LED stability
-                f3 = [plot_dir,files(f).name(1:end-4), '_LEDstability'];
-                save_fig(3,f3,false);
-                % normalized signals
-                f4 = [plot_dir,files(f).name(1:end-4), '_NormalizedSignal'];
-                save_fig(4,f4,false);
-                close all;
-                pptcontents0=[pptcontents0; {forj_fig_path 1}];
             end
-        else
-            disp('forj_out_ was empty')
+            % save some more figures
+            %LED stability
+            f3 = [plot_dir,files(f).name(1:end-4), '_LEDstability'];
+            save_fig(3,f3,false);
+            % normalized signals
+            f4 = [plot_dir,files(f).name(1:end-4), '_NormalizedSignal'];
+            save_fig(4,f4,false);
+            close all;
+            pptcontents0=[pptcontents0; {forj_fig_path 1}; {f3 4}; {f4 4}; ];
         end
-        
-    catch
-        %%
-        [pn,fname,ext] = fileparts(vis);
-        
-        disp(['Bad file? ', [fname, ext]])
+    else
+        disp('forj_out_ was empty')
     end
-   % close('all')
+    
+    
+    % close('all')
 end
 %%
 bad_time = (sum(isNaN(forj_out.corr'))>0);
@@ -112,8 +131,11 @@ forj_out.corr_cw(bad_time,:) = [];
 forj_out.corr_cw_std(bad_time,:) = [];
 forj_out.corr_ccw(bad_time,:) = [];
 forj_out.corr_ccw_std(bad_time,:) = [];
-disp(['Saving new Forj all file to: ',matdir,filesep,'forj_all.mat'])
-save([matdir,filesep,'forj_all.mat'],'-struct','forj_out');
+
+if save_mat_file
+    disp(['Saving new Forj all file to: ',matdir,filesep,'forj_all.mat'])
+    save([matdir,filesep,'forj_all.mat'],'-struct','forj_out'); 
+end
 
 if create_ppt
     % sort out the PowerPoint contents

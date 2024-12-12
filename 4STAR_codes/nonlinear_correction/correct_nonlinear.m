@@ -38,12 +38,13 @@
 %           - added version_set call
 % Modified (v1.1): by Samuel LeBlanc, Santa Cruz, CA, 2016-09-30
 %           - changed the file to reference with the 20160330 (most recent)
-%
+% Modified (v1.2): by Connor Flynn, OU, 2020-05-01
+%           - changed lines 88-89 to avoid truncating negative NIR counts
 % -------------------------------------------------------------------------
 
 %% Function routine
 function spout_raw=correct_nonlinear(spin_raw, verbose)
-version_set('1.1');
+version_set('1.2');
 
 %% Determine either vis or nir spectrometer
 if length(spin_raw(1,:)) == 512 
@@ -83,8 +84,10 @@ wd=spin_raw./max_val; %get well depth
 %      spout_wd(it,inm)=wd(it,inm)./corr.aresp(ind);
 %    end
 % end
-wd(find(wd <0))=0;
-spout_wd=wd./corr.aresp(round(wd*100)+1); % Yohei, 2014/10/08
+% wd(find(wd <0))=0;
+% spout_wd=wd./corr.aresp(round(wd*100)+1); % Yohei, 2014/10/08
+wd_=wd; wd_(wd<0)=0; % Connor, to avoid truncating negative NIR raw counts
+spout_wd=wd./corr.aresp(round(wd_*100)+1); 
 
 %% Write to the out spectra array by converting well depth back to raw counts
 spout_raw=spout_wd.*max_val; 

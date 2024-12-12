@@ -70,8 +70,12 @@ stamp(stampstr, author);
 
 % save
 if exist(fullfile(pathname,[figurename '.fig']))==2;
-    ButtonName=questdlg(['File ' figurename '.fig already exists.  Do you want to overwrite?'], ...
-        'Overwriting', 'OK','Cancel','Save Both','OK');
+    if usejava('desktop')
+    	ButtonName=questdlg(['File ' figurename '.fig already exists.  Do you want to overwrite?'], ...
+        	'Overwriting', 'OK','Cancel','Save Both','OK');
+    else
+       ButtonName='Save Both';
+    end
     switch ButtonName,
         case 'Cancel', 
             return;

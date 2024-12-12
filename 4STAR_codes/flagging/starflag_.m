@@ -63,12 +63,12 @@ if Mode==1 || fresh_start % Then output flag file with auto-generated flags
    % Use "which" to locate directory containing starinfo and put flag files in same location
    outputfile=[getnamedpath('starinfo','Select where starinfo files and flag files are to be saved.'),flagfile];
    op_name_str = 'auto';
-   disp(['Automatic flags written to: ' flagfile])   
+   disp(['...Automatic flags written to: ' flagfile])   
    if ~exist(outputfile,'file')
-      disp(['Creating ',flagfile]);
+      %disp(['Creating ',flagfile]);
       save(outputfile,'-struct','flags','-v7.3');
    else
-      disp(['Appending to ',flagfile]);
+      disp(['...Appending to ',flagfile]);
       save(outputfile,'-append','-struct','flags');
    end
    save(tmp_file,'-struct','flags','-v7.3');

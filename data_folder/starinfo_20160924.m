@@ -31,7 +31,7 @@ s.flagfilenameCWV  = '20160924_starflag_CWV_man_created20161017_2140by_MS.mat';
 s.flagfilenameO3   = '20160924_starflag_O3_man_created20161017_2141by_MS.mat';
 s.flagfilenameNO2  = '20160924_starflag_NO2_man_created20161017_2145by_MS.mat';
 s.flagfilenameHCOH = '20160924_starflag_HCOH_man_created20161017_2147by_MS.mat';
-s.flagacaod = '20160924_flag_acaod_sleblanc_20180302_143354.mat';
+s.flagacaod = '20160924_flag_acaod_lebla_20201016_111440.mat'; %old/R3: '20160924_flag_acaod_sleblanc_20180302_143354.mat';
 
 %dirty correction
 s.AODuncert_mergemark_file = '20160924_AOD_merge_marks.mat';

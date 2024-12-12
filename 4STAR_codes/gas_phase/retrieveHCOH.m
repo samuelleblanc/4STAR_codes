@@ -64,7 +64,7 @@ loadCrossSections_global;
  % decide which c0 to use
  % mode = 0-lamp?; 1-MLO ref spec
   
-  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'HCOH',mode);
+  [tmp]=starc0gases(nanmean(s.t),s.toggle.verbose,'HCOH',mode,s.instrumentname);
   
   if mode==0
       % when mode==0 need to choose wln

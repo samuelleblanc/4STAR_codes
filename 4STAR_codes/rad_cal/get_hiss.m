@@ -33,11 +33,15 @@
 %          - added control over nuber of header lines for 2016 version.
 % MOdified v1.2: by Samuel LeBlanc, NASA Ames, 2017-11-07
 %          - added getnamedpath for easier locating of files
+% Modified v1.3: by Samuel LeBlanc, NASA Ames, 2022-04-12
+%          - changed special rules for file type 20170803
+% Modified v1.4: by Samuel LeBlanc, Santa Cruz, 2024-06-20
+%          - Added special rule for .csv file from Alok Shresta (for 2024-05-21)
 % -------------------------------------------------------------------------
 
 %% Start of function
 function [archi] = get_hiss(in)
-version_set('1.2');
+version_set('1.4');
 
 % 4STAR radiance cal after TCAP2 and before SEAC4RS
 % Source:    Hiss                                        (ARC High Output Sphere)                                                                           
@@ -62,7 +66,7 @@ if ~exist('in','var')
 %    in = ['D:\case_studies\radiation_cals\spheres\HISS\20130605124300HISS.txt'];
     savePath = pwd;
     cd(getnamedpath('rad_cal_dir'));
-   [fin nin]=uigetfile('*.txt','Select a calibrated radiance file of Sphere');
+   [fin nin]=uigetfile('*.txt; *.csv','Select a calibrated radiance file of Sphere');
    in=strcat(nin,fin);
    cd(savePath);
    %      in = getfullname(in,'radcals','Select a calibrated radiance file of Sphere');
@@ -80,10 +84,10 @@ if fid>2
     date=fname(1:8);
     dd=str2num(date);
     hlines = 15;
-    if dd==20160121.0;
+    if dd==20160121.0 || dd==20170803.0
         hlines=16;
-    end;
-    if dd<20140604.0,
+    end
+    if dd<20140604.0
       %C = textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f\n ','HeaderLines',15,'Delimiter','\n'); %%*[^\n]
       %C=textscan(fid,'%f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',15);
       C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',hlines);
@@ -106,7 +110,37 @@ if fid>2
       figure; plot(archi.nm, [archi.lamps_12,archi.lamps_9,archi.lamps_8,archi.lamps_7,archi.lamps_6,archi.lamps_5,...
         archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1,archi.lamps_p5],'-');
     legend('12 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp','0.5 lamp');
-    else;
+    elseif dd>20170802.0 && dd<20240510.0
+      C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %f','HeaderLines',hlines,'Delimiter','\n');
+      fclose(fid);
+      archi.fname = fname;
+      archi.nm = C{1};
+      archi.lamps_12 = C{2};       archi.lamps_9 = C{5};      archi.lamps_8 = C{6};
+      archi.lamps_7 = C{7};      archi.lamps_6 = C{8};      archi.lamps_5 = C{9};
+      archi.lamps_4 = C{10};      archi.lamps_3 = C{11};      archi.lamps_2 = C{12};
+      archi.lamps_1 = C{13};      archi.lamps_p5 = C{14};
+      archi.units = 'W/(m^2.sr.um)';
+      %archi.lamps_12_pct = C{9}./100;
+            figure; plot(archi.nm, [archi.lamps_12,archi.lamps_9,archi.lamps_8,archi.lamps_7,archi.lamps_6,archi.lamps_5,...
+        archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1],'-');
+    legend('12 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp','0.5 lamp');
+    elseif strcmp(ext,'.csv')
+      C=textscan(fid,'%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f','HeaderLines',hlines,'Delimiter','\n');
+      fclose(fid);
+      archi.fname = fname;
+      archi.nm = C{1};
+      archi.lamps_12 = C{14};       archi.lamps_11 = C{13};      
+      archi.lamps_10 = C{12};       archi.lamps_9 = C{11};      archi.lamps_8 = C{10};
+      archi.lamps_7 = C{9};      archi.lamps_6 = C{8};      archi.lamps_5 = C{7};
+      archi.lamps_4 = C{6};      archi.lamps_3 = C{5};      archi.lamps_2 = C{4};
+      archi.lamps_1 = C{3};      archi.lamps_p5 = C{2};
+      archi.units = 'W/(m^2.sr.um)';
+      %archi.lamps_12_pct = C{9}./100;
+            figure; plot(archi.nm, [archi.lamps_12,archi.lamps_11,archi.lamps_10,archi.lamps_9,archi.lamps_8,archi.lamps_7,archi.lamps_6,archi.lamps_5,...
+        archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1],'-');
+    legend('12 lamps','11 lamps','10 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp','0.0 lamp');
+    set(gca,'ColorOrder','factory')
+    else
       C=textscan(fid,'%f %f %f %f %f %f %f %f %f %f %f %f %f %*[^\n]','HeaderLines',hlines);
       fclose(fid);
       archi.fname = fname;

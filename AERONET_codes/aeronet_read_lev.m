@@ -151,8 +151,8 @@ jini=1;
 % Date and Time
 % num2str() will convert with right alignment
 % then we replace empty spaces with zeros
-dates=num2str(M(1:aero.ntimes,jini)); dates(dates==' ')='0';
-times=num2str(M(1:aero.ntimes,jini+1)); times(times==' ')='0';
+dates=num2str(M(1:aero.ntimes,jini),'%08d'); dates(dates==' ')='0';
+times=num2str(M(1:aero.ntimes,jini+1),'%06d'); times(times==' ')='0';
 aero.jd(1:aero.ntimes,1)=datenum([dates times],'ddmmyyyyHHMMSS');
 jini=jini+2;
 % Day of year

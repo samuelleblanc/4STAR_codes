@@ -3,6 +3,9 @@ function [Aind, Bind] = nearest(A,B,nearby);
 % Returns the unique set of one-to-one paired indices having least
 % separation. That is, the points identified by Aind and Bind represent
 % matched pairs from A and B which are closest to one another.
+% Allows optional parameter 'nearby' to preclude identifying distantly separated
+% points as though nearby. Points separated by more than the distance
+% supplied in "nearby" will be excluded.
 
 % Idea is to use interp1('nearest','extrap') to first identify nearest points.  
 % This may yield repeats, so follow it with unique and then another interp1

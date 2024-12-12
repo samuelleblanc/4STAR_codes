@@ -10,7 +10,8 @@ function [fullpath] = getnamedpath(pathfile,dialog)
 % 2017-03-21, CJF: Modified for robustness. Potential replacement for starpaths
 % 2017-08-05, CJF: Handle alternate forms for argument "reset"
 % 2017-12-05, CJF: Removing 'RESET' argument
-version_set('1.1'); 
+% 2022-10-27, SL: v1.2, Added handling of paths for network connected folders
+version_set('1.2'); 
 
 % Handle missing "dialog" argument
 if ~exist('dialog','var')||isempty(dialog)
@@ -87,6 +88,9 @@ pname = setnamedpath(pathfile,[],dialog);
 end
 
 pname = [pname,filesep]; 
-fullpath = strrep(pname,[filesep filesep],filesep);
+ifileseps = strfind(pname,[filesep filesep]); 
+pname = strrep(pname,[filesep filesep], filesep);
+if any(ifileseps<2), pname = [filesep, pname]; end %for any leading double // for network attached drives
+fullpath = pname;
 
 return

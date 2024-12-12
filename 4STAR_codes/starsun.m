@@ -23,7 +23,9 @@ function [savematfile, contents]=starsun(varargin)
 %                           exact properties of runs. Similar to starzen
 % Samuel, v1.2, 2016/02/17, made the program version be concatenation of
 %                           saved mat files and new version_set values.
-version_set('1.2');
+% Samuel, v1.3, 2021/04/01, Changed the saved mat file version to v7.3, to
+%                           support larger files.
+version_set('1.3');
 %********************
 % regulate input and read source
 %********************
@@ -67,12 +69,12 @@ end;
 
 %% Change the types of variables to make smaller variables
 if ~isfield(s.toggle, 'reduce_variable_size'); 
-    if s.toggle.verbose; disp('reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
+    if s.toggle.verbose; disp('...reduce_variable_size not set in toggle; update the update_toggle function, defaulting to true'), end;
     s.toggle.reduce_variable_size = true;
 end;
 
 if s.toggle.reduce_variable_size;
-  if s.toggle.verbose; disp('Reducing the variable precision for smaller starsun file size'), end;
+  if s.toggle.verbose; disp('...Reducing the variable precision for smaller starsun file size'), end;
   s = make_starsun_single(s);
 end;
 
@@ -84,7 +86,16 @@ if exist('program_version','var');
 end;
 tic; make_small(s, savematfile);toc
 tic; make_for_starflag(s, savematfile);toc
-disp(['Saving: ',savematfile])
-tic; save([getnamedpath('starsun'),savematfile], '-struct', 's', '-mat');toc
+
+tic; 
+pathparts = strsplit(savematfile,filesep);
+if length(pathparts)>1
+    disp(['Saving: ',savematfile])
+    save(savematfile,'-struct','s','-mat','-v7.3' );
+else
+    disp(['Saving: ',fullfile(getnamedpath('starsun'),savematfile)])
+    save(fullfile(getnamedpath('starsun'),savematfile),'-struct','s','-mat','-v7.3' );
+end
+toc
 
 contents=[contents; fieldnames(s)];

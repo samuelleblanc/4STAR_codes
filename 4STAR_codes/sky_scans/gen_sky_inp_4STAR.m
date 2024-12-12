@@ -22,16 +22,16 @@ if isfield(star.toggle,'sky_rad_scale')
 else
     star.rad_scale = 1;
 end
-
 if isfield(star,'rad')
     sat_rad = star.rad_scale .* star.rad;
 elseif isfield(star,'skyrad')
     sat_rad = star.rad_scale .* star.skyrad;
-end
-    
+end    
 sat_rad(star.sat_ij) = NaN;
-% sat_rad(star.sat_ij) = NaN;
 sat_rad = sat_rad(:,star.wl_ii);
+if ~all(size(sat_rad)==size(star.skymask)) && size(star.skymask,2)==length(star.w)
+    star.skymask = star.skymask(:,star.wl_ii);
+end
 % skymask should permit screening SA independent of WL
 if isfield(star,'skymask')
     sat_rad = sat_rad.*star.skymask;
@@ -577,7 +577,10 @@ else
         tag = [tag, sprintf('lv%2.0d',star.anet_level.*10)];
     end
     if isfield(star.toggle, 'sky_tag')&&~isempty(star.toggle.sky_tag)
-        tag = [tag, deblank(star.toggle.sky_tag)];
+        sky_tag = star.toggle.sky_tag; 
+        if iscell(sky_tag) sky_tag = sky_tag{:};end
+            
+        tag = [tag, deblank(sky_tag)];
     end
     % fid = fopen([pname_tagged,fname_tagged],'w');
     fid = fopen([pname_inp,tag,'.input'],'w');

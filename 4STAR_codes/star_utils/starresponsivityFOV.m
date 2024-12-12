@@ -24,6 +24,10 @@ if t>datenum([2016 8 1 0 0 0]); %ORACLES
     daystr = '20160923';
     fova_filen=3; % filenumber of 15
     fovp_filen=1; % filenumber of 11
+elseif t>datenum([2016 4 15 0 0 0]);% FOV for SARP/KORUS-AQ
+    daystr = '20160923';
+    fova_filen=3; % filenumber of 15
+    fovp_filen=1; % filenumber of 11
 elseif t>datenum([2013 7 16 0 0 0]); % SEAC4RS. NAAMES #1 data processing relies on this FOV too. More notes below.
     daystr='20130805';
     fova_filen=13; % file number for almucantar FOV
@@ -44,11 +48,21 @@ elseif t>datenum([2012 10 3 0 0 0]); % before 2012/10/03 there was no tracking e
     fovp_filen=17; % file number for principal plane FOV
 end;
     case {'4STARB'}
-        warning('4STARB FOV not yet implemented, using recent 4STAR')
-        daystr = '20160923';
-        fova_filen=3; % filenumber of 15
-        fovp_filen=1; % filenumber of 11
-        instrumentname = '4STAR';
+        if t>datenum([2024 6 27 0 0 0]); %AirSHARP post fiber clamping
+            daystr = '20240627';
+            fova_filen=1; % filenumber of 09
+            fovp_filen=1; % filenumber of 08
+        elseif t>datenum([2022 4 18 0 0 0]); %SaSa
+            daystr = '20220418';
+            fova_filen=1; % filenumber of 05
+            fovp_filen=2; % filenumber of 04
+        else
+            warning('4STARB FOV not yet implemented, using recent 4STAR')
+            daystr = '20160923';
+            fova_filen=3; % filenumber of 15
+            fovp_filen=1; % filenumber of 11
+            instrumentname = '4STAR';
+        end
     case {'2STAR'}
         warning('2STAR FOV not yet implemented, using recent modified 4STAR')
         daystr = '20160923';
@@ -57,15 +71,15 @@ end;
 end; %switch instrumentname
 % load FOV data
 %if t>datenum([2016 6 15 0 0 0]);% FOV for SARP/KORUS-AQ
-if t>datenum([2016 4 15 0 0 0]);% FOV for SARP/KORUS-AQ
-    daystr = '20160923';
-    fova_filen=3; % filenumber of 15
-    fovp_filen=1; % filenumber of 11
+if t>datenum([2016 4 15 0 0 0]);% FOV for when multiple instruments are used (post SARP/KORUS-AQ)
+%     daystr = '20160923';
+%     fova_filen=3; % filenumber of 15
+%     fovp_filen=1; % filenumber of 11
     load(which([instrumentname '_' daystr 'starfov.mat']));
 else
 %     daystr = '20160923';
-    fova_filen=3; % filenumber of 15
-    fovp_filen=1; % filenumber of 11
+%     fova_filen=3; % filenumber of 15
+%     fovp_filen=1; % filenumber of 11
     load(which( [daystr 'starfov.mat']));
 end;
 

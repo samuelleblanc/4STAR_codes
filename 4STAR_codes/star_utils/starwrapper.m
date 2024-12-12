@@ -105,8 +105,10 @@ function	s=starwrapper(s, s2, toggle, varargin)
 % toggle was being set, and added logic to set toggle.applyforjcorr to
 % false if 2STAR, 4STARB, or forj measurement
 % SL: v3.3, 2018-11-16, Added loading of predefined starflag file if there, to avoid multiple auto starflag files
+% SL: v3.4, 2020-10-05, Added check if 4STARB to disable water vapor and trace gas retrieval
+% SL: v3.5, 2022-08-31, Added toggles for separate gas retrieval and water vapor retrievals
 
-version_set('3.3');
+version_set('3.5');
 %********************
 %% prepare for processing
 %********************
@@ -119,7 +121,7 @@ else
 end
 
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle, toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = merge_toggle(s.toggle, toggle);
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -191,7 +193,7 @@ end; % if
 
 %% remerge the toggles and if not created make the s.toggle struct
 if isfield(s, 'toggle')
-   s.toggle = catstruct(s.toggle,toggle); % merge, overwrite s.toggle with toggle
+   s.toggle = merge_toggle(s.toggle, toggle);
    toggle = s.toggle;
 else
    s.toggle = toggle;
@@ -213,10 +215,10 @@ if nargin>=2+nnarg && ~isfield(s2, 'note');
       s2.note = {s2.note};
    end
 end;
-s2.note={};
+if isavar('s2'), s2.note={}; end
 
 %% get data type
-if toggle.verbose; disp('get data types'), end;
+if toggle.verbose; disp('...get data types'), end;
 [daystr, filen, datatype,instrumentname]=starfilenames2daystr(s.filename, 1);s.datatype = datatype;
 s.instrumentname = instrumentname;
 % if 2STAR, 4STARB, or a forj measurement then set applyforjcorr to false.
@@ -232,7 +234,7 @@ end;
 %********************
 %% get additional info specific to this data set
 %********************
-if toggle.verbose; disp('get additional info specific to file'), end;
+if toggle.verbose; disp('...get additional info specific to file'), end;
 s.ng=[]; % variables needed for this code (starwrapper.m).
 s.O3h=[];s.O3col=[];s.NO2col=[]; % variables needed for starsun.m.
 s.sd_aero_crit=0.01; % variable for screening direct sun datanote
@@ -292,12 +294,24 @@ else; % copy an existing old starinfo file and run it
       dayspast=dayspast+1;
       infofile_previous=fullfile(getnamedpath('starinfo'), ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m']);
       if isafile(infofile_previous);
-         copyfile(infofile_previous, infofile_);
-         open(infofile_);
-         eval([infofile_(1:end-2),'(s)']);
-         %run(infofile_);
-         %             eval(['edit ' infofile ';']);
-         %             eval(['run ' infofile ';']);
+         change_starinfo_times(infofile_previous,infofile_,s.t(1),s.t(end));
+         try
+            copyfile(infofile_,fullfile(getnamedpath('starinfo'),infofile_));
+         catch
+            disp(['...Modified starinfo file in folder: ' getnamedpath('starinfo')]) 
+         end
+         try
+             open(infofile_);
+         catch
+             disp(['Unable to open starinfo file for editing, please open and check file: ' infofile_])
+         end
+         infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
+        try
+             s = infofnt(s);
+        catch
+             eval([infofile_(1:end-2),'(s)']);
+         %     s = eval([infofile2,'(s)']);
+        end
          warning([infofile_ ' has been created from ' ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);
          break;
       end;
@@ -320,7 +334,7 @@ end;
 %% add related variables, derive count rate and combine structures
 %********************
 %% include wavelengths in um and flip NIR raw data
-if toggle.verbose; disp('add related variables, count rate and combine structures'), end;
+if toggle.verbose; disp('...add related variables, count rate and combine structures'), end;
 [visw, nirw, visfwhm, nirfwhm, visnote, nirnote]=starwavelengths(nanmean(s.t),instrumentname); % wavelengths
 if ~toggle.lampcalib % choose Langley c0
    [visc0, nirc0, visnotec0, nirnotec0, ~, ~, visaerosolcols, niraerosolcols, visc0err, nirc0err]=starc0(nanmean(s.t),toggle.verbose,instrumentname);     % C0
@@ -418,7 +432,7 @@ else
 end;
 
 %% subtract dark and divide by integration time
-if toggle.verbose; disp('substract darks and divide by integration time'), end;
+if toggle.verbose; disp('...substract darks and divide by integration time (starrate)'), end;
 [s.rate, s.dark, s.darkstd, note]=starrate(s,'bookends',instrumentname);
 
 s.note(end+1,1)={note};
@@ -428,7 +442,7 @@ if nargin>=2+nnarg
 end;
 %sum_isnan=sum(isnan(s.rate(1,:)))
 % combine two structures
-if toggle.verbose; disp('out of starrate, combining two structures'), end;
+if toggle.verbose; disp('...out of starrate, combining two structures'), end;
 drawnow;
 if isavar('s')&&isavar('s2');
    s = combine_star_s_s2(s,s2,toggle);
@@ -472,7 +486,8 @@ end;
 v=datevec(s.t);
 [s.sunaz, s.sunel]=sun(s.Lon, s.Lat,v(:,3), v(:,2), v(:,1), rem(s.t,1)*24,s.Tst+273.15,s.Pst); % Beat's code
 s.sza=90-s.sunel;
-s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code
+s.f=sundist(v(:,3), v(:,2), v(:,1)); % Beat's code, "f" is actually 1/solar_distance^2
+s.soldst_au = sqrt(1./s.f);
 clear v;
 [s.m_ray, s.m_aero, s.m_H2O]=airmasses(s.sza, s.Alt); % note ozone airmass will be computed in starsun.m after O3 height is entered.
 
@@ -496,7 +511,8 @@ course_changed = false(size(s.t));
 course_changed(2:end) = dist_moved(2:end)>0 | diff(s.Headng)~=0 | diff(s.pitch)~=0 | diff(s.roll)~=0;
 if sum(course_changed)>5 && sum(course_changed)./length(course_changed)>0.2
    s.airborne = true;
-   warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   %warning('Change ac_to_gnd_oracles to general ac_to_gnd function')
+   if toggle.verbose; disp('...Using  ac_to_gnd_oracles, for ORACLES and after only'), end;
    [s.Az_gnd, s.El_gnd] = ac_to_gnd_oracles(s.Az_sky, s.El_sky, s.Headng, s.pitch, s.roll);
 else
    s.airborne = false;
@@ -518,7 +534,7 @@ end
 %********************
 %% adjust the count rate
 %********************
-if toggle.verbose; disp('adjusting the count rate'), end;
+if toggle.verbose; disp('...adjusting the count rate'), end;
 % apply forj correction for nearest forj test
 % get correction values
 % set toggle.applyforjcorr to 2 for a two-way correction accounting for
@@ -646,7 +662,7 @@ end; % toggle.doflagging
 % bad altitude data, tr<=0
 
 %********************
-% derive AODs, uncertainties and polynomial fits
+%% derive AODs, uncertainties and polynomial fits
 %********************
 % mode of gas retrieval proc
 % gasmode=menu('Select gas retrieval mode:','1: CWV only','2: PCA, hyperspectral');
@@ -656,6 +672,7 @@ end; % toggle.doflagging
 
 %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
 % derive optical depths by the traditional method
+%% Rayleigh and airmasses
 [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
 [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
 if ~isfield(toggle,'hires_rayleigh');toggle.hires_rayleigh=true;end; % Check if needed to do a hires wavelength resolution rayleigh calculation for accounting for large slit functions
@@ -694,6 +711,18 @@ s.tau_tot_vert(~sun_,:) = NaN;
 
 [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
 
+% trim the tau if only one spectrometer is used
+tau_flds = [{'tau_O3'},{'tau_NO2'},{'tau_O4'},{'tau_CO2_CH4_N2O'},{'tau_CO2_CH4_N2O_abserr'}];
+if qq==512 %nir
+    for k=1:length(tau_flds)
+        s.(tau_flds{k}) = s.(tau_flds{k})(:,1045:end);
+    end
+elseif qq==1044 %vis
+    for k=1:length(tau_flds)
+        s.(tau_flds{k}) = s.(tau_flds{k})(:,1:1044);
+    end
+end
+
 s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
 s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
 s.tau_aero=s.tau_aero_noscreening;
@@ -706,7 +735,7 @@ s.tau_aero=s.tau_aero_noscreening;
 %     if toggle.gassubtract
 tau_O4nir          = s.tau_O4;
 if ~strcmp(instrumentname,'2STAR');
-   tau_O4nir(:,1:1044)=0;
+    if qq>1043, tau_O4nir(:,1:1044)=0; end
 else;
    tau_O4nir(:,1:256)=0;
 end;
@@ -726,38 +755,48 @@ s.tau_tot_vertical(~sun_,:) = NaN;
 
 % water vapor retrieval (940fit+c0 method)
 %-----------------------------------------
-if ~license('test','Optimization_Toolbox'); % check if the opticmization toolbox exists
+if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox exists
    toggle.runwatervapor = false;
    warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
-end;
+end
+if ~isfield(toggle,'check4STARB_nogasretrieval');toggle.check4STARB_nogasretrieval=true;end;
+if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
+    toggle.runwatervapor = false;
+    if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
+end
 if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'))||~isempty(strfind(lower(datatype),'sky'));
-   if toggle.runwatervapor;
-      disp('water vapor retrieval start')
-      [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
-      
-      % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
-      s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
-      
-      if toggle.verbose; disp('water vapor retrieval end'); end;
-      % gases subtractions and o3/no2 conc [in DU] from fit
-      %-----------------------------------------------------
-      if toggle.gassubtract
-         disp('gases subtractions start')
-         [s.gas] = retrieveGases(s);         
-         % subtract derived gasess         
-         s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
+    if toggle.runwatervapor;
+        if toggle.verbose; disp('...water vapor retrieval start'), end;
+        [s.cwv] = cwvcorecalc(s,s.c0mod,model_atmosphere);
+        
+        % create subtracted 940 nm water vapor from AOD (this is nir-o2-o2 sub)
+        s.tau_aero_subtract = real(s.cwv.tau_OD_wvsubtract./repmat(s.m_aero,1,qq));  %m_aero and m_H2O are the same
+        if toggle.verbose; disp('...water vapor retrieval end'), end;
+    end
+    
+    % gases subtractions and o3/no2 conc [in DU] from fit
+    %-----------------------------------------------------
+    if toggle.rungasretrievals
+        if toggle.verbose; disp('...gases retrieval start'), end
+        [s.gas] = retrieveGases(s);
+        if toggle.verbose; disp('...gases retrieval end'), end
+    end
+    % subtract derived gasess
+    if toggle.gassubtract & toggle.rungasretrievals & toggle.runwatervapor
+        if toggle.verbose; disp('...gases subtractions start'), end
+        s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;  %tau_NO2% s.gas.no2.no2OD! temporary until no2 refined
-         %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
-         %                                                s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.ch4OD;%
-         if toggle.verbose; disp('gases subtractions end'); end
-         %s.tau_aero=s.tau_aero_wvsubtract;
-      end;
-      
-   end;
-   tau=real(-log(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % tau, just for the error analysis below
-   warning('Diffuse light correction and its uncertainty (tau_aero_err10) to be amended.');
-   % % % s=rmfield(s, 'rate'); YS 2012/10/09
-   
+        %s.tau_aero_subtract_all = s.tau_aero_subtract - s.gas.o3.o3OD - s.gas.o3.o4OD - s.gas.o3.h2oOD - ...
+        %                                                s.gas.no2.no2OD - s.gas.co2.co2OD - s.gas.co2.ch4OD;%
+        if toggle.verbose; disp('...gases subtractions end'); end
+        %s.tau_aero=s.tau_aero_wvsubtract;
+    end
+    
+
+tau=real(-log(s.rate./repmat(s.f,1,qq)./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % tau, just for the error analysis below
+disp('Diffuse light correction and its uncertainty (tau_aero_err10) to be amended. - currently set to 0');
+% % % s=rmfield(s, 'rate'); YS 2012/10/09
+
    % estimate uncertainties in tau aero - largely inherited from AATS14_MakeAOD_MLO_2011.m
    if toggle.computeerror;
       s.m_err=0.0003.*(s.m_ray/2).^2.2; % expression for dm/m is from Reagan report
@@ -780,7 +819,7 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
       s.track_err=abs(1-s.responsivityFOV);
       s.tau_aero_err9=s.track_err./repmat(s.m_aero,1,qq);
       s.tau_aero_err10=0; % reserved for error associated with diffuse light correction; tau_aero_err10=tau_aero.*runc_F'; %error of diffuse light correction
-      s.tau_aero_err11=s.m_ray./s.m_aero*s.tau_CO2_CH4_N2O_abserr;
+      s.tau_aero_err11=repmat(s.m_ray./s.m_aero,1,qq).*s.tau_CO2_CH4_N2O_abserr;
       if size(s.c0err,1)==1;
          s.tau_aero_err=(s.tau_aero_err1.^2+s.tau_aero_err2.^2+s.tau_aero_err3.^2+s.tau_aero_err4.^2+s.tau_aero_err5.^2+s.tau_aero_err6.^2+s.tau_aero_err7.^2+s.tau_aero_err8.^2+s.tau_aero_err9.^2+s.tau_aero_err10.^2+s.tau_aero_err11.^2).^0.5; % combined uncertianty
       elseif size(s.c0err,1)==2;
@@ -854,10 +893,17 @@ if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'
 %      figure_(2999); plot(s.w, [s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:); gas_od; s.tau_tot_vert(issun_ii,:)-s.tau_ray(issun_ii,:)- gas_od],'-'); legend('tot','gas','aero?');logy;
 %  
    s.w_isubset_for_polyfit = get_wvl_subset(s.t(1),instrumentname);
+   
+   if isfield(s.toggle,'use_last_wl')&& s.toggle.use_last_wl
+       [last_wl.wl_, last_wl.wl_ii, last_wl.sky_wl,last_wl.w_fit_ii] = get_last_wl(s);
+       s.wl_ = last_wl.wl_; s.wl_ii = last_wl.wl_ii; s.w_isubset_for_polyfit= last_wl.w_fit_ii;
+       s.aeronetcols = s.wl_ii;
+   end
+   
    [a2,a1,a0,ang,curvature]=polyfitaod(s.w(s.w_isubset_for_polyfit),s.tau_aero(:,s.w_isubset_for_polyfit)); % polynomial separated into components for historic reasons
    s.tau_aero_polynomial=[a2 a1 a0];
    
-end; % End of sun-specific processing
+end % End of sun-specific processing
 
 if ~isempty(strfind(lower(datatype),'sky'))||~isempty(strfind(lower(datatype),'zen'))||...
       ~isempty(strfind(lower(datatype),'cld')); % if clause added by Yohei, 2012/10/22
@@ -1133,7 +1179,7 @@ if isequal(lower(s.datatype(1:3)), lower(s2.datatype(1:3)))
    error('Two structures must be for separate spectrometers.');
 end;
 % discard the s2 variables for which s has duplicates
-if toggle.verbose, disp('discarding duplicate structures'), end;
+if toggle.verbose, disp('...discarding duplicate structures'), end;
 fn={'Str' 'Md' 'Zn' 'Lat' 'Lon' 'Alt' 'Headng' 'pitch' 'roll' 'Tst' 'Pst' 'RH' 'AZstep' 'Elstep' 'AZ_deg' 'El_deg' 'QdVlr' 'QdVtb' 'QdVtot' 'AZcorr' 'ELcorr'};...
    fn={fn{:} 'Tbox' 'Tprecon' 'RHprecon' 'Tplate' 'sat_time'};
 fnok=[]; % Yohei, 2012/11/27

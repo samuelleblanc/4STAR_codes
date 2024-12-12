@@ -11,6 +11,7 @@ function result = isadir(dirpath)
 %   See also FINFO, MKDIR.
 %   C. Flynn 2018-11-26
 
+
 result = false;
 if ~isempty(dirpath)
     if iscell(dirpath)
@@ -20,8 +21,8 @@ if ~isempty(dirpath)
             result = [isadir(dirpath{1}), isadir(dirpath(2:end))];
         end
     else
-        result = length(dir(dirpath))>=2;
+        result = isempty(findstr(dirpath,'*'))&&isempty(findstr(dirpath,'?'))&&length(dir(dirpath))>=2;
     end
 end
-% result = exist(dirpath,'dir') == 7;
+    % result = exist(dirpath,'dir') == 7;
 return

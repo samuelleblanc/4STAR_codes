@@ -1,6 +1,17 @@
 function TF = isafile(in)
 % Returns TRUE if the contents of "in" matches an existing filename
 % Intended to replace exist(var,'file') usage since it doesn't compile
+% Connor , v1.0, substitute for "isfile" which is now builtin but
+% previously didn't exist.  Use "isafile" for back-compatibility
+% Connor, v1.1, 2020/04/??, Added line 12 with "which" to capture full
+% pathname of a file that exists in the matlab path but was not provided as
+% full-path specified.  
+% Connor, v1.2, 2020/05/03, Removed nexted function "isavar".  Caused
+% problems with version_set to add a static field to function with a nexted
+% function.  
+% Connor, v1.3, 2020/06/03, Modified test of whether supplied name is found
+% in reconstructed name to only test filename+ext.
+version_set('1.2');
 
 TF = false;
 if isavar('in')
@@ -8,16 +19,24 @@ if isavar('in')
     in_ = which(in); if ~isempty(in_); in = in_; end
     out = dir(in);
     if ~isempty(out)
+%%% 10-2020: KP commented this out and replaced it with just
+%%% fileparts(in),filesep in the out assignment below, because out.folder
+%%% didn't want to write after out had been defined by a dir command. This
+%%% may be because 2013b is problematic, but now this works.
+%         if ~isfield(out,'folder') 
+%             out.folder = [fileparts(in),filesep];
+%         end
+%        out = fullfile(fileparts(in),filesep, out.name);
+%        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in));
         if ~isfield(out,'folder')
             out.folder = [fileparts(in),filesep];
         end
         out = fullfile(out.folder, out.name);
-        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in));
+        [~,in_,ex] = fileparts(in);in_ex = [in_ ex];
+        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in_ex));
     end
 end
-    %nested function isavar
-    % This fast version of isavar benefit from knowing the input is a char
-    function TF = isavar(var)
-            TF = ~isempty(who(var));
-    end
 end
+%     function TF = isavar(var)
+%             TF = ~isempty(who(var));
+%     end

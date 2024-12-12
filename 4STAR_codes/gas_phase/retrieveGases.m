@@ -1,4 +1,4 @@
-function [gas] = retrieveGases(s)
+ function [gas] = retrieveGases(s)
 % Syntax: gas = retrieveGases(s)
 %% Details of the function:
 % NAME:
@@ -48,32 +48,41 @@ function [gas] = retrieveGases(s)
  warning('off','MATLAB:rankDeficientMatrix');
  
 %% load cross-sections
-gxs = get_GlobalCrossSections;
+gxs = get_GlobalCrossSections(s.t,s.instrumentname);
 %----------------------------------------------------------------------
 
 
 %% retrieve NO2
 
-if s.toggle.verbose; disp('Starting NO2 gas retrieval'), end
+if s.toggle.verbose; disp('...starting NO2 gas retrieval'), end
  [gas.no2] = retrieveNO2(s,0.460,0.490,1,gxs);
 % gas.no2.no2OD is column OD
 %% retrieve O3
-if s.toggle.verbose; disp('Starting O3 gas retrieval'), end
+if s.toggle.verbose; disp('...starting O3 gas retrieval'), end
 [gas.o3]  = retrieveO3(s,0.490,0.682,1,gxs);
 %  
 % [gas.o3]  = retrieveO3(s,0.550,0.640,1,gxs);
 %----------------------------------------------------------------------
 %% retrieve CO2
-if s.toggle.verbose; disp('Starting CO2 gas retrieval'), end
+if s.toggle.verbose; disp('...starting CO2 gas retrieval'), end
+try
  [gas.co2]  = retrieveCO2(s,1.555,1.630,gxs);
-   
+catch
+    disp('*** Error with CO2 retrievals ***')
+    gas.co2.co2OD = 0.0;
+    gas.co2.ch4OD = 0.0;    
+end
 %% retrieve O2
 %  TBD
 
 %% retrieve HCOH
-if s.toggle.verbose; disp('Starting HCOH gas retrieval'), end
+if s.toggle.verbose; disp('...starting HCOH gas retrieval'), end
+%try
  [gas.hcoh] = retrieveHCOH(s,0.335,0.359,1,gxs);
- 
+% catch
+%    disp('*** Error with Formaldehyde retrievals ***')
+%    gas.hcoh = NaN;
+%end
  %% Check gases
 %           s.tau_aero_subtract_all = s.tau_aero_subtract -s.gas.o3.o3OD -s.gas.o3.o4OD -s.gas.o3.h2oOD  ...
 %             -s.tau_NO2 -s.gas.co2.co2OD -s.gas.co2.ch4OD;
@@ -86,14 +95,19 @@ gas.no2; gas.o3; gas.co2; gas.hcoh;
    Loschmidt          = 2.686763e19; %molecules/cm2
    d.no2_molec_cm2    = gas.no2.no2_molec_cm2;%gas.no2.no2DU*(Loschmidt/1000);
    d.no2err_molec_cm2 = gas.no2.no2resi;%gas.no2.no2resiDU*(Loschmidt/1000);
-   d.no2DU            = d.no2_molec_cm2/(Loschmidt/1000);
+   d.no2DU            = d.no2_molec_cm2/(Loschmidt/100);
    d.no2resiDU        = gas.no2.no2resi;
    d.o3DU             = gas.o3.o3DU;
    d.o3resiDU         = gas.o3.o3resiDU;
    d.hcoh_DU          = gas.hcoh.hcoh_DU;
    d.hcohresi         = gas.hcoh.hcohresi;
-   d.cwv              = s.cwv.cwv940m1;
-   d.cwv_std          = s.cwv.cwv940m1std;
+   try
+    d.cwv              = s.cwv.cwv940m1;
+    d.cwv_std          = s.cwv.cwv940m1std;
+   catch
+    d.cwv              = gas.o3.o3DU .*NaN;
+    d.cwv_std          = gas.o3.o3DU .*NaN;
+   end
    d.lat              = s.Lat;
    d.lon              = s.Lon;
    d.alt              = s.Alt;
@@ -105,8 +119,9 @@ gas.no2; gas.o3; gas.co2; gas.hcoh;
    d.tUTC             = serial2Hh(s.t);
    
   
-   fi = strcat(datestr(s.t(1),'yyyymmdd'),'_gas_summary.mat');
-   save([starpaths fi],'-struct','d');
+   fi = strcat(s.instrumentname,'_',datestr(s.t(1),'yyyymmdd'),'_gas_summary.mat');
+   if s.toggle.verbose; disp(['...saving gas summary file to: ' getnamedpath('gas_summary') fi]), end
+   save([getnamedpath('gas_summary') fi],'-struct','d');
    
   
 %---------------------------------------------------------------------

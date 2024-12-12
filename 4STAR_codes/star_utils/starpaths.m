@@ -41,8 +41,9 @@ function [matfolder, figurefolder, askforsourcefolder, author]=starpaths(source,
 % Modified (v2.0) by Connor, replaced user-dependent paths with getnamedpath. 
 %            The author logic should probably be moved out of starpaths.
 % Modified (v2.1) by Connor, added reset boolean as trailing argument.
+% v2.2, 2020-05-04, Connor: replaced author list with call to "get_starauthor"
 %---------------------------------------------------------------------
-version_set('2.1');
+version_set('2.2');
 
 % get the version of matlab
 vv = version('-release');
@@ -59,36 +60,39 @@ else
    getnamedpath('starsun', 'Select the location for starsun mat-file...');
    figurefolder=getnamedpath('starfig','4STAR image files.'); 
 end
-if ~isempty(strfind(lower(userpath),'msegalro')); %
-    askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
-    author='Michal';
-elseif ~isempty(strfind(lower(userpath),'meloe'));
-    author='Meloe';
-elseif ~isempty(strfind(lower(userpath),'qin'));
-    author='Qin';
-elseif ~isempty(strfind(lower(userpath),'d3k014')) || ~isempty(strfind(lower(userpath),'connor')) 
-    author='Connor';
-elseif ~isempty(strfind(lower(userpath),'jredeman'));
-    author='Jens';
-elseif ~isempty(strfind(lower(userpath),'livings'));
-    author='John';
-elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
-    author='Yohei';
-elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
-    author='Yohei';
-elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')); % Sam's laptop
-    author='Samuel';
-elseif ~isempty(strfind(lower(userpath),'sleblan2'))
-    author='Samuel';
-elseif ~isempty(strfind(lower(getenv('USER')),'sleblan2')) % for running on pleiades
-    author='Samuel';
-elseif ~isempty(strfind(lower(userpath),'kpistone'))
-    author='Kristina';
-elseif ~isempty(strfind(lower(userpath), 'loganm818'))
-    author='Logan';
-else
-    warning('Update starpaths.m');
-    author='anon_star_user';
-end;
+
+
+% Add new authors in "get_starauthor" function.
+[author, askforsourcefolder] = get_starauthor;
+
+% if ~isempty(strfind(lower(userpath),'msegalro')); %
+%     askforsourcefolder=1; % in allstarmat.m, ask for a folder first; if that request is canceled, ask for files.
+%     author='Michal';
+% elseif ~isempty(strfind(lower(userpath),'meloe'));
+%     author='Meloe';
+% elseif ~isempty(strfind(lower(userpath),'qin'));
+%     author='Qin';
+% elseif ~isempty(strfind(lower(userpath),'d3k014')) || ~isempty(strfind(lower(userpath),'connor')) 
+%     author='Connor';
+% elseif ~isempty(strfind(lower(userpath),'jredeman'));
+%     author='Jens';
+% elseif ~isempty(strfind(lower(userpath),'livings'));
+%     author='John';
+% elseif ~isempty(strfind(lower(userpath),'ys')) || ~isempty(strfind(lower(userpath),'yohei'))
+%     author='Yohei';
+% elseif ~isempty(strfind(lower(userpath),'yohei')); % Yohei's laptop
+%     author='Yohei';
+%elseif ~isempty(strfind(lower(userpath),'samuel')) || ~isempty(strfind(lower(userpath),'sleblanc')) || ...
+%        ~isempty(strfind(lower(userpath),'sleblan2')) || ~isempty(strfind(lower(getenv('USER')),'sleblan2')) ||  ~isempty(strfind(lower(userpath),'lebla')) % Sam's laptop
+%    author='Samuel';
+% elseif ~isempty(strfind(lower(userpath),'kpistone'))
+%     author='Kristina';
+% elseif ~isempty(strfind(lower(userpath), 'logan'))
+%     author='Logan';
+% else
+%     warning('Update starpaths.m');
+%     author='anon_star_user';
+% end;
+
 
 return

@@ -133,8 +133,15 @@ dynamicDateTicks;
 xlabel('Time')
 ylabel('Rate at 500 nm [cts/ms]');
 title([daystr ' - Dirty to clean LED lamp measurements'])
-save_fig(figtdirt,[p filesep daystr '_dirty_clean_time'],ask_to_save_fig);
-saved_fig_path = [p filesep daystr '_dirty_clean_time.png'];
+if isfolder([getnamedpath('starfig') instrumentname '_' daystr])
+    mkdir([apname instrumentname '_' daystr]);
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];
+else
+    apname = [getnamedpath('starfig') instrumentname '_' daystr filesep];    
+end
+
+save_fig(figtdirt,[apname instrumentname '_' daystr '_dirty_clean_time'],ask_to_save_fig);
+saved_fig_path = [apname insrumentname '_' daystr '_dirty_clean_time.png'];
 
 %% Now plot the appropriate spectra
 %startup_plotting
@@ -219,8 +226,8 @@ plot(s1.w,sdirty.mean-sdirty.stdev,'r--',...
  xlim([0.4,0.8]);
  set(figdirt,'units','points','position',[50,100,700,700])
  
- save_fig(figdirt,[p filesep daystr '_dirty_clean_spc'],ask_to_save_fig);
- saved_fig_path = [{saved_fig_path} ; {[p filesep daystr '_dirty_clean_spc.png']}];
+ save_fig(figdirt,[apname instrumentname '_' daystr '_dirty_clean_spc'],ask_to_save_fig);
+ saved_fig_path = [{saved_fig_path} ; {[apname instrumentname '_' daystr '_dirty_clean_spc.png']}];
  
 % if nargin > 1; stophere, end;
 % savefile=[dir 'ARISE_' flightnum '_stardirty.mat'];
