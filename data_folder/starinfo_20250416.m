@@ -12,7 +12,7 @@ end
 s.ground = [datenum(2025,04,16,21,01,46) datenum(2025,04,17,01,11,09)];
 %s.flight = [datenum(2024,10,30,18,16,28) datenum(2024,10,30,19,42,36)];
 s.loose_aeronet_comparison = true;
-%s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
+s.langley1 = [datenum(2025,04,16,22,51,46) datenum(2025,04,17,00,35,09)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
 %s.aeronet_valid_time = [datenum(2024,10,30,18,44,30) datenum(2024,10,30,19,42,15)];
