@@ -89,6 +89,7 @@ else
     [pth,fstem,ext] = fileparts(fspec);
     fspec = [fstem,ext];
     if ~ispc; disp(dialog); end
+
     if isadir(pth)
         [fname,pname] = uigetfile([pth,filesep,fspec],dialog,'multiselect','on');
     elseif isadir(pname)

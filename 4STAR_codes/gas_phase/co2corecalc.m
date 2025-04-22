@@ -43,7 +43,7 @@ for i = suns
  
        % check spectrum validity for conversion
        ypos = logical(y>=0); ylarge = logical(y>=2);
-       if ~isNaN(y(1)) && isreal(y) && sum(ypos)>length(wln)-15 && sum(ylarge)<10 && sum(isinf(y))==0
+       if ~isNaN(y(1)) && isreal(y) && sum(ypos)>length(wln)-20 && sum(ylarge)<10 && sum(isinf(y))==0
           
             [U_,fval,exitflag,output]  = fmincon('CH4CO2resi',x0,[],[],[],[],lb,ub, [], options, meas,PAR);
             

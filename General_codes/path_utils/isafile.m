@@ -19,6 +19,15 @@ if isavar('in')
     in_ = which(in); if ~isempty(in_); in = in_; end
     out = dir(in);
     if ~isempty(out)
+%%% 10-2020: KP commented this out and replaced it with just
+%%% fileparts(in),filesep in the out assignment below, because out.folder
+%%% didn't want to write after out had been defined by a dir command. This
+%%% may be because 2013b is problematic, but now this works.
+%         if ~isfield(out,'folder') 
+%             out.folder = [fileparts(in),filesep];
+%         end
+%        out = fullfile(fileparts(in),filesep, out.name);
+%        TF =  ~isadir(in)&&~isempty(out)&&~isempty(strfind(out,in));
         if ~isfield(out,'folder')
             out.folder = [fileparts(in),filesep];
         end

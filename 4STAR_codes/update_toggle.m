@@ -12,12 +12,12 @@ toggle_out.subsetting_Tint = true;
 toggle_out.pca_filter = false;
 toggle_out.verbose=true;
 toggle_out.saveadditionalvariables=true;
-toggle_out.savefigure=false;
+toggle_out.savefigure=true;
 toggle_out.computeerror=true;
 toggle_out.inspectresults=false;
 toggle_out.applynonlinearcorr=true;
 toggle_out.applytempcorr=false;% true is for SEAC4RS data
-toggle_out.gassubtract = true;
+toggle_out.gassubtract = true; %false; %false = 4STARB for now, right?  %
 toggle_out.booleanflagging = false; % for running any Yohei style flagging
 toggle_out.starflag_mode = 1; % for starflag, mode=1 for automatic, mode=2 for in-depth 'manual'
 toggle_out.flagging = toggle_out.starflag_mode; % Defunct but kept for old codes
