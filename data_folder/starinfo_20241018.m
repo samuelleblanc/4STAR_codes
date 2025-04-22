@@ -57,7 +57,7 @@ if isfield(s,'instrumentname')
      %   s.langley1 = [datenum(2019,09,27,13,30,30) datenum(2019,09,27,17,10,30)];
     %             s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)];
     %             % flags
-    %             s.flagfilename     = '20170831_starflag_man_created20180512_1333by_KP.mat'; 
+                 s.flagfilename     = '20241018_starflag_man_created20241203_1623by_SL.mat'; 
     %             s.flagfilenameCWV  = '20170831_starflag_CWV_man_created20170903_0109by_MS.mat';
     %             s.flagfilenameO3   = '20170831_starflag_O3_man_created20170903_0136by_MS.mat';
     %             s.flagfilenameNO2  = '20170831_starflag_NO2_man_created20170903_0147by_MS.mat';
@@ -67,7 +67,7 @@ end
 % window deposition
 %s.AODuncert_constant_extra = 0.02;
 % load ict MetNav data from Twin Otter ict
-s.NavMetfile = 'AirSHARP-MetNav_1Hz_CIRPAS-TO_20241018_RA.ict';
+s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20241018_R0.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
 if isfield(s, 'Pst') 
     s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
