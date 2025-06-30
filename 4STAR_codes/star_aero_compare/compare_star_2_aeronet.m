@@ -1,4 +1,4 @@
-function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparison,valid_time);
+function fig_paths = compare_star_2_aeronet(fname_starsun,loose_aeronet_comparison,valid_time,suffix);
 %% PURPOSE:
 %   Compare the 4STAR aod values to a cimel aeronet v1.5 ground site. 
 %
@@ -48,6 +48,7 @@ if nargin<1;
         return
     end
     fname_starsun = [pname file];
+    suffix = '';
 end
 disp(['Loading the matlab file: ' fname_starsun])
 [daystr, filen, datatype, instrumentname]=starfilenames2daystr({fname_starsun});
@@ -147,6 +148,7 @@ ia = iidat;
 
 if length(it)<1;
     warning('No good 4STAR data found to compare, please reevaluate the filtering in compare_star_2_aeronet.m')
+    return
 end
 %% match aeronet wvls to 4STAR's
 wvls = a.wlen(a.anywlen==1);
@@ -156,6 +158,11 @@ for n=1:length(wvls);
     [nul,in] = min(abs(wvls(n)-w*1000.0));
     iw(n) = in;
 end;
+
+%% update the daystr name with suffix
+if length(suffix)>0
+    daystr = [daystr '_' suffix]
+end
 
 %%%%%%%%%%%%%%
 %% plot the time trace output and correlate
@@ -395,7 +402,11 @@ save_fig(gcf(),fname,0);
 fig_paths = [fig_paths; [fname '.png']];
 
 %% Save the c0s to new file.
-filesuffix=[instrumentname '_AODmatch_toAERONET' '_from' a.location]; %_loglogquad';
+%if length(suffix)>0
+%    filesuffix=['_v' suffix '_' instrumentname '_AODmatch_toAERONET' '_from' a.location ]; %_loglogquad';
+%else
+    filesuffix=[instrumentname '_AODmatch_toAERONET' '_from' a.location]; %_loglogquad';%
+%end
 additionalnotes={['Data C0 built to match AOD from ' instrumentname ' to AERONET spline fit for ' a.location ' within ' ...
     num2str(max_alt_diff,'%.0f') ' m [Alt] and ' num2str(max_seconds_diff,'%.0f') ' seconds, measured on ' daystr '.' ...
     ' Using the AERONET file: ' afile ' as input for this comparison. Date of creation: ' datestr(now)]};

@@ -256,16 +256,20 @@ if isafile(infofile_);
       infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
       try
          s = infofnt(s);
+         if isavar('s2'), s2 = infofnt(s2); end
       catch
          eval([infofile_(1:end-2),'(s)']);
+         if isavar('s2'), eval([infofile_(1:end-2),'(s2)']); end
          %     s = eval([infofile2,'(s)']);
       end
    else
       infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
       try
          s = infofnt(s);
+         if isavar('s2'), s2 = infofnt(s2); end
       catch
          eval([infofile_(1:end-2),'(s)']);
+         if isavar('s2'), eval([infofile_(1:end-2),'(s2)']); end
          %     s = eval([infofile2,'(s)']);
       end
    end;
@@ -278,11 +282,13 @@ elseif isafile(infofile2)
    try
       infofnt = str2func(infofile2(1:end-2)); % Use function handle instead of eval for compiler compatibility
       s = infofnt(s);
+      if isavar('s2'), s2 = infofnt(s2); end
    catch
       disp('*Problem with executing as script, converting to starinfo function*')
       modify_starinfo(which(infofile2));
       infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
       s = infofnt(s);
+      if isavar('s2'), s2 = infofnt(s2); end
    end
    %     s = eval([infofile2,'(s)']);
 elseif isafile(infofile)
@@ -308,8 +314,10 @@ else; % copy an existing old starinfo file and run it
          infofnt = str2func(infofile_(1:end-2)); % Use function handle instead of eval for compiler compatibility
         try
              s = infofnt(s);
+             if isavar('s2'), s2 = infofnt(s2); end
         catch
              eval([infofile_(1:end-2),'(s)']);
+             if isavar('s2'), eval([infofile_(1:end-2),'(s2)']); end
          %     s = eval([infofile2,'(s)']);
         end
          warning([infofile_ ' has been created from ' ['starinfo_' datestr(datenum(daystr, 'yyyymmdd')-dayspast, 'yyyymmdd') '.m'] '. Inspect it and add notes specific to the measurements of the day, for future data users.']);

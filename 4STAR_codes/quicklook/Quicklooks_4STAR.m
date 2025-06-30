@@ -191,7 +191,6 @@ if plotting_langley_first
   end
 end
 
-
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
 %% call the gas 'gas'/'cwv' if does not exist in starsun
 if isfield(s,'gas') && isfield(s,'cwv')
@@ -308,6 +307,20 @@ fld = {fld{~ifld}};
 fld = {fld{strcmp(fld,'vis_sun')},fld{strcmp(fld,'vis_zen')},fld{~strcmp(fld,'vis_sun')&~strcmp(fld,'vis_zen')}}; % sun and then zen on first positions;
 fld_marks = '.+>^<vopx';
 cls = 'krgbcmy';
+
+%% Check if navmet interpolation is needed
+if isfield(s,'NavMetfile')
+    for ii = 2:length(fld)
+        if length(st.(fld{ii}))>1
+            try
+                st.(fld{ii}) = interpol_MetNav(st.(fld{ii}),[getnamedpath('stardat'),s.NavMetfile]);
+            catch
+                disp('error with interpol_MetNav')
+            end
+        end
+    end
+end
+
 
 %********************
 %% Plot the housekeeping data

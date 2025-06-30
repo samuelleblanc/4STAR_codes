@@ -9,25 +9,26 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.ground = [datenum(2025,04,21,19,06,22) datenum(2025,04,21,22,29,26)];
-s.flight = [datenum(2024,10,30,18,16,28) datenum(2024,10,30,19,42,36)];
+s.ground = [datenum(2025,05,09,16,14,55) datenum(2025,05,09,21,33,07)];
+s.flight = [datenum(2025,05,09,16,14,55) datenum(2025,05,09,21,33,07)];
 s.loose_aeronet_comparison = true;
 %s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-%s.aeronet_valid_time = [datenum(2024,10,30,18,44,30) datenum(2024,10,30,19,42,15)];
-s.sd_aero_crit=0.008;  
+s.aeronet_valid_time = [[datenum(2025,05,09,16,49,30) datenum(2025,05,09,17,06,52)],
+			[datenum(2025,05,09,17,16,10) datenum(2025,05,09,17,20,15)],
+			[datenum(2025,05,09,21,21,10) datenum(2025,05,09,21,30,07)]]
+s.sd_aero_crit=0.003;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.276; %From SUOMI NPP / OMPS over Ames
+s.O3col=0.307; %From SUOMI NPP / OMPS over Monterey Bay
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=0.102 % from TEMPO tropospheric NO2 in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
+s.NO2col=0.118 % from TEMPO tropospheric NO2 in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
-% s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
-%s.flight = [datenum(2020,07,08,11,00,00) datenum(2020,07,08,23,30,30)];
+s.flagfilename     = '20250509_starflag_man_created20250512_1519by_SL.mat';
 if isfield(s,'instrumentname')
     if(strcmp(s.instrumentname,'4STAR'))
 %         s.t_hg_ar_lamp = [datenum(2022,5,7,19,20,30),datenum(2022,5,7,19,25,30)];
@@ -65,10 +66,14 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
-%s.AODuncert_constant_extra = 0.02;
+s.AODuncert_constant_extra = 0.02;
 % load ict MetNav data from Twin Otter ict
-%s.NavMetfile = 'AirSHARP-MetNav_CIRPAS-TO_20241012_RA.ict';
-%s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250509_RA.ict';
+try
+	s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+catch
+	disp('error with interpol_MetNav')
+end
 if isfield(s, 'Pst') 
     %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
     s.Pst(find(s.Pst<10))=1013; %for Marina Airport

@@ -41,12 +41,12 @@ elseif isfield(flag,'before_or_after_flight');
     end
     qual_flag = bitor(flag.before_or_after_flight,flag.bad_aod);
     try
-        qual_flag = bitor(qual_flag,flag.cirrus);
-        qual_flag = bitor(qual_flag,flag.frost);
-        qual_flag = bitor(qual_flag,flag.low_cloud);
-        qual_flag = bitor(qual_flag,flag.unspecified_clouds);
+        if isfield(flag,'cirrus') & size(flag.cirrus)>1; qual_flag = bitor(qual_flag,flag.cirrus); end;
+        if isfield(flag,'frost') & size(flag.frost)>1;qual_flag = bitor(qual_flag,flag.frost); end;
+        if isfield(flag,'low_cloud') & size(flag.low_cloud)>1;qual_flag = bitor(qual_flag,flag.low_cloud); end;
+        if isfield(flag,'unspecified_clouds') & size(flag.unspecified_clouds)>1;qual_flag = bitor(qual_flag,flag.unspecified_clouds); end;
     catch
-        disp('No flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
+        disp('Error with flags for cirrus, frost, low_cloud, or unsecified_clouds found, Keep moving on')
     end
 elseif isfield(flag,'screened')
     flag_tags = [1  ,2 ,3,10,90,100,200,300,400,500,600,700,800,900,1000];
