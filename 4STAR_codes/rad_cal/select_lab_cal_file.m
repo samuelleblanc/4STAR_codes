@@ -207,6 +207,29 @@ elseif strcmp(date,'20240521') && strcmp(instrumentname,'4STARB');
         end
         pp='ZEN';
         date='20240521';
+elseif strcmp(date,'20250626') && strcmp(instrumentname,'4STARB');
+        switch ll
+            case 12
+                fnum = '003';
+            case 11
+                fnum = '004';
+            case 10
+                fnum = '005';
+            case 9
+                fnum = '007';
+            case 6
+                fnum = '008';
+            case 3
+                fnum = '009';
+            case 2
+                fnum = '';
+            case 1
+                fnum = '011';
+            case 0
+                fnum = '012';
+        end
+        pp='ZEN';
+        date='20250626';
 else
     disp('problem! date not recongnised *** Update select_lab_cal_file ***')
 end

@@ -44,7 +44,7 @@
 function rad_cal=analysis_cal_rad
 startup_plotting
 version_set('1.3');
-instrumentname = '4STAR';
+instrumentname = '4STARB';
 
 %get response function calibration file
 [file pname fi]=uigetfile2('*.mat','Find calibration files .mat');
@@ -59,7 +59,8 @@ instrumentname = '4STAR';
 date = '20160330';
 date = '20170620';
 date = '20171102';
-date = '20240521'
+date = '20240521';
+date = '20250626'
 
 disp(['Loading the matlab file: ' pname file])
 disp(['for Date: ' date])
@@ -251,6 +252,15 @@ elseif date == '20240521';
         lampstr = 'Lamps_12';
         fnum = '007'; % file number to use : for printing the right file
         st = '014'; %last file analysed
+    end;
+elseif date == '20250626';
+       if strcmp(instrumentname,'4STARB');
+        ll = 9; % select the lamps-12
+        iint_vis = 4; % 12 ms int time
+        iint_nir = 6; % 250 ms int time
+        lampstr = 'Lamps_9';
+        fnum = '007'; % file number to use : for printing the right file
+        st = '011'; %last file analysed
     end;
 else
     ll=1; %select the lamps-9

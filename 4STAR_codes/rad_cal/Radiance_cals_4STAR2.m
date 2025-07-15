@@ -72,15 +72,18 @@ else
     %date='20140716'
     %date='20141024'
     %date = '20150915'
-    date = '20160330'
+    %date = '20160330'
+    date = '20250626'
 end
 docorrection=false; %do nonlinear correction
 
-if ~exist(['C:\Users\sleblan2\Research\4STAR\cal\' date])
+pname_callab = getnamedpath('cal_rad');
+if ~exist(pname_callab)
     pname=uigetdir('C:\','Find folder for calibration files');
 else
-    disp('Using default cal folder:')
-    pname = ['C:\Users\sleblan2\Research\4STAR\cal\' date]
+    disp(['Using default cal folder:' pname_callab])
+    pname = pname_callab
+    %['C:\Users\sleblan2\Research\4STAR\cal\' date]
 end
 
 %% Get instrument used from the available files
@@ -114,7 +117,11 @@ for ll = lamps
     k = k+1;
     lamp_str = ['Lamps_',sprintf('%d',ll)];
     [date fnum pp] = select_lab_cal_file(date,ll,instrumentname);
-    
+    if length(fnum)<1, 
+        cal.(lamp_str).vis.mean_resp = NaN(1044,1);
+        cal.(lamp_str).nir.mean_resp = NaN(512,1);
+        continue
+    end
     %% load the files
     disp(strcat('Getting lamp #',num2str(ll)))
     
@@ -203,7 +210,11 @@ for ll = lamps
         cal.(lamp_str).vis.t_ms(vs) = vis_tints(vs);
         cal.(lamp_str).vis.dark(vs,:) = mean(s.dark(s.visTint==vis_tints(vs),1:1044));
         cal.(lamp_str).vis.light(vs,:) = mean(s.raw(sky&s.visTint==vis_tints(vs),1:1044));
-        cal.(lamp_str).vis.rate(vs,:) = mean(s.rate(sky&s.visTint==vis_tints(vs),1:1044));
+        if any(sky&s.visTint==vis_tints(vs)&~s.sat_time)
+            cal.(lamp_str).vis.rate(vs,:) = mean(s.rate(sky&s.visTint==vis_tints(vs)&~s.sat_time,1:1044));
+        else
+            cal.(lamp_str).vis.rate(vs,:) = mean(s.rate(sky&s.visTint==vis_tints(vs),1:1044))+NaN;
+        end
         cal.(lamp_str).vis.rad = interp1(hiss.nm,hiss.(['lamps_',num2str(ll)]), vis.nm,'linear');
         cal.(lamp_str).vis.resp(vs,:) = cal.(lamp_str).vis.rate(vs,:)./cal.(lamp_str).vis.rad;
     end
@@ -211,7 +222,11 @@ for ll = lamps
         cal.(lamp_str).nir.t_ms(ns) = nir_tints(ns);
         cal.(lamp_str).nir.dark(ns,:) = mean(s.dark(s.nirTint==nir_tints(vs),1045:end));
         cal.(lamp_str).nir.light(ns,:)= mean(s.raw(sky&s.nirTint==nir_tints(vs),1045:end));
-        cal.(lamp_str).nir.rate(ns,:) = mean(s.rate(sky&s.nirTint==nir_tints(vs),1045:end));
+        if any(sky&s.nirTint==nir_tints(vs)&~s.sat_time)
+            cal.(lamp_str).nir.rate(ns,:) = mean(s.rate(sky&s.nirTint==nir_tints(vs)&~s.sat_time,1045:end));
+        else
+            cal.(lamp_str).nir.rate(ns,:) = mean(s.rate(sky&s.nirTint==nir_tints(vs)&~s.sat_time,1045:end))+NaN;
+        end
         cal.(lamp_str).nir.rad = interp1(hiss.nm,hiss.(['lamps_',num2str(ll)]), nir.nm,'linear');
         cal.(lamp_str).nir.resp(ns,:) = cal.(lamp_str).nir.rate(ns,:)./cal.(lamp_str).nir.rad;
     end

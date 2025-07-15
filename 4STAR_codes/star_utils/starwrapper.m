@@ -681,6 +681,7 @@ end; % toggle.doflagging
 %if ~isempty(strmatch('sun', lower(datatype(end-2:end)))) || ~isempty(strmatch('forj', lower(datatype(end-3:end)))) || ~isempty(strmatch('sky', lower(datatype(end-2:end)))); % not for FOV, ZEN, PARK data
 % derive optical depths by the traditional method
 %% Rayleigh and airmasses
+if ~isfield(s,'O3h'), disp('... not O3h subfield - using default 21km'), s.O3h=21; end
 [s.m_ray, s.m_aero, s.m_H2O, s.m_O3, s.m_NO2]=airmasses(s.sza, s.Alt, s.O3h); % airmass for O3
 [s.tau_ray, s.tau_r_err]=rayleighez(s.w,s.Pst,s.t,s.Lat); % Rayleigh
 if ~isfield(toggle,'hires_rayleigh');toggle.hires_rayleigh=true;end; % Check if needed to do a hires wavelength resolution rayleigh calculation for accounting for large slit functions
@@ -716,61 +717,63 @@ s.tau_tot_vert = tau_noray_vert + s.tau_ray; % This is really a "total" vertical
 
 sun_ = s.Zn==0&s.Str==1; 
 s.tau_tot_vert(~sun_,:) = NaN;
+if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'sky'))
+    
+    [cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
 
-[cross_sections, s.tau_O3, s.tau_NO2, s.tau_O4, s.tau_CO2_CH4_N2O, s.tau_O3_err, s.tau_NO2_err, s.tau_O4_err, s.tau_CO2_CH4_N2O_abserr]=taugases(s.t, 'SUN', s.Alt, s.Pst, s.Lat, s.Lon, s.O3col, s.NO2col,instrumentname); % gases
-
-% trim the tau if only one spectrometer is used
-tau_flds = [{'tau_O3'},{'tau_NO2'},{'tau_O4'},{'tau_CO2_CH4_N2O'},{'tau_CO2_CH4_N2O_abserr'}];
-if qq==512 %nir
-    for k=1:length(tau_flds)
-        s.(tau_flds{k}) = s.(tau_flds{k})(:,1045:end);
+    % trim the tau if only one spectrometer is used
+    tau_flds = [{'tau_O3'},{'tau_NO2'},{'tau_O4'},{'tau_CO2_CH4_N2O'},{'tau_CO2_CH4_N2O_abserr'}];
+    if qq==512 %nir
+        for k=1:length(tau_flds)
+            s.(tau_flds{k}) = s.(tau_flds{k})(:,1045:end);
+        end
+    elseif qq==1044 %vis
+        for k=1:length(tau_flds)
+            s.(tau_flds{k}) = s.(tau_flds{k})(:,1:1044);
+        end
     end
-elseif qq==1044 %vis
-    for k=1:length(tau_flds)
-        s.(tau_flds{k}) = s.(tau_flds{k})(:,1:1044);
+
+    s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
+    s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
+    s.tau_aero=s.tau_aero_noscreening;
+    % aerosol optical depth before flags are applied
+
+    s.rateaero(~sun_,:) = NaN;
+    s.tau_aero_noscreening(~sun_,:) = NaN;
+    s.tau_aero=s.tau_aero_noscreening;
+    % total optical depth (Rayleigh subtracted) needed for gas processing
+    %     if toggle.gassubtract
+    tau_O4nir          = s.tau_O4;
+    if ~strcmp(instrumentname,'2STAR');
+        if qq>1043, tau_O4nir(:,1:1044)=0; end
+    else;
+       tau_O4nir(:,1:256)=0;
+    end;
+
+
+    s.rateslant        = real(s.rate./repmat(s.f,1,qq));
+    % Comment from Connor: the fields in following 3 lines aren't really "total" since Rayleigh and O4 are removed
+    % Why remove O4 here? If necessary, perhaps it could be moved within retrieveGases
+    s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
+    s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
+    s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
+
+    s.rateslant(~sun_,:) = NaN;
+    s.ratetot(~sun_,:) = NaN;
+    s.tau_tot_slant(~sun_,:) = NaN;
+    s.tau_tot_vertical(~sun_,:) = NaN;
+
+    % water vapor retrieval (940fit+c0 method)
+    %-----------------------------------------
+    if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox exists
+       toggle.runwatervapor = false;
+       warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
     end
-end
-
-s.rateaero=real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_O3, s.tau_O3)./tr(s.m_NO2, s.tau_NO2)./tr(s.m_ray, s.tau_O4)./tr(s.m_ray, s.tau_CO2_CH4_N2O)); % rate adjusted for the aerosol component
-s.tau_aero_noscreening=real(-log(s.rateaero./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq)); % aerosol optical depth before flags are applied
-s.tau_aero=s.tau_aero_noscreening;
-% aerosol optical depth before flags are applied
-
-s.rateaero(~sun_,:) = NaN;
-s.tau_aero_noscreening(~sun_,:) = NaN;
-s.tau_aero=s.tau_aero_noscreening;
-% total optical depth (Rayleigh subtracted) needed for gas processing
-%     if toggle.gassubtract
-tau_O4nir          = s.tau_O4;
-if ~strcmp(instrumentname,'2STAR');
-    if qq>1043, tau_O4nir(:,1:1044)=0; end
-else;
-   tau_O4nir(:,1:256)=0;
-end;
-
-
-s.rateslant        = real(s.rate./repmat(s.f,1,qq));
-% Comment from Connor: the fields in following 3 lines aren't really "total" since Rayleigh and O4 are removed
-% Why remove O4 here? If necessary, perhaps it could be moved within retrieveGases
-s.ratetot          = real(s.rate./repmat(s.f,1,qq)./tr(s.m_ray, s.tau_ray)./tr(s.m_ray, tau_O4nir));
-s.tau_tot_slant    = real(-log(s.ratetot./repmat(s.c0,pp,1)));
-s.tau_tot_vertical = real(-log(s.ratetot./repmat(s.c0,pp,1))./repmat(s.m_aero,1,qq));
-
-s.rateslant(~sun_,:) = NaN;
-s.ratetot(~sun_,:) = NaN;
-s.tau_tot_slant(~sun_,:) = NaN;
-s.tau_tot_vertical(~sun_,:) = NaN;
-
-% water vapor retrieval (940fit+c0 method)
-%-----------------------------------------
-if ~license('test','Optimization_Toolbox') % check if the opticmization toolbox exists
-   toggle.runwatervapor = false;
-   warning('!!Optimization Toolbox not found!!, running without watervapor and gas retrievals')
-end
-if ~isfield(toggle,'check4STARB_nogasretrieval');toggle.check4STARB_nogasretrieval=true;end;
-if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
-    toggle.runwatervapor = false;
-    if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
+    if ~isfield(toggle,'check4STARB_nogasretrieval');toggle.check4STARB_nogasretrieval=true;end;
+    if toggle.check4STARB_nogasretrieval & strcmp(instrumentname,'4STARB')
+        toggle.runwatervapor = false;
+        if toggle.verbose, disp('4STARB identified, disabling the watervapor and trace gas retrieval'), end;
+    end
 end
 if ~isempty(strfind(lower(datatype),'sun'))|| ~isempty(strfind(lower(datatype),'forj'))||~isempty(strfind(lower(datatype),'sky'));
     if toggle.runwatervapor;
