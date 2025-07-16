@@ -64,6 +64,8 @@ for ll=1:length(cal_names);
             fnum = '015';
   end
   lampstr = cal_names{ll};
+  if ~isfield(cal,lampstr), continue, end
+  if ~isfield(cal.(lampstr).vis,'t_ms'), continue, end
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:),'DisplayName',['VIS ' lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -88,6 +90,7 @@ figure(4);
 subplot(2,1,1);
 for ll=1:length(cal_names);
   lampstr = cal_names{ll};
+  if ~isfield(cal.(lampstr).vis,'t_ms'), continue, end
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:),'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -104,6 +107,7 @@ hold off; %legend(gca,'show');
 subplot(2,1,2);
 for ll=1:length(cal_names);
   lampstr = cal_names{ll};
+  if ~isfield(cal.(lampstr).nir,'t_ms'), continue, end
   for iint=1:length(cal.(lampstr).nir.t_ms);
     plot(nir.nm,cal.(lampstr).nir.resp(iint,:),'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).nir.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -127,6 +131,7 @@ resp.nir=cal.Lamps_9.nir.resp(3,:);
 subplot(2,1,1);
 for ll=1:length(cal_names);
   lampstr = cal_names{ll};
+  if ~isfield(cal.(lampstr).vis,'t_ms'), continue, end
   for iint=1:length(cal.(lampstr).vis.t_ms);
     plot(vis.nm,cal.(lampstr).vis.resp(iint,:)./resp.vis*100,'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).vis.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;
@@ -143,6 +148,7 @@ hold off; %legend(gca,'show');
 subplot(2,1,2);
 for ll=1:length(cal_names);
   lampstr = cal_names{ll};
+  if ~isfield(cal.(lampstr).nir,'t_ms'), continue, end
   for iint=1:length(cal.(lampstr).nir.t_ms);
     plot(nir.nm,cal.(lampstr).nir.resp(iint,:)./resp.nir*100,'DisplayName',[lampstr ' - int time:' sprintf('%-d',cal.(lampstr).nir.t_ms(iint)) ' ms']);
     if iint==1 && ll==1;

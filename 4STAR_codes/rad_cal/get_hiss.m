@@ -37,11 +37,13 @@
 %          - changed special rules for file type 20170803
 % Modified v1.4: by Samuel LeBlanc, Santa Cruz, 2024-06-20
 %          - Added special rule for .csv file from Alok Shresta (for 2024-05-21)
+% Modified v1.5: by Samuel LeBlanc, Santa Cruz, 2025-07-15
+%          - Added special rule for .csv file from Alok Shresta (for 2025-07-09)
 % -------------------------------------------------------------------------
 
 %% Start of function
 function [archi] = get_hiss(in)
-version_set('1.4');
+version_set('1.5');
 
 % 4STAR radiance cal after TCAP2 and before SEAC4RS
 % Source:    Hiss                                        (ARC High Output Sphere)                                                                           
@@ -124,6 +126,24 @@ if fid>2
             figure; plot(archi.nm, [archi.lamps_12,archi.lamps_9,archi.lamps_8,archi.lamps_7,archi.lamps_6,archi.lamps_5,...
         archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1],'-');
     legend('12 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp','0.5 lamp');
+    elseif dd==20250709 % for special file from 20250709
+      hlines = 1;
+      C=textscan(fid,'%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f','HeaderLines',hlines,'Delimiter','\n');
+      fclose(fid);
+      archi.fname = fname;
+      archi.nm = C{1};
+      archi.lamps_12 = C{13};       archi.lamps_11 = C{12};      
+      archi.lamps_10 = C{11};       archi.lamps_9 = C{10};      archi.lamps_8 = C{9};
+      archi.lamps_7 = C{8};      archi.lamps_6 = C{7};      archi.lamps_5 = C{6};
+      archi.lamps_4 = C{5};      archi.lamps_3 = C{4};      archi.lamps_2 = C{3};
+      archi.lamps_1 = C{2};      
+      archi.units = 'W/(m^2.sr.um)';
+      %archi.lamps_12_pct = C{9}./100;
+            figure; plot(archi.nm, [archi.lamps_12,archi.lamps_11,archi.lamps_10,archi.lamps_9,archi.lamps_8,archi.lamps_7,archi.lamps_6,archi.lamps_5,...
+        archi.lamps_4,archi.lamps_3,archi.lamps_2,archi.lamps_1],'-');
+    legend('12 lamps','11 lamps','10 lamps','9 lamps','8 lamps','7 lamps','6 lamps','5 lamps','4 lamps','3 lamps','2 lamps','1 lamp');
+    set(gca,'ColorOrder','factory')
+        
     elseif strcmp(ext,'.csv')
       C=textscan(fid,'%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f','HeaderLines',hlines,'Delimiter','\n');
       fclose(fid);

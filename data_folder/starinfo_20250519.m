@@ -66,7 +66,11 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
+<<<<<<< HEAD
 s.AODuncert_constant_extra = 0.03;
+=======
+s.AODuncert_constant_extra = 0.02;
+>>>>>>> 7d2c2c39632a94d241d538a3f9620a504eb64751
 % load ict MetNav data from Twin Otter ict
 s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250519_RA.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);

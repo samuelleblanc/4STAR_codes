@@ -112,12 +112,22 @@ for i=1:length(filenames);
                     [uu,iu,cu] = unique(s.t);
                     len_t = length(s.t);
                     if length(uu) ~= len_t %duplicate lines found
-                        note = [note; {['Duplicate lines found (N=' num2str(len_t-length(uu)) ') removing those from all fields']}];                        
-                        for fnn = fieldnames(s.vis_zen)
-                           if length(s.(fnn)) == len_t
-                              s.(fnn) = s.(fnn)(iu); %subset the fields hat have the same number of lines as the time to 
+                        note = [note; {['Duplicate lines found (N=' num2str(len_t-length(uu)) ') removing those from all fields']}];  
+                        if isfield(s,'vis_zen'), fnn = fieldnames(s.vis_zen); else fnn = fieldnames(s); end
+                        for ifnn = 1:length(fnn)
+                           if length(s.(fnn{ifnn})) == len_t
+                              s.(fnn{ifnn}) = s.(fnn{ifnn})(iu); %subset the fields hat have the same number of lines as the time to 
+                           else
+                               try
+                              [p,q] = size(s.(fnn{ifnn}));
+                              if p==len_t
+                                  s.(fnn{ifnn}) = s.(fnn{ifnn})(iu,:);
+                              end
+                               catch
+                                   disp(['... issue with ' fnn{ifnn} ])
+                               end
                            end
-                        end                       
+                        end         
                     end
                 
                     if isequal(type(end-2:end), 'sun') || isequal(type(end-2:end), 'zen')  || isequal(type(end-3:end), 'park') || isequal(type(end-3:end), 'forj') || isequal(type(end-4:end), 'track');

@@ -191,7 +191,6 @@ if plotting_langley_first
   end
 end
 
-
 %% prepare the gas 'gas'/'cwv' does not exist in starsun
 %% call the gas 'gas'/'cwv' if does not exist in starsun
 if isfield(s,'gas') && isfield(s,'cwv')
@@ -311,11 +310,15 @@ cls = 'krgbcmy';
 
 %% Check if navmet interpolation is needed
 if isfield(s,'NavMetfile')
+    for ii = 2:length(fld)
+        if length(st.(fld{ii}))>1
             try
-                st.vis_sun = interpol_MetNav(st.vis_sun,[getnamedpath('stardat'),s.NavMetfile]);
+                st.(fld{ii}) = interpol_MetNav(st.(fld{ii}),[getnamedpath('stardat'),s.NavMetfile]);
             catch
                 disp('error with interpol_MetNav')
             end
+        end
+    end
 end
 
 %********************

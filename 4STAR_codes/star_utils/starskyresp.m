@@ -160,12 +160,19 @@ switch instrumentname;
     case {'4STARB'}
         
         %warning('4STARB radiance response using old HISS values, and old fiber configuration')
-        if t< datenum([2017 07 15 0 0 0]);
-            daystr = '20170621';
-            filesuffix = 'from_4STARB_20170621_005_VIS_ZEN_with_20160121125700HISS';
+        if t>datenum([2025 4 21 0 0 0]);
+            %20250626_VIS_SKY_Resp_from_4STARB_20250626_007_VIS_ZEN_with_20250709_ARC_USS3600_CASE01_Radiance.dat
+            daystr = '20250626'; % placeholder at 2% lower for new files
+            filesuffix = 'from_4STARB_20250626_007_VIS_ZEN_with_20250709_ARC_USS3600_CASE01_Radiance';
+        elseif t>datenum([2024 5 21 0 0 0]);
+            daystr = '20240521';
+            filesuffix = 'from_4STARB_20240521_007_VIS_ZEN_with_20240516_ARC_USS3600_CASE01_Radiance';
         elseif t>= datenum([2017 07 15 0 0 0]);
             daystr = '20171102';
             filesuffix = 'from_4STARB_20171102_004_VIS_ZEN_with_20160121125700HISS';
+        elseif t< datenum([2017 07 15 0 0 0]);
+            daystr = '20170621';
+            filesuffix = 'from_4STARB_20170621_005_VIS_ZEN_with_20160121125700HISS';
         end;
     case {'2STAR'}
         warning('2STAR does not have a radiance measurement, returning nul arrays')

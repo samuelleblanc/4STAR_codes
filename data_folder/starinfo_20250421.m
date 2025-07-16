@@ -10,7 +10,7 @@ else
     s.toggle = update_toggle;
 end
 s.ground = [datenum(2025,04,21,19,06,22) datenum(2025,04,21,22,29,26)];
-%s.flight = [datenum(2024,10,30,18,16,28) datenum(2024,10,30,19,42,36)];
+s.flight = [datenum(2024,10,30,18,16,28) datenum(2024,10,30,19,42,36)];
 s.loose_aeronet_comparison = true;
 %s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];

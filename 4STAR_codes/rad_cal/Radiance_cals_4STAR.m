@@ -49,7 +49,7 @@
 
 %% Start of function
 function hiss_star_cals = Radiance_cals_4STAR
-version_set('1.2');
+version_set('1.3');
 
 %date='20131121'
 %date='20130506'
