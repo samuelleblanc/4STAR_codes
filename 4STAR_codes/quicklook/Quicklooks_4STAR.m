@@ -309,6 +309,15 @@ fld = {fld{strcmp(fld,'vis_sun')},fld{strcmp(fld,'vis_zen')},fld{~strcmp(fld,'vi
 fld_marks = '.+>^<vopx';
 cls = 'krgbcmy';
 
+%% Check if navmet interpolation is needed
+if isfield(s,'NavMetfile')
+            try
+                st.vis_sun = interpol_MetNav(st.vis_sun,[getnamedpath('stardat'),s.NavMetfile]);
+            catch
+                disp('error with interpol_MetNav')
+            end
+end
+
 %********************
 %% Plot the housekeeping data
 %********************

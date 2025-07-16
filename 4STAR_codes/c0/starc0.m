@@ -410,7 +410,10 @@ switch instrumentname;
         end;
         
     case{'4STARB'}
-        if t>datenum([2025 3 5 0 0 0]) % for AirSHARP 2025
+        if t>datenum([2025 5 1 0 0 0]) % for AirSHARP 2025
+            daystr = '20250606';
+            filesuffix = '4STARB_refined_averaged_good_AirSHARP_2025'; 
+        elseif t>datenum([2025 3 5 0 0 0]) % for pre campaign AirSHARP 2025
             daystr = '20250422';
             filesuffix = '4STARB_refined_averaged_good_AirSHARP_2025'; 
         elseif t>datenum([2024 9 30 0 0 0]) % for AirSHARP 2024

@@ -1156,10 +1156,10 @@ if pp~=length(s2.t);
       [rr,col] = size(s.(fld{fd}));
       if rr == st_len && col==1
          s.(fld{fd}) = s.(fld{fd})(ainb);
-         s2.(fld{fd}) = s2.(fld{fd})(bina);
+         if isfield(s2,fld{fd}), s2.(fld{fd}) = s2.(fld{fd})(bina); end
       elseif rr==st_len && col == length(s.w)
          s.(fld{fd}) = s.(fld{fd})(ainb,:);
-         s2.(fld{fd}) = s2.(fld{fd})(bina,:);
+         if isfield(s2,fld{fd}), s2.(fld{fd}) = s2.(fld{fd})(bina,:); end
       end
    end
    
