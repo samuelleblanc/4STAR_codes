@@ -9,22 +9,20 @@ if isfield(s, 'toggle')
 else
     s.toggle = update_toggle;
 end
-s.ground = [datenum(2025,06,26,20,34,47) datenum(2025,06,26,20,46,11)];
-s.flight = [datenum(2025,06,26,20,34,47) datenum(2025,06,26,20,46,11)];
+s.ground = [datenum(2025,06,26,22,46,09) datenum(2025,06,26,23,04,46)];
+s.flight = [datenum(2025,06,26,22,46,09) datenum(2025,06,26,23,04,46)];
 s.loose_aeronet_comparison = true;
-%s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
+s.langley1 = [datenum(2025,06,26,22,46,09) datenum(2025,06,26,23,04,46)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
-%            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-s.aeronet_valid_time = [[datenum(2025,05,19,17,35,30) datenum(2025,05,19,18,45,15)]]
-	               % [datenum(2025,05,15,21,0,30) datenum(2025,05,15,21,5,15)]];
+%s.aeronet_valid_time = [[datenum(2025,05,19,17,35,30) datenum(2025,05,19,18,45,15)]]
 s.sd_aero_crit=0.008;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
              
 % Ozone and other gases 
 s.O3h=21; %  
-s.O3col=0.315; %From SUOMI NPP / OMPS over Ames
+s.O3col=0.348; %From SUOMI NPP / OMPS over Ames
 Loschmidt= 2.686763e19; %molecules/cm2
-s.NO2col=0.037 % from TEMPO tropospheric NO2 in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
+s.NO2col=0.0658 % from TEMPO tropospheric NO2 in DU %7.134e-2*(Loschmidt/1000); %  5.883e-2 DU from Mauna Loa Pandora
 % s.dirty = [datenum(2018,10,06,7,35,0) datenum(2018,10,06,7,45,0)];
 % s.clean = [datenum(2018,10,06,7,50,49) datenum(2018,10,06,7,58,56)];
 % s.ground = [datenum(2022,06,30,13,47,57) datenum(2022,06,30,17,26,28)];
@@ -66,15 +64,15 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
-s.AODuncert_constant_extra = 0.03;
+%s.AODuncert_constant_extra = 0.03;
 % load ict MetNav data from Twin Otter ict
-s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250510_RA.ict';
+%s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250510_RA.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
-try
-	        s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
-catch
-	        disp('error with interpol_MetNav')
-end
+%try
+%	        s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+%catch
+%	        disp('error with interpol_MetNav')
+%end
 if isfield(s, 'Pst') 
     %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
     s.Pst(find(s.Pst<10))=1013; %for Marina Airport

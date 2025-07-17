@@ -321,7 +321,6 @@ if isfield(s,'NavMetfile')
     end
 end
 
-
 %********************
 %% Plot the housekeeping data
 %********************

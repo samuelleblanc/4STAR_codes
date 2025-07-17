@@ -125,15 +125,16 @@ end
 a = aeronet_read_lev_v3([apname afile]);
 
 %% filter out the bad aod 4STAR
+t_mask = filter_by_valid_times(t, valid_time);
 if ~loose_aeronet_comparison
     i = (rawrelstd(:,1) < 0.008)&(tau_aero_noscreening(:,400)<4.0)&(tau_aero_noscreening(:,1503)>(-0.02))&(tau_aero_noscreening(:,400)>0.0)& ...
-    (Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
+    (Alt>(a.elev-max_alt_diff))&(Alt<(a.elev+max_alt_diff)) & t_mask; %(t>=valid_time(1)) & (t<=valid_time(2));
 elseif loose_aeronet_comparison>1
     i = (rawrelstd(:,1) < 0.008)&(~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))& ...
-        (Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
+        (Alt<(a.elev+max_alt_diff)) & t_mask;%(t>=valid_time(1)) & (t<=valid_time(2));
 else
     i = (~isnan(tau_aero_noscreening(:,400)))&(~isnan(tau_aero_noscreening(:,1503)))&(tau_aero_noscreening(:,400)>-4.0)&(Alt>(a.elev-max_alt_diff))& ...
-        (Alt<(a.elev+max_alt_diff)) & (t>=valid_time(1)) & (t<=valid_time(2));
+        (Alt<(a.elev+max_alt_diff)) & t_mask; %(t>=valid_time(1)) & (t<=valid_time(2));
 end
 %% knnsearch to find the closest times to compare aeronet and 4STAR data
 % make sure to only have unique valuesSL331125766198
@@ -464,3 +465,14 @@ function m = rms(x)
     n = length(x);
     m=sqrt(1/n.*(sum(x.^2)));
 return
+
+function mask = filter_by_valid_times(time_array, valid_times)
+    if isvector(valid_times) && length(valid_times) == 2
+        valid_times = reshape(valid_times, 1, 2);
+    end
+    mask = false(size(time_array));
+    for i = 1:size(valid_times, 1)
+        mask = mask | (time_array >= valid_times(i,1) & time_array <= valid_times(i,2));
+    end
+return
+

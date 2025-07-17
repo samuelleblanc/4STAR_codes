@@ -15,7 +15,7 @@ s.loose_aeronet_comparison = true;
 %s.langley1 = [datenum(2024,10,07,20,42,11) datenum(2024,10,07,23,30,27)];
 %s.langley2 = [datenum(2022,05,09,1,10,00) datenum(2022,05,09,2,40,0)];
 %            s.flight=[datenum(2017,8,31,07,59,14) datenum(2017,8,31,15,52,10)]; 
-s.aeronet_valid_time = [[datenum(2025,05,19,17,35,30) datenum(2025,05,19,18,45,15)]]
+%s.aeronet_valid_time = [[datenum(2025,05,19,17,35,30) datenum(2025,05,19,18,45,15)]]
 	               % [datenum(2025,05,15,21,0,30) datenum(2025,05,15,21,5,15)]];
 s.sd_aero_crit=0.008;  
 % s.xtra_langleyfilesuffix = 'MLO_May2022_Day9';
@@ -66,15 +66,15 @@ if isfield(s,'instrumentname')
     end
 end
 % window deposition
-s.AODuncert_constant_extra = 0.03;
+%s.AODuncert_constant_extra = 0.03;
 % load ict MetNav data from Twin Otter ict
-s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250510_RA.ict';
+%s.NavMetfile = 'AirSHARP-MetNav-1Hz_AirSHARP-TO_20250510_RA.ict';
 %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
-try
-	        s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
-catch
-	        disp('error with interpol_MetNav')
-end
+%try
+%	        s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
+%catch
+%	        disp('error with interpol_MetNav')
+%end
 if isfield(s, 'Pst') 
     %s = interpol_MetNav(s,[getnamedpath('stardat'),s.NavMetfile]);
     s.Pst(find(s.Pst<10))=1013; %for Marina Airport
