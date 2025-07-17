@@ -97,6 +97,7 @@ s.skyresp = [visresp,nirresp];
 
 disp('...applying response function to get the radiances (rad)')
 s.i_sky = [find(s.Md==7)-6;find(s.Md==7)-5;find(s.Md==7)-4]; % issue with the mode for these hybrid measurements. 
+s.i_sky = s.i_sky(s.i_sky>1);
 s.rad = zeros(length(s.i_sky),length(s.w));
 disp(['... found ' num2str(length(s.i_sky)) ' number of radiance points in starsun'])
 for i=1:length(s.i_sky)
