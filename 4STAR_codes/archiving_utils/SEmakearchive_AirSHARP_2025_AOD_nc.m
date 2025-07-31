@@ -34,10 +34,13 @@ function SEmakearchive_AirSHARP_2025_AOD_nc
 % Written (v1.0): Samuel LeBlanc, Santa Cruz, CA, 2025-06-27
 %                 based on over from SEmakearchive_ORACLES_2018_zenrad.m
 %                 modified from SEmakearchive_AirSHARP_2025_AOD_nc
+% Modified (v1.1): Samuel LeBlanc, Santa Cruz, CA, 2025-07-31
+%                  Modifications to save file to respond to Kristina
+%                   Pistone's comments from email on 07-21
 % -------------------------------------------------------------------------
 
 %% Start the code
-version_set('v1.0')
+version_set('v1.1')
 
 %% set variables
 starinfo_path = starpaths; %'C:\Users\sleblan2\Research\4STAR_codes\data_folder\';
@@ -63,9 +66,9 @@ HeaderInfo.DM_Contact_info = 'Samuel LeBlanc, samuel.leblanc@nasa.gov; Kristina 
 HeaderInfo.Project_info = 'AirSHARP 2025 deployment for PACE validation; May 2025; Based out of Marina, CA';
 HeaderInfo.STIPULATIONS_ON_USE = 'This is the initial public release of the 4STAR-AOD data set. We strongly recommend that you consult the PI, both for updates to the data set, and for the proper and most recent interpretation of the data for specific science use.';...
 %HeaderInfo.R0_comments = 'Final calibrations, the data is subject to uncertainties associated with detector stability, transfer efficiency of light through fiber optic cable, cloud screening, diffuse light, deposition on the front windows. Potential of higher uncertainty at wavelengths between 390 nm - 430 nm.';
-HeaderInfo.RA_comments = 'Initial field release of the 4STARB-AOD data. The data is subject to uncertainties associated with cloud screening and deposition on the front windows, beyond what is reported in the uncertainties. Included here is a subset of the measured wavelenghts that area least impacted by probable uncertainties. Please contact for other wavelengths in the range of 355 - 1650 nm.';
+HeaderInfo.RA_comments = 'Initial field release of the 4STARB-AOD data. The data is subject to uncertainties associated with cloud screening and deposition on the front windows, beyond what is reported in the uncertainties. Included here is a subset of the measured wavelengths that area least impacted by probable uncertainties. Please contact for other wavelengths in the range of 355 - 1650 nm.';
 HeaderInfo.R0_comments = 'Initial public release of the 4STARB-AOD data. Using the MetNAV R0 files. Uncertainty comments from RA remains.';
-HeaderInfo.Data_uncertainty = 'AOD uncertainty included in file is based on calibration coefficient variance, airmass factor changes and uncertainty, tracking uncertainty, trace gas optical depth contamination, and window deposition, see LeBlanc et al. 2020 for some details';
+HeaderInfo.Data_uncertainty = 'AOD uncertainty included in file is based on calibration coefficient variance, airmass factor changes and uncertainty, tracking uncertainty, trace gas optical depth contamination, and window deposition, see LeBlanc et al. 2020 for some details.';
 
 %% Prepare the information/attributes for each saved variable
 info.Latitude.units  = 'deg North';
@@ -137,8 +140,22 @@ for i=idx_file_proc
 
     %% get the special comments
     switch daystr
-        case '20241007'
-            HeaderInfo.Special_comments = 'Twin Otter Check flight.';
+        case '20250505'
+            HeaderInfo.Special_comments = 'Second Sortie only available here due to instrument issues on takeoff of first Sortie.';
+        case '20250508'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
+        case '20250509'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage..';
+        case '20250510'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
+        case '20250514'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
+        case '20250515'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
+        case '20250518'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
+        case '20250519'
+            HeaderInfo.Special_comments = 'New hybrid instrument mode operating as a stand-in to C-AIR L_i (sky radiance at 40deg) - expected increased uncertainty and reduced data coverage.';
         otherwise
             HeaderInfo.Special_comments = '';
     end
@@ -229,6 +246,10 @@ for i=idx_file_proc
     if any(ihigh_uncert)
         data.qual_flag = bitor(data.qual_flag,cast(ihigh_uncert,'int8'));
     end
+    ihigh_uncert_nir = data.AOD_uncertainty(:,iw1040)>0.15;
+    if any(ihigh_uncert_nir)
+        data.qual_flag = bitor(data.qual_flag,cast(ihigh_uncert_nir,'int8'));
+    end
     ihigh_aod = data.AOD(:,iw500)>1.5;
     if any(ihigh_aod)
         data.qual_flag = bitor(data.qual_flag,cast(ihigh_aod,'int8'));
@@ -239,13 +260,33 @@ for i=idx_file_proc
         data.qual_flag = bitor(data.qual_flag,cast(ilow_aod,'int8'));
     end
     
+    ilow_aod_vis = data.AOD(:,iw500)<-0.02;
+    if any(ilow_aod_vis)
+        data.qual_flag = bitor(data.qual_flag,cast(ilow_aod_vis,'int8'));
+    end
+    
+    %% Specialty cases for filtering out issues on certain dates
+    switch daystr
+        case '20250505'
+            ibad = (data.UTC_time > 22.39) & (data.UTC_time < 22.45) & (data.AOD(:,iw500)>0.12);
+            if any(ibad), data.qual_flag = bitor(data.qual_flag,cast(ibad,'int8')); end
+        case '20250514'
+            ibad = (data.UTC_time > 20.17) & (data.UTC_time < 21.35) & (data.AOD(:,iw500)>0.27);
+            if any(ibad), data.qual_flag = bitor(data.qual_flag,cast(ibad,'int8')); end
+        case '20250515'
+            ibad = (data.UTC_time > 18.6) & (data.UTC_time < 18.7) & (data.AOD(:,iw500)>0.25);
+            if any(ibad), data.qual_flag = bitor(data.qual_flag,cast(ibad,'int8')); end
+        otherwise
+            
+    end
+    
     %% extract special comments about response functions from note
     calComments = {};
     if ~isempty(strfind(s.note, 'C0'));
         temp_cells = strfind(s.note,'C0');
         inote = find(not(cellfun('isempty',temp_cells)));
         for n=1:length(inote);
-            calComments{end+1} = [strrep(s.note{inote(n)},'Co from','Using the C0 calibration file: ') '\n'];
+            calComments{end+1} = [strrep(s.note{inote(n)},'Co from','Using the C0 calibration file, based on Marina_Airport_CA Aeronet comparisons: ') '\n'];
         end
     end
     
