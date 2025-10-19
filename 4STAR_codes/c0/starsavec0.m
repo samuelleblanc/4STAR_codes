@@ -15,9 +15,19 @@ function starsavec0(filename, source, additionalnotes, w, c0, c0unc)
 % Connor, 2018-08-25: replace "exist" syntax with "isavar" for
 % back-compatability
 % prohibit overwriting, because keeping records of c0 files is important
-if isavar(filename);
-    error([filename ' exists.']);
-end;
+while isafile(filename);
+    [pname, fname, ext] = fileparts(filename); pname = [pname, filesep];
+
+    emanf = fliplr(fname); [mun,emanf] = strtok(emanf,'_'); num=sscanf('%d',fliplr(mun));
+    if isempty(num) 
+        num=1;
+        fname = [fname, '_'];
+    else        
+        fname = fliplr(emanf);
+    end
+    num = num+1;
+    filename = [pname, fname, num2str(num), ext];
+end
 
 % determine the data type
 if ~isempty(findstr(upper(filename), 'VIS'));

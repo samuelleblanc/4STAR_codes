@@ -112,11 +112,7 @@ else
                 end
             end
             if ~isadir(pname)
-<<<<<<< Updated upstream
-                pname = pwd;
-=======
                 pname = pwd; pname = [pname, filesep]; pname = strrep(pname, [filesep filesep], filesep);
->>>>>>> Stashed changes
             end
             pname = [pname, filesep,'..',filesep];
             if pickdir
